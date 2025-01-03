@@ -16,7 +16,7 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "Reactor Finance",
-  description: "Native DEX on Abstract chain.",
+  description: "Native DEX on Monad chain.",
 };
 
 export default function RootLayout({
