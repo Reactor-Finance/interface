@@ -1,4 +1,9 @@
-import { RainbowKitProvider, darkTheme, getDefaultConfig } from "@rainbow-me/rainbowkit";
+"use client";
+import {
+  RainbowKitProvider,
+  darkTheme,
+  getDefaultConfig,
+} from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { abstractTestnet } from "wagmi/chains";
 import { hashFn } from "@wagmi/core/query";
@@ -10,27 +15,29 @@ const web3Config = getDefaultConfig({
   appName: "Reactor Finance",
   projectId: "WALLET_CONNECT_PROJECT_ID_HERE",
   ssr: true,
-  chains: [abstractTestnet]
+  chains: [abstractTestnet],
 });
 
 const queryClient = new QueryClient({
   defaultOptions: {
-      queries: {
-          queryKeyHashFn: hashFn,
-      },
+    queries: {
+      queryKeyHashFn: hashFn,
+    },
   },
 });
 
 export const Providers: FC<PropsWithChildren> = ({ children }) => {
-  return (<WagmiProvider config={web3Config}>
-    <QueryClientProvider client={queryClient}>
-      <RainbowKitProvider theme={darkTheme()}>
-        <NextUIProvider className="flex min-h-svh flex-col w-screen">
-          {/* Header goes here */}
-          {children}
-          {/* Footer goes here */}
-        </NextUIProvider>
-      </RainbowKitProvider>
-    </QueryClientProvider>
-  </WagmiProvider>)
-}
+  return (
+    <WagmiProvider config={web3Config}>
+      <QueryClientProvider client={queryClient}>
+        <RainbowKitProvider theme={darkTheme()}>
+          <NextUIProvider className="flex min-h-svh w-screen flex-col">
+            {/* Header goes here */}
+            {children}
+            {/* Footer goes here */}
+          </NextUIProvider>
+        </RainbowKitProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
+  );
+};
