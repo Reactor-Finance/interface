@@ -26,7 +26,7 @@ export default function Home() {
                   onFocus={() => setIsFocused(true)}
                   onBlur={() => setIsFocused(false)}
                   type="text"
-                  className="bg-transparent font-geistMono placeholder:text-gray-400 focus:outline-none"
+                  className="w-full bg-transparent font-geistMono placeholder:text-gray-400 focus:outline-none"
                   placeholder="Search by name or symbol"
                 />
               </div>
