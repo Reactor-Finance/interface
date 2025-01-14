@@ -1,5 +1,6 @@
 "use client";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
 import { Search } from "lucide-react";
 import { useState } from "react";
 export default function Home() {
@@ -7,9 +8,13 @@ export default function Home() {
   return (
     <div className="min-h-screen w-screen font-geistMono ">
       <Dialog>
-        <DialogTrigger>Open</DialogTrigger>
-        <DialogContent className="w-[440px] bg-[#1a1a1a] p-0 text-white">
-          <div className="relative h-[80vh] space-y-6 pt-4 text-white">
+        <div className="flex w-full justify-center py-4">
+          <DialogTrigger className="border border-black p-2">
+            Open
+          </DialogTrigger>
+        </div>
+        <DialogContent className="w-[440px] overflow-hidden border-none bg-[#1a1a1a] p-0 text-white">
+          <div className="relative  h-[80vh] space-y-6 pt-4 text-white">
             <div className="space-y-6 px-6">
               <h1 className="font-geistMono">Select a token</h1>
               <div
@@ -26,9 +31,11 @@ export default function Home() {
                 />
               </div>
             </div>
-            <div className="relative h-[calc(100%-160px)] border-t border-gray-500 px-6 pt-4">
-              <h2 className="text-sm text-[#999999]">Tokens (229)</h2>
-              <div className="-mb-[40px] h-full  space-y-4 overflow-y-auto pt-3">
+            <div className="relative z-0 h-[calc(100%-184px)] border-t border-gray-600 px-6 ">
+              <h2 className="py-3 font-geistMono text-[14px] text-[#999999]">
+                Tokens (229)
+              </h2>
+              <div className=" h-[calc(100%-22px)] space-y-4  overflow-y-auto pb-2">
                 <TokenItem />
                 <TokenItem />
                 <TokenItem />
@@ -45,9 +52,13 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="rounded-bl-md rounded-br-[15px] border-b border-white bg-black">
-              {" "}
-              <span>Only show verified tokens</span>
+            <div className="z-10  rounded-bl-md rounded-br-[15px] border-t border-gray-600  bg-[#1a1a1a] px-10 py-2">
+              <div className="flex items-center justify-between">
+                <span className="font-geistMono text-gray-300">
+                  Only show verified tokens
+                </span>
+                <Switch id="airplane-mode" />
+              </div>
             </div>
           </div>
         </DialogContent>
@@ -58,7 +69,7 @@ export default function Home() {
 
 function TokenItem() {
   return (
-    <div className="flex justify-between rounded-md bg-[#262626] px-4 py-2">
+    <div className="mb-2 flex justify-between rounded-md bg-[#262626] px-4 py-2">
       <div className="flex items-center gap-x-2">
         <div className="h-10 w-10 rounded-full bg-white font-geistMono"></div>
         <div>
