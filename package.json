@@ -12,12 +12,10 @@
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
-      "eslint --fix",
-      "prettier --write"
+      "eslint --fix"
     ],
     "*.css": [
-      "stylelint '**/*.css' --fix  --stdin",
-      "prettier --write"
+      "stylelint '**/*.css' --fix  --stdin"
     ]
   },
   "commitlint": {
