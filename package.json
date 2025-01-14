@@ -9,7 +9,8 @@
     "lint": "next lint",
     "prepare": "husky install",
     "prettier-check": "prettier ./src --check",
-    "test": "jest"
+    "test": "jest",
+    "type-check": "tsc --noEmit --incremental"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -28,6 +29,7 @@
     "@radix-ui/react-switch": "^1.1.2",
     "@rainbow-me/rainbowkit": "^2.2.0",
     "@tanstack/react-query": "^5.59.20",
+    "@wagmi/core": "^2.16.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^11.11.13",
