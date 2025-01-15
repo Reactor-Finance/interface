@@ -38,11 +38,11 @@ export default function Home() {
                 />
               </div>
             </div>
-            <div className="relative z-0 h-[calc(100%-184px)] border-t border-gray-600 px-6 ">
-              <h2 className="py-3 font-geistMono text-[14px] text-[#999999]">
+            <div className="relative z-0 h-[calc(100%-184px)] border-t border-gray-600  ">
+              <h2 className="py-3 font-geistMono text-[14px] text-[#999999] pl-6">
                 Tokens (229)
               </h2>
-              <div className=" h-[calc(100%-22px)] space-y-4  overflow-y-auto pb-2">
+              <div className=" h-[calc(100%-22px)] space-y-4 scrollbar overflow-y-auto pb-2 px-6">
                 <TokenItem />
                 <TokenItem />
                 <TokenItem />
