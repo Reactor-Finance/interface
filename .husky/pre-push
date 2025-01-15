@@ -1,1 +1,2 @@
-yarn test
+pnpm test
+pnpm type-check
