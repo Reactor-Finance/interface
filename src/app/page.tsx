@@ -20,8 +20,10 @@ export default function Home() {
         >
           <div className="relative  h-[80vh] space-y-6 pt-4 text-white">
             <div className="space-y-6 px-6">
-              <DialogTitle>Select a token</DialogTitle>
-              <h1 className="font-geistMono">Select a token</h1>
+              <DialogTitle className="font-geistMono">
+                Select a token
+              </DialogTitle>
+              {/* <h1 className="font-geistMono">Select a token</h1> */}
               <div
                 data-focused={isFocused ? "focused" : "not-focused"}
                 className="flex gap-x-3 rounded-md border p-2 outline-1  data-[focused=focused]:outline data-[focused=focused]:outline-white"
