@@ -1,6 +1,7 @@
 "use client";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
+import { DialogTitle } from "@radix-ui/react-dialog";
 import { Search } from "lucide-react";
 import { useState } from "react";
 export default function Home() {
@@ -13,9 +14,13 @@ export default function Home() {
             Open
           </DialogTrigger>
         </div>
-        <DialogContent className="w-[440px] overflow-hidden border-none bg-[#1a1a1a] p-0 text-white">
+        <DialogContent
+          title="Search Tokens"
+          className="w-[440px] overflow-hidden border-none bg-[#1a1a1a] p-0 text-white"
+        >
           <div className="relative  h-[80vh] space-y-6 pt-4 text-white">
             <div className="space-y-6 px-6">
+              <DialogTitle>Select a token</DialogTitle>
               <h1 className="font-geistMono">Select a token</h1>
               <div
                 data-focused={isFocused ? "focused" : "not-focused"}
