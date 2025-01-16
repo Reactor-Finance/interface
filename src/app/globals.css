@@ -36,7 +36,22 @@ body {
     --gray-600: 0, 0%, 20%;
     --gray-400: 0, 0%, 60%;
 
+    light-blue-100: 195, 97%, 73%;
+    light-blue-600: 195, 97%, 50%;
+
+    red-100: 0, 98%, 62%;
+    red-600: 0, 98%, 62%;
+
+    yellow-100: 48, 96%, 53%;
+    yellow-600: 48, 96%, 16%;
+
+    green-100: 142, 69%, 58%;
+    green-600: 142, 69%, 22%;
+
+    purple-100: 249, 92%, 70%;
+    purple-600: 249, 92%, 19%;
     /* shadcn component colors */
+
     --card: 0 0% 100%;
     --card-foreground: 0 0% 3.9%;
     --popover: 0 0% 100%;

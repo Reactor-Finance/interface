@@ -28,6 +28,27 @@ export default {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
         },
+
+        ["light-blue"]: {
+          100: "hsl(var(--gray-100), <alpha-value>)",
+          600: "hsl(var(--gray-600), <alpha-value>)",
+        },
+        ["purple"]: {
+          100: "hsl(var(--gray-100), <alpha-value>)",
+          600: "hsl(var(--gray-600), <alpha-value>)",
+        },
+        ["red"]: {
+          100: "hsl(var(--gray-100), <alpha-value>)",
+          600: "hsl(var(--gray-600), <alpha-value>)",
+        },
+        ["green"]: {
+          100: "hsl(var(--gray-100), <alpha-value>)",
+          600: "hsl(var(--gray-600), <alpha-value>)",
+        },
+        ["yellow"]: {
+          100: "hsl(var(--gray-100), <alpha-value>)",
+          600: "hsl(var(--gray-600), <alpha-value>)",
+        },
         gray: {
           100: "hsl(var(--gray-100), <alpha-value>)",
           200: "hsl(var(--gray-200), <alpha-value>)",
