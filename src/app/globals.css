@@ -33,6 +33,7 @@ body {
     --gray-900: 0, 0%, 10%;
     --gray-800: 0, 0%, 12%;
     --gray-700: 0, 0%, 15%;
+    --gray-600: 0, 0%, 20%;
     --gray-400: 0, 0%, 60%;
 
     /* shadcn component colors */
