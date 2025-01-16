@@ -10,7 +10,7 @@ export default function Home() {
     <div className="min-h-screen w-screen font-geistMono ">
       <Dialog>
         <div className="flex w-full justify-center py-4">
-          <DialogTrigger className="border border-black p-2">
+          <DialogTrigger className="border p-2 border-white text-white">
             Open
           </DialogTrigger>
         </div>
@@ -26,7 +26,7 @@ export default function Home() {
               {/* <h1 className="font-geistMono">Select a token</h1> */}
               <div
                 data-focused={isFocused ? "focused" : "not-focused"}
-                className="flex gap-x-3 rounded-md border p-2 outline-1  data-[focused=focused]:outline data-[focused=focused]:outline-white"
+                className="flex gap-x-3 bg-gray-800 rounded-md p-2 outline-1  data-[focused=focused]:outline data-[focused=focused]:outline-white"
               >
                 <Search className="text-gray-400" />
                 <input
@@ -76,7 +76,7 @@ export default function Home() {
 
 function TokenItem() {
   return (
-    <div className="mb-2 flex justify-between rounded-md bg-[#262626] px-4 py-2">
+    <div className="mb-2 flex justify-between rounded-md bg-gray-800 px-4 py-2">
       <div className="flex items-center gap-x-2">
         <div className="h-10 w-10 rounded-full bg-white font-geistMono"></div>
         <div>
