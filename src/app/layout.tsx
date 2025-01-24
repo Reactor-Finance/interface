@@ -3,7 +3,12 @@ import type { Metadata } from "next";
 import { Providers } from "./providers";
 import { JetBrains_Mono } from "next/font/google";
 
-const jetbrainsMono = JetBrains_Mono({});
+const jetbrainsMono = JetBrains_Mono({
+  weight: ["100", "200", "300", "500", "400", "600", "700", "800"],
+  display: "swap",
+  subsets: ["latin"],
+  variable: "--jetbrains-font",
+});
 
 export const metadata: Metadata = {
   title: "Reactor Finance",
@@ -17,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={` ${jetbrainsMono.className} antialiased`}>
+      <body className={`${jetbrainsMono.variable} antialiased`}>
         <Providers>
           <main className="flex-1">{children}</main>
         </Providers>
