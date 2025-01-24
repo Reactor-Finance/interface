@@ -12,6 +12,8 @@ export default {
       fontFamily: {
         geistMono: ["var(--font-geist-mono)"],
       },
+      margin: {},
+      padding: { xs: "px-4", xxs: "8px", sm: "12px" },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
@@ -24,21 +26,22 @@ export default {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
         },
+
         yellow: "hsl(var(--yellow), <alpha-value>)",
         ["blue-light"]: "hsl(var(--blue-light), <alpha-value>)",
         ["pink"]: "hsl(var(--pink), <alpha-value>)",
         neutral: {
-          100: "hsl(var(--grey-100), <alpha-value>)",
-          200: "hsl(var(--grey-200), <alpha-value>)",
-          300: "hsl(var(--grey-300), <alpha-value>)",
-          400: "hsl(var(--grey-400), <alpha-value>)",
-          500: "hsl(var(--grey-500), <alpha-value>)",
-          600: "hsl(var(--grey-600), <alpha-value>)",
-          700: "hsl(var(--grey-700), <alpha-value>)",
-          800: "hsl(var(--grey-800), <alpha-value>)",
-          900: "hsl(var(--grey-900), <alpha-value>)",
-          950: "hsl(var(--grey-950), <alpha-value>)",
-          1000: "hsl(var(--grey-1000), <alpha-value>)",
+          100: "hsl(var(--neutral-100), <alpha-value>)",
+          200: "hsl(var(--neutral-200), <alpha-value>)",
+          300: "hsl(var(--neutral-300), <alpha-value>)",
+          400: "hsl(var(--neutral-400), <alpha-value>)",
+          500: "hsl(var(--neutral-500), <alpha-value>)",
+          600: "hsl(var(--neutral-600), <alpha-value>)",
+          700: "hsl(var(--neutral-700), <alpha-value>)",
+          800: "hsl(var(--neutral-800), <alpha-value>)",
+          900: "hsl(var(--neutral-900), <alpha-value>)",
+          950: "hsl(var(--neutral-950), <alpha-value>)",
+          1000: "hsl(var(--neutral-1000), <alpha-value>)",
         },
 
         blue: {
