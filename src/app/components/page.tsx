@@ -4,7 +4,7 @@ import Headers from "@/components/ui/headers";
 
 export default function Page() {
   return (
-    <div className="py-10 mx-auto w-[1500px]">
+    <div className="py-10 mx-auto w-[880px] 2xl:w-[1500px]">
       <div className="space-y-4">
         <Headers.GradiantHeaderOne colorOne="#A0055D" colorTwo="#836EF9F2">
           Dashboard
