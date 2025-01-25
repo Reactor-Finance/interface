@@ -1,3 +1,4 @@
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Headers from "@/components/ui/headers";
@@ -88,6 +89,25 @@ export default function Page() {
               Full
             </Badge>
           </div>
+        </div>
+        <div className="w-[400px] space-y-4">
+          <Alert>
+            <AlertDescription>
+              <p className="text-[12px] ">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                Molestiae commodi quidem similique sed asperiores harum ullam
+              </p>
+            </AlertDescription>
+          </Alert>
+
+          <Alert colors={"error"}>
+            <AlertDescription>
+              <p className="text-[12px] ">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                Molestiae commodi quidem similique sed asperiores harum ullam
+              </p>
+            </AlertDescription>
+          </Alert>
         </div>
       </div>
     </div>
