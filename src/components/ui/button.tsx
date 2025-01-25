@@ -20,6 +20,7 @@ const buttonVariants = cva(
         sm: "h-9 py-xxs px-sm rounded-md  text-[12px] leading-[16px] font-medium",
         xs: "h-9 py-xs px-xxs rounded-md  text-[12px] leading-[16px] font-medium",
         md: "px-4 rounded-md text-md leading-[20px] py-[10px]",
+        submit: "py-3 w-full",
       },
     },
     defaultVariants: {

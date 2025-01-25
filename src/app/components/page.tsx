@@ -63,6 +63,12 @@ export default function Page() {
               Button
             </Button>
           </div>
+
+          <div className="w-[300px]">
+            <Button variant={"primary"} size="submit">
+              Submit
+            </Button>
+          </div>
         </div>
         <div className="flex gap-x-4">
           <Badge colors="success" border="one">
