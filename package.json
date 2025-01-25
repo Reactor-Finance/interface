@@ -14,7 +14,7 @@
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
-      "eslint --fix"
+      "eslint_d --fix"
     ]
   },
   "commitlint": {
@@ -25,6 +25,7 @@
   "dependencies": {
     "@nextui-org/react": "^2.4.8",
     "@radix-ui/react-dialog": "^1.1.4",
+    "@radix-ui/react-hover-card": "^1.1.5",
     "@radix-ui/react-select": "^2.1.4",
     "@radix-ui/react-slot": "^1.1.1",
     "@radix-ui/react-switch": "^1.1.2",
@@ -64,6 +65,7 @@
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "15.0.3",
+    "eslint_d": "^14.3.0",
     "husky": "^9.1.7",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
