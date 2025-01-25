@@ -1,5 +1,6 @@
 import React, { ReactNode } from "react";
-
+import Image from "next/image";
+import questionMark from "@/assets/question-mark.svg";
 function GradiantHeaderOne({
   colorOne,
   colorTwo,
@@ -22,7 +23,12 @@ function GradiantHeaderOne({
 }
 
 function InfoHeaderTwo({ children }: { children: ReactNode }) {
-  return <h1 className={`font-medium text-2xl`}>{children}</h1>;
+  return (
+    <h1 className={`flex items-center gap-x-2 font-medium text-2xl`}>
+      <span>{children}</span>
+      <Image src={questionMark} alt="question mark" />
+    </h1>
+  );
 }
 const Headers = {
   GradiantHeaderOne,
