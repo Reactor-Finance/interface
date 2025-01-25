@@ -9,7 +9,15 @@ export default function Page() {
         <Headers.GradiantHeaderOne colorOne="#A0055D" colorTwo="#836EF9F2">
           Dashboard
         </Headers.GradiantHeaderOne>
-        <Headers.InfoHeaderTwo>Info Header</Headers.InfoHeaderTwo>
+        <Headers.InfoHeaderTwo
+          popupContent={
+            <div>
+              <p>Info about something...</p>
+            </div>
+          }
+        >
+          Info Header
+        </Headers.InfoHeaderTwo>
         <div className="flex flex-col gap-y-4">
           <div>
             <Button variant={"outline"} size="md">
