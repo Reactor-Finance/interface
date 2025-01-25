@@ -10,9 +10,11 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          "bg-primary-400/15  text-primary-400 disabled:text-neutral-300 disabled:bg-neutral-900 ",
-        outline: "border border-neutral-900 text-neutral-100",
-        filled: "border border-neutral-900 text-white bg-neutral-950",
+          "bg-primary-400/15 hover:bg-primary-400/20  text-primary-400 disabled:text-neutral-300 disabled:bg-neutral-900 ",
+        outline:
+          "border border-neutral-900 text-neutral-100 hover:bg-neutral-900",
+        filled:
+          "border border-neutral-900 text-white hover:bg-neutral-800 bg-neutral-950",
       },
       size: {
         sm: "h-9 py-xxs px-sm rounded-md  text-[12px] leading-[16px] font-medium",
