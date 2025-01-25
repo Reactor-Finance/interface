@@ -2,6 +2,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Headers from "@/components/ui/headers";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Page() {
   return (
@@ -115,6 +116,41 @@ export default function Page() {
             </AlertDescription>
           </Alert>
         </div>
+        <Tabs>
+          <TabsList colors={"muted"}>
+            <TabsTrigger value="account">Account</TabsTrigger>
+            <TabsTrigger value="password">Password</TabsTrigger>
+            <TabsTrigger value="passwordi">lOrem</TabsTrigger>
+          </TabsList>
+        </Tabs>
+        <p>Full</p>
+        <div className="w-[600px]">
+          <Tabs>
+            <TabsList border={"border-1"} display={"grow"}>
+              <TabsTrigger display={"grow"} value="account">
+                Account
+              </TabsTrigger>
+              <TabsTrigger display={"grow"} value="password">
+                Password
+              </TabsTrigger>
+              <TabsTrigger display={"grow"} value="passwordi">
+                Password
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+      </div>
+      <div className="py-4">
+        <Tabs>
+          <TabsList>
+            <TabsTrigger colors={"white"} border={"primary-1"} value="account">
+              Account
+            </TabsTrigger>
+            <TabsTrigger colors={"white"} border={"primary-1"} value="account1">
+              Acc
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
     </div>
   );
