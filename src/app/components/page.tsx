@@ -130,8 +130,8 @@ export default function Page() {
             </AlertDescription>
           </Alert>
         </div>
-        <Tabs>
-          <TabsList colors={"muted"}>
+        <Tabs defaultValue={"account"}>
+          <TabsList defaultValue={"account"} colors={"muted"}>
             <TabsTrigger value="account">Account</TabsTrigger>
             <TabsTrigger value="password">Password</TabsTrigger>
             <TabsTrigger value="passwordi">lOrem</TabsTrigger>
@@ -139,7 +139,7 @@ export default function Page() {
         </Tabs>
         <p>Full</p>
         <div className="w-[600px]">
-          <Tabs>
+          <Tabs defaultValue={"account"}>
             <TabsList border={"border-1"} display={"grow"}>
               <TabsTrigger display={"grow"} value="account">
                 Account
@@ -155,8 +155,8 @@ export default function Page() {
         </div>
       </div>
       <div className="py-4">
-        <Tabs>
-          <TabsList>
+        <Tabs defaultValue={"account"}>
+          <TabsList defaultValue={"account"}>
             <TabsTrigger colors={"white"} border={"primary-1"} value="account">
               Account
             </TabsTrigger>
