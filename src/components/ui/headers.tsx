@@ -1,12 +1,6 @@
 import React, { ReactNode } from "react";
-import Image from "next/image";
 import questionMark from "@/assets/question-mark.svg";
-import { HoverCard } from "./hoverCard";
-import {
-  HoverCardArrow,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@radix-ui/react-hover-card";
+import Tooltip from "./tooltip";
 function GradiantHeaderOne({
   colorOne,
   colorTwo,
@@ -38,18 +32,7 @@ function InfoHeaderTwo({
   return (
     <h1 className={`flex items-center gap-x-2 font-medium text-2xl`}>
       <span>{children}</span>
-
-      <HoverCard openDelay={0} closeDelay={20}>
-        <HoverCardTrigger>
-          <Image src={questionMark} alt="question mark" />
-        </HoverCardTrigger>
-        <HoverCardContent side="top" alignOffset={10}>
-          <div className="max-w-[200px] rounded-md text-sm bg-white px-2 py-2 text-gray-800">
-            {popupContent}
-          </div>
-          <HoverCardArrow className="fill-white" height={15} width={14} />
-        </HoverCardContent>
-      </HoverCard>
+      <Tooltip triggerImageSrc={questionMark}>{popupContent}</Tooltip>
     </h1>
   );
 }
