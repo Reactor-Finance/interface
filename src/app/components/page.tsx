@@ -1,5 +1,6 @@
 "use client";
 import CurrenciesOverlapIcons from "@/components/shared/currenciesOverlapIcons";
+import CurrencyInput from "@/components/shared/currencyInput";
 import SearchInput from "@/components/shared/searchInput";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +25,15 @@ export default function Page() {
         >
           Info Header
         </Headers.InfoHeaderTwo>
+        <div className="w-[400px]">
+          <CurrencyInput.Root>
+            <CurrencyInput.CurrencySelect
+              tokenAddress="0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+              token="USDC"
+            />
+            <CurrencyInput.NumberInput disabled={false} decimals={10} />
+          </CurrencyInput.Root>
+        </div>
         <div className="w-[400px]">
           <SearchInput
             value=""

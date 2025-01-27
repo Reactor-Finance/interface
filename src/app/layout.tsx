@@ -24,7 +24,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`text-white ${jetbrainsMono.className} antialiased`}>
         <Providers>
-          <main className="flex-1">{children}</main>
+          <main className="">{children}</main>
         </Providers>
       </body>
     </html>
