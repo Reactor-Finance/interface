@@ -1,8 +1,10 @@
+import Currencies from "@/components/shared/currencies";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Headers from "@/components/ui/headers";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TAddress } from "@/lib/types";
 
 export default function Page() {
   return (
@@ -20,6 +22,18 @@ export default function Page() {
         >
           Info Header
         </Headers.InfoHeaderTwo>
+        <div>
+          <Currencies
+            tokenOne={{
+              alt: "a",
+              address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" as TAddress,
+            }}
+            tokenTwo={{
+              alt: "a",
+              address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" as TAddress,
+            }}
+          />
+        </div>
         <div className="flex flex-col gap-y-4">
           <div>
             <Button variant={"outline"} size="md">
