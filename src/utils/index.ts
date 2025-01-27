@@ -19,3 +19,13 @@ export function getLogoAsset(address: `0x${string}` | undefined) {
   const chainName = getChainName();
   return `${ASSET_REPO}/blockchains/${chainName}/assets/${address}/logo.png`;
 }
+
+export function inputPatternNumberMatch(s: string, decimals = 18) {
+  const pattern = /^[0-9]*[.,]?[0-9]*$/;
+  const decimalPattern = RegExp(`^\\d+(\\.\\d{0,${decimals}})?$`);
+  if (s === "") {
+    return true;
+  }
+  if (pattern.test(s) && decimalPattern.test(s)) return true;
+  return false;
+}
