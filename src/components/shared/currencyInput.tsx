@@ -34,8 +34,22 @@ function NumberInput<T extends FieldValues>({
     />
   );
 }
-function Root({ children }: { children: ReactNode }) {
-  return <div className="flex w-full">{children}</div>;
+function Root({
+  children,
+  title,
+  estimate,
+}: {
+  title: string;
+  estimate: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className="space-y-1">
+      <h4 className="text-sm text-neutral-300">{title}</h4>
+      <div className="flex w-full">{children}</div>
+      <h4 className="text-right text-sm text-neutral-300">~{estimate}</h4>
+    </div>
+  );
 }
 function CurrencySelect({
   token,
