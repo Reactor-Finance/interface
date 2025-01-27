@@ -12,7 +12,7 @@ interface Props {
     alt: string;
   };
 }
-export default function Currencies({ tokenOne, tokenTwo }: Props) {
+export default function CurrenciesOverlapIcons({ tokenOne, tokenTwo }: Props) {
   console.log(getLogoAsset(tokenOne.address));
   return (
     <div className="flex">
