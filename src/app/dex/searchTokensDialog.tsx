@@ -1,12 +1,11 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { Search } from "lucide-react";
+import SearchInput from "@/components/shared/searchInput";
 export default function SearchTokensDailog() {
-  const [isFocused, setIsFocused] = useState(false);
   return (
     <Dialog>
       <div className="flex w-full justify-center py-4">
@@ -22,19 +21,7 @@ export default function SearchTokensDailog() {
           <div className="space-y-6 px-6">
             <DialogTitle className="font-geistMono">Select a token</DialogTitle>
             {/* <h1 className="font-geistMono">Select a token</h1> */}
-            <div
-              data-focused={isFocused ? "focused" : "not-focused"}
-              className="flex gap-x-3 bg-gray-800 rounded-md p-2 outline-1  data-[focused=focused]:outline data-[focused=focused]:outline-white"
-            >
-              <Search className="text-gray-400" />
-              <input
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => setIsFocused(false)}
-                type="text"
-                className="w-full bg-transparent font-geistMono placeholder:text-gray-400 focus:outline-none"
-                placeholder="Search by name or symbol"
-              />
-            </div>
+            <SearchInput />
           </div>
           <div className="relative z-0 h-[calc(100%-184px)] border-t border-gray-600  ">
             <h2 className="py-3 font-geistMono text-[14px] text-[#999999] pl-6">

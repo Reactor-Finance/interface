@@ -1,4 +1,6 @@
+"use client";
 import CurrenciesOverlapIcons from "@/components/shared/currenciesOverlapIcons";
+import SearchInput from "@/components/shared/searchInput";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,6 +24,14 @@ export default function Page() {
         >
           Info Header
         </Headers.InfoHeaderTwo>
+        <div className="w-[400px]">
+          <SearchInput
+            value=""
+            setValue={(s: string) => {
+              console.log(s);
+            }}
+          />
+        </div>
         <div>
           <CurrenciesOverlapIcons
             tokenOne={{
