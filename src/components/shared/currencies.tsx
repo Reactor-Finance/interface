@@ -17,16 +17,16 @@ export default function Currencies({ tokenOne, tokenTwo }: Props) {
   return (
     <div className="flex">
       <ImageWithFallback
-        className="h-6 w-6"
-        width={24}
-        height={24}
+        className="h-8 w-8"
+        width={32}
+        height={32}
         src={getLogoAsset(tokenOne.address)}
         alt={tokenOne.alt}
       />
       <ImageWithFallback
-        className="h-6 w-6 -ml-2 z-10"
-        width={24}
-        height={24}
+        className="h-8 w-8 -ml-2 z-10"
+        width={32}
+        height={32}
         src={getLogoAsset(tokenTwo.address)}
         alt={tokenTwo.alt}
       />
