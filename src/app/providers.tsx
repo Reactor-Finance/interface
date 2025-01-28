@@ -31,7 +31,7 @@ export const Providers: FC<PropsWithChildren> = ({ children }) => {
     <WagmiProvider config={web3Config}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider theme={darkTheme()}>
-          <NextUIProvider className="flex min-h-svh flex-col w-screen">
+          <NextUIProvider className="flex min-h-svh flex-col ">
             {/* Header goes here */}
             {children}
             {/* Footer goes here */}

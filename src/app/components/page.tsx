@@ -1,8 +1,13 @@
+"use client";
+import CurrenciesOverlapIcons from "@/components/shared/currenciesOverlapIcons";
+import CurrencyInput from "@/components/shared/currencyInput";
+import SearchInput from "@/components/shared/searchInput";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Headers from "@/components/ui/headers";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TAddress } from "@/lib/types";
 
 export default function Page() {
   return (
@@ -20,6 +25,35 @@ export default function Page() {
         >
           Info Header
         </Headers.InfoHeaderTwo>
+        <div className="w-[400px]">
+          <CurrencyInput.Root title="Sell" estimate="200">
+            <CurrencyInput.CurrencySelect
+              tokenAddress="0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+              token="USDC"
+            />
+            <CurrencyInput.NumberInput disabled={false} decimals={10} />
+          </CurrencyInput.Root>
+        </div>
+        <div className="w-[400px]">
+          <SearchInput
+            value=""
+            setValue={(s: string) => {
+              console.log(s);
+            }}
+          />
+        </div>
+        <div>
+          <CurrenciesOverlapIcons
+            tokenOne={{
+              alt: "a",
+              address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" as TAddress,
+            }}
+            tokenTwo={{
+              alt: "a",
+              address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" as TAddress,
+            }}
+          />
+        </div>
         <div className="flex flex-col gap-y-4">
           <div>
             <Button variant={"outline"} size="md">
@@ -116,8 +150,8 @@ export default function Page() {
             </AlertDescription>
           </Alert>
         </div>
-        <Tabs>
-          <TabsList colors={"muted"}>
+        <Tabs defaultValue={"account"}>
+          <TabsList defaultValue={"account"} colors={"muted"}>
             <TabsTrigger value="account">Account</TabsTrigger>
             <TabsTrigger value="password">Password</TabsTrigger>
             <TabsTrigger value="passwordi">lOrem</TabsTrigger>
@@ -125,7 +159,7 @@ export default function Page() {
         </Tabs>
         <p>Full</p>
         <div className="w-[600px]">
-          <Tabs>
+          <Tabs defaultValue={"account"}>
             <TabsList border={"border-1"} display={"grow"}>
               <TabsTrigger display={"grow"} value="account">
                 Account
@@ -141,8 +175,8 @@ export default function Page() {
         </div>
       </div>
       <div className="py-4">
-        <Tabs>
-          <TabsList>
+        <Tabs defaultValue={"account"}>
+          <TabsList defaultValue={"account"}>
             <TabsTrigger colors={"white"} border={"primary-1"} value="account">
               Account
             </TabsTrigger>
