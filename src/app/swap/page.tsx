@@ -1,8 +1,11 @@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SearchTokensDailog from "../dex/searchTokensDialog";
+import Image from "next/image";
 import { TabsContent } from "@radix-ui/react-tabs";
 import CurrenciesOverlapIcons from "@/components/shared/currenciesOverlapIcons";
 import { ReactNode } from "react";
+import { getLogoAsset } from "@/utils";
+import { USDC_ADDRESS } from "@/data/constants";
 function Stat({ title, value }: { title: string; value: string }) {
   return (
     <div>
@@ -14,7 +17,7 @@ function Stat({ title, value }: { title: string; value: string }) {
 export default function Home() {
   return (
     <div className="min-h-screen px-4 w-screen font-geistMono pt-4 ">
-      <div className="mx-auto w-[1600px] gap-2 space-y-4">
+      <div className="mx-auto w-[1650px] gap-2 space-y-4">
         <Card className="p-4 items-center gap-x-4 flex">
           <div className="flex items-center gap-x-2">
             <CurrenciesOverlapIcons
@@ -58,20 +61,15 @@ export default function Home() {
               </TabsList>
               <TabsContent value="transaction">
                 <div className="border-t border-neutral-800">
-                  <caption className="h-0 overflow-hidden">Test</caption>
                   <table className="w-full">
-                    <thead className="grid grid-cols-12 p-4 w-full font-normal text-neutral-600 text-sm">
-                      <th className="col-span-2 text-left">Date</th>
-                      <th className="col-span-2 text-left">Transaction id</th>
-                      <th>Wallet</th>
-                      <th>Side</th>
-                      <th>Type</th>
-                      <th>Price</th>
-                      <th>Value</th>
-                      <th>ETH</th>
-                      <th>USDC</th>
-                      <th>TXN</th>
-                    </thead>
+                    <caption className="h-0 overflow-hidden">Test</caption>
+                    <TransactionTableHeaders />
+                    <tbody>
+                      <TransactionTableRow />
+                      <TransactionTableRow />
+                      <TransactionTableRow />
+                      <TransactionTableRow />
+                    </tbody>
                   </table>
                 </div>
               </TabsContent>
@@ -101,5 +99,59 @@ function Card({
     >
       {children}
     </div>
+  );
+}
+
+function TransactionTableHeaders() {
+  return (
+    <thead>
+      <tr className="grid grid-cols-13 p-4 w-full font-normal text-neutral-600 text-sm">
+        <th className="col-span-2 text-left">Date</th>
+        <th className="col-span-2 text-left">Transaction id</th>
+        <th className="col-span-2 text-left">Wallet</th>
+        <th>Side</th>
+        <th>Type</th>
+        <th>Price</th>
+        <th>Value</th>
+        <th>ETH</th>
+        <th>USDC</th>
+        <th>TXN</th>
+      </tr>
+    </thead>
+  );
+}
+function TransactionTableRow() {
+  return (
+    <tr className="grid grid-cols-13 items-center text-sm py-2 px-4 text-center">
+      <td className="col-span-2 text-left">Dec 26 03:52:59 PM</td>
+      <td className="col-span-2 text-left">0x35f013528x8721…</td>
+      <td className="col-span-2 text-left">0x5ffb6…22e1</td>
+      <td className="text-success-400">Buy</td>
+      <td className="text-success-400">Market</td>
+      <td className="text-error-400">0.0180</td>
+      <td>3,400</td>
+
+      <td className="flex gap-x-1 items-center justify-center">
+        <Image
+          width={20}
+          height={20}
+          className="h-5 w-5"
+          src={getLogoAsset(USDC_ADDRESS)}
+          alt="USDC"
+        />
+        0.1
+      </td>
+      <td className="flex gap-x-1 items-center justify-center">
+        <Image
+          width={20}
+          height={20}
+          className="h-5 w-5"
+          src={getLogoAsset(USDC_ADDRESS)}
+          alt="USDC"
+        />
+        134.01
+      </td>
+      <td>^</td>
+    </tr>
   );
 }
