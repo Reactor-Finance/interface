@@ -123,13 +123,17 @@ function TransactionTableHeaders() {
 function TransactionTableRow() {
   return (
     <tr className="grid grid-cols-13 items-center text-sm py-2 px-4 text-center">
-      <td className="col-span-2 text-left">Dec 26 03:52:59 PM</td>
-      <td className="col-span-2 text-left">0x35f013528x8721…</td>
-      <td className="col-span-2 text-left">0x5ffb6…22e1</td>
+      <td className="col-span-2 text-left text-neutral-100">
+        Dec 26 03:52:59 PM
+      </td>
+      <td className="col-span-2 text-left text-neutral-200">
+        0x35f013528x8721…
+      </td>
+      <td className="col-span-2 text-left text-neutral-200">0x5ffb6…22e1</td>
       <td className="text-success-400">Buy</td>
       <td className="text-success-400">Market</td>
       <td className="text-error-400">0.0180</td>
-      <td>3,400</td>
+      <td className="text-neutral-300"> $3,400.00</td>
 
       <td className="flex gap-x-1 items-center justify-center">
         <Image
