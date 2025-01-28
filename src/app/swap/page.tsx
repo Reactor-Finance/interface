@@ -1,11 +1,11 @@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import SearchTokensDailog from "../dex/searchTokensDialog";
 import Image from "next/image";
 import { TabsContent } from "@radix-ui/react-tabs";
 import CurrenciesOverlapIcons from "@/components/shared/currenciesOverlapIcons";
 import { ReactNode } from "react";
 import { getLogoAsset } from "@/utils";
 import { USDC_ADDRESS } from "@/data/constants";
+import { LineChart } from "./lineChart";
 function Stat({ title, value }: { title: string; value: string }) {
   return (
     <div>
@@ -16,7 +16,7 @@ function Stat({ title, value }: { title: string; value: string }) {
 }
 export default function Home() {
   return (
-    <div className="min-h-screen px-4 w-screen font-geistMono pt-4 ">
+    <div className="min-h-screen px-4  font-geistMono pt-4 ">
       <div className="mx-auto w-[1650px] gap-2 space-y-4">
         <Card className="p-4 items-center gap-x-4 flex">
           <div className="flex items-center gap-x-2">
@@ -40,47 +40,51 @@ export default function Home() {
           <Stat title="TVL" value="3145.24" />
         </Card>
         <div className="flex gap-2">
-          <Card className="flex-grow">
-            <Tabs defaultValue="transaction">
-              <TabsList colors="transparent">
-                <TabsTrigger
-                  className="rounded-b-none rounded-tr-none"
-                  value="transaction"
-                >
-                  Transaction
-                </TabsTrigger>
-                <TabsTrigger className="rounded-none" value="limits">
-                  Limits
-                </TabsTrigger>
-                <TabsTrigger className="rounded-none" value="liquidity">
-                  Liquidity
-                </TabsTrigger>
-                <TabsTrigger className="rounded-none" value="info">
-                  Info
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="transaction">
-                <div className="border-t border-neutral-800">
-                  <table className="w-full">
-                    <caption className="h-0 overflow-hidden">Test</caption>
-                    <TransactionTableHeaders />
-                    <tbody>
-                      <TransactionTableRow />
-                      <TransactionTableRow />
-                      <TransactionTableRow />
-                      <TransactionTableRow />
-                    </tbody>
-                  </table>
-                </div>
-              </TabsContent>
-            </Tabs>
-          </Card>
+          <div className="flex-grow">
+            <LineChart />
+
+            <div className="pt-4"></div>
+            <Card className="">
+              <Tabs defaultValue="transaction">
+                <TabsList colors="transparent">
+                  <TabsTrigger
+                    className="rounded-b-none rounded-tr-none"
+                    value="transaction"
+                  >
+                    Transaction
+                  </TabsTrigger>
+                  <TabsTrigger className="rounded-none" value="limits">
+                    Limits
+                  </TabsTrigger>
+                  <TabsTrigger className="rounded-none" value="liquidity">
+                    Liquidity
+                  </TabsTrigger>
+                  <TabsTrigger className="rounded-none" value="info">
+                    Info
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent value="transaction">
+                  <div className="border-t border-neutral-800">
+                    <table className="w-full">
+                      <caption className="h-0 overflow-hidden">Test</caption>
+                      <TransactionTableHeaders />
+                      <tbody>
+                        <TransactionTableRow />
+                        <TransactionTableRow />
+                        <TransactionTableRow />
+                        <TransactionTableRow />
+                      </tbody>
+                    </table>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </Card>
+          </div>
           <div className="w-[400px] h-10 border-neutral-700 border rounded-md">
             <div className="border-b border-neutral-700"></div>
           </div>
         </div>
       </div>
-      <SearchTokensDailog />
     </div>
   );
 }
