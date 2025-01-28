@@ -13,6 +13,9 @@ export default {
         geistMono: ["var(--font-geist-mono)"],
       },
       margin: {},
+      gridTemplateColumns: {
+        13: "repeat(13, minmax(0, 1fr))",
+      },
       padding: { xs: "px-4", xxs: "8px", sm: "12px" },
       colors: {
         background: "hsl(var(--background))",
