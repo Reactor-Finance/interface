@@ -109,7 +109,7 @@ function TransactionTableHeaders() {
         <th className="col-span-2 text-left">Date</th>
         <th className="col-span-2 text-left">Transaction id</th>
         <th className="col-span-2 text-left">Wallet</th>
-        <th>Side</th>
+        <th className="text-left">Side</th>
         <th>Type</th>
         <th>Price</th>
         <th>Value</th>
@@ -130,7 +130,7 @@ function TransactionTableRow() {
         0x35f013528x8721…
       </td>
       <td className="col-span-2 text-left text-neutral-200">0x5ffb6…22e1</td>
-      <td className="text-success-400">Buy</td>
+      <td className="text-success-400 text-left">Buy</td>
       <td className="text-success-400">Market</td>
       <td className="text-error-400">0.0180</td>
       <td className="text-neutral-300"> $3,400.00</td>
