@@ -16,7 +16,7 @@ export default {
       gridTemplateColumns: {
         13: "repeat(13, minmax(0, 1fr))",
       },
-      padding: { xs: "px-4", xxs: "8px", sm: "12px" },
+      padding: { xs: "4px", xxs: "8px", sm: "12px" },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
