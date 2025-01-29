@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { CircleAlert } from "lucide-react";
 
 const alertVariants = cva(
-  `relative w-full rounded-lg p-4 [&>svg~*]:pl-7 
+  `relative w-full text-[13px] rounded-lg p-4 [&>svg~*]:pl-7 
    [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground`,
   {
     variants: {
@@ -13,6 +13,7 @@ const alertVariants = cva(
         yellow: "bg-yellow/15 text-yellow",
         error: "bg-error-400/15 text-error-400",
         success: "bg-success-400/15 text-success-400",
+        muted: "bg-neutral-950 text-neutral-400",
       },
     },
     defaultVariants: {
