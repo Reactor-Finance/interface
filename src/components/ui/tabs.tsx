@@ -10,7 +10,7 @@ import { cva } from "class-variance-authority";
 const Tabs = TabsPrimitive.Root;
 // Define the `cva` function for styling variants
 const tabsListVariants = cva(
-  "h-10 items-center justify-center bg-transparent rounded-md  p-1 text-muted-foreground", // Base styles
+  " items-center justify-center bg-transparent rounded-md text-muted-foreground", // Base styles
   {
     variants: {
       size: {
@@ -67,8 +67,8 @@ const tabsTriggerVariants = cva(
       },
       colors: {
         primary:
-          "data-[state=active]:bg-primary-400 data-[state=active]:text-white",
-        white: " data-[state=active]:text-white text-neutral-400",
+          "data-[state=active]:bg-primary-400 data-[state=active]:text-white text-neutral-300",
+        white: "data-[state=active]:text-white text-neutral-400",
       },
       border: {
         none: "",

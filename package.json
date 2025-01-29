@@ -12,6 +12,9 @@
     "test": "jest",
     "type-check": "tsc --noEmit --incremental"
   },
+  "overrides": {
+    "react-is": "^19.0.0-rc-69d4b800-20241021"
+  },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
       "eslint_d --fix"
@@ -47,6 +50,7 @@
     "react-dom": "19.0.0-rc-66855b96-20241106",
     "react-hook-form": "^7.54.2",
     "react-query-kit": "^3.3.1",
+    "recharts": "^2.15.1",
     "redux-persist": "^6.0.0",
     "sharp": "^0.33.5",
     "tailwind-merge": "^2.6.0",

@@ -1,10 +1,14 @@
 "use client";
+import Image from "next/image";
 import React from "react";
-
+import verified from "@/assets/verified.svg";
+import info from "@/assets/info.svg";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import SearchInput from "@/components/shared/searchInput";
+import ImageWithFallback from "@/components/shared/imageWithFallback";
+import { getLogoAsset } from "@/utils";
 export default function SearchTokensDailog() {
   return (
     <Dialog>
@@ -28,11 +32,11 @@ export default function SearchTokensDailog() {
               value=""
             />
           </div>
-          <div className="relative z-0 h-[calc(100%-184px)] border-t border-gray-600  ">
+          <div className="relative z-0 h-[calc(100%-179px)] border-t border-gray-600  ">
             <h2 className="py-3 font-geistMono text-[14px] text-[#999999] pl-6">
               Tokens (229)
             </h2>
-            <div className=" h-[calc(100%-22px)] space-y-4 scrollbar overflow-y-auto pb-2 px-6">
+            <div className=" h-[calc(100%-22px)] space-y-4 scrollbar overflow-y-auto pb-2 px-2">
               <TokenItem />
               <TokenItem />
               <TokenItem />
@@ -49,11 +53,15 @@ export default function SearchTokensDailog() {
             </div>
           </div>
 
-          <div className="z-10  rounded-bl-md rounded-br-[15px] border-t border-gray-600  bg-[#1a1a1a] px-10 py-2">
+          <div className="z-10  rounded-bl-md  border-t border-gray-600  bg-[#1a1a1a] px-10 py-3">
             <div className="flex items-center justify-between">
-              <span className="font-geistMono text-gray-300">
-                Only show verified tokens
-              </span>
+              <div className="flex items-center gap-x-2">
+                <Image src={verified} alt="verified icon" />
+                <span className="font-geistMono text-sm text-gray-300">
+                  Only show verified tokens
+                </span>
+                <Image src={info} alt="info" />
+              </div>
               <Switch id="airplane-mode" />
             </div>
           </div>
@@ -65,15 +73,21 @@ export default function SearchTokensDailog() {
 
 function TokenItem() {
   return (
-    <div className="mb-2 flex justify-between rounded-md bg-gray-800 px-4 py-2">
+    <button className="mb-2 hover:bg-neutral-800 transition-colors flex w-full text-left justify-between rounded-md bg-neutral-900 px-4 py-2">
       <div className="flex items-center gap-x-2">
-        <div className="h-10 w-10 rounded-full bg-white font-geistMono"></div>
+        <ImageWithFallback
+          className="h-10 w-10"
+          src={getLogoAsset("0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48")}
+          width={40}
+          height={40}
+          alt=""
+        />
         <div>
           <div>
             <span>ETH</span>
           </div>
           <div>
-            <span className="text-gray-400">Ethereum Token</span>
+            <span className="text-gray-400 text-sm">Ethereum Token</span>
           </div>
         </div>
       </div>
@@ -85,6 +99,6 @@ function TokenItem() {
           <span className="text-gray-400">$0</span>
         </div>
       </div>
-    </div>
+    </button>
   );
 }
