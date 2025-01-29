@@ -6,6 +6,9 @@ import { ReactNode } from "react";
 import { getLogoAsset } from "@/utils";
 import { USDC_ADDRESS } from "@/data/constants";
 import { LineChart } from "./lineChart";
+import CurrencyInput from "@/components/shared/currencyInput";
+import SwapIconBorder from "@/components/shared/swapIconBorder";
+import { Button } from "@/components/ui/button";
 function Stat({ title, value }: { title: string; value: string }) {
   return (
     <div>
@@ -80,9 +83,42 @@ export default function Home() {
               </Tabs>
             </Card>
           </div>
-          <div className="w-[400px] h-10 border-neutral-700 border rounded-md">
-            <div className="border-b border-neutral-700"></div>
-          </div>
+          <Card className="w-[360px] p-4 border rounded-md">
+            <Tabs defaultValue="swap">
+              <TabsList size="md" colors="muted" display={"grow"}>
+                <TabsTrigger display={"grow"} value="swap">
+                  Swap
+                </TabsTrigger>
+                <TabsTrigger display={"grow"} value="twap">
+                  TWAP
+                </TabsTrigger>
+                <TabsTrigger display={"grow"} value="limit">
+                  Limit
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+            <div className="pt-4"></div>
+            <CurrencyInput.Root title="Sell" estimate="0">
+              <CurrencyInput.CurrencySelect
+                token="USDC"
+                tokenAddress={USDC_ADDRESS}
+              />
+              <CurrencyInput.NumberInput disabled={false} decimals={10} />
+            </CurrencyInput.Root>
+            <SwapIconBorder />
+
+            <CurrencyInput.Root title="Buy" estimate="0">
+              <CurrencyInput.CurrencySelect
+                token="USDC"
+                tokenAddress={USDC_ADDRESS}
+              />
+              <CurrencyInput.NumberInput disabled={false} decimals={10} />
+            </CurrencyInput.Root>
+            <div className="pt-4"></div>
+            <Button className="w-full" size="md" variant="primary">
+              Connect Wallet
+            </Button>
+          </Card>
         </div>
       </div>
     </div>
@@ -96,11 +132,7 @@ function Card({
   children: ReactNode;
 }) {
   return (
-    <div
-      className={
-        "border-neutral-700 bg-neutral-950 border rounded-md " + className
-      }
-    >
+    <div className={"border-neutral-700  border rounded-md " + className}>
       {children}
     </div>
   );
