@@ -21,14 +21,15 @@ export function IncreaseContent() {
         <h4>Add to lock</h4>
         <h5 className="text-neutral-200 text-[13px]">Available: 200.00 RCT</h5>
       </div>
-      <div className="rounded-md bg-neutral-950 flex border-[1px] border-neutral-500 px-4">
-        <div className="border-r-[1px] flex border-neutral-500 py-2 pr-4">
+      <div className="apply-focus rounded-md bg-neutral-950 border-neutral-900 flex border-[1px]  px-4">
+        <div className="border-r-[1px] flex border-neutral-900 py-2 pr-4">
           <Image src={symbl} width={24} height={24} alt="Reactor Ticker" />
           <h2>RCT</h2>
         </div>
-        <div className="flex-grow">
-          <Input className="border-none bg-transparent flex-grow" />
-        </div>
+        <Input
+          ring="none"
+          className="border-none peer bg-transparent flex-grow"
+        />
       </div>
       <h3 className="text-lg">Estimates</h3>
       <div className="space-y-1">
