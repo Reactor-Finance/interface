@@ -107,7 +107,9 @@ body {
   }
 }
 .apply-focus:focus-within {
-  box-shadow: 0 0 0 2px #ebebeb;
+  box-shadow:
+    0 0 0 3px black,
+    0 0 0 5px rgba(235, 235, 235, 0.8);
   border-radius: 2px; /* Optional: Adjust based on your element */
 }
 @layer base {
