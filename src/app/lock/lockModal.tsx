@@ -19,7 +19,7 @@ export default function LockModal() {
         <Button onClick={() => setOpen(!open)} variant={"primary"} size="md">
           Claim All Lock Rewards
         </Button>
-        <DialogContent>
+        <DialogContent position="static">
           <DialogTitle className="text-lg">
             Manage your <span className="text-primary-400">lock</span>
           </DialogTitle>
