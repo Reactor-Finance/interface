@@ -6,7 +6,7 @@ import LockModal from "./lockModal";
 export default function Lock() {
   return (
     <div>
-      <div className="mx-auto w-[1400px] pt-24">
+      <div className="mx-auto px-8 xl:w-[1200px] 2xl:w-[1400px] pt-24">
         <div className="flex justify-between">
           <div className="w-[640px]">
             <div className="">
