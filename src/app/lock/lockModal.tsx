@@ -7,6 +7,9 @@ import { TabsContent } from "@radix-ui/react-tabs";
 import React from "react";
 import { IncreaseContent } from "./increaseContent";
 import ExtendContent from "./extendContent";
+import TransferContent from "./transferContent";
+import MergeContent from "./mergeContent";
+import WithdrawContent from "./withdrawContent";
 
 export default function LockModal() {
   const [open, setOpen] = React.useState(false);
@@ -68,6 +71,15 @@ export default function LockModal() {
             </TabsContent>
             <TabsContent value="extend">
               <ExtendContent />
+            </TabsContent>
+            <TabsContent value="transfer">
+              <TransferContent />
+            </TabsContent>
+            <TabsContent value="merge">
+              <MergeContent />
+            </TabsContent>
+            <TabsContent value="withdraw">
+              <WithdrawContent />
             </TabsContent>
           </Tabs>
         </DialogContent>
