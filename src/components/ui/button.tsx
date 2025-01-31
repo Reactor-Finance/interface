@@ -17,10 +17,11 @@ const buttonVariants = cva(
           "border border-neutral-900 text-white hover:bg-neutral-800 bg-neutral-950",
       },
       size: {
-        sm: "h-9 py-xxs px-sm rounded-md  text-[12px] leading-[16px] font-medium",
-        xs: "h-9 py-xs px-xxs rounded-md  text-[12px] leading-[16px] font-medium",
+        sm: "py-xxs px-sm rounded-md  text-[12px] leading-[16px] font-medium",
+        xs: "py-xs px-xxs rounded-sm  text-[12px] leading-[12px] font-medium",
+        xss: "py-[2px] px-xs rounded-sm  text-[12px] leading-[12px] font-medium",
         md: "px-4 rounded-md text-md leading-[20px] py-[10px]",
-        submit: "py-3 w-full",
+        submit: "py-3 w-full text-[16px]",
       },
     },
     defaultVariants: {

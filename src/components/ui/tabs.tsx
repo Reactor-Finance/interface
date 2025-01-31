@@ -73,7 +73,7 @@ const tabsTriggerVariants = cva(
       border: {
         none: "",
         "primary-1":
-          "border-b rounded-none border-neutral-800 data-[state=active]:border-primary-400",
+          "border-b rounded-none border-neutral-900 data-[state=active]:border-primary-400",
       },
     },
     defaultVariants: {

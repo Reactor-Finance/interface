@@ -20,7 +20,7 @@ function Stat({ title, value }: { title: string; value: string }) {
 export default function Home() {
   return (
     <div className="min-h-screen px-4  font-geistMono pt-4 ">
-      <div className="mx-auto w-[1650px] gap-2 space-y-4">
+      <div className=" gap-2 space-y-4">
         <Card className="p-4 items-center gap-x-4 flex">
           <div className="flex items-center gap-x-2">
             <CurrenciesOverlapIcons
