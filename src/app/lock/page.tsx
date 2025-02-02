@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import Headers from "@/components/ui/headers";
 import { Button } from "@/components/ui/button";

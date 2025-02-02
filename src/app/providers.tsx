@@ -10,6 +10,7 @@ import { hashFn } from "@wagmi/core/query";
 import { FC, PropsWithChildren } from "react";
 import { WagmiProvider } from "wagmi";
 import { NextUIProvider } from "@nextui-org/react";
+import { TRPCReactProvider } from "@/trpc/react";
 
 const web3Config = getDefaultConfig({
   appName: "Reactor Finance",
@@ -28,16 +29,18 @@ const queryClient = new QueryClient({
 
 export const Providers: FC<PropsWithChildren> = ({ children }) => {
   return (
-    <WagmiProvider config={web3Config}>
-      <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider theme={darkTheme()}>
-          <NextUIProvider className="flex min-h-svh flex-col ">
-            {/* Header goes here */}
-            {children}
-            {/* Footer goes here */}
-          </NextUIProvider>
-        </RainbowKitProvider>
-      </QueryClientProvider>
-    </WagmiProvider>
+    <TRPCReactProvider>
+      <WagmiProvider config={web3Config}>
+        <QueryClientProvider client={queryClient}>
+          <RainbowKitProvider theme={darkTheme()}>
+            <NextUIProvider className="flex min-h-svh flex-col ">
+              {/* Header goes here */}
+              {children}
+              {/* Footer goes here */}
+            </NextUIProvider>
+          </RainbowKitProvider>
+        </QueryClientProvider>
+      </WagmiProvider>
+    </TRPCReactProvider>
   );
 };
