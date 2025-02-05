@@ -1,0 +1,7 @@
+import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
+
+export const userRouter = createTRPCRouter({
+  test: publicProcedure.query(async () => {
+    return "hello";
+  }),
+});

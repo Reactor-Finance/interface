@@ -3,7 +3,7 @@ import Toggle from "@/components/ui/toggle";
 
 export default function Home() {
   return (
-    <div className="min-h-screen w-screen font-geistMono ">
+    <div className="min-h-screen font-geistMono ">
       <SearchTokensDailog />
       <div className="flex items-center justify-between">
         <Toggle className="" label="Label" isDisabled={false} />
