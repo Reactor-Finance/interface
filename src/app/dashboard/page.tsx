@@ -10,9 +10,7 @@ export default function Dashboard() {
         <Headers.GradiantHeaderOne colorOne="#A0055D" colorTwo="#836EF9">
           Dashboard
         </Headers.GradiantHeaderOne>
-        <div className="pt-6">
-          {/* input part goes here */}
-        </div>
+        <div className="pt-6">{/* input part goes here */}</div>
         <div className="pt-12">
           <div className="flex justify-between pt-12">
             <Headers.InfoHeaderTwo
@@ -24,9 +22,7 @@ export default function Dashboard() {
               New Deposit
             </Button>
           </div>
-          <div className="pt-4">
-
-          </div>
+          <div className="pt-4"></div>
           <div className="text-start rounded-sm bg-neutral-1000 font-medium text-neutral-400 py-4 px-6">
             To receive emissions{" "}
             <span
