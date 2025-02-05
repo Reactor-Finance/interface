@@ -84,7 +84,6 @@ export default {
           900: "hsl(var(--error-900), <alpha-value>)",
           950: "hsl(var(--error-950), <alpha-value>)",
         },
-
         success: {
           100: "hsl(var(--success-100), <alpha-value>)",
           200: "hsl(var(--success-200), <alpha-value>)",
