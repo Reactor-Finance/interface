@@ -22,7 +22,7 @@ export default function Home() {
     <div className="min-h-screen px-4  font-geistMono pt-4 ">
       <div className=" gap-2 space-y-4">
         <Card className="p-4 items-center gap-x-4 flex">
-          <div className="flex items-center gap-x-2">
+          <div className="flex items-center gap-x-2 pr-6">
             <CurrenciesOverlapIcons
               tokenOne={{
                 alt: "",
