@@ -4,9 +4,10 @@ import React from "react";
 import reactor from "@/assets/reactor.svg";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { CustomConnectButton } from "./customConnectButton";
 export default function Header() {
   return (
-    <div className="h-[88px]  items-center grid grid-cols-3">
+    <div className="h-[88px] px-4 items-center grid grid-cols-3">
       <div>
         <Image src={reactor} alt="" />
       </div>
@@ -16,6 +17,9 @@ export default function Header() {
           <NavLink href="/dashboard">Dashboard</NavLink>
           <NavLink href="/liquidity">Liquidity</NavLink>
         </ul>
+      </div>
+      <div className="flex justify-end">
+        <CustomConnectButton />
       </div>
     </div>
   );
