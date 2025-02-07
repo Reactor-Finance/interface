@@ -1,22 +1,14 @@
 "use client";
-
-import { TrendingUp } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 const chartData = [
   { month: "January", desktop: 186 },
   { month: "February", desktop: 305 },
@@ -35,13 +27,7 @@ const chartConfig = {
 
 export function LineChart() {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Area Chart - Linear</CardTitle>
-        <CardDescription>
-          Showing total visitors for the last 6 months
-        </CardDescription>
-      </CardHeader>
+    <Card className="py-4 px-2">
       <CardContent>
         <ChartContainer className="h-[400px] w-full" config={chartConfig}>
           <AreaChart
@@ -75,15 +61,20 @@ export function LineChart() {
         </ChartContainer>
       </CardContent>
       <CardFooter>
-        <div className="flex w-full items-start gap-2 text-sm">
-          <div className="grid gap-2">
-            <div className="flex items-center gap-2 font-medium leading-none">
-              Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-            </div>
-            <div className="flex items-center gap-2 leading-none text-muted-foreground">
-              January - June 2024
-            </div>
-          </div>
+        <div className="flex w-full pt-4 justify-end gap-2 text-sm">
+          <Tabs defaultValue="24H">
+            <TabsList colors="muted" className="w-[200px]" display="grow">
+              <TabsTrigger display="grow" value="24h">
+                24H
+              </TabsTrigger>
+              <TabsTrigger display="grow" value="7D">
+                7D
+              </TabsTrigger>
+              <TabsTrigger display="grow" value="30D">
+                30D
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
         </div>
       </CardFooter>
     </Card>
