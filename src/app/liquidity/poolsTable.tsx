@@ -1,5 +1,5 @@
 import React from "react";
-
+import { ChevronRight, ChevronLeft } from "lucide-react";
 export default function PoolsTable() {
   return (
     <table className="w-full">
@@ -23,6 +23,22 @@ export default function PoolsTable() {
           <th className="text-left col-span-3 ">Liquidity Manager</th>
         </tr>
       </tbody>
+      <tfoot className="pt-2 block">
+        <div className="flex justify-between">
+          <p className="text-[13px]">
+            Page 1 of 34{" "}
+            <span className="text-neutral-300">(1 - 250 results)</span>
+          </p>
+          <div className="flex">
+            <button>
+              <ChevronLeft className="text-white" />
+            </button>
+            <button>
+              <ChevronRight className="text-white" />
+            </button>
+          </div>
+        </div>
+      </tfoot>
     </table>
   );
 }
