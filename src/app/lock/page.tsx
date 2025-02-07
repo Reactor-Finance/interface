@@ -4,10 +4,11 @@ import Headers from "@/components/ui/headers";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import LockModal from "./lockModal";
+import PageMarginContainer from "@/components/ui/pageMarginContainer";
 export default function Lock() {
   return (
     <div>
-      <div className="mx-auto px-8 xl:w-[1200px] 2xl:w-[1400px] pt-24">
+      <PageMarginContainer>
         <div className="flex justify-between">
           <div className="w-[640px]">
             <div className="">
@@ -111,7 +112,7 @@ export default function Lock() {
             </tr>
           </tbody>
         </table>
-      </div>
+      </PageMarginContainer>
     </div>
   );
 }
