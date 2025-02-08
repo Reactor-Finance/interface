@@ -6,9 +6,9 @@ import Link from "next/link";
 export default function Footer() {
   return (
     <PageMarginContainer>
-      <footer className="py-4">
-        <div className="grid grid-cols-4">
-          <div className="flex flex-col justify-between">
+      <footer className="py-12">
+        <div className="grid grid-cols-5">
+          <div className="flex flex-col col-span-2 justify-between">
             <div>
               <Image alt="logo" src={Reactor} />
             </div>
@@ -18,36 +18,29 @@ export default function Footer() {
               </span>
             </div>
           </div>
-          <div>
-            <h4>Features</h4>
-            <ul className="space-y-4 pt-6">
-              <li>
-                <Link href="">Trade</Link>
-              </li>
-              <li>
-                <Link href="">Trade</Link>
-              </li>
-              <li>
-                <Link href="">Trade</Link>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h4>Features</h4>
-            <ul className="space-y-4 pt-6">
-              <li>
-                <Link href="">Trade</Link>
-              </li>
-              <li>
-                <Link href="">Trade</Link>
-              </li>
-              <li>
-                <Link href="">Trade</Link>
-              </li>
-            </ul>
-          </div>
+          <Headers />
+          <Headers />
+          <Headers />
         </div>
       </footer>
     </PageMarginContainer>
+  );
+}
+function Headers() {
+  return (
+    <div>
+      <h4 className="text-neutral-500 text-sm">Features</h4>
+      <ul className="space-y-4 pt-6 text-neutral-200">
+        <li>
+          <Link href="">Trade</Link>
+        </li>
+        <li>
+          <Link href="">Trade</Link>
+        </li>
+        <li>
+          <Link href="">Trade</Link>
+        </li>
+      </ul>
+    </div>
   );
 }
