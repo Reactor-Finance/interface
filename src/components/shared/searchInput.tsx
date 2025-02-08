@@ -19,7 +19,7 @@ export default function SearchInput({ value, setValue }: Props) {
         type="text"
         onChange={(e) => setValue?.(e.target.value)}
         value={value}
-        className="w-full bg-transparent font-geistMono placeholder:text-neutral-500 focus:outline-none"
+        className="w-full placeholder:text-sm bg-transparent font-geistMono placeholder:text-neutral-500 focus:outline-none"
         placeholder="Search by name or symbol"
       />
       {value !== "" && (
