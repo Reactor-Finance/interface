@@ -11,7 +11,7 @@ import { abstractTestnet } from "wagmi/chains";
 import { hashFn } from "@wagmi/core/query";
 import { FC, PropsWithChildren } from "react";
 import { WagmiProvider } from "wagmi";
-import { NextUIProvider } from "@nextui-org/react";
+import { HeroUIProvider } from "@heroui/react";
 import { TRPCReactProvider } from "@/trpc/react";
 
 const web3Config = getDefaultConfig({
@@ -35,11 +35,11 @@ export const Providers: FC<PropsWithChildren> = ({ children }) => {
       <WagmiProvider config={web3Config}>
         <QueryClientProvider client={queryClient}>
           <RainbowKitProvider theme={darkTheme()}>
-            <NextUIProvider className="flex min-h-svh flex-col ">
+            <HeroUIProvider className="flex min-h-svh flex-col ">
               {/* Header goes here */}
               {children}
               {/* Footer goes here */}
-            </NextUIProvider>
+            </HeroUIProvider>
           </RainbowKitProvider>
         </QueryClientProvider>
       </WagmiProvider>
