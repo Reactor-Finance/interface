@@ -1,19 +1,40 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import Headers from "@/components/ui/headers";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import InnerLabelInput from "./input";
 import PageMarginContainer from "@/components/ui/pageMarginContainer";
+import wheel from "@/assets/wheel.svg";
+import PoolTable from "./pool_table";
 
 export default function Dashboard() {
+  const [isPoolTableOpen, setIsPoolTableOpen] = useState(false);
   return (
     <div>
       <PageMarginContainer>
         <Headers.GradiantHeaderOne colorOne="#A0055D" colorTwo="#836EF9">
           Dashboard
         </Headers.GradiantHeaderOne>
-        <div className="pt-6">{/* input part goes here */}</div>
-        <div className="pt-12">
-          <div className="flex justify-between pt-12">
+        <div className="pt-4"></div>
+        <div className="flex gap-3">
+          {/* input part goes here */}
+          <InnerLabelInput label="Account" />
+
+          <div className="relative inline-flex items-center justify-between gap-2 rounded-sm border border-neutral-900 bg-transparent px-4 py-2 h-[34px]">
+            <span className="text-white text-sm opacity-70">
+              Claimable Rewards:
+            </span>
+            <div className="flex items-center gap-2 justify-between">
+              <div className="inline-block text-white text-sm tracking-tighter">
+                $0
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="pt-6"></div>
+        <div>
+          <div className="flex justify-between">
             <Headers.InfoHeaderTwo
               popupContent={<div>explanation goes here</div>}
             >
@@ -23,17 +44,23 @@ export default function Dashboard() {
               New Deposit
             </Button>
           </div>
-          <div className="pt-4"></div>
-          <div className="text-start rounded-sm bg-neutral-1000 font-medium text-neutral-400 py-4 px-6">
-            To receive emissions{" "}
-            <span
-              className="underline decoration-gray-500 font-semibold cursor-pointer text-white"
-              onClick={() => {}}
-            >
-              deposit and stake
-            </span>{" "}
-            your liquidity first.
-          </div>
+          <div className="pt-6"></div>
+          {isPoolTableOpen ? (
+            <PoolTable />
+          ) : (
+            <div className="text-start rounded-sm bg-neutral-1000 font-medium text-neutral-400 py-4 px-6">
+              To receive emissions{" "}
+              <span
+                className="underline decoration-gray-500 font-semibold cursor-pointer text-white"
+                onClick={() => {
+                  setIsPoolTableOpen(true);
+                }}
+              >
+                deposit and stake
+              </span>{" "}
+              your liquidity first.
+            </div>
+          )}
         </div>
         <div className="pt-16"></div>
         <Headers.InfoHeaderTwo popupContent={<div>explanation goes here</div>}>
@@ -49,7 +76,7 @@ export default function Dashboard() {
           <div>
             <div className="flex items-center gap-2">
               <div className="w-[40px] h-[40px] rounded-[8px] bg-neutral-950 flex items-center justify-center">
-                <img src="/wheel.svg" alt="hive" className="w-6 h-6" />
+                <Image src={wheel} alt="hive" className="w-6 h-6" />
               </div>
               <div>
                 <div className="text-white font-semibold">Hive Strategies</div>
