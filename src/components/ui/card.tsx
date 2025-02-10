@@ -5,6 +5,7 @@ import { cva, VariantProps } from "class-variance-authority";
 const cardVariants = cva("", {
   variants: {
     bg: {
+      "1050": "bg-neutral-1050",
       "1000": "bg-neutral-1000",
       "950": "bg-neutral-950",
       "900": "bg-neutral-900",
@@ -13,6 +14,7 @@ const cardVariants = cva("", {
       none: "",
     },
     border: {
+      "1050": "border border-neutral-1050",
       "1000": "border border-neutral-1000",
       "950": "border border-neutral-950",
       "900": "border border-neutral-900",
