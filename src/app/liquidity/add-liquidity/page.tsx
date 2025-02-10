@@ -33,9 +33,9 @@ export default function Page() {
               <TabsTrigger value="concentrated">Concentrated</TabsTrigger>
             </TabsList>
           </Tabs>
-          <div>
+          <button>
             <Settings className="text-neutral-600 h-5 w-5" />
-          </div>
+          </button>
         </div>
       </div>
       <div className="pt-6"></div>

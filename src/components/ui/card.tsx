@@ -22,17 +22,24 @@ const cardVariants = cva("", {
       "700": "border border-neutral-700",
       none: "",
     },
+    rounded: {
+      md: "rounded-md",
+    },
+    p: {
+      "4": "p-4",
+      "6": "p-6",
+    },
   },
-  defaultVariants: { border: "none", bg: "none" },
+  defaultVariants: { rounded: "md", p: "4", border: "none", bg: "none" },
 });
 export interface CardProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof cardVariants> {}
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ className, border, bg, ...props }, ref) => (
+  ({ className, p, border, bg, rounded, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn(cardVariants({ className, border, bg }))}
+      className={cn(cardVariants({ p, rounded, className, border, bg }))}
       {...props}
     />
   )

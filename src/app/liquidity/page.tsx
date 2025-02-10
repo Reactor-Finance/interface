@@ -17,7 +17,7 @@ export default function Page() {
         Liquidity
       </Headers.GradiantHeaderOne>
       <div className="pt-6"></div>
-      <Card bg="1050" className="p-6 space-y-4">
+      <Card bg="1000" className="p-6 space-y-4">
         <div>
           <h2 className="text-[16px]">
             Liquidity Providers (LPs) make low-slippage swaps possible.
