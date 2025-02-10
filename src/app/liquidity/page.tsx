@@ -38,7 +38,9 @@ export default function Page() {
             <span className="underline text-neutral-300">View Tokens</span> or{" "}
             <span className="underline text-neutral-300">List new token</span>
           </h4>
-          <Button variant="filled">Deposit Liquidity</Button>
+          <a href="/liquidity/deposit">
+            <Button variant="filled">Deposit Liquidity</Button>
+          </a>
         </div>
       </Card>
       <div className="pt-12"></div>
