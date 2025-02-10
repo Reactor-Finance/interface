@@ -16,7 +16,7 @@ import { TRPCReactProvider } from "@/trpc/react";
 
 const web3Config = getDefaultConfig({
   appName: "Reactor Finance",
-  projectId: "WALLET_CONNECT_PROJECT_ID_HERE",
+  projectId: "75ec6bc09b1280c146d750fbb7aae68a",
   ssr: true,
   chains: [abstractTestnet],
 });
