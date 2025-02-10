@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import React from "react";
 import LockDropdown from "./lockDropdown";
-import { SelectItem } from "@nextui-org/react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { SelectItem } from "@/components/ui/select";
 
 export default function HiveModal() {
   const [open, setOpen] = React.useState(false);
@@ -31,7 +31,7 @@ export default function HiveModal() {
             </button>
           </div>
           <LockDropdown placeholder="RCT">
-            <SelectItem></SelectItem>
+            <SelectItem value="a"></SelectItem>
           </LockDropdown>
           <h4 className="text-neutral-600">Hive Strategy</h4>
           <div className="flex rounded-md gap-x-2 bg-neutral-950 border border-neutral-800 p-4">

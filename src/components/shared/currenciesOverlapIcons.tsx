@@ -2,8 +2,7 @@ import React from "react";
 import ImageWithFallback from "./imageWithFallback";
 import { getLogoAsset } from "@/utils";
 import { TAddress } from "@/lib/types";
-import { cva } from "class-variance-authority";
-import { VariantProps } from "@nextui-org/react";
+import { cva, VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const variants = cva("", {
