@@ -1,29 +1,26 @@
 import React from "react";
 import Reactor from "@/assets/reactor.svg";
 import Image from "next/image";
-import PageMarginContainer from "../ui/pageMarginContainer";
 import Link from "next/link";
 export default function Footer() {
   return (
-    <PageMarginContainer>
-      <footer className="py-12">
-        <div className="grid grid-cols-5">
-          <div className="flex flex-col col-span-2 justify-between">
-            <div>
-              <Image alt="logo" src={Reactor} />
-            </div>
-            <div>
-              <span className="text-[12px]">
-                2024 © Reactor Finance. All rights reserved.
-              </span>
-            </div>
+    <footer className="py-12 mx-auto w-[1400px]">
+      <div className="grid grid-cols-5">
+        <div className="flex flex-col col-span-2 justify-between">
+          <div>
+            <Image alt="logo" src={Reactor} />
           </div>
-          <Headers />
-          <Headers />
-          <Headers />
+          <div>
+            <span className="text-[12px]">
+              2024 © Reactor Finance. All rights reserved.
+            </span>
+          </div>
         </div>
-      </footer>
-    </PageMarginContainer>
+        <Headers />
+        <Headers />
+        <Headers />
+      </div>
+    </footer>
   );
 }
 function Headers() {
