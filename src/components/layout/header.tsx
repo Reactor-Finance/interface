@@ -36,7 +36,7 @@ function NavLink({
   return (
     <li>
       <Link
-        className='data-[active="active"]:text-white transition-colors text-gray-400'
+        className='data-[active="active"]:text-white hover:text-white transition-colors text-neutral-500'
         data-active={path.includes(href) ? "active" : "inactive"}
         href={href}
       >

@@ -67,7 +67,7 @@ const tabsTriggerVariants = cva(
       },
       colors: {
         primary:
-          "data-[state=active]:bg-primary-400 data-[state=active]:text-white text-neutral-300",
+          "data-[state=active]:bg-primary-400 data-[state=active]:text-white text-neutral-400",
         white: "data-[state=active]:text-white text-neutral-400",
       },
       border: {

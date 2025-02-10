@@ -27,7 +27,7 @@ const chartConfig = {
 
 export function LineChart() {
   return (
-    <Card className="py-4 px-2">
+    <Card border="700" className="py-4 px-2 rounded-md">
       <CardContent>
         <ChartContainer className="h-[400px] w-full" config={chartConfig}>
           <AreaChart

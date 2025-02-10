@@ -2,11 +2,12 @@
 import React from "react";
 import Headers from "@/components/ui/headers";
 import { Button } from "@/components/ui/button";
+import PageMarginContainer from "@/components/ui/pageMarginContainer";
 
 export default function Dashboard() {
   return (
     <div>
-      <div className="mx-auto px-8 xl:w-[1200px] 2xl:w-[1400px] pt-24">
+      <PageMarginContainer>
         <Headers.GradiantHeaderOne colorOne="#A0055D" colorTwo="#836EF9">
           Dashboard
         </Headers.GradiantHeaderOne>
@@ -65,7 +66,7 @@ export default function Dashboard() {
             </Button>
           </div>
         </div>
-      </div>
+      </PageMarginContainer>
     </div>
   );
 }
