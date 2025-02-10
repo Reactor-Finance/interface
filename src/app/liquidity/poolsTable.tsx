@@ -25,7 +25,7 @@ export default function PoolsTable() {
         </tbody>
       </table>
 
-      <div className="pt-2 block">
+      <div className="pt-2  flex justify-between">
         <p className="text-[13px]">
           Page 1 of 34{" "}
           <span className="text-neutral-300">(1 - 250 results)</span>
