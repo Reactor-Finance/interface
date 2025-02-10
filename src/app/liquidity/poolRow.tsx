@@ -1,11 +1,12 @@
 import CurrenciesOverlapIcons from "@/components/shared/currenciesOverlapIcons";
 import PoolHeader from "@/components/shared/poolHeader";
 import { Button } from "@/components/ui/button";
+import { TableRow } from "@/components/ui/table";
 import React from "react";
 
 export default function PoolRow() {
   return (
-    <tr className="grid grid-cols-11 items-center text-sm text-right gap-x-4 py-4 bg-neutral-1050 px-4 rounded-md">
+    <TableRow>
       <th className="col-span-4 text-left">
         <PoolHeader />
       </th>
@@ -34,6 +35,6 @@ export default function PoolRow() {
           </Button>
         </div>
       </th>
-    </tr>
+    </TableRow>
   );
 }
