@@ -7,6 +7,7 @@ export const env = createEnv({
    */
   server: {
     RPC_URL: z.string(),
+    SUBGRAPH_URL: z.string(),
   },
 
   /**
@@ -15,7 +16,8 @@ export const env = createEnv({
    * `NEXT_PUBLIC_`.
    */
   client: {
-    // NEXT_PUBLIC_CLIENTVAR: z.string(),
+    NEXT_PUBLIC_CHAIN_ID: z.string(),
+    NEXT_PUBLIC_RPC_URL: z.string(),
   },
 
   /**
@@ -23,7 +25,10 @@ export const env = createEnv({
    * middlewares) or client-side so we need to destruct manually.
    */
   runtimeEnv: {
+    NEXT_PUBLIC_RPC_URL: process.env.NEXT_PUBLIC_RPC_URL,
+    NEXT_PUBLIC_CHAIN_ID: process.env.NEXT_PUBLIC_CHAIN_ID,
     RPC_URL: process.env.RPC_URL,
+    SUBGRAPH_URL: process.env.SUBGRAPH_URL,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
