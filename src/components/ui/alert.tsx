@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { CircleAlert } from "lucide-react";
 
 const alertVariants = cva(
-  `relative w-full text-[13px] rounded-lg p-4 [&>svg~*]:pl-7 
+  `relative w-full flex gap-x-2 text-[13px] rounded-lg py-2 px-4 [&>svg~*]:pl-7 
    [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground`,
   {
     variants: {
@@ -32,12 +32,10 @@ const Alert = React.forwardRef<
     className={cn(alertVariants({ colors }), className)}
     {...props}
   >
-    <div className="flex gap-x-2">
-      <div className="pt-[3px]">
-        <CircleAlert className={` w-5 h-5`} />
-      </div>
-      <div>{children}</div>
+    <div className="">
+      <CircleAlert className={` w-5 h-5`} />
     </div>
+    <div>{children}</div>
   </div>
 ));
 Alert.displayName = "Alert";
