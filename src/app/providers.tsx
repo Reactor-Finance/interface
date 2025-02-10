@@ -7,18 +7,27 @@ import {
   getDefaultConfig,
 } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { abstractTestnet } from "wagmi/chains";
+import { mainnet } from "wagmi/chains";
 import { hashFn } from "@wagmi/core/query";
 import { FC, PropsWithChildren } from "react";
 import { WagmiProvider } from "wagmi";
 import { NextUIProvider } from "@nextui-org/react";
 import { TRPCReactProvider } from "@/trpc/react";
-
+import { env } from "./env";
+const chainId = env.NEXT_PUBLIC_CHAIN_ID;
+const rpcUrl = env.NEXT_PUBLIC_RPC_URL;
+const chain = {
+  ...mainnet,
+  // NOTE MAYBE REMOVE THIS.
+  // All rpc calls are done through trpc
+  rpcUrls: { default: { http: [rpcUrl] } },
+  id: parseInt(chainId),
+};
 const web3Config = getDefaultConfig({
   appName: "Reactor Finance",
   projectId: "WALLET_CONNECT_PROJECT_ID_HERE",
   ssr: true,
-  chains: [abstractTestnet],
+  chains: [chain],
 });
 
 const queryClient = new QueryClient({
