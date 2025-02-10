@@ -8,6 +8,7 @@ const badgeVariants = cva(
   {
     variants: {
       colors: {
+        neutral: "border-neutral-400",
         success: "bg-success-400/15 text-success-400 border-success-400",
         error: "bg-error-400/15 text-error-400 border-error-400",
         yellow: "bg-yellow/15 text-yellow border-yellow",
@@ -18,7 +19,7 @@ const badgeVariants = cva(
         none: "",
       },
       size: {
-        sm: "text-[12px] font-normal leading-[16px] py-[2px] px-[4px]",
+        sm: "text-[12px] h-[20px] font-normal leading-[16px] py-[2px] px-[4px]",
         md: "text-sm font-normal leading-[16px] py-[4px] px-[6px]",
         full: "text-sm w-full flex justify-center  font-normal leading-[16px] py-[4px] px-[6px]",
       },
