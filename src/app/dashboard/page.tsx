@@ -1,12 +1,18 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import Headers from "@/components/ui/headers";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import InnerLabelInput from "./input";
+import PageMarginContainer from "@/components/ui/pageMarginContainer";
+import wheel from "@/assets/wheel.svg";
+import PoolTable from "./pool_table";
+
 export default function Dashboard() {
+  const [isPoolTableOpen, setIsPoolTableOpen] = useState(false);
   return (
     <div>
-      <div className="mx-auto px-8 xl:w-[1200px] 2xl:w-[1400px] pt-16">
+      <PageMarginContainer>
         <Headers.GradiantHeaderOne colorOne="#A0055D" colorTwo="#836EF9">
           Dashboard
         </Headers.GradiantHeaderOne>
@@ -39,16 +45,22 @@ export default function Dashboard() {
             </Button>
           </div>
           <div className="pt-6"></div>
-          <div className="text-start rounded-sm bg-neutral-1000 font-medium text-neutral-400 py-4 px-6">
-            To receive emissions{" "}
-            <span
-              className="underline decoration-gray-500 font-semibold cursor-pointer text-white"
-              onClick={() => {}}
-            >
-              deposit and stake
-            </span>{" "}
-            your liquidity first.
-          </div>
+          {isPoolTableOpen ? (
+            <PoolTable />
+          ) : (
+            <div className="text-start rounded-sm bg-neutral-1000 font-medium text-neutral-400 py-4 px-6">
+              To receive emissions{" "}
+              <span
+                className="underline decoration-gray-500 font-semibold cursor-pointer text-white"
+                onClick={() => {
+                  setIsPoolTableOpen(true);
+                }}
+              >
+                deposit and stake
+              </span>{" "}
+              your liquidity first.
+            </div>
+          )}
         </div>
         <div className="pt-16"></div>
         <Headers.InfoHeaderTwo popupContent={<div>explanation goes here</div>}>
@@ -64,7 +76,7 @@ export default function Dashboard() {
           <div>
             <div className="flex items-center gap-2">
               <div className="w-[40px] h-[40px] rounded-[8px] bg-neutral-950 flex items-center justify-center">
-                <img src="/wheel.svg" alt="hive" className="w-6 h-6" />
+                <Image src={wheel} alt="hive" className="w-6 h-6" />
               </div>
               <div>
                 <div className="text-white font-semibold">Hive Strategies</div>
@@ -81,7 +93,7 @@ export default function Dashboard() {
             </Button>
           </div>
         </div>
-      </div>
+      </PageMarginContainer>
     </div>
   );
 }
