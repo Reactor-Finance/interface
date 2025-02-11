@@ -3,7 +3,7 @@ import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { z } from "zod";
 
 export const tokensRouter = createTRPCRouter({
-  test: publicProcedure
+  searchTokensByNameAndAddress: publicProcedure
     .input(
       z.object({
         search: z.string(),
