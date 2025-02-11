@@ -3,20 +3,21 @@ import Image from "next/image";
 import React from "react";
 import verified from "@/assets/verified.svg";
 import info from "@/assets/info.svg";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import SearchInput from "@/components/shared/searchInput";
 import ImageWithFallback from "@/components/shared/imageWithFallback";
 import { getLogoAsset } from "@/utils";
-export default function SearchTokensDailog() {
+export default function SearchTokensDailog({
+  open,
+  setOpen,
+}: {
+  open?: boolean;
+  setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   return (
-    <Dialog>
-      <div className="flex w-full justify-center py-4">
-        <DialogTrigger className="border p-2 border-white text-white">
-          Open
-        </DialogTrigger>
-      </div>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
         title="Search Tokens"
         className="w-[440px] overflow-hidden border-none bg-[#1a1a1a] p-0 text-white"

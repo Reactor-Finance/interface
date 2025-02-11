@@ -1,20 +1,14 @@
+"use client";
 import { Card } from "@/components/ui/card";
 import Headers from "@/components/ui/headers";
 import PageMarginContainer from "@/components/ui/pageMarginContainer";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import React from "react";
-import ImageWithFallback from "@/components/shared/imageWithFallback";
-import { getLogoAsset } from "@/utils";
-import { USDC_ADDRESS } from "@/data/constants";
+import React, { useState } from "react";
 import { Alert } from "@/components/ui/alert";
+import { ChevronDown } from "lucide-react";
+import SearchTokensDailog from "@/app/dex/searchTokensDialog";
 
 export default function Page() {
+  const [open, setOpen] = useState(false);
   return (
     <PageMarginContainer>
       <Headers.GradiantHeaderOne colorOne="#A0055D" colorTwo="#836EF9">
@@ -22,29 +16,36 @@ export default function Page() {
       </Headers.GradiantHeaderOne>
       <div className="pt-6"></div>
       <div className=" gap-x-4 grid grid-cols-2">
-        <Card bg="950" className="p-4 w-full">
-          <Select>
-            <SelectTrigger className="flex p-4">
-              <div className="flex justify-center items-center gap-x-2 ">
-                <ImageWithFallback
-                  src={getLogoAsset(USDC_ADDRESS)}
-                  width={24}
-                  height={24}
-                  alt="Reactor Ticker"
-                />
-                <SelectValue placeholder={"usdc"} />
-              </div>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup></SelectGroup>
-            </SelectContent>
-          </Select>
+        <SearchTokensDailog open={open} setOpen={setOpen} />
+        <Card bg="1000">
+          <SearchTokensTrigger onClick={() => setOpen(true)} />
         </Card>
-        <Card bg="950"></Card>
+        <Card bg="1000">
+          <SearchTokensTrigger onClick={() => setOpen(true)} />
+        </Card>
       </div>
       <div className="pt-6">
-        <Alert colors="muted">Select a tokens first</Alert>
+        <Alert className="items-center" colors="muted">
+          Start by selecting the tokens. The liquidity pools available for
+          deposit will show up next.
+        </Alert>
       </div>
     </PageMarginContainer>
+  );
+}
+
+function SearchTokensTrigger({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      onClick={() => {
+        onClick();
+      }}
+      className="flex justify-between items-center py-2 bg-neutral-950 w-full rounded-md px-4"
+    >
+      <span className="text-neutral-200">Select first token</span>
+      <div>
+        <ChevronDown className="w-5 h-5" />
+      </div>
+    </button>
   );
 }
