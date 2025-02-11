@@ -21,6 +21,7 @@ export default function AssetSymbolAndName({
       return false;
     }
   }, [tokenAddress]);
+  console.log(tokenAddress, "tokenAddress");
   return (
     <div
       data-is-rct={isRCT ? "true" : "false"}
@@ -29,7 +30,7 @@ export default function AssetSymbolAndName({
       <ImageWithFallback
         width={24}
         height={24}
-        className="h-6 w-6"
+        className="h-6 w-6 rounded-full"
         src={getLogoAsset(tokenAddress)}
         alt={symbol ?? "unknown icon"}
       ></ImageWithFallback>
