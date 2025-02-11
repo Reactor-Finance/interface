@@ -12,13 +12,27 @@ export default function Stable() {
         <div>
           <label htmlFor="">Asset 1</label>
         </div>
-        <AssetCard tokenAddress={USDC_ADDRESS} />
+        <AssetCard
+          tokenAddress={"0x"}
+          setTokenAmount={function (address: string): void {
+            console.log(address);
+            throw new Error("Function not implemented.");
+          }}
+          tokenAmount={""}
+        />
       </div>
       <div className="space-y-2">
         <div>
           <label htmlFor="">Asset 2</label>
         </div>
-        <AssetCard tokenAddress={USDC_ADDRESS} />
+        <AssetCard
+          tokenAddress={USDC_ADDRESS}
+          setTokenAmount={function (_address: string): void {
+            console.log(_address);
+            throw new Error("Function not implemented.");
+          }}
+          tokenAmount={""}
+        />
       </div>
       <StableStats />
       <Button variant="primary" disabled size="submit">
