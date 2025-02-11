@@ -7,6 +7,8 @@ interface Props {
   tokenTwo: TAddress;
 }
 export default function InitializePool({ tokenOne, tokenTwo }: Props) {
+  const [tokenOneAmount, setTokenOneAmount] = React.useState("");
+  const [tokenTwoAmount, setTokenTwoAmount] = React.useState("");
   return (
     <>
       <h2 className="text-xl">Initialize Pool</h2>
@@ -14,13 +16,21 @@ export default function InitializePool({ tokenOne, tokenTwo }: Props) {
         <div>
           <label htmlFor="">Asset 1</label>
         </div>
-        <AssetCard tokenAddress={tokenOne} />
+        <AssetCard
+          setTokenAmount={setTokenOneAmount}
+          tokenAmount={tokenOneAmount}
+          tokenAddress={tokenOne}
+        />
       </div>
       <div className="space-y-2">
         <div>
           <label htmlFor="">Asset 2</label>
         </div>
-        <AssetCard tokenAddress={tokenTwo} />
+        <AssetCard
+          setTokenAmount={setTokenTwoAmount}
+          tokenAmount={tokenTwoAmount}
+          tokenAddress={tokenTwo}
+        />
       </div>
 
       <div className="">
