@@ -31,7 +31,7 @@ export default function AssetSymbolAndName({
         height={24}
         className="h-6 w-6"
         src={getLogoAsset(tokenAddress)}
-        alt={""}
+        alt={symbol ?? "unknown icon"}
       ></ImageWithFallback>
       <span className="text-[13px]">{symbol}</span>
     </div>
