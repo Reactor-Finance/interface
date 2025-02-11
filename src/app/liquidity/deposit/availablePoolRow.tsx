@@ -2,6 +2,7 @@ import PoolHeader from "@/components/shared/poolHeader";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { TPoolType, TToken } from "@/lib/types";
+import Link from "next/link";
 import React from "react";
 interface Props {
   poolType: TPoolType;
@@ -35,9 +36,13 @@ export default function AvailablePoolRow({
         <span className="text-primary-400">$0.00</span>
       </div>
       <div className="flex justify-end items-center">
-        <Button size="md" variant="filled">
-          Deposit
-        </Button>
+        <Link
+          href={`/liquidity/add-liquidity?tokenOne=${tokenOne.address}&tokenTwo=${tokenTwo.address}&version=1`}
+        >
+          <Button size="md" variant="filled">
+            Deposit
+          </Button>
+        </Link>
       </div>
     </Card>
   );

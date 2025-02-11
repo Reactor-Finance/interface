@@ -1,12 +1,14 @@
+"use client";
 import Headers from "@/components/ui/headers";
 import PageMarginContainer from "@/components/ui/pageMarginContainer";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronLeft, Settings } from "lucide-react";
 import Link from "next/link";
 import React from "react";
-import LiquidityCard from "./liquidityCard";
+import LiquidityCard from "./liquidityCard/liquidityCard";
 
 export default function Page() {
+  const [tab, setTab] = React.useState("stable");
   return (
     <PageMarginContainer>
       <div className="flex justify-between">
@@ -28,7 +30,7 @@ export default function Page() {
           </Headers.GradiantHeaderOne>
         </div>
         <div className="flex gap-x-4 items-center">
-          <Tabs defaultValue="stable">
+          <Tabs value={tab} onValueChange={setTab}>
             <TabsList colors="muted">
               <TabsTrigger value="stable">Stable</TabsTrigger>
               <TabsTrigger value="classic">Classic</TabsTrigger>
