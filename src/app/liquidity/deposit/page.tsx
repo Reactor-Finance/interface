@@ -15,7 +15,6 @@ export default function Page() {
   const [openTwo, setOpenTokenTwo] = useState(false);
   const [tokenOne, setTokenOne] = useState<TToken | undefined>();
   const [tokenTwo, setTokenTwo] = useState<TToken | undefined>();
-  console.log(tokenTwo, tokenOne, "TOKENS");
   const setToken = ({ address, symbol }: TToken) => {
     if (openOne) {
       setTokenOne({ address, symbol });
@@ -95,7 +94,6 @@ function SearchTokensTrigger({
   onClick: () => void;
   token?: TToken;
 }) {
-  console.log(token);
   return (
     <button
       onClick={() => {
