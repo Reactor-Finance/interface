@@ -8,9 +8,8 @@ import { ChevronDown } from "lucide-react";
 import SearchTokensDailog from "@/components/shared/searchTokensDialog";
 import ImageWithFallback from "@/components/shared/imageWithFallback";
 import { getLogoAsset } from "@/utils";
-import { TAddress, TPoolType } from "@/lib/types";
+import { TAddress, TPoolType, TToken } from "@/lib/types";
 import AvailablePoolRow from "./availablePoolRow";
-type TToken = { address: string; symbol: string };
 export default function Page() {
   const [openOne, setOpenTokenOne] = useState(false);
   const [openTwo, setOpenTokenTwo] = useState(false);
@@ -72,13 +71,13 @@ export default function Page() {
           {tokenOne && tokenTwo && (
             <>
               <AvailablePoolRow
-                tokenOne={tokenOne.address as TAddress}
-                tokenTwo={tokenTwo.address as TAddress}
+                tokenOne={tokenOne}
+                tokenTwo={tokenTwo}
                 poolType={TPoolType.STABLE}
               />
               <AvailablePoolRow
-                tokenOne={tokenOne.address as TAddress}
-                tokenTwo={tokenTwo.address as TAddress}
+                tokenOne={tokenOne}
+                tokenTwo={tokenTwo}
                 poolType={TPoolType.VOLATILE}
               />
             </>

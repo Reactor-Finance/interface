@@ -9,7 +9,7 @@ import SearchInput from "@/components/shared/searchInput";
 import ImageWithFallback from "@/components/shared/imageWithFallback";
 import { getLogoAsset } from "@/utils";
 import { api } from "@/trpc/react";
-import { TAddress } from "@/lib/types";
+import { TAddress, TToken } from "@/lib/types";
 export default function SearchTokensDailog({
   open,
   setOpen,
@@ -17,7 +17,7 @@ export default function SearchTokensDailog({
 }: {
   open?: boolean;
   setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
-  setToken: ({ address, symbol }: { address: string; symbol: string }) => void;
+  setToken: ({ address, symbol }: TToken) => void;
 }) {
   const [value, setValue] = useState("");
   const { data } = api.tokens.searchTokensByNameAndAddress.useQuery({
@@ -105,14 +105,8 @@ function TokenItem({
   selectToken,
 }: {
   symbol: string;
-  selectToken: ({
-    address,
-    symbol,
-  }: {
-    address: string;
-    symbol: string;
-  }) => void;
-  address: string;
+  selectToken: ({ address, symbol }: TToken) => void;
+  address: TAddress;
 }) {
   return (
     <button
