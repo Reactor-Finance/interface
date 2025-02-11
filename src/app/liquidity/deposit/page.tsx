@@ -8,7 +8,8 @@ import { ChevronDown } from "lucide-react";
 import SearchTokensDailog from "@/components/shared/searchTokensDialog";
 import ImageWithFallback from "@/components/shared/imageWithFallback";
 import { getLogoAsset } from "@/utils";
-import { TAddress } from "@/lib/types";
+import { TAddress, TPoolType } from "@/lib/types";
+import AvailablePoolRow from "./availablePoolRow";
 type TToken = { address: string; symbol: string };
 export default function Page() {
   const [openOne, setOpenTokenOne] = useState(false);
@@ -64,6 +65,25 @@ export default function Page() {
           Start by selecting the tokens. The liquidity pools available for
           deposit will show up next.
         </Alert>
+      </div>
+      <div className="pt-8">
+        <h3>Available pools</h3>
+        <div className="space-y-2 pt-4">
+          {tokenOne && tokenTwo && (
+            <>
+              <AvailablePoolRow
+                tokenOne={tokenOne.address as TAddress}
+                tokenTwo={tokenTwo.address as TAddress}
+                poolType={TPoolType.STABLE}
+              />
+              <AvailablePoolRow
+                tokenOne={tokenOne.address as TAddress}
+                tokenTwo={tokenTwo.address as TAddress}
+                poolType={TPoolType.VOLATILE}
+              />
+            </>
+          )}
+        </div>
       </div>
     </PageMarginContainer>
   );
