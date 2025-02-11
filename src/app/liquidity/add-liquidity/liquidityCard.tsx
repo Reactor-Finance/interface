@@ -1,10 +1,25 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import React from "react";
+import React, { useEffect, useMemo } from "react";
 import AssetCard from "./assetCard";
 import { USDC_ADDRESS } from "@/data/constants";
-
+import { useSearchParams, useRouter } from "next/navigation";
 export default function LiquidityCard() {
+  const params = useSearchParams();
+  const router = useRouter();
+  const { tokenOneAddress, tokenTwoAddress, version } = useMemo(() => {
+    const tokenOneAddress = params.get("tokenOne");
+    const tokenTwoAddress = params.get("tokenTwo");
+    const version = params.get("version");
+    return { tokenOneAddress, tokenTwoAddress, version };
+  }, [params]);
+  useEffect(() => {
+    if (!tokenOneAddress || !tokenTwoAddress || !version) {
+      router.push("/");
+    }
+  }, [router, tokenOneAddress, tokenTwoAddress, version]);
+
   return (
     <Card border="900" bg="1000" className="p-4 space-y-4 w-[440px] rounded-md">
       <h2 className="text-xl">Add C.Stable Liquidity</h2>
