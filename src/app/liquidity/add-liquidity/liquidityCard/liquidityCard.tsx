@@ -6,6 +6,7 @@ import InitializePool from "./initializePool";
 import Stable from "./stable";
 import { z } from "zod";
 import { TAddress } from "@/lib/types";
+import { LiquidityCardFormProvider } from "./liquidityCardFormProvider";
 const searchParamsSchema = z.object({
   tokenOneAddress: z.string().length(42).startsWith("0x"),
   tokenTwoAddress: z.string().length(42).startsWith("0x"),
@@ -21,7 +22,6 @@ export default function LiquidityCard() {
     const param = { tokenOneAddress, tokenTwoAddress, version };
 
     const a = searchParamsSchema.safeParse(param);
-    console.log(a, param, "A");
     if (a.success) {
       return {
         tokenOneAddress: a.data.tokenOneAddress as TAddress,
@@ -46,11 +46,23 @@ export default function LiquidityCard() {
     return;
   }
   return (
-    <Card border="900" bg="1000" className="p-4 space-y-4 w-[440px] rounded-md">
-      {!found && (
-        <InitializePool tokenOne={tokenOneAddress} tokenTwo={tokenTwoAddress} />
-      )}
-      {found && <Stable />}
-    </Card>
+    <LiquidityCardFormProvider
+      tokenOne={tokenOneAddress}
+      tokenTwo={tokenTwoAddress}
+    >
+      <Card
+        border="900"
+        bg="1000"
+        className="p-4 space-y-4 w-[440px] rounded-md"
+      >
+        {!found && (
+          <InitializePool
+            tokenOne={tokenOneAddress}
+            tokenTwo={tokenTwoAddress}
+          />
+        )}
+        {found && <Stable />}
+      </Card>
+    </LiquidityCardFormProvider>
   );
 }
