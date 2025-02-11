@@ -1,8 +1,13 @@
 import React from "react";
 import CurrenciesOverlapIcons from "./currenciesOverlapIcons";
 import { Badge } from "../ui/badge";
-
-export default function PoolHeader() {
+import { TAddress, TPoolType } from "@/lib/types";
+interface Props {
+  poolType: TPoolType;
+  tokenOne: TAddress;
+  tokenTwo: TAddress;
+}
+export default function PoolHeader({ poolType, tokenOne, tokenTwo }: Props) {
   return (
     <div className="flex gap-x-4 items-center">
       <span>1</span>
@@ -10,17 +15,17 @@ export default function PoolHeader() {
         <CurrenciesOverlapIcons
           tokenOne={{
             alt: "",
-            address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+            address: tokenOne,
           }}
           tokenTwo={{
             alt: "",
-            address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+            address: tokenTwo,
           }}
         />
         <div>
           <h4>vAMM-ETH/USDC</h4>
           <div className="space-x-1">
-            <Badge>Concetrated</Badge>
+            <PoolBadge poolType={poolType} />
             <Badge border="one" colors="neutral">
               0.3%
             </Badge>
@@ -29,4 +34,15 @@ export default function PoolHeader() {
       </div>
     </div>
   );
+}
+function PoolBadge({ poolType }: { poolType: TPoolType }) {
+  if (poolType === TPoolType.STABLE) {
+    return <Badge colors="success">Stable</Badge>;
+  }
+  if (poolType === TPoolType.CONCENTRATED) {
+    return <Badge colors="primary">Concentrated</Badge>;
+  }
+  if (poolType === TPoolType.VOLATILE) {
+    return <Badge colors="yellow">Volatile</Badge>;
+  }
 }

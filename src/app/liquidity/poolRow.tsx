@@ -2,13 +2,19 @@ import CurrenciesOverlapIcons from "@/components/shared/currenciesOverlapIcons";
 import PoolHeader from "@/components/shared/poolHeader";
 import { Button } from "@/components/ui/button";
 import { TableRow } from "@/components/ui/table";
+import { USDC_ADDRESS } from "@/data/constants";
+import { TPoolType } from "@/lib/types";
 import React from "react";
 
 export default function PoolRow() {
   return (
     <TableRow>
       <th className="col-span-4 text-left">
-        <PoolHeader />
+        <PoolHeader
+          tokenOne={USDC_ADDRESS}
+          tokenTwo={USDC_ADDRESS}
+          poolType={TPoolType.STABLE}
+        />
       </th>
       <th className="">$5,505,444</th>
       <th className="text-blue-light">11%</th>
