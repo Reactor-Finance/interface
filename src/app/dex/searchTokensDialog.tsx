@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import React from "react";
+import React, { useState } from "react";
 import verified from "@/assets/verified.svg";
 import info from "@/assets/info.svg";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -9,6 +9,7 @@ import { DialogTitle } from "@radix-ui/react-dialog";
 import SearchInput from "@/components/shared/searchInput";
 import ImageWithFallback from "@/components/shared/imageWithFallback";
 import { getLogoAsset } from "@/utils";
+import { api } from "@/trpc/react";
 export default function SearchTokensDailog({
   open,
   setOpen,
@@ -16,6 +17,11 @@ export default function SearchTokensDailog({
   open?: boolean;
   setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
+  const [value, setValue] = useState("");
+  const { data } = api.tokens.searchTokensByNameAndAddress.useQuery({
+    search: value,
+  });
+  console.log(data, "DATA");
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
@@ -28,9 +34,9 @@ export default function SearchTokensDailog({
             {/* <h1 className="font-geistMono">Select a token</h1> */}
             <SearchInput
               setValue={(s: string) => {
-                console.log(s);
+                setValue(s);
               }}
-              value=""
+              value={value}
             />
           </div>
           <div className="relative z-0 h-[calc(100%-179px)] border-t border-gray-600  ">
