@@ -6,3 +6,5 @@ export enum TPoolType {
   "STABLE",
   "VOLATILE",
 }
+
+export type TToken = { address: TAddress; symbol: string };
