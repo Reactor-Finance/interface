@@ -11,8 +11,8 @@ export default function PoolRow() {
     <TableRow>
       <th className="col-span-4 text-left">
         <PoolHeader
-          tokenOne={USDC_ADDRESS}
-          tokenTwo={USDC_ADDRESS}
+          tokenOne={{ address: USDC_ADDRESS, symbol: "USDC" }}
+          tokenTwo={{ address: USDC_ADDRESS, symbol: "USDC" }}
           poolType={TPoolType.STABLE}
         />
       </th>

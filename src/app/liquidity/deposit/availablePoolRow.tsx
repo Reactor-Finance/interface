@@ -1,12 +1,12 @@
 import PoolHeader from "@/components/shared/poolHeader";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { TAddress, TPoolType } from "@/lib/types";
+import { TPoolType, TToken } from "@/lib/types";
 import React from "react";
 interface Props {
   poolType: TPoolType;
-  tokenOne: TAddress;
-  tokenTwo: TAddress;
+  tokenOne: TToken;
+  tokenTwo: TToken;
 }
 export default function AvailablePoolRow({
   poolType,
