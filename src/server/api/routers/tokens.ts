@@ -11,12 +11,12 @@ export const tokensRouter = createTRPCRouter({
     )
     .query(async ({ input }) => {
       // ** For now Mocking a query to a database **
-      const tokenFoundByName = tokens.filter((token) =>
+      const tokensFoundByName = tokens.filter((token) =>
         token.symbol.toLowerCase().includes(input.search.toLowerCase())
       );
-      const tokenFoundByAddress = tokens.filter((token) =>
+      const tokensFoundByAddress = tokens.filter((token) =>
         token.address.toLowerCase().includes(input.search.toLowerCase())
       );
-      return { tokenFoundByName, tokenFoundByAddress };
+      return { tokensFoundByName, tokensFoundByAddress };
     }),
 });
