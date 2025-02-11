@@ -1,7 +1,9 @@
 import { Button } from "@/components/ui/button";
-import React from "react";
+import React, { useCallback } from "react";
 import AssetCard from "./assetCard";
 import { TAddress } from "@/lib/types";
+import { useCreatePair } from "./hooks/useCreatePair";
+import { useWriteContract } from "wagmi";
 interface Props {
   tokenOne: TAddress;
   tokenTwo: TAddress;
@@ -9,6 +11,13 @@ interface Props {
 export default function InitializePool({ tokenOne, tokenTwo }: Props) {
   const [tokenOneAmount, setTokenOneAmount] = React.useState("");
   const [tokenTwoAmount, setTokenTwoAmount] = React.useState("");
+  const { data } = useCreatePair({ tokenOne, tokenTwo, stable: true });
+  const { writeContract } = useWriteContract();
+  console.log(data?.request);
+  const onSubmit = useCallback(() => {
+    if (data?.request) writeContract(data?.request);
+  }, [data?.request, writeContract]);
+
   return (
     <>
       <h2 className="text-xl">Initialize Pool</h2>
@@ -47,7 +56,12 @@ export default function InitializePool({ tokenOne, tokenTwo }: Props) {
           </div>
         </div>
       </div>
-      <Button variant="primary" disabled size="submit">
+      <Button
+        onClick={onSubmit}
+        variant="primary"
+        disabled={!Boolean(data?.request)}
+        size="submit"
+      >
         Add Liquidity
       </Button>
     </>
