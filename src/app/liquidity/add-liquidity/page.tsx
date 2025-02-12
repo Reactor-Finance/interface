@@ -4,11 +4,61 @@ import PageMarginContainer from "@/components/ui/pageMarginContainer";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronLeft, Settings } from "lucide-react";
 import Link from "next/link";
-import React from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import LiquidityCard from "./liquidityCard/liquidityCard";
-
+import { useRouter, useSearchParams } from "next/navigation";
+import { z } from "zod";
+import { TPoolType } from "@/lib/types";
+const searchParamsSchema = z.object({
+  version: z.enum(["stable", "volatile", "concentrated"]),
+});
 export default function Page() {
-  const [tab, setTab] = React.useState("stable");
+  const params = useSearchParams();
+  const router = useRouter();
+  const { version } = useMemo(() => {
+    const version = params.get("version");
+    const param = { version };
+
+    const a = searchParamsSchema.safeParse(param);
+    if (a.success) {
+      return {
+        version: a.data.version,
+      };
+    }
+    return {
+      version: undefined,
+    };
+  }, [params]);
+  useEffect(() => {
+    if (!version) router.push("/");
+  }, [router, version]);
+  // Get a new searchParams string by merging the current
+  // searchParams with a provided key/value pair
+  const createQueryString = useCallback(
+    (name: string, value: string) => {
+      const searchParams = new URLSearchParams(params.toString());
+      searchParams.set(name, value);
+      return searchParams.toString();
+    },
+    [params]
+  );
+  const tabTriggerHandle = useCallback(
+    (poolType: TPoolType) => {
+      if (poolType === TPoolType.STABLE) {
+        router.push("add-liquidity?" + createQueryString("version", "stable"));
+      } else if (poolType === TPoolType.VOLATILE) {
+        router.push(
+          "add-liquidity?" + createQueryString("version", "volatile")
+        );
+      } else if (poolType === TPoolType.CONCENTRATED) {
+        router.push(
+          "add-liquidity?" + createQueryString("version", "concentrated")
+        );
+      }
+    },
+    [createQueryString, router]
+  );
+  if (!version) return;
   return (
     <PageMarginContainer>
       <div className="flex justify-between">
@@ -30,11 +80,26 @@ export default function Page() {
           </Headers.GradiantHeaderOne>
         </div>
         <div className="flex gap-x-4 items-center">
-          <Tabs value={tab} onValueChange={setTab}>
+          <Tabs value={version}>
             <TabsList colors="muted">
-              <TabsTrigger value="stable">Stable</TabsTrigger>
-              <TabsTrigger value="classic">Classic</TabsTrigger>
-              <TabsTrigger value="concentrated">Concentrated</TabsTrigger>
+              <TabsTrigger
+                onClick={() => tabTriggerHandle(TPoolType.STABLE)}
+                value="stable"
+              >
+                Stable
+              </TabsTrigger>
+              <TabsTrigger
+                onClick={() => tabTriggerHandle(TPoolType.VOLATILE)}
+                value="volatile"
+              >
+                Classic
+              </TabsTrigger>
+              <TabsTrigger
+                onClick={() => tabTriggerHandle(TPoolType.CONCENTRATED)}
+                value="concentrated"
+              >
+                Concentrated
+              </TabsTrigger>
             </TabsList>
           </Tabs>
           <button>
