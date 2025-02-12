@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import AssetCard from "./assetCard";
 import { TPoolType } from "@/lib/types";
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
@@ -8,7 +8,8 @@ import useGetAllowances from "./hooks/useGetAllowances";
 import useCheckNeedsApproval from "./hooks/useCheckNeedsApproval";
 import { useAddLiquidity } from "./hooks/useAddLiquidity";
 import useApproveTokens from "./hooks/useApproveTokens";
-import useInitializeVaultValidation from "./hooks/useInitializeVaultValidation";
+import useInitializePoolValidation from "./hooks/useInitializePoolValidation";
+import { useQueryClient } from "@tanstack/react-query";
 export default function InitializePool() {
   const {
     tokenOne,
@@ -19,9 +20,15 @@ export default function InitializePool() {
     tokenTwoBalance,
     poolType,
   } = useLiquidityCardFormProvider();
+  const queryClient = useQueryClient();
   const [tokenOneDeposit, setTokenOneDeposit] = React.useState("");
   const [tokenTwoDeposit, setTokenTwoDeposit] = React.useState("");
-  const { tokenTwoAllowance, tokenOneAllowance } = useGetAllowances({
+  const {
+    tokenTwoAllowance,
+    tokenOneAllowance,
+    tokenOneQueryKey,
+    tokenTwoQueryKey,
+  } = useGetAllowances({
     tokenOne,
     tokenTwo,
   });
@@ -31,6 +38,7 @@ export default function InitializePool() {
     tokenTwoDeposit,
     tokenOneDeposit,
   });
+  console.log(needsApprovals);
   const { data: approveSimulation } = useApproveTokens({
     approveTokenOne: needsApprovals?.tokenOne ?? false,
     approveTokenTwo: needsApprovals?.tokenTwo ?? false,
@@ -48,15 +56,16 @@ export default function InitializePool() {
     tokenTwoDeposit,
     stable: poolType === TPoolType.STABLE,
   });
-  const vaultValidation = useInitializeVaultValidation({
+  const { writeContract, isPending, data: hash, reset } = useWriteContract();
+  const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash });
+  const vaultValidation = useInitializePoolValidation({
     isApproveSimulationValid: Boolean(approveSimulation?.request),
     isAddLiquiditySimulationValid: Boolean(addLiquiditySimulation?.request),
     tokenOneDeposit,
     tokenTwoDeposit,
     isApproving,
+    isSuccess,
   });
-  const { writeContract, isPending, data: hash, reset } = useWriteContract();
-  const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash });
   const onSubmit = useCallback(() => {
     if (isSuccess) {
       reset();
@@ -75,6 +84,27 @@ export default function InitializePool() {
     reset,
     writeContract,
   ]);
+  useEffect(() => {
+    if (!isSuccess) return;
+    if (needsApprovals?.tokenOne) {
+      queryClient.invalidateQueries({ queryKey: tokenOneQueryKey });
+      return;
+    }
+    if (needsApprovals?.tokenTwo) {
+      queryClient.invalidateQueries({ queryKey: tokenTwoQueryKey });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    isSuccess,
+    needsApprovals?.tokenOne,
+    needsApprovals?.tokenTwo,
+    tokenOneQueryKey,
+    tokenTwoQueryKey,
+  ]);
+
+  const action = isApproving
+    ? `Approve ${needsApprovals?.tokenOne ? "USDT" : "DAI"}`
+    : "Add Liquidity";
   return (
     <>
       <h2 className="text-xl">Initialize Pool</h2>
@@ -124,12 +154,10 @@ export default function InitializePool() {
         disabled={isPending || isLoading || !vaultValidation.isValid}
         size="submit"
       >
-        {!isPending && !isLoading && !isSuccess && !isApproving
-          ? "Add Liquidity"
-          : "Approve"}
+        {!isPending && !isLoading && !isSuccess && action}
         {isPending && "Waiting for Signature..."}
         {isLoading && "Transction Pending..."}
-        {isSuccess && "Transaction Successful!"}
+        {isSuccess && "Success!"}
       </Button>
     </>
   );
