@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
-import AssetCard from "./assetCard";
+// import AssetCard from "./assetCard";
 import { Button } from "@/components/ui/button";
-import { USDC_ADDRESS } from "@/data/constants";
+// import { USDC_ADDRESS } from "@/data/constants";
 
 export default function Stable() {
   return (
@@ -12,27 +12,27 @@ export default function Stable() {
         <div>
           <label htmlFor="">Asset 1</label>
         </div>
-        <AssetCard
-          tokenAddress={"0x"}
-          setTokenAmount={function (address: string): void {
-            console.log(address);
-            throw new Error("Function not implemented.");
-          }}
-          tokenAmount={""}
-        />
+        {/* <AssetCard */}
+        {/*   tokenAddress={"0x"} */}
+        {/*   set={function (address: string): void { */}
+        {/*     console.log(address); */}
+        {/*     throw new Error("Function not implemented."); */}
+        {/*   }} */}
+        {/*   tokenAmount={""} */}
+        {/* /> */}
       </div>
       <div className="space-y-2">
         <div>
           <label htmlFor="">Asset 2</label>
         </div>
-        <AssetCard
-          tokenAddress={USDC_ADDRESS}
-          setTokenAmount={function (_address: string): void {
-            console.log(_address);
-            throw new Error("Function not implemented.");
-          }}
-          tokenAmount={""}
-        />
+        {/* <AssetCard */}
+        {/*   tokenAddress={USDC_ADDRESS} */}
+        {/*   setTokenAmount={function (_address: string): void { */}
+        {/*     console.log(_address); */}
+        {/*     throw new Error("Function not implemented."); */}
+        {/*   }} */}
+        {/*   tokenAmount={""} */}
+        {/* /> */}
       </div>
       <StableStats />
       <Button variant="primary" disabled size="submit">
