@@ -7,6 +7,8 @@ import { useReadContracts } from "wagmi";
 interface LiquidityCardFormProviderType {
   tokenOneDecimals: number | undefined;
   tokenTwoDecimals: number | undefined;
+  tokenOne: TAddress;
+  tokenTwo: TAddress;
   poolType: TPoolType | undefined;
 }
 
@@ -46,6 +48,8 @@ export const LiquidityCardFormProvider = ({
     <LiquidityContext.Provider
       value={{
         poolType,
+        tokenOne,
+        tokenTwo,
         tokenOneDecimals,
         tokenTwoDecimals,
       }}
