@@ -3,7 +3,7 @@ import React, { useCallback } from "react";
 import AssetCard from "./assetCard";
 import { TAddress } from "@/lib/types";
 import { useCreatePair } from "./hooks/useCreatePair";
-import { useWriteContract } from "wagmi";
+import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 interface Props {
   tokenOne: TAddress;
   tokenTwo: TAddress;
@@ -12,11 +12,15 @@ export default function InitializePool({ tokenOne, tokenTwo }: Props) {
   const [tokenOneAmount, setTokenOneAmount] = React.useState("");
   const [tokenTwoAmount, setTokenTwoAmount] = React.useState("");
   const { data } = useCreatePair({ tokenOne, tokenTwo, stable: true });
-  const { writeContract } = useWriteContract();
+  const { writeContract, isPending, data: hash, reset } = useWriteContract();
+  const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash });
   console.log(data?.request);
   const onSubmit = useCallback(() => {
+    if (isSuccess) {
+      reset();
+    }
     if (data?.request) writeContract(data?.request);
-  }, [data?.request, writeContract]);
+  }, [data?.request, isSuccess, reset, writeContract]);
 
   return (
     <>
@@ -57,12 +61,16 @@ export default function InitializePool({ tokenOne, tokenTwo }: Props) {
         </div>
       </div>
       <Button
+        data-pending={isPending || isLoading || isSuccess ? "true" : "false"}
         onClick={onSubmit}
         variant="primary"
-        disabled={!Boolean(data?.request)}
+        disabled={!Boolean(data?.request) || isPending || isLoading}
         size="submit"
       >
-        Add Liquidity
+        {!isPending && !isLoading && !isSuccess && "Add Liquidity"}
+        {isPending && "Waiting for Signature..."}
+        {isLoading && "Transction Pending..."}
+        {isSuccess && "Transaction Successful!"}
       </Button>
     </>
   );
