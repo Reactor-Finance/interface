@@ -9,7 +9,14 @@ import useCheckNeedsApproval from "./hooks/useCheckNeedsApproval";
 import { useAddLiquidity } from "./hooks/useAddLiquidity";
 import useApproveTokens from "./hooks/useApproveTokens";
 export default function InitializePool() {
-  const { tokenOne, tokenTwo } = useLiquidityCardFormProvider();
+  const {
+    tokenOne,
+    tokenTwo,
+    tokenOneDecimals,
+    tokenTwoDecimals,
+    tokenOneBalance,
+    tokenTwoBalance,
+  } = useLiquidityCardFormProvider();
   const [tokenOneAmount, setTokenOneAmount] = React.useState("");
   const [tokenTwoAmount, setTokenTwoAmount] = React.useState("");
   const { tokenTwoAllowance, tokenOneAllowance } = useGetAllowances({
@@ -63,6 +70,8 @@ export default function InitializePool() {
           <label htmlFor="">Asset 1</label>
         </div>
         <AssetCard
+          balanceOf={tokenOneBalance}
+          decimals={tokenOneDecimals}
           setTokenAmount={setTokenOneAmount}
           tokenAmount={tokenOneAmount}
           tokenAddress={tokenOne}
@@ -73,6 +82,8 @@ export default function InitializePool() {
           <label htmlFor="">Asset 2</label>
         </div>
         <AssetCard
+          balanceOf={tokenTwoBalance}
+          decimals={tokenTwoDecimals}
           setTokenAmount={setTokenTwoAmount}
           tokenAmount={tokenTwoAmount}
           tokenAddress={tokenTwo}

@@ -2,13 +2,15 @@
 import { TAddress, TPoolType } from "@/lib/types";
 import React, { createContext, useContext } from "react";
 import { erc20Abi } from "viem";
-import { useReadContracts } from "wagmi";
+import { useAccount, useReadContracts } from "wagmi";
 
 interface LiquidityCardFormProviderType {
   tokenOneDecimals: number | undefined;
   tokenTwoDecimals: number | undefined;
   tokenOne: TAddress;
   tokenTwo: TAddress;
+  tokenOneBalance: bigint | undefined;
+  tokenTwoBalance: bigint | undefined;
   poolType: TPoolType | undefined;
 }
 
@@ -28,6 +30,7 @@ export const LiquidityCardFormProvider = ({
   tokenTwo,
   poolType,
 }: Props) => {
+  const { address } = useAccount();
   const { data } = useReadContracts({
     contracts: [
       {
@@ -40,10 +43,24 @@ export const LiquidityCardFormProvider = ({
         abi: erc20Abi,
         functionName: "decimals",
       },
+      {
+        address: tokenOne,
+        abi: erc20Abi,
+        functionName: "balanceOf",
+        args: [address ?? "0x"],
+      },
+      {
+        address: tokenTwo,
+        abi: erc20Abi,
+        functionName: "balanceOf",
+        args: [address ?? "0x"],
+      },
     ],
   });
   const tokenOneDecimals = data?.[0].result;
   const tokenTwoDecimals = data?.[1].result;
+  const tokenOneBalance = data?.[2].result;
+  const tokenTwoBalance = data?.[3].result;
   return (
     <LiquidityContext.Provider
       value={{
@@ -52,6 +69,8 @@ export const LiquidityCardFormProvider = ({
         tokenTwo,
         tokenOneDecimals,
         tokenTwoDecimals,
+        tokenOneBalance,
+        tokenTwoBalance,
       }}
     >
       {children}
