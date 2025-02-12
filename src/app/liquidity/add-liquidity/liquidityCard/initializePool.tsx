@@ -5,6 +5,8 @@ import { TAddress, TPoolType } from "@/lib/types";
 import { useCreatePair } from "./hooks/useCreatePair";
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { useLiquidityCardFormProvider } from "./liquidityCardFormProvider";
+import useGetAllowances from "./hooks/useGetAllowances";
+import useCheckNeedsApproval from "./hooks/useCheckNeedsApproval";
 interface Props {
   tokenOne: TAddress;
   tokenTwo: TAddress;
@@ -12,6 +14,23 @@ interface Props {
 export default function InitializePool({ tokenOne, tokenTwo }: Props) {
   const [tokenOneAmount, setTokenOneAmount] = React.useState("");
   const [tokenTwoAmount, setTokenTwoAmount] = React.useState("");
+  const { tokenTwoAllowance, tokenOneAllowance } = useGetAllowances({
+    tokenOne,
+    tokenTwo,
+  });
+  const needsApprovals = useCheckNeedsApproval({
+    tokenTwoAllowance,
+    tokenOneAllowance,
+    tokenTwoAmount,
+    tokenOneAmount,
+  });
+
+  if (needsApprovals?.tokenOne) {
+    console.log("approve");
+  }
+  if (needsApprovals?.tokenTwo) {
+    console.log("approve");
+  }
   const { poolType } = useLiquidityCardFormProvider();
   const { data } = useCreatePair({
     tokenOne,
@@ -20,14 +39,13 @@ export default function InitializePool({ tokenOne, tokenTwo }: Props) {
   });
   const { writeContract, isPending, data: hash, reset } = useWriteContract();
   const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash });
-  console.log(data?.request);
   const onSubmit = useCallback(() => {
     if (isSuccess) {
       reset();
     }
     if (data?.request) writeContract(data?.request);
   }, [data?.request, isSuccess, reset, writeContract]);
-
+  const isApproving = needsApprovals?.tokenOne || needsApprovals?.tokenTwo;
   return (
     <>
       <h2 className="text-xl">Initialize Pool</h2>
@@ -73,7 +91,9 @@ export default function InitializePool({ tokenOne, tokenTwo }: Props) {
         disabled={!Boolean(data?.request) || isPending || isLoading}
         size="submit"
       >
-        {!isPending && !isLoading && !isSuccess && "Add Liquidity"}
+        {!isPending && !isLoading && !isSuccess && !isApproving
+          ? "Add Liquidity"
+          : "Approve"}
         {isPending && "Waiting for Signature..."}
         {isLoading && "Transction Pending..."}
         {isSuccess && "Transaction Successful!"}
