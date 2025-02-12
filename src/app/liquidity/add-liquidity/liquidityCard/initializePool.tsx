@@ -31,13 +31,6 @@ export default function InitializePool() {
     tokenTwoDeposit,
     tokenOneDeposit,
   });
-  const { data: addLiquiditySimulation } = useAddLiquidity({
-    tokenOne,
-    tokenTwo,
-    tokenOneDeposit,
-    tokenTwoDeposit,
-    stable: poolType === TPoolType.STABLE,
-  });
   const { data: approveSimulation } = useApproveTokens({
     approveTokenOne: needsApprovals?.tokenOne ?? false,
     approveTokenTwo: needsApprovals?.tokenTwo ?? false,
@@ -46,14 +39,22 @@ export default function InitializePool() {
   const isApproving = Boolean(
     needsApprovals?.tokenOne || needsApprovals?.tokenTwo
   );
-  const valid = useInitializeVaultValidation({
+
+  const { data: addLiquiditySimulation } = useAddLiquidity({
+    tokenOne,
+    tokenTwo,
+    isApproving,
+    tokenOneDeposit,
+    tokenTwoDeposit,
+    stable: poolType === TPoolType.STABLE,
+  });
+  const vaultValidation = useInitializeVaultValidation({
     isApproveSimulationValid: Boolean(approveSimulation?.request),
     isAddLiquiditySimulationValid: Boolean(addLiquiditySimulation?.request),
     tokenOneDeposit,
     tokenTwoDeposit,
     isApproving,
   });
-  console.log(valid);
   const { writeContract, isPending, data: hash, reset } = useWriteContract();
   const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash });
   const onSubmit = useCallback(() => {
@@ -120,7 +121,7 @@ export default function InitializePool() {
         data-pending={isPending || isLoading || isSuccess ? "true" : "false"}
         onClick={onSubmit}
         variant="primary"
-        disabled={isPending || isLoading}
+        disabled={isPending || isLoading || !vaultValidation.isValid}
         size="submit"
       >
         {!isPending && !isLoading && !isSuccess && !isApproving

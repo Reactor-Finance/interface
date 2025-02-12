@@ -21,6 +21,9 @@ export default function AssetSymbolAndName({
       return false;
     }
   }, [tokenAddress]);
+  const assetSrc = useMemo(() => {
+    return getLogoAsset(tokenAddress);
+  }, [tokenAddress]);
   return (
     <div
       data-is-rct={isRCT ? "true" : "false"}
@@ -30,7 +33,7 @@ export default function AssetSymbolAndName({
         width={24}
         height={24}
         className="h-6 w-6 rounded-full"
-        src={getLogoAsset(tokenAddress)}
+        src={assetSrc}
         alt={symbol ?? "unknown icon"}
       ></ImageWithFallback>
       <span className="text-[13px]">{symbol}</span>
