@@ -7,7 +7,7 @@ interface Props {
   isApproveSimulationValid: boolean;
   isAddLiquiditySimulationValid: boolean;
 }
-export default function useInitializeVaultValidation({
+export default function useInitializePoolValidation({
   isApproving,
   isAddLiquiditySimulationValid,
   isApproveSimulationValid,
@@ -19,13 +19,17 @@ export default function useInitializeVaultValidation({
   //   tokenOneDecimals,
   // } = useLiquidityCardFormProvider();
   if (isApproving) {
+    console.log("here3");
     if (isApproveSimulationValid) {
-      return { isValid: false, error: null };
+      console.log("here2");
+      return { isValid: true, error: null };
     }
   }
 
   if (!isAddLiquiditySimulationValid) {
+    console.log("here");
     return { isValid: false, error: null };
   }
-  return { isValid: false, error: null };
+  console.log("here");
+  return { isValid: true, error: null };
 }
