@@ -21,7 +21,6 @@ export default function AssetSymbolAndName({
       return false;
     }
   }, [tokenAddress]);
-  console.log(tokenAddress, "tokenAddress");
   return (
     <div
       data-is-rct={isRCT ? "true" : "false"}
