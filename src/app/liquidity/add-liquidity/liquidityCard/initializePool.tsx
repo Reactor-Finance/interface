@@ -1,17 +1,14 @@
 import { Button } from "@/components/ui/button";
 import React, { useCallback } from "react";
 import AssetCard from "./assetCard";
-import { TAddress, TPoolType } from "@/lib/types";
+import { TPoolType } from "@/lib/types";
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { useLiquidityCardFormProvider } from "./liquidityCardFormProvider";
 import useGetAllowances from "./hooks/useGetAllowances";
 import useCheckNeedsApproval from "./hooks/useCheckNeedsApproval";
 import { useAddLiquidity } from "./hooks/useAddLiquidity";
-interface Props {
-  tokenOne: TAddress;
-  tokenTwo: TAddress;
-}
-export default function InitializePool({ tokenOne, tokenTwo }: Props) {
+export default function InitializePool() {
+  const { tokenOne, tokenTwo } = useLiquidityCardFormProvider();
   const [tokenOneAmount, setTokenOneAmount] = React.useState("");
   const [tokenTwoAmount, setTokenTwoAmount] = React.useState("");
   const { tokenTwoAllowance, tokenOneAllowance } = useGetAllowances({
@@ -24,7 +21,6 @@ export default function InitializePool({ tokenOne, tokenTwo }: Props) {
     tokenTwoAmount,
     tokenOneAmount,
   });
-
   if (needsApprovals?.tokenOne) {
     console.log("approve");
   }

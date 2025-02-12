@@ -51,12 +51,7 @@ export default function LiquidityCard({ poolType }: { poolType: TPoolType }) {
         bg="1000"
         className="p-4 space-y-4 w-[440px] rounded-md"
       >
-        {!found && (
-          <InitializePool
-            tokenOne={tokenOneAddress}
-            tokenTwo={tokenTwoAddress}
-          />
-        )}
+        {!found && <InitializePool />}
         {found && <Stable />}
       </Card>
     </LiquidityCardFormProvider>
