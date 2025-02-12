@@ -12,10 +12,20 @@ import { TPoolType } from "@/lib/types";
 const searchParamsSchema = z.object({
   version: z.enum(["stable", "volatile", "concentrated"]),
 });
+function covertToPoolType(version: string) {
+  switch (version) {
+    case "stable":
+      return TPoolType.STABLE;
+    case "volatile":
+      return TPoolType.VOLATILE;
+    case "concentrated":
+      return TPoolType.CONCENTRATED;
+  }
+}
 export default function Page() {
   const params = useSearchParams();
   const router = useRouter();
-  const { version } = useMemo(() => {
+  const { poolType, version } = useMemo(() => {
     const version = params.get("version");
     const param = { version };
 
@@ -23,15 +33,16 @@ export default function Page() {
     if (a.success) {
       return {
         version: a.data.version,
+        poolType: covertToPoolType(a.data.version),
       };
     }
     return {
-      version: undefined,
+      poolType: undefined,
     };
   }, [params]);
   useEffect(() => {
-    if (!version) router.push("/");
-  }, [router, version]);
+    if (poolType === undefined) router.push("/");
+  }, [poolType, router]);
   // Get a new searchParams string by merging the current
   // searchParams with a provided key/value pair
   const createQueryString = useCallback(
@@ -58,7 +69,7 @@ export default function Page() {
     },
     [createQueryString, router]
   );
-  if (!version) return;
+  if (!version && poolType === undefined) return;
   return (
     <PageMarginContainer>
       <div className="flex justify-between">
@@ -109,7 +120,7 @@ export default function Page() {
       </div>
       <div className="pt-6"></div>
       <div className="flex justify-center p-4">
-        <LiquidityCard />
+        {poolType !== undefined && <LiquidityCard poolType={poolType} />}
       </div>
     </PageMarginContainer>
   );

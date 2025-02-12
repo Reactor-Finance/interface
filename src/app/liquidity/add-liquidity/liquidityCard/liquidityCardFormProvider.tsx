@@ -1,5 +1,5 @@
 "use client";
-import { TAddress } from "@/lib/types";
+import { TAddress, TPoolType } from "@/lib/types";
 import React, { createContext, useContext } from "react";
 import { erc20Abi } from "viem";
 import { useReadContracts } from "wagmi";
@@ -7,6 +7,7 @@ import { useReadContracts } from "wagmi";
 interface LiquidityCardFormProviderType {
   tokenOneDecimals: number | undefined;
   tokenTwoDecimals: number | undefined;
+  poolType: TPoolType | undefined;
 }
 
 const LiquidityContext = createContext<
@@ -16,12 +17,14 @@ interface Props {
   children: React.ReactNode;
   tokenOne: TAddress;
   tokenTwo: TAddress;
+  poolType: TPoolType;
 }
 
 export const LiquidityCardFormProvider = ({
   children,
   tokenOne,
   tokenTwo,
+  poolType,
 }: Props) => {
   const { data } = useReadContracts({
     contracts: [
@@ -42,6 +45,7 @@ export const LiquidityCardFormProvider = ({
   return (
     <LiquidityContext.Provider
       value={{
+        poolType,
         tokenOneDecimals,
         tokenTwoDecimals,
       }}

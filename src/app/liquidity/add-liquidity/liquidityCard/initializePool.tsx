@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
 import React, { useCallback } from "react";
 import AssetCard from "./assetCard";
-import { TAddress } from "@/lib/types";
+import { TAddress, TPoolType } from "@/lib/types";
 import { useCreatePair } from "./hooks/useCreatePair";
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import { useLiquidityCardFormProvider } from "./liquidityCardFormProvider";
 interface Props {
   tokenOne: TAddress;
   tokenTwo: TAddress;
@@ -11,7 +12,12 @@ interface Props {
 export default function InitializePool({ tokenOne, tokenTwo }: Props) {
   const [tokenOneAmount, setTokenOneAmount] = React.useState("");
   const [tokenTwoAmount, setTokenTwoAmount] = React.useState("");
-  const { data } = useCreatePair({ tokenOne, tokenTwo, stable: true });
+  const { poolType } = useLiquidityCardFormProvider();
+  const { data } = useCreatePair({
+    tokenOne,
+    tokenTwo,
+    stable: poolType === TPoolType.STABLE,
+  });
   const { writeContract, isPending, data: hash, reset } = useWriteContract();
   const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash });
   console.log(data?.request);
