@@ -56,14 +56,19 @@ export default function Page() {
   const tabTriggerHandle = useCallback(
     (poolType: TPoolType) => {
       if (poolType === TPoolType.STABLE) {
-        router.push("add-liquidity?" + createQueryString("version", "stable"));
+        router.push("add-liquidity?" + createQueryString("version", "stable"), {
+          scroll: false,
+        });
       } else if (poolType === TPoolType.VOLATILE) {
         router.push(
-          "add-liquidity?" + createQueryString("version", "volatile")
+          "add-liquidity?" + createQueryString("version", "volatile"),
+          { scroll: false }
         );
       } else if (poolType === TPoolType.CONCENTRATED) {
         router.push(
-          "add-liquidity?" + createQueryString("version", "concentrated")
+          "add-liquidity?" + createQueryString("version", "concentrated"),
+
+          { scroll: false }
         );
       }
     },
