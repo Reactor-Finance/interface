@@ -9,8 +9,8 @@ interface LiquidityCardFormProviderType {
   tokenTwoDecimals: number | undefined;
   tokenOne: TAddress;
   tokenTwo: TAddress;
-  tokenOneBalance: bigint | undefined;
-  tokenTwoBalance: bigint | undefined;
+  tokenOneBalance: bigint;
+  tokenTwoBalance: bigint;
   poolType: TPoolType | undefined;
 }
 
@@ -59,8 +59,8 @@ export const LiquidityCardFormProvider = ({
   });
   const tokenOneDecimals = data?.[0].result;
   const tokenTwoDecimals = data?.[1].result;
-  const tokenOneBalance = data?.[2].result;
-  const tokenTwoBalance = data?.[3].result;
+  const tokenOneBalance = data?.[2].result ?? 0n;
+  const tokenTwoBalance = data?.[3].result ?? 0n;
   return (
     <LiquidityContext.Provider
       value={{
