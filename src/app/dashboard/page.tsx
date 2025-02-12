@@ -9,7 +9,7 @@ import wheel from "@/assets/wheel.svg";
 import PoolTable from "./pool_table";
 
 export default function Dashboard() {
-  const [isPoolTableOpen, setIsPoolTableOpen] = useState(false);
+  const [isDepositOpen, setIsDepositOpen] = useState(false);
   return (
     <div>
       <PageMarginContainer>
@@ -40,22 +40,23 @@ export default function Dashboard() {
             >
               Deposit & Staked Liquidity
             </Headers.InfoHeaderTwo>
-            <Button variant={"primary"} size="md">
+            <Button
+              variant={"primary"}
+              size="md"
+              onClick={() => {
+                setIsDepositOpen(true);
+              }}
+            >
               New Deposit
             </Button>
           </div>
           <div className="pt-6"></div>
-          {isPoolTableOpen ? (
+          {isDepositOpen ? (
             <PoolTable />
           ) : (
             <div className="text-start rounded-sm bg-neutral-1000 font-medium text-neutral-400 py-4 px-6">
               To receive emissions{" "}
-              <span
-                className="underline decoration-gray-500 font-semibold cursor-pointer text-white"
-                onClick={() => {
-                  setIsPoolTableOpen(true);
-                }}
-              >
+              <span className="underline decoration-gray-500 font-semibold cursor-pointer text-white">
                 deposit and stake
               </span>{" "}
               your liquidity first.
