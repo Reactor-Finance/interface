@@ -1,7 +1,8 @@
 import { useSimulateContract } from "wagmi";
 import { useLiquidityCardFormProvider } from "../liquidityCardFormProvider";
 import { Contracts } from "@/lib/contracts";
-import { maxInt256 } from "viem";
+import { maxUint256 } from "viem";
+
 // altered abi for USDT edge case
 const abi = [
   {
@@ -29,22 +30,32 @@ export default function useApproveTokens({
   approveTokenOne: boolean;
   approveTokenTwo: boolean;
 }) {
+  console.log({ approveTokenOne, approveTokenTwo });
   const { tokenOne, tokenTwo } = useLiquidityCardFormProvider();
   const { data: approveTokenOneRequest } = useSimulateContract({
     address: tokenOne,
     abi,
     functionName: "approve",
-    args: [Contracts.Router.address, maxInt256],
+    args: [Contracts.Router.address, maxUint256],
     query: { enabled: approveTokenOne },
   });
-  const { data: approveTokenTwoRequest } = useSimulateContract({
+  const {
+    data: approveTokenTwoRequest,
+    isError,
+    error,
+  } = useSimulateContract({
     address: tokenTwo,
     abi,
     functionName: "approve",
-    args: [Contracts.Router.address, maxInt256],
+    args: [Contracts.Router.address, maxUint256],
     query: { enabled: approveTokenTwo },
   });
-  console.log({ approveTokenOneRequest, approveTokenTwoRequest });
+  console.log({
+    approveTokenOneRequest,
+    approveTokenTwoRequest,
+    error,
+    isError,
+  });
   if (approveTokenOne) {
     return { data: approveTokenOneRequest };
   }
