@@ -37,7 +37,7 @@ export default function AvailablePoolRow({
       </div>
       <div className="flex justify-end items-center">
         <Link
-          href={`/liquidity/add-liquidity?tokenOne=${tokenOne.address}&tokenTwo=${tokenTwo.address}&version=1`}
+          href={`/liquidity/add-liquidity?tokenOne=${tokenOne.address}&tokenTwo=${tokenTwo.address}&version=${convertPoolTypeToString(poolType)}`}
         >
           <Button size="md" variant="filled">
             Deposit
@@ -46,4 +46,15 @@ export default function AvailablePoolRow({
       </div>
     </Card>
   );
+}
+
+function convertPoolTypeToString(poolType: TPoolType) {
+  switch (poolType) {
+    case 0:
+      return "stable";
+    case 1:
+      return "volatile";
+    case 2:
+      return "concentrated";
+  }
 }
