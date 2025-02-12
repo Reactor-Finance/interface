@@ -7,6 +7,7 @@ import { useLiquidityCardFormProvider } from "./liquidityCardFormProvider";
 import useGetAllowances from "./hooks/useGetAllowances";
 import useCheckNeedsApproval from "./hooks/useCheckNeedsApproval";
 import { useAddLiquidity } from "./hooks/useAddLiquidity";
+import useApproveTokens from "./hooks/useApproveTokens";
 export default function InitializePool() {
   const { tokenOne, tokenTwo } = useLiquidityCardFormProvider();
   const [tokenOneAmount, setTokenOneAmount] = React.useState("");
@@ -21,28 +22,38 @@ export default function InitializePool() {
     tokenTwoAmount,
     tokenOneAmount,
   });
-  if (needsApprovals?.tokenOne) {
-    console.log("approve");
-  }
-  if (needsApprovals?.tokenTwo) {
-    console.log("approve");
-  }
   const { poolType } = useLiquidityCardFormProvider();
-  const { data } = useAddLiquidity({
+  const { data: addLiquiditySimulation } = useAddLiquidity({
     tokenOne,
     tokenTwo,
     tokenOneAmount,
     tokenTwoAmount,
     stable: poolType === TPoolType.STABLE,
   });
+  const { data: approveSimulation } = useApproveTokens({
+    approveTokenOne: needsApprovals?.tokenOne ?? false,
+    approveTokenTwo: needsApprovals?.tokenTwo ?? false,
+  });
   const { writeContract, isPending, data: hash, reset } = useWriteContract();
   const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash });
   const onSubmit = useCallback(() => {
     if (isSuccess) {
       reset();
+      return;
     }
-    if (data?.request) writeContract(data?.request);
-  }, [data?.request, isSuccess, reset, writeContract]);
+    if (approveSimulation?.request) {
+      writeContract(approveSimulation?.request);
+      return;
+    }
+    if (addLiquiditySimulation?.request)
+      writeContract(addLiquiditySimulation?.request);
+  }, [
+    addLiquiditySimulation?.request,
+    approveSimulation?.request,
+    isSuccess,
+    reset,
+    writeContract,
+  ]);
   const isApproving = needsApprovals?.tokenOne || needsApprovals?.tokenTwo;
   return (
     <>
@@ -86,7 +97,7 @@ export default function InitializePool() {
         data-pending={isPending || isLoading || isSuccess ? "true" : "false"}
         onClick={onSubmit}
         variant="primary"
-        disabled={!Boolean(data?.request) || isPending || isLoading}
+        disabled={isPending || isLoading}
         size="submit"
       >
         {!isPending && !isLoading && !isSuccess && !isApproving
