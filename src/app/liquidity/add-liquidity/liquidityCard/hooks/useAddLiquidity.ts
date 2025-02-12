@@ -9,12 +9,14 @@ interface Props {
   tokenOneDeposit: string;
   tokenTwoDeposit: string;
   stable: boolean;
+  isApproving: boolean;
 }
 export function useAddLiquidity({
   tokenOne,
   tokenTwo,
   tokenOneDeposit,
   tokenTwoDeposit,
+  isApproving,
   stable,
 }: Props) {
   const { tokenOneDecimals, tokenTwoDecimals } = useLiquidityCardFormProvider();
@@ -37,7 +39,7 @@ export function useAddLiquidity({
       0n,
     ],
     query: {
-      enabled: Boolean(address),
+      enabled: Boolean(address) && !isApproving,
     },
   });
   console.log({ data });
