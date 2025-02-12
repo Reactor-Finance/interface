@@ -7,15 +7,15 @@ import Input from "@/components/ui/input";
 import { inputPatternNumberMatch } from "@/utils";
 interface Props {
   tokenAddress: TAddress;
-  setTokenAmount: (address: string) => void;
-  tokenAmount: string;
+  setTokenDeposit: (address: string) => void;
+  tokenDeposit: string;
   balanceOf: bigint | undefined;
   decimals: number | undefined;
 }
 export default function AssetCard({
   tokenAddress,
-  tokenAmount,
-  setTokenAmount,
+  tokenDeposit,
+  setTokenDeposit,
   balanceOf,
   decimals,
 }: Props) {
@@ -27,10 +27,10 @@ export default function AssetCard({
             aria-label="amount"
             className="w-[200px] md:text-lg px-1 py-1 bg-transparent border-none"
             placeholder="0"
-            value={tokenAmount}
+            value={tokenDeposit}
             onChange={(s) => {
               if (inputPatternNumberMatch(s.target.value, 18)) {
-                setTokenAmount(s.target.value);
+                setTokenDeposit(s.target.value);
               }
             }}
           />

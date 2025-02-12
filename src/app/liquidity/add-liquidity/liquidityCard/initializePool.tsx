@@ -8,6 +8,7 @@ import useGetAllowances from "./hooks/useGetAllowances";
 import useCheckNeedsApproval from "./hooks/useCheckNeedsApproval";
 import { useAddLiquidity } from "./hooks/useAddLiquidity";
 import useApproveTokens from "./hooks/useApproveTokens";
+import useInitializeVaultValidation from "./hooks/useInitializeVaultValidation";
 export default function InitializePool() {
   const {
     tokenOne,
@@ -16,9 +17,10 @@ export default function InitializePool() {
     tokenTwoDecimals,
     tokenOneBalance,
     tokenTwoBalance,
+    poolType,
   } = useLiquidityCardFormProvider();
-  const [tokenOneAmount, setTokenOneAmount] = React.useState("");
-  const [tokenTwoAmount, setTokenTwoAmount] = React.useState("");
+  const [tokenOneDeposit, setTokenOneDeposit] = React.useState("");
+  const [tokenTwoDeposit, setTokenTwoDeposit] = React.useState("");
   const { tokenTwoAllowance, tokenOneAllowance } = useGetAllowances({
     tokenOne,
     tokenTwo,
@@ -26,21 +28,32 @@ export default function InitializePool() {
   const needsApprovals = useCheckNeedsApproval({
     tokenTwoAllowance,
     tokenOneAllowance,
-    tokenTwoAmount,
-    tokenOneAmount,
+    tokenTwoDeposit,
+    tokenOneDeposit,
   });
-  const { poolType } = useLiquidityCardFormProvider();
   const { data: addLiquiditySimulation } = useAddLiquidity({
     tokenOne,
     tokenTwo,
-    tokenOneAmount,
-    tokenTwoAmount,
+    tokenOneDeposit,
+    tokenTwoDeposit,
     stable: poolType === TPoolType.STABLE,
   });
   const { data: approveSimulation } = useApproveTokens({
     approveTokenOne: needsApprovals?.tokenOne ?? false,
     approveTokenTwo: needsApprovals?.tokenTwo ?? false,
   });
+
+  const isApproving = Boolean(
+    needsApprovals?.tokenOne || needsApprovals?.tokenTwo
+  );
+  const valid = useInitializeVaultValidation({
+    isApproveSimulationValid: Boolean(approveSimulation?.request),
+    isAddLiquiditySimulationValid: Boolean(addLiquiditySimulation?.request),
+    tokenOneDeposit,
+    tokenTwoDeposit,
+    isApproving,
+  });
+  console.log(valid);
   const { writeContract, isPending, data: hash, reset } = useWriteContract();
   const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash });
   const onSubmit = useCallback(() => {
@@ -61,7 +74,6 @@ export default function InitializePool() {
     reset,
     writeContract,
   ]);
-  const isApproving = needsApprovals?.tokenOne || needsApprovals?.tokenTwo;
   return (
     <>
       <h2 className="text-xl">Initialize Pool</h2>
@@ -70,10 +82,10 @@ export default function InitializePool() {
           <label htmlFor="">Asset 1</label>
         </div>
         <AssetCard
+          setTokenDeposit={setTokenOneDeposit}
+          tokenDeposit={tokenOneDeposit}
           balanceOf={tokenOneBalance}
           decimals={tokenOneDecimals}
-          setTokenAmount={setTokenOneAmount}
-          tokenAmount={tokenOneAmount}
           tokenAddress={tokenOne}
         />
       </div>
@@ -82,10 +94,10 @@ export default function InitializePool() {
           <label htmlFor="">Asset 2</label>
         </div>
         <AssetCard
+          tokenDeposit={tokenTwoDeposit}
+          setTokenDeposit={setTokenTwoDeposit}
           balanceOf={tokenTwoBalance}
           decimals={tokenTwoDecimals}
-          setTokenAmount={setTokenTwoAmount}
-          tokenAmount={tokenTwoAmount}
           tokenAddress={tokenTwo}
         />
       </div>

@@ -6,15 +6,15 @@ import { parseUnits } from "viem";
 interface Props {
   tokenOne: TAddress;
   tokenTwo: TAddress;
-  tokenOneAmount: string;
-  tokenTwoAmount: string;
+  tokenOneDeposit: string;
+  tokenTwoDeposit: string;
   stable: boolean;
 }
 export function useAddLiquidity({
   tokenOne,
   tokenTwo,
-  tokenOneAmount,
-  tokenTwoAmount,
+  tokenOneDeposit,
+  tokenTwoDeposit,
   stable,
 }: Props) {
   const { tokenOneDecimals, tokenTwoDecimals } = useLiquidityCardFormProvider();
@@ -29,10 +29,10 @@ export function useAddLiquidity({
       tokenOne,
       tokenTwo,
       stable,
-      parseUnits(tokenOneAmount, tokenOneDecimals ?? 0),
-      parseUnits(tokenTwoAmount, tokenTwoDecimals ?? 0),
-      parseUnits(tokenOneAmount, tokenOneDecimals ?? 0), //slipage
-      parseUnits(tokenTwoAmount, tokenTwoDecimals ?? 0), //slippage
+      parseUnits(tokenOneDeposit, tokenOneDecimals ?? 0),
+      parseUnits(tokenTwoDeposit, tokenTwoDecimals ?? 0),
+      parseUnits(tokenOneDeposit, tokenOneDecimals ?? 0), //slipage
+      parseUnits(tokenTwoDeposit, tokenTwoDecimals ?? 0), //slippage
       address ?? "0x",
       0n,
     ],
@@ -40,5 +40,6 @@ export function useAddLiquidity({
       enabled: Boolean(address),
     },
   });
+  console.log({ data });
   return { data };
 }
