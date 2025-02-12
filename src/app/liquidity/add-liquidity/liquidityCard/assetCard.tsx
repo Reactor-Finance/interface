@@ -1,8 +1,7 @@
 import { Card } from "@/components/ui/card";
 import React from "react";
 import AssetSymbolAndName from "./assetSymbolAndName";
-import { useAccount, useReadContracts } from "wagmi";
-import { erc20Abi, formatUnits } from "viem";
+import { formatUnits } from "viem";
 import { TAddress } from "@/lib/types";
 import Input from "@/components/ui/input";
 import { inputPatternNumberMatch } from "@/utils";
@@ -10,33 +9,16 @@ interface Props {
   tokenAddress: TAddress;
   setTokenAmount: (address: string) => void;
   tokenAmount: string;
+  balanceOf: bigint | undefined;
+  decimals: number | undefined;
 }
 export default function AssetCard({
   tokenAddress,
   tokenAmount,
   setTokenAmount,
+  balanceOf,
+  decimals,
 }: Props) {
-  const { address } = useAccount();
-  const { data: tokenInfo } = useReadContracts({
-    contracts: [
-      {
-        address: tokenAddress,
-        abi: erc20Abi,
-        functionName: "balanceOf",
-        args: [address ?? "0x"],
-      },
-      {
-        address: tokenAddress,
-        abi: erc20Abi,
-        functionName: "decimals",
-      },
-    ],
-    query: {
-      enabled: Boolean(address),
-    },
-  });
-  const balanceOf = tokenInfo?.[0].result;
-  const decimals = tokenInfo?.[1].result;
   return (
     <Card border="900" className="py-3 rounded-md px-4 space-y-2">
       <div className="flex justify-between">
