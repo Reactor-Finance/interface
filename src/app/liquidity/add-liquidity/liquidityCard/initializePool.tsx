@@ -58,7 +58,7 @@ export default function InitializePool() {
   });
   const { writeContract, isPending, data: hash, reset } = useWriteContract();
   const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash });
-  const vaultValidation = useInitializePoolValidation({
+  const poolValidation = useInitializePoolValidation({
     isApproveSimulationValid: Boolean(approveSimulation?.request),
     isAddLiquiditySimulationValid: Boolean(addLiquiditySimulation?.request),
     tokenOneDeposit,
@@ -66,7 +66,7 @@ export default function InitializePool() {
     isApproving,
     isSuccess,
   });
-  console.log(vaultValidation);
+  console.log(poolValidation);
   const onSubmit = useCallback(() => {
     if (isSuccess) {
       reset();
@@ -152,7 +152,7 @@ export default function InitializePool() {
         data-pending={isPending || isLoading || isSuccess ? "true" : "false"}
         onClick={onSubmit}
         variant="primary"
-        disabled={isPending || isLoading || !vaultValidation.isValid}
+        disabled={isPending || isLoading || !poolValidation.isValid}
         size="submit"
       >
         {!isPending && !isLoading && !isSuccess && action}
@@ -161,7 +161,7 @@ export default function InitializePool() {
         {isSuccess && "Success!"}
       </Button>
       <span className="text-[13px] text-red-400 pt-3 text-center">
-        {vaultValidation.error}
+        {poolValidation.error}
       </span>
     </>
   );
