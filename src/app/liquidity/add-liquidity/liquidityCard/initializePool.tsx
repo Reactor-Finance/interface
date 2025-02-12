@@ -66,6 +66,7 @@ export default function InitializePool() {
     isApproving,
     isSuccess,
   });
+  console.log(vaultValidation);
   const onSubmit = useCallback(() => {
     if (isSuccess) {
       reset();
@@ -159,6 +160,9 @@ export default function InitializePool() {
         {isLoading && "Transction Pending..."}
         {isSuccess && "Success!"}
       </Button>
+      <span className="text-[13px] text-red-400 pt-3 text-center">
+        {vaultValidation.error}
+      </span>
     </>
   );
 }
