@@ -15,12 +15,11 @@ import { HeroUIProvider } from "@heroui/react";
 import { TRPCReactProvider } from "@/trpc/react";
 import { env } from "./env";
 const chainId = env.NEXT_PUBLIC_CHAIN_ID;
-const rpcUrl = env.NEXT_PUBLIC_RPC_URL;
 const chain = {
   ...mainnet,
   // NOTE MAYBE REMOVE THIS.
   // All rpc calls are done through trpc
-  rpcUrls: { default: { http: [rpcUrl] } },
+  rpcUrls: { default: { http: ["/api/rpc"] } },
   id: parseInt(chainId),
 };
 const web3Config = getDefaultConfig({

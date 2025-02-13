@@ -13,6 +13,14 @@ const nextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: "/api/rpc",
+        destination: process.env.RPC_URL,
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;

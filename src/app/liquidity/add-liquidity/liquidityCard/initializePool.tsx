@@ -20,6 +20,7 @@ export default function InitializePool() {
     tokenTwoBalance,
     poolType,
   } = useLiquidityCardFormProvider();
+  console.log({ tokenOne, tokenTwo, tokenOneDecimals, tokenTwoDecimals });
   const queryClient = useQueryClient();
   const [tokenOneDeposit, setTokenOneDeposit] = React.useState("");
   const [tokenTwoDeposit, setTokenTwoDeposit] = React.useState("");
