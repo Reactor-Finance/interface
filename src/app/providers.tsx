@@ -18,8 +18,8 @@ const chainId = env.NEXT_PUBLIC_CHAIN_ID;
 const chain = {
   ...mainnet,
   // NOTE MAYBE REMOVE THIS.
-  // All rpc calls are done through trpc
-  rpcUrls: { default: { http: ["/rpc"] } },
+  // All rpc calls are done throtcugh trpc
+  rpcUrls: { default: { http: ["/api/rpc"] } },
   id: parseInt(chainId),
 };
 const web3Config = getDefaultConfig({

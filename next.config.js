@@ -16,8 +16,8 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: "/rpc",
-        destination: process.env.RPC_URL,
+        source: "/api/rpc",
+        destination: process.env.NEXT_PUBLIC_RPC_URL,
       },
     ];
   },
