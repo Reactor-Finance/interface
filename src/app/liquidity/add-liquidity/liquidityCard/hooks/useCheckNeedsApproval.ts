@@ -14,12 +14,6 @@ export default function useCheckNeedsApproval({
 }) {
   const { tokenOneDecimals, tokenTwoDecimals } = useLiquidityCardFormProvider();
 
-  console.log({
-    tokenOneAllowance,
-    tokenTwoAllowance,
-    tokenOneDeposit,
-    tokenTwoDeposit,
-  });
   if (
     tokenOneAllowance === undefined ||
     tokenTwoAllowance === undefined ||
