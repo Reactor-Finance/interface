@@ -28,6 +28,15 @@ export const tokens: IToken[] = [
       "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xE41d2489571d322189246DaFA5ebDe1F4699F498/logo.png",
   },
   {
+    name: "Wrapped BTC",
+    address: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+    symbol: "WBTC",
+    decimals: 8,
+    chainId: 1,
+    logoURI:
+      "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599/logo.png",
+  },
+  {
     name: "Curve DAO Token",
     address: "0xD533a949740bb3306d119CC777fa900bA034cd52",
     symbol: "CRV",
