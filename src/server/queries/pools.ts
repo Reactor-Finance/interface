@@ -78,15 +78,10 @@ export const executeFindPool = async ({
   tokenOneAddress: string;
   tokenTwoAddress: string;
 }) => {
-  try {
-    const result = await graphqlClient.request(findPoolQuery, {
-      token0Id: tokenOneAddress,
-      token1Id: tokenTwoAddress,
-    });
-    const safe = PoolsSceham.safeParse(result);
-    return safe.data;
-  } catch (e) {
-    console.log(e.response, "ERROR");
-    throw Error("Pool not found");
-  }
+  const result = await graphqlClient.request(findPoolQuery, {
+    token0Id: tokenOneAddress,
+    token1Id: tokenTwoAddress,
+  });
+  const safe = PoolsSceham.safeParse(result);
+  return safe.data;
 };
