@@ -2,7 +2,7 @@ import { useAccount, useSimulateContract } from "wagmi";
 import { Contracts } from "@/lib/contracts";
 import { TAddress } from "@/lib/types";
 import { useLiquidityCardFormProvider } from "../liquidityCardFormProvider";
-import { parseUnits } from "viem";
+import { getAddress, parseUnits } from "viem";
 interface Props {
   tokenOne: TAddress;
   tokenTwo: TAddress;
@@ -25,31 +25,48 @@ export function useAddLiquidity({
     tokenOneBalance,
     tokenTwoBalance,
   } = useLiquidityCardFormProvider();
-
   const { address } = useAccount();
   const enoughToken =
     parseUnits(tokenOneDeposit, tokenOneDecimals ?? 0) <= tokenOneBalance &&
     parseUnits(tokenTwoDeposit, tokenTwoDecimals ?? 0) <= tokenTwoBalance;
   // TODO
   // ADD Slippage
-  const { data, error } = useSimulateContract({
+  const { data, error, isError, isFetching } = useSimulateContract({
     ...Contracts.Router,
     functionName: "addLiquidity",
     args: [
-      tokenOne,
-      tokenTwo,
+      getAddress(tokenOne),
+      getAddress(tokenTwo),
       stable,
       parseUnits(tokenOneDeposit, tokenOneDecimals ?? 0),
       parseUnits(tokenTwoDeposit, tokenTwoDecimals ?? 0),
-      parseUnits(tokenOneDeposit, tokenOneDecimals ?? 0), //slipage
-      parseUnits(tokenTwoDeposit, tokenTwoDecimals ?? 0), //slippage
+      parseUnits(tokenOneDeposit, tokenOneDecimals ?? 0) -
+        parseUnits("1", tokenOneDecimals ?? 0), //slipage
+      parseUnits(tokenTwoDeposit, tokenTwoDecimals ?? 0) -
+        parseUnits("1", tokenTwoDecimals ?? 0), //slippage
       address ?? "0x",
-      BigInt(Date.now() + 1000 * 60 * 2),
+      BigInt(Date.now() + 1000 * 20),
     ],
     query: {
       enabled: Boolean(address) && !isApproving && enoughToken,
     },
   });
+  console.log([
+    isFetching,
+    tokenOne,
+    tokenTwo,
+    stable,
+    parseUnits(tokenOneDeposit, tokenOneDecimals ?? 0),
+    parseUnits(tokenTwoDeposit, tokenTwoDecimals ?? 0),
+
+    parseUnits("1", tokenOneDecimals ?? 0), //slipage
+    parseUnits(tokenTwoDeposit, tokenTwoDecimals ?? 0) -
+      parseUnits("1", tokenTwoDecimals ?? 0), //slippage
+    address ?? "0x",
+    BigInt(Date.now() + 1000 * 20),
+  ]);
+  console.log(isError);
+  console.log(data, error);
   if (error) {
     console.error(error);
   }
