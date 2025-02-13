@@ -19,12 +19,20 @@ export function useAddLiquidity({
   isApproving,
   stable,
 }: Props) {
-  const { tokenOneDecimals, tokenTwoDecimals } = useLiquidityCardFormProvider();
+  const {
+    tokenOneDecimals,
+    tokenTwoDecimals,
+    tokenOneBalance,
+    tokenTwoBalance,
+  } = useLiquidityCardFormProvider();
 
   const { address } = useAccount();
+  const enoughToken =
+    parseUnits(tokenOneDeposit, tokenOneDecimals ?? 0) <= tokenOneBalance &&
+    parseUnits(tokenTwoDeposit, tokenTwoDecimals ?? 0) <= tokenTwoBalance;
   // TODO
   // ADD Slippage
-  const { data } = useSimulateContract({
+  const { data, error } = useSimulateContract({
     ...Contracts.Router,
     functionName: "addLiquidity",
     args: [
@@ -36,12 +44,15 @@ export function useAddLiquidity({
       parseUnits(tokenOneDeposit, tokenOneDecimals ?? 0), //slipage
       parseUnits(tokenTwoDeposit, tokenTwoDecimals ?? 0), //slippage
       address ?? "0x",
-      0n,
+      BigInt(Date.now() + 1000 * 60 * 2),
     ],
     query: {
-      enabled: Boolean(address) && !isApproving,
+      enabled: Boolean(address) && !isApproving && enoughToken,
     },
   });
+  if (error) {
+    console.error(error);
+  }
   console.log({ data });
   return { data };
 }
