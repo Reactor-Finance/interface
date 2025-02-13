@@ -1,7 +1,8 @@
-import React from "react";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import PoolRow from "./poolRow";
-export default function PoolsTable() {
+import { api } from "@/trpc/server";
+export default async function PoolsTable() {
+  const pools = await api.pool.getPools();
   return (
     <>
       <table className="w-full">
@@ -18,10 +19,7 @@ export default function PoolsTable() {
           </tr>
         </thead>
         <tbody className="gap-y-2 pt-2 flex flex-col">
-          <PoolRow />
-          <PoolRow />
-          <PoolRow />
-          <PoolRow />
+          {pools?.pairs.map((pool) => <PoolRow {...pool} key={pool.id} />)}
         </tbody>
       </table>
 
