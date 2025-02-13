@@ -10,6 +10,7 @@ import ImageWithFallback from "@/components/shared/imageWithFallback";
 import { getLogoAsset } from "@/utils";
 import { TAddress, TPoolType, TToken } from "@/lib/types";
 import AvailablePoolRow from "./availablePoolRow";
+import { api } from "@/trpc/react";
 export default function Page() {
   const [openOne, setOpenTokenOne] = useState(false);
   const [openTwo, setOpenTokenTwo] = useState(false);
@@ -33,6 +34,14 @@ export default function Page() {
       setOpenTokenTwo(false);
     }
   }, [openOne, openTwo]);
+  const { data } = api.pool.findPool.useQuery(
+    {
+      tokenOneAddress: tokenOne?.address ?? "0x",
+      tokenTwoAddress: tokenTwo?.address ?? "0x",
+    },
+    { enabled: Boolean(tokenOne) && Boolean(tokenTwo) }
+  );
+  console.log(data, "DATA");
   return (
     <PageMarginContainer>
       <Headers.GradiantHeaderOne colorOne="#A0055D" colorTwo="#836EF9">
