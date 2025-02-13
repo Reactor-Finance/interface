@@ -30,7 +30,6 @@ export default function useApproveTokens({
   approveTokenOne: boolean;
   approveTokenTwo: boolean;
 }) {
-  console.log({ approveTokenOne, approveTokenTwo });
   const { tokenOne, tokenTwo } = useLiquidityCardFormProvider();
   const { data: approveTokenOneRequest } = useSimulateContract({
     address: tokenOne,
@@ -39,22 +38,12 @@ export default function useApproveTokens({
     args: [Contracts.Router.address, maxUint256],
     query: { enabled: approveTokenOne },
   });
-  const {
-    data: approveTokenTwoRequest,
-    isError,
-    error,
-  } = useSimulateContract({
+  const { data: approveTokenTwoRequest } = useSimulateContract({
     address: tokenTwo,
     abi,
     functionName: "approve",
     args: [Contracts.Router.address, maxUint256],
     query: { enabled: approveTokenTwo },
-  });
-  console.log({
-    approveTokenOneRequest,
-    approveTokenTwoRequest,
-    error,
-    isError,
   });
   if (approveTokenOne) {
     return { data: approveTokenOneRequest };
