@@ -19,6 +19,14 @@ export const tokens: IToken[] = [
       "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x6B175474E89094C44Da98b954EedeAC495271d0F/logo.png",
   },
   {
+    name: "Usdt",
+    address: "0xdac17f958d2ee523a2206206994597c13d831ec7",
+    symbol: "USDT",
+    decimals: 6,
+    chainId: 1,
+    logoURI: "",
+  },
+  {
     name: "0x Protocol Token",
     address: "0xE41d2489571d322189246DaFA5ebDe1F4699F498",
     symbol: "ZRX",
