@@ -12,12 +12,14 @@ export const poolsRouter = createTRPCRouter({
       z.object({
         tokenOneAddress: z.string().length(42),
         tokenTwoAddress: z.string().length(42),
+        isStable: z.boolean().optional(),
       })
     )
     .query(async ({ input }) => {
       const pools = await executeFindPool({
         tokenOneAddress: input.tokenOneAddress.toLowerCase(),
         tokenTwoAddress: input.tokenTwoAddress.toLowerCase(),
+        isStable: input.isStable,
       });
       return pools;
     }),
