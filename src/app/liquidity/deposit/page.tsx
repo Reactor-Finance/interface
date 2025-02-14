@@ -103,7 +103,7 @@ export default function Page() {
               ></AvailablePoolRow>
             );
           })}
-          {isTokensSelected && stablePoolExist && (
+          {isTokensSelected && !stablePoolExist && (
             <>
               <AvailablePoolRow
                 tokenOne={tokenOne}
@@ -112,7 +112,7 @@ export default function Page() {
               />
             </>
           )}
-          {isTokensSelected && volatilePoolExist && (
+          {isTokensSelected && !volatilePoolExist && (
             <AvailablePoolRow
               tokenOne={tokenOne}
               tokenTwo={tokenTwo}
