@@ -39,7 +39,6 @@ const PoolsSceham = z.object({ pairs: z.array(PoolSchema) });
 export type TPool = z.infer<typeof PoolSchema>;
 export const executeGetPools = async () => {
   const result = await graphqlClient.request(getPools);
-  console.log(result, "result");
   const safe = PoolsSceham.safeParse(result);
   return safe.data;
 };
