@@ -10,6 +10,7 @@ import { useAddLiquidity } from "./hooks/useAddLiquidity";
 import useApproveTokens from "./hooks/useApproveTokens";
 import useInitializePoolValidation from "./hooks/useInitializePoolValidation";
 import { useQueryClient } from "@tanstack/react-query";
+import { api } from "@/trpc/react";
 export default function InitializePool() {
   const {
     tokenOne,
@@ -20,7 +21,14 @@ export default function InitializePool() {
     tokenTwoBalance,
     poolType,
   } = useLiquidityCardFormProvider();
-  console.log({ tokenOne, tokenTwo, tokenOneDecimals, tokenTwoDecimals });
+  const { data: pool, isLoading: isPoolQueryLoading } =
+    api.pool.findPool.useQuery({
+      tokenOneAddress: tokenOne,
+      tokenTwoAddress: tokenTwo,
+      isStable: poolType === TPoolType.STABLE,
+    });
+
+  console.log({ pool, isPoolQueryLoading });
   const queryClient = useQueryClient();
   const [tokenOneDeposit, setTokenOneDeposit] = React.useState("");
   const [tokenTwoDeposit, setTokenTwoDeposit] = React.useState("");
@@ -107,9 +115,12 @@ export default function InitializePool() {
   const action = isApproving
     ? `Approve ${needsApprovals?.tokenOne ? "USDT" : "DAI"}`
     : "Add Liquidity";
+  console.log({ length: pool?.pairs.length });
   return (
     <>
-      <h2 className="text-xl">Initialize Pool</h2>
+      <h2 className="text-xl">
+        {(pool?.pairs.length ?? 0) > 0 ? "Add Liquidity" : "Initialize Pool"}
+      </h2>{" "}
       <div className="space-y-2">
         <div>
           <label htmlFor="">Asset 1</label>
@@ -134,7 +145,6 @@ export default function InitializePool() {
           tokenAddress={tokenTwo}
         />
       </div>
-
       <div className="">
         <h5>Starting Liquidity Info</h5>
         <div className="pt-1"></div>
