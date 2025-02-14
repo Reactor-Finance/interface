@@ -2,13 +2,14 @@ import { parseUnits } from "viem";
 import { useLiquidityCardFormProvider } from "../liquidityCardFormProvider";
 
 export default function useCheckNeedsApproval({
-  tokenOneDeposit,
+  tokenDeposits,
   tokenOneAllowance,
   tokenTwoAllowance,
-  tokenTwoDeposit,
 }: {
-  tokenOneDeposit: string;
-  tokenTwoDeposit: string;
+  tokenDeposits: {
+    tokenOneDeposit: string;
+    tokenTwoDeposit: string;
+  };
   tokenOneAllowance: bigint | undefined;
   tokenTwoAllowance: bigint | undefined;
 }) {
@@ -21,10 +22,16 @@ export default function useCheckNeedsApproval({
     tokenTwoDecimals === undefined
   )
     return;
-  if (parseUnits(tokenOneDeposit, tokenOneDecimals) > tokenOneAllowance) {
+  if (
+    parseUnits(tokenDeposits.tokenOneDeposit, tokenOneDecimals) >
+    tokenOneAllowance
+  ) {
     return { tokenOne: true, tokenTwo: false };
   }
-  if (parseUnits(tokenTwoDeposit, tokenTwoDecimals) > tokenTwoAllowance) {
+  if (
+    parseUnits(tokenDeposits.tokenTwoDeposit, tokenTwoDecimals) >
+    tokenTwoAllowance
+  ) {
     return { tokenOne: false, tokenTwo: true };
   }
 }

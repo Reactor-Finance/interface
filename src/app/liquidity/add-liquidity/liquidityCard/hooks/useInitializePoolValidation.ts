@@ -3,21 +3,23 @@ import { useLiquidityCardFormProvider } from "../liquidityCardFormProvider";
 import { parseUnits } from "viem";
 
 interface Props {
-  tokenOneDeposit: string;
-  tokenTwoDeposit: string;
+  tokenDeposits: {
+    tokenOneDeposit: string;
+    tokenTwoDeposit: string;
+  };
   isApproving: boolean;
   isApproveSimulationValid: boolean;
   isAddLiquiditySimulationValid: boolean;
   isSuccess: boolean;
 }
 export default function useInitializePoolValidation({
-  tokenOneDeposit,
-  tokenTwoDeposit,
   isApproving,
   isSuccess,
   isAddLiquiditySimulationValid,
   isApproveSimulationValid,
+  tokenDeposits,
 }: Props) {
+  const { tokenOneDeposit, tokenTwoDeposit } = tokenDeposits;
   const {
     tokenOneBalance,
     tokenTwoBalance,

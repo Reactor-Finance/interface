@@ -28,8 +28,10 @@ export default function InitializePool() {
   });
 
   const queryClient = useQueryClient();
-  const [tokenOneDeposit, setTokenOneDeposit] = React.useState("");
-  const [tokenTwoDeposit, setTokenTwoDeposit] = React.useState("");
+  const [tokenDeposits, setTokenDeposits] = React.useState({
+    tokenOneDeposit: "",
+    tokenTwoDeposit: "",
+  });
   const {
     tokenTwoAllowance,
     tokenOneAllowance,
@@ -42,8 +44,7 @@ export default function InitializePool() {
   const needsApprovals = useCheckNeedsApproval({
     tokenTwoAllowance,
     tokenOneAllowance,
-    tokenTwoDeposit,
-    tokenOneDeposit,
+    tokenDeposits,
   });
   const { data: approveSimulation } = useApproveTokens({
     approveTokenOne: needsApprovals?.tokenOne ?? false,
@@ -57,9 +58,8 @@ export default function InitializePool() {
   const { data: addLiquiditySimulation } = useAddLiquidity({
     tokenOne,
     tokenTwo,
+    tokenDeposits,
     isApproving,
-    tokenOneDeposit,
-    tokenTwoDeposit,
     stable: poolType === TPoolType.STABLE,
   });
   const { writeContract, isPending, data: hash, reset } = useWriteContract();
@@ -67,9 +67,8 @@ export default function InitializePool() {
   const poolValidation = useInitializePoolValidation({
     isApproveSimulationValid: Boolean(approveSimulation?.request),
     isAddLiquiditySimulationValid: Boolean(addLiquiditySimulation?.request),
-    tokenOneDeposit,
-    tokenTwoDeposit,
     isApproving,
+    tokenDeposits,
     isSuccess,
   });
   const onSubmit = useCallback(() => {
@@ -121,8 +120,10 @@ export default function InitializePool() {
           <label htmlFor="">Asset 1</label>
         </div>
         <AssetCard
-          setTokenDeposit={setTokenOneDeposit}
-          tokenDeposit={tokenOneDeposit}
+          setTokenDeposit={(s: string) => {
+            setTokenDeposits((d) => ({ ...d, tokenOneDeposit: s }));
+          }}
+          tokenDeposit={tokenDeposits.tokenOneDeposit}
           balanceOf={tokenOneBalance}
           decimals={tokenOneDecimals}
           tokenAddress={tokenOne}
@@ -133,8 +134,10 @@ export default function InitializePool() {
           <label htmlFor="">Asset 2</label>
         </div>
         <AssetCard
-          tokenDeposit={tokenTwoDeposit}
-          setTokenDeposit={setTokenTwoDeposit}
+          setTokenDeposit={(s: string) => {
+            setTokenDeposits((d) => ({ ...d, tokenTwoDeposit: s }));
+          }}
+          tokenDeposit={tokenDeposits.tokenTwoDeposit}
           balanceOf={tokenTwoBalance}
           decimals={tokenTwoDecimals}
           tokenAddress={tokenTwo}

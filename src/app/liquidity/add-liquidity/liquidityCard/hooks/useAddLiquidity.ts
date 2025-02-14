@@ -6,16 +6,17 @@ import { getAddress, parseUnits } from "viem";
 interface Props {
   tokenOne: TAddress;
   tokenTwo: TAddress;
-  tokenOneDeposit: string;
-  tokenTwoDeposit: string;
+  tokenDeposits: {
+    tokenOneDeposit: string;
+    tokenTwoDeposit: string;
+  };
   stable: boolean;
   isApproving: boolean;
 }
 export function useAddLiquidity({
   tokenOne,
   tokenTwo,
-  tokenOneDeposit,
-  tokenTwoDeposit,
+  tokenDeposits,
   isApproving,
   stable,
 }: Props) {
@@ -27,8 +28,10 @@ export function useAddLiquidity({
   } = useLiquidityCardFormProvider();
   const { address } = useAccount();
   const enoughToken =
-    parseUnits(tokenOneDeposit, tokenOneDecimals ?? 0) <= tokenOneBalance &&
-    parseUnits(tokenTwoDeposit, tokenTwoDecimals ?? 0) <= tokenTwoBalance;
+    parseUnits(tokenDeposits.tokenOneDeposit, tokenOneDecimals ?? 0) <=
+      tokenOneBalance &&
+    parseUnits(tokenDeposits.tokenTwoDeposit, tokenTwoDecimals ?? 0) <=
+      tokenTwoBalance;
   // TODO
   // ADD Slippage
   const { data, error } = useSimulateContract({
@@ -38,11 +41,11 @@ export function useAddLiquidity({
       getAddress(tokenOne),
       getAddress(tokenTwo),
       stable,
-      parseUnits(tokenOneDeposit, tokenOneDecimals ?? 0),
-      parseUnits(tokenTwoDeposit, tokenTwoDecimals ?? 0),
-      parseUnits(tokenOneDeposit, tokenOneDecimals ?? 0) -
+      parseUnits(tokenDeposits.tokenOneDeposit, tokenOneDecimals ?? 0),
+      parseUnits(tokenDeposits.tokenTwoDeposit, tokenTwoDecimals ?? 0),
+      parseUnits(tokenDeposits.tokenOneDeposit, tokenOneDecimals ?? 0) -
         parseUnits("1", tokenOneDecimals ?? 0), //slipage
-      parseUnits(tokenTwoDeposit, tokenTwoDecimals ?? 0) -
+      parseUnits(tokenDeposits.tokenTwoDeposit, tokenTwoDecimals ?? 0) -
         parseUnits("1", tokenTwoDecimals ?? 0), //slippage
       address ?? "0x",
       BigInt(Date.now() + 1000 * 20),
