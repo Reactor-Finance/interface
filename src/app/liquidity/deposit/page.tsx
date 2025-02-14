@@ -2,7 +2,7 @@
 import { Card } from "@/components/ui/card";
 import Headers from "@/components/ui/headers";
 import PageMarginContainer from "@/components/ui/pageMarginContainer";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { Alert } from "@/components/ui/alert";
 import { ChevronDown } from "lucide-react";
 import SearchTokensDailog from "@/components/shared/searchTokensDialog";
@@ -42,6 +42,17 @@ export default function Page() {
     },
     { enabled: Boolean(tokenOne) && Boolean(tokenTwo) }
   );
+  const { stablePoolExist, volatilePoolExist } = useMemo(() => {
+    if ((pools?.pairs.length ?? 0) <= 0) {
+      return { stablePoolExist: false, volatilePoolExist: false };
+    }
+    const stablePoolExist = Boolean(pools?.pairs.find((pool) => pool.isStable));
+    const volatilePoolExist = Boolean(
+      pools?.pairs.find((pool) => !pool.isStable)
+    );
+    return { stablePoolExist, volatilePoolExist };
+  }, [pools]);
+  const isTokensSelected = tokenOne && tokenTwo;
   return (
     <PageMarginContainer>
       <Headers.GradiantHeaderOne colorOne="#A0055D" colorTwo="#836EF9">
@@ -92,19 +103,21 @@ export default function Page() {
               ></AvailablePoolRow>
             );
           })}
-          {tokenOne && tokenTwo && !Boolean(pools) && (
+          {isTokensSelected && stablePoolExist && (
             <>
               <AvailablePoolRow
                 tokenOne={tokenOne}
                 tokenTwo={tokenTwo}
                 poolType={TPoolType.STABLE}
               />
-              <AvailablePoolRow
-                tokenOne={tokenOne}
-                tokenTwo={tokenTwo}
-                poolType={TPoolType.VOLATILE}
-              />
             </>
+          )}
+          {isTokensSelected && volatilePoolExist && (
+            <AvailablePoolRow
+              tokenOne={tokenOne}
+              tokenTwo={tokenTwo}
+              poolType={TPoolType.VOLATILE}
+            />
           )}
         </div>
       </div>
