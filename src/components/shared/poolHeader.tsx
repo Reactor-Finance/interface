@@ -24,6 +24,7 @@ export default function PoolHeader({ poolType, tokenOne, tokenTwo }: Props) {
         />
         <div>
           <h4>
+            {`${poolType === TPoolType.STABLE ? "s" : "v"}AMM`}-
             {tokenOne.symbol}/{tokenTwo.symbol}
           </h4>
           <div className="space-x-1">
