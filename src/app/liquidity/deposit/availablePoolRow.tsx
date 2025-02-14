@@ -50,11 +50,11 @@ export default function AvailablePoolRow({
 
 function convertPoolTypeToString(poolType: TPoolType) {
   switch (poolType) {
-    case 0:
+    case TPoolType["STABLE"]:
       return "stable";
-    case 1:
+    case TPoolType["VOLATILE"]:
       return "volatile";
-    case 2:
+    case TPoolType["CONCENTRATED"]:
       return "concentrated";
   }
 }
