@@ -9,13 +9,18 @@ import { getAddress } from "viem";
 import React from "react";
 import { useRouter } from "next/navigation";
 
-export default function PoolRow({ token0, token1, volumeUSD }: TPool) {
+export default function PoolRow({
+  isStable,
+  token0,
+  token1,
+  volumeUSD,
+}: TPool) {
   const router = useRouter();
   const tokenOneAddress = getAddress(token0.id);
   const tokenTwoAddress = getAddress(token1.id);
   const addLiquidityHandler = () => {
     router.push(
-      `/liquidity/add-liquidity?tokenOne=${tokenOneAddress}&tokenTwo=${tokenTwoAddress}&version=${token0.pairBase[0].isStable ? "stable" : "volatile"}`
+      `/liquidity/add-liquidity?tokenOne=${tokenOneAddress}&tokenTwo=${tokenTwoAddress}&version=${isStable ? "stable" : "volatile"}`
     );
   };
   return (
@@ -30,9 +35,7 @@ export default function PoolRow({ token0, token1, volumeUSD }: TPool) {
             address: getAddress(tokenTwoAddress),
             symbol: token1.symbol,
           }}
-          poolType={
-            token0.pairBase[0].isStable ? TPoolType.STABLE : TPoolType.VOLATILE
-          }
+          poolType={isStable ? TPoolType.STABLE : TPoolType.VOLATILE}
         />
       </th>
       <th className="">$5,505,444</th>

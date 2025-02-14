@@ -2,7 +2,7 @@ import ImageWithFallback from "@/components/shared/imageWithFallback";
 import { TAddress } from "@/lib/types";
 import { getLogoAsset } from "@/utils";
 import { useMemo } from "react";
-import { erc20Abi } from "viem";
+import { erc20Abi, getAddress } from "viem";
 import { useReadContract } from "wagmi";
 export default function AssetSymbolAndName({
   tokenAddress,
@@ -22,7 +22,7 @@ export default function AssetSymbolAndName({
     }
   }, [tokenAddress]);
   const assetSrc = useMemo(() => {
-    return getLogoAsset(tokenAddress);
+    return getLogoAsset(getAddress(tokenAddress));
   }, [tokenAddress]);
   return (
     <div
