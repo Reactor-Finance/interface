@@ -4,7 +4,8 @@ import { z } from "zod";
 
 export const poolsRouter = createTRPCRouter({
   getPools: publicProcedure.query(async () => {
-    const pools = executeGetPools();
+    const pools = await executeGetPools();
+    console.log(pools, "POOLS");
     return pools;
   }),
   findPool: publicProcedure

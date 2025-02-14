@@ -21,14 +21,12 @@ export default function InitializePool() {
     tokenTwoBalance,
     poolType,
   } = useLiquidityCardFormProvider();
-  const { data: pool, isLoading: isPoolQueryLoading } =
-    api.pool.findPool.useQuery({
-      tokenOneAddress: tokenOne,
-      tokenTwoAddress: tokenTwo,
-      isStable: poolType === TPoolType.STABLE,
-    });
+  const { data: pool } = api.pool.findPool.useQuery({
+    tokenOneAddress: tokenOne,
+    tokenTwoAddress: tokenTwo,
+    isStable: poolType === TPoolType.STABLE,
+  });
 
-  console.log({ pool, isPoolQueryLoading });
   const queryClient = useQueryClient();
   const [tokenOneDeposit, setTokenOneDeposit] = React.useState("");
   const [tokenTwoDeposit, setTokenTwoDeposit] = React.useState("");
@@ -47,7 +45,6 @@ export default function InitializePool() {
     tokenTwoDeposit,
     tokenOneDeposit,
   });
-  console.log(needsApprovals);
   const { data: approveSimulation } = useApproveTokens({
     approveTokenOne: needsApprovals?.tokenOne ?? false,
     approveTokenTwo: needsApprovals?.tokenTwo ?? false,
@@ -75,7 +72,6 @@ export default function InitializePool() {
     isApproving,
     isSuccess,
   });
-  console.log(poolValidation);
   const onSubmit = useCallback(() => {
     if (isSuccess) {
       reset();
@@ -115,7 +111,6 @@ export default function InitializePool() {
   const action = isApproving
     ? `Approve ${needsApprovals?.tokenOne ? "USDT" : "DAI"}`
     : "Add Liquidity";
-  console.log({ length: pool?.pairs.length });
   return (
     <>
       <h2 className="text-xl">

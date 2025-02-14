@@ -31,7 +31,7 @@ export function useAddLiquidity({
     parseUnits(tokenTwoDeposit, tokenTwoDecimals ?? 0) <= tokenTwoBalance;
   // TODO
   // ADD Slippage
-  const { data, error, isError, isFetching } = useSimulateContract({
+  const { data, error } = useSimulateContract({
     ...Contracts.Router,
     functionName: "addLiquidity",
     args: [
@@ -51,25 +51,8 @@ export function useAddLiquidity({
       enabled: Boolean(address) && !isApproving && enoughToken,
     },
   });
-  console.log([
-    isFetching,
-    tokenOne,
-    tokenTwo,
-    stable,
-    parseUnits(tokenOneDeposit, tokenOneDecimals ?? 0),
-    parseUnits(tokenTwoDeposit, tokenTwoDecimals ?? 0),
-
-    parseUnits("1", tokenOneDecimals ?? 0), //slipage
-    parseUnits(tokenTwoDeposit, tokenTwoDecimals ?? 0) -
-      parseUnits("1", tokenTwoDecimals ?? 0), //slippage
-    address ?? "0x",
-    BigInt(Date.now() + 1000 * 20),
-  ]);
-  console.log(isError);
-  console.log(data, error);
   if (error) {
     console.error(error);
   }
-  console.log({ data });
   return { data };
 }
