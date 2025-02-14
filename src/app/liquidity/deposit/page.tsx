@@ -11,6 +11,7 @@ import { getLogoAsset } from "@/utils";
 import { TAddress, TPoolType, TToken } from "@/lib/types";
 import AvailablePoolRow from "./availablePoolRow";
 import { api } from "@/trpc/react";
+import { getAddress } from "viem";
 export default function Page() {
   const [openOne, setOpenTokenOne] = useState(false);
   const [openTwo, setOpenTokenTwo] = useState(false);
@@ -34,14 +35,13 @@ export default function Page() {
       setOpenTokenTwo(false);
     }
   }, [openOne, openTwo]);
-  const { data } = api.pool.findPool.useQuery(
+  const { data: pools } = api.pool.findPool.useQuery(
     {
       tokenOneAddress: tokenOne?.address ?? "0x",
       tokenTwoAddress: tokenTwo?.address ?? "0x",
     },
     { enabled: Boolean(tokenOne) && Boolean(tokenTwo) }
   );
-  console.log(data, "DATA");
   return (
     <PageMarginContainer>
       <Headers.GradiantHeaderOne colorOne="#A0055D" colorTwo="#836EF9">
@@ -76,7 +76,23 @@ export default function Page() {
       <div className="pt-8">
         <h3>Available pools</h3>
         <div className="space-y-2 pt-4">
-          {tokenOne && tokenTwo && (
+          {pools?.pairs.map((pool) => {
+            return (
+              <AvailablePoolRow
+                key={pool.id}
+                tokenOne={{
+                  address: getAddress(pool.token0.id),
+                  symbol: pool.token0.symbol,
+                }}
+                tokenTwo={{
+                  address: getAddress(pool.token1.id),
+                  symbol: pool.token1.symbol,
+                }}
+                poolType={pool.isStable ? TPoolType.STABLE : TPoolType.VOLATILE}
+              ></AvailablePoolRow>
+            );
+          })}
+          {tokenOne && tokenTwo && !Boolean(pools) && (
             <>
               <AvailablePoolRow
                 tokenOne={tokenOne}
