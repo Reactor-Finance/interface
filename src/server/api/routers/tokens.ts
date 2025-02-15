@@ -23,6 +23,14 @@ export const tokensRouter = createTRPCRouter({
   getPoolTokens: publicProcedure
     .input(z.object({ searchQuery: z.string().optional() }))
     .query(async ({ input }) => {
-      return await executeGetPoolTokens({ searchQuery: input.searchQuery });
+      const nameAndSymbolTokens = await executeGetPoolTokens({
+        searchQuery: input.searchQuery,
+        searchByAddress: false,
+      });
+      const addressTokens = await executeGetPoolTokens({
+        searchQuery: input.searchQuery,
+        searchByAddress: true,
+      });
+      return { nameAndSymbolTokens, addressTokens };
     }),
 });
