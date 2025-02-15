@@ -8,7 +8,7 @@ const getPoolTokensByAddress = ({ searchQuery }: { searchQuery?: string }) => {
   if (searchQuery) {
     tokenDef = "$searchQuery: ID";
     tokenWhere =
-      "where: { or: [{ tokenO_contains: $searchQuery }, { token1_contains: $searchQuery }] }";
+      "where: { or: [{ tokenO_contains_nocase: $searchQuery }, { token1_contains_nocase: $searchQuery }] }";
   }
   return gql`
     query (${tokenDef}) {
@@ -38,10 +38,10 @@ const getPoolTokensBySymbolName = ({
     tokenDef = "$searchQuery: ID";
     tokenWhere = `where: { or: 
                     [token0_:{ 
-                      or:[{symbol_contains: $seachQuery }, {name_contains:$searchQuery}]
+                      or:[{symbol_contains_nocase: $seachQuery }, {name_contains_nocase:$searchQuery}]
                     },
                     { token1_:
-                      or:[{ name_contains:$searchQuery}, {symbol_contains:$searchQuery}]
+                      or:[{ name_contains_nocase:$searchQuery}, {symbol_contains_nocase:$searchQuery}]
                     } ] }`;
   }
   return gql`
