@@ -1,6 +1,18 @@
 import { graphqlClient } from "@/lib/graphClient";
 import { gql } from "graphql-request";
 import { z } from "zod";
+const pairData = `
+        id
+        token0 {
+          id
+          symbol
+          name
+        }
+        token1 {
+          id
+          symbol
+          name
+        }`;
 
 const getPoolTokensByAddress = ({ searchQuery }: { searchQuery?: string }) => {
   let tokenDef = "";
@@ -13,15 +25,7 @@ const getPoolTokensByAddress = ({ searchQuery }: { searchQuery?: string }) => {
   return gql`
     query (${tokenDef}) {
       pairs(${tokenWhere}) {
-        id
-        token0 {
-          id
-          symbol
-        }
-        token1 {
-          id
-          symbol
-        }
+        ${pairData}
       }
     }
   `;
@@ -47,15 +51,7 @@ const getPoolTokensBySymbolName = ({
   return gql`
     query (${tokenDef}) {
       pairs(${tokenWhere}) {
-        id
-        token0 {
-          id
-          symbol
-        }
-        token1 {
-          id
-          symbol
-        }
+    ${pairData}
       }
     }
   `;
