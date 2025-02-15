@@ -1,5 +1,6 @@
 import { tokens } from "@/data/mock/tokens";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
+import { executeGetPoolTokens } from "@/server/queries/pools/getPoolTokens";
 import { z } from "zod";
 
 export const tokensRouter = createTRPCRouter({
@@ -18,5 +19,10 @@ export const tokensRouter = createTRPCRouter({
         token.address.toLowerCase().includes(input.search.toLowerCase())
       );
       return { tokensFoundByName, tokensFoundByAddress };
+    }),
+  searchPoolTokens: publicProcedure
+    .input(z.object({ token: z.string().optional() }))
+    .query(async ({ input }) => {
+      return await executeGetPoolTokens({ token: input.token });
     }),
 });

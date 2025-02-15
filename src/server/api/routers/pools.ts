@@ -1,11 +1,11 @@
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
-import { executeFindPool, executeGetPools } from "@/server/queries/pools";
+import { executeFindPool } from "@/server/queries/pools/getFindPools";
+import { executeGetPools } from "@/server/queries/pools/getPools";
 import { z } from "zod";
 
 export const poolsRouter = createTRPCRouter({
   getPools: publicProcedure.query(async () => {
     const pools = await executeGetPools();
-    console.log(pools, "POOLS");
     return pools;
   }),
   findPool: publicProcedure
