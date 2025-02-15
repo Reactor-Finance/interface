@@ -6,8 +6,6 @@ import { ReactNode } from "react";
 import { getLogoAsset } from "@/utils";
 import { USDC_ADDRESS } from "@/data/constants";
 import { LineChart } from "./lineChart";
-import CurrencyInput from "@/components/shared/currencyInput";
-import SwapIconBorder from "@/components/shared/swapIconBorder";
 import { Button } from "@/components/ui/button";
 function Stat({ title, value }: { title: string; value: string }) {
   return (
@@ -98,22 +96,6 @@ export default function Home() {
               </TabsList>
             </Tabs>
             <div className="pt-4"></div>
-            <CurrencyInput.Root title="Sell" estimate="0">
-              <CurrencyInput.CurrencySelect
-                token="USDC"
-                tokenAddress={USDC_ADDRESS}
-              />
-              <CurrencyInput.NumberInput disabled={false} decimals={10} />
-            </CurrencyInput.Root>
-            <SwapIconBorder />
-
-            <CurrencyInput.Root title="Buy" estimate="0">
-              <CurrencyInput.CurrencySelect
-                token="USDC"
-                tokenAddress={USDC_ADDRESS}
-              />
-              <CurrencyInput.NumberInput disabled={false} decimals={10} />
-            </CurrencyInput.Root>
             <div className="pt-4"></div>
             <Button className="w-full" size="md" variant="primary">
               Connect Wallet
