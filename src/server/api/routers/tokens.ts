@@ -20,7 +20,7 @@ export const tokensRouter = createTRPCRouter({
       );
       return { tokensFoundByName, tokensFoundByAddress };
     }),
-  searchPoolTokens: publicProcedure
+  getPoolTokens: publicProcedure
     .input(z.object({ token: z.string().optional() }))
     .query(async ({ input }) => {
       return await executeGetPoolTokens({ token: input.token });
