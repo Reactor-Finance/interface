@@ -2,12 +2,13 @@ import { graphqlClient } from "@/lib/graphClient";
 import { gql } from "graphql-request";
 import { z } from "zod";
 
-const getPoolTokens = ({ token }: { token?: string }) => {
+const getPoolTokens = ({ searchQuery }: { searchQuery?: string }) => {
   let tokenDef = "";
   let tokenWhere = "";
-  if (token) {
-    tokenDef = "$token: ID";
-    tokenWhere = "where: { OR: [{ tokenO: $token }, { token1: $token }] }";
+  if (searchQuery) {
+    tokenDef = "$searchQuery: ID";
+    tokenWhere =
+      "filter: { OR: [{ tokenO_contains: $searchQuery }, { token1_contains: $searchQuery }] }";
   }
   return gql`
     query (${tokenDef}) {
@@ -40,8 +41,12 @@ const PoolTokenSchema = z.object({
 const PoolTokensSchema = z.object({
   pairs: z.array(PoolTokenSchema),
 });
-export const executeGetPoolTokens = async ({ token }: { token?: string }) => {
-  const result = await graphqlClient.request(getPoolTokens({ token }));
+export const executeGetPoolTokens = async ({
+  searchQuery,
+}: {
+  searchQuery?: string;
+}) => {
+  const result = await graphqlClient.request(getPoolTokens({ searchQuery }));
   const a = PoolTokensSchema.safeParse(result);
   return a.data;
 };
