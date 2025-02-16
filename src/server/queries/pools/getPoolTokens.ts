@@ -14,13 +14,20 @@ const pairData = `
           name
         }`;
 
-const getPoolTokensByAddress = ({ searchQuery }: { searchQuery?: string }) => {
+const getPoolTokensBySymbolName = ({
+  searchQuery,
+}: {
+  searchQuery?: string;
+}) => {
   let tokenDef = "";
   let tokenWhere = "";
+  const tokenWhereAddress = `{token0_contains_nocase: $searchQuery}, {token1_contains_nocase:$searchQuery}`;
+  const tokenNameAndSymbl = `{or: [{name_contains_nocase: $searchQuery}, {symbol_contains_nocase: $searchQuery}]}`;
+  const tokenWhereNameSymbl0 = `{token0_: ${tokenNameAndSymbl}}`;
+  const tokenWhereNameSymbl1 = `{token1_: ${tokenNameAndSymbl}}`;
   if (searchQuery) {
     tokenDef = "$searchQuery: ID";
-    tokenWhere =
-      "where: { or: [{ tokenO_contains_nocase: $searchQuery }, { token1_contains_nocase: $searchQuery }] }";
+    tokenWhere = `where: { or: [${tokenWhereAddress}, ${tokenWhereNameSymbl0}, ${tokenWhereNameSymbl1}]`;
   }
   return gql`
     query (${tokenDef}) {
@@ -31,41 +38,17 @@ const getPoolTokensByAddress = ({ searchQuery }: { searchQuery?: string }) => {
   `;
 };
 
-const getPoolTokensBySymbolName = ({
-  searchQuery,
-}: {
-  searchQuery?: string;
-}) => {
-  let tokenDef = "";
-  let tokenWhere = "";
-  if (searchQuery) {
-    tokenDef = "$searchQuery: ID";
-    tokenWhere = `where: { or: 
-                    [token0_:{ 
-                      or:[{symbol_contains_nocase: $seachQuery }, {name_contains_nocase:$searchQuery}]
-                    },
-                    { token1_:
-                      or:[{ name_contains_nocase:$searchQuery}, {symbol_contains_nocase:$searchQuery}]
-                    } ] }`;
-  }
-  return gql`
-    query (${tokenDef}) {
-      pairs(${tokenWhere}) {
-    ${pairData}
-      }
-    }
-  `;
-};
-
 const PoolTokenSchema = z.object({
   id: z.string(),
   token0: z.object({
     id: z.string(),
     symbol: z.string(),
+    name: z.string(),
   }),
   token1: z.object({
     id: z.string(),
     symbol: z.string(),
+    name: z.string(),
   }),
 });
 const PoolTokensSchema = z.object({
@@ -73,16 +56,16 @@ const PoolTokensSchema = z.object({
 });
 export const executeGetPoolTokens = async ({
   searchQuery,
-  searchByAddress,
 }: {
   searchQuery?: string;
-  searchByAddress: boolean;
 }) => {
   const result = await graphqlClient.request(
-    searchByAddress
-      ? getPoolTokensByAddress({ searchQuery })
-      : getPoolTokensBySymbolName({ searchQuery })
+    getPoolTokensBySymbolName({ searchQuery })
   );
   const a = PoolTokensSchema.safeParse(result);
+  if (a.error) {
+    console.log(a.error);
+    throw new Error("Failed to parse get pool tokens data.");
+  }
   return a.data;
 };
