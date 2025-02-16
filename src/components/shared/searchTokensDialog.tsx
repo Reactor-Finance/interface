@@ -80,7 +80,7 @@ export default function SearchTokensDailog({
               Tokens (
               {!usePoolTokens ? foundTokens.length : poolTokens?.tokens.length})
             </h2>
-            <div className=" h-[calc(100%-22px)] space-y-4 scrollbar overflow-y-auto pb-2 px-2">
+            <div className=" h-[calc(100%-22px)] space-y-2 scrollbar overflow-y-auto pb-2 px-2">
               {!usePoolTokens &&
                 foundTokens?.map((token) => {
                   return (
