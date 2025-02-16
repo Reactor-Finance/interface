@@ -1,15 +1,19 @@
 "use client";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import SwapIconBorder from "@/components/shared/swapIconBorder";
 import CurrencyInput from "@/components/shared/currencyInput";
 import SearchTokensDailog from "@/components/shared/searchTokensDialog";
-import { TToken } from "@/lib/types";
+import { TAddress, TToken } from "@/lib/types";
+type Token = {
+  address: TAddress | undefined;
+  symbol: string | undefined;
+};
 type CurrencyInputState = {
   inputOneModal: boolean;
   inputTwoModal: boolean;
   selectedTokens: {
-    tokenOne: TToken;
-    tokenTwo: TToken;
+    tokenOne: Token;
+    tokenTwo: Token;
   };
 };
 export default function CurrencyInputs() {
@@ -17,31 +21,63 @@ export default function CurrencyInputs() {
     inputOneModal: false,
     inputTwoModal: false,
     selectedTokens: {
-      tokenOne: { address: "0x", symbol: "" },
-      tokenTwo: { address: "0x", symbol: "" },
+      tokenOne: { address: undefined, symbol: undefined },
+      tokenTwo: { address: undefined, symbol: undefined },
     },
   });
-
+  const handleSetToken = ({ address, symbol }: TToken) => {
+    if (state.inputOneModal) {
+      setState((prev) => ({
+        ...prev,
+        inputOneModal: false,
+        selectedTokens: {
+          ...prev.selectedTokens,
+          tokenOne: { address, symbol },
+        },
+      }));
+    }
+    if (state.inputTwoModal) {
+      setState((prev) => ({
+        ...prev,
+        inputTwoModal: false,
+        selectedTokens: {
+          ...prev.selectedTokens,
+          tokenTwo: { address, symbol },
+        },
+      }));
+    }
+  };
+  const handleSetOpen = (open: boolean) => {
+    if (state.inputOneModal) {
+      setState((prev) => ({ ...prev, inputOneModal: open }));
+    } else {
+      setState((prev) => ({ ...prev, inputTwoModal: open }));
+    }
+  };
+  const matchToken = useMemo(() => {
+    if (
+      state.selectedTokens.tokenTwo.address &&
+      state.selectedTokens.tokenOne.address
+    ) {
+      return;
+    }
+    if (state.selectedTokens.tokenOne.address) {
+      return state.selectedTokens.tokenOne.address;
+    } else {
+      return state.selectedTokens.tokenTwo.address;
+    }
+  }, [state.selectedTokens.tokenOne, state.selectedTokens.tokenTwo.address]);
+  console.log(matchToken, "match");
   return (
     <>
+      <SearchTokensDailog
+        open={state.inputOneModal || state.inputTwoModal}
+        setOpen={handleSetOpen}
+        usePoolTokens
+        setToken={handleSetToken}
+        matchToken={matchToken}
+      />
       <CurrencyInput.Root title="Sell" estimate="0">
-        <SearchTokensDailog
-          open={state.inputOneModal}
-          setOpen={(open) => {
-            setState((prev) => ({ ...prev, inputOneModal: open }));
-          }}
-          usePoolTokens
-          setToken={({ address, symbol }: TToken) =>
-            setState((prev) => ({
-              ...prev,
-              inputOneModal: false,
-              selectedTokens: {
-                ...prev.selectedTokens,
-                tokenOne: { address, symbol },
-              },
-            }))
-          }
-        />
         <CurrencyInput.CurrencySelect
           onClick={() => setState((prev) => ({ ...prev, inputOneModal: true }))}
           token={state.selectedTokens.tokenOne.symbol}
@@ -51,23 +87,6 @@ export default function CurrencyInputs() {
       </CurrencyInput.Root>
       <SwapIconBorder />
       <CurrencyInput.Root title="Buy" estimate="0">
-        <SearchTokensDailog
-          open={state.inputTwoModal}
-          setOpen={(open) =>
-            setState((prev) => ({ ...prev, inputTwoModal: open }))
-          }
-          setToken={({ address, symbol }: TToken) =>
-            setState((prev) => ({
-              ...prev,
-              inputTwoModal: false,
-              selectedTokens: {
-                ...prev.selectedTokens,
-                tokenTwo: { address, symbol },
-              },
-            }))
-          }
-          usePoolTokens
-        />
         <CurrencyInput.CurrencySelect
           onClick={() => setState((prev) => ({ ...prev, inputTwoModal: true }))}
           token={state.selectedTokens.tokenTwo.symbol}

@@ -58,8 +58,8 @@ function CurrencySelect({
   tokenAddress,
   ...buttonProps
 }: {
-  token: string;
-  tokenAddress: string;
+  token: string | undefined;
+  tokenAddress: string | undefined;
   disabled?: boolean;
 } & ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
@@ -68,7 +68,7 @@ function CurrencySelect({
       className="w-[50%] bg-neutral-950 items-center flex justify-between border rounded-[2px] px-4  border-neutral-900"
     >
       <div className="flex items-center gap-x-2 text-sm ">
-        {token !== "" && tokenAddress !== "" && (
+        {token !== undefined && tokenAddress !== undefined && (
           <>
             <ImageWithFallback
               src={getLogoAsset(tokenAddress as TAddress)}
@@ -80,7 +80,7 @@ function CurrencySelect({
             {token}
           </>
         )}
-        {(token === "" || tokenAddress === "") && (
+        {(token === undefined || tokenAddress === undefined) && (
           <span className="text-[12px] font-medium">Select Token</span>
         )}
       </div>
