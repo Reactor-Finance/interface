@@ -31,8 +31,10 @@ export const tokensRouter = createTRPCRouter({
       const nameAndSymbolPairs = await executeGetPoolTokens({
         searchQuery: input.searchQuery,
       });
-      nameAndSymbolPairs.pairs.forEach((pair) => {
+      nameAndSymbolPairs.tokens0.pairs.forEach((pair) => {
         tokens.push(pair.token0);
+      });
+      nameAndSymbolPairs.tokens1.pairs.forEach((pair) => {
         tokens.push(pair.token1);
       });
       return { tokens: [...new Set(tokens)] };
