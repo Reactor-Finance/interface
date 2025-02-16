@@ -15,7 +15,7 @@ const getPoolTokens = ({
   let tokenWhere = "";
   const matchTokenNum = searchToken === "0" ? "1" : "0";
   if (searchQuery) {
-    tokenDef = "($searchQuery: String!, $matchToken: ID!)";
+    tokenDef = "($searchQuery: String!)";
 
     const containsNameOrSymbl = `{or: [{name_contains_nocase: $searchQuery}, {symbol_contains_nocase: $searchQuery}]}`;
     const tokenContainsAddress = `{token${searchToken}_contains_nocase: $searchQuery}`;
@@ -25,6 +25,7 @@ const getPoolTokens = ({
     tokenWhere = `(where: ${tokenOr})`;
 
     if (matchToken) {
+      tokenDef = "($searchQuery: String!, $matchToken: ID!)";
       const tokenEqualsAddress = `{token${matchTokenNum}: $matchToken}`;
       const tokenAnd = `{ and: [${tokenOr}, ${tokenEqualsAddress}] }`;
       tokenWhere = `(where: ${tokenAnd})`;
