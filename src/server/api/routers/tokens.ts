@@ -1,6 +1,7 @@
 import { tokens } from "@/data/mock/tokens";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { executeGetPoolTokens } from "@/server/queries/pools/getPoolTokens";
+import { getAddress } from "viem";
 import { z } from "zod";
 
 export const tokensRouter = createTRPCRouter({
@@ -31,12 +32,22 @@ export const tokensRouter = createTRPCRouter({
       const nameAndSymbolPairs = await executeGetPoolTokens({
         searchQuery: input.searchQuery,
       });
-      nameAndSymbolPairs.tokens0.pairs.forEach((pair) => {
-        tokens.push(pair.token0);
-      });
-      nameAndSymbolPairs.tokens1.pairs.forEach((pair) => {
-        tokens.push(pair.token1);
-      });
+      nameAndSymbolPairs.tokens0.pairs
+        .map((token) => ({
+          ...token,
+          token0: { ...token.token0, id: getAddress(token.token0.id) },
+        }))
+        .forEach((pair) => {
+          tokens.push(pair.token0);
+        });
+      nameAndSymbolPairs.tokens1.pairs
+        .map((token) => ({
+          ...token,
+          token0: { ...token.token1, id: getAddress(token.token1.id) },
+        }))
+        .forEach((pair) => {
+          tokens.push(pair.token1);
+        });
       return { tokens: [...new Set(tokens)] };
     }),
 });
