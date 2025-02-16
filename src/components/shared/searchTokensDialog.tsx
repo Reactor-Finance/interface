@@ -30,7 +30,7 @@ export default function SearchTokensDailog({
       { enabled: !usePoolTokens && open }
     );
   const { data: poolTokens } = api.tokens.getPoolTokens.useQuery(
-    {},
+    { searchQuery: value },
     { enabled: usePoolTokens && open }
   );
   const foundTokens = useMemo(() => {
