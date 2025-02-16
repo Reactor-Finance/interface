@@ -22,7 +22,6 @@ function NumberInput<T extends FieldValues>({
       type="text"
       inputMode="decimal"
       autoComplete="off"
-      ring="none"
       pattern="^[0-9]*[.,]?[0-9]*$"
       placeholder="0"
       minLength={1}
@@ -48,7 +47,7 @@ function Root({
   return (
     <div className="space-y-1 ">
       <h4 className="text-sm text-neutral-300">{title}</h4>
-      <div className="flex w-full apply-focus">{children}</div>
+      <div className="flex w-full">{children}</div>
       <h4 className="text-right text-sm text-neutral-300">~{estimate}</h4>
     </div>
   );
