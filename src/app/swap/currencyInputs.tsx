@@ -112,7 +112,7 @@ export default function CurrencyInputs() {
         <CurrencyInput.NumberInput disabled={false} decimals={10} />
       </CurrencyInput.Root>
       <SwapIconBorder
-        onClick={() => {
+        swapClick={() => {
           setState((prev) => ({
             ...prev,
             inputTwoModal: false,
