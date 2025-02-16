@@ -7,7 +7,7 @@ import { getLogoAsset } from "@/utils";
 import { USDC_ADDRESS } from "@/data/constants";
 import { LineChart } from "./lineChart";
 import { Button } from "@/components/ui/button";
-import CurrencyInputs from "./currencyInput";
+import CurrencyInputs from "./currencyInputs";
 function Stat({ title, value }: { title: string; value: string }) {
   return (
     <div>
