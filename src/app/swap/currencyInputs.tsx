@@ -1,9 +1,7 @@
 "use client";
 import React, { useState } from "react";
-
 import SwapIconBorder from "@/components/shared/swapIconBorder";
 import CurrencyInput from "@/components/shared/currencyInput";
-import { USDC_ADDRESS } from "@/data/constants";
 import SearchTokensDailog from "@/components/shared/searchTokensDialog";
 import { TToken } from "@/lib/types";
 type CurrencyInputState = {
@@ -36,6 +34,7 @@ export default function CurrencyInputs() {
           setToken={({ address, symbol }: TToken) =>
             setState((prev) => ({
               ...prev,
+              inputOneModal: false,
               selectedTokens: {
                 ...prev.selectedTokens,
                 tokenOne: { address, symbol },
@@ -45,8 +44,8 @@ export default function CurrencyInputs() {
         />
         <CurrencyInput.CurrencySelect
           onClick={() => setState((prev) => ({ ...prev, inputOneModal: true }))}
-          token="USDC"
-          tokenAddress={USDC_ADDRESS}
+          token={state.selectedTokens.tokenOne.symbol}
+          tokenAddress={state.selectedTokens.tokenOne.address}
         />
         <CurrencyInput.NumberInput disabled={false} decimals={10} />
       </CurrencyInput.Root>
@@ -60,6 +59,7 @@ export default function CurrencyInputs() {
           setToken={({ address, symbol }: TToken) =>
             setState((prev) => ({
               ...prev,
+              inputTwoModal: false,
               selectedTokens: {
                 ...prev.selectedTokens,
                 tokenTwo: { address, symbol },
@@ -70,8 +70,8 @@ export default function CurrencyInputs() {
         />
         <CurrencyInput.CurrencySelect
           onClick={() => setState((prev) => ({ ...prev, inputTwoModal: true }))}
-          token="USDC"
-          tokenAddress={USDC_ADDRESS}
+          token={state.selectedTokens.tokenTwo.symbol}
+          tokenAddress={state.selectedTokens.tokenTwo.address}
         />
         <CurrencyInput.NumberInput disabled={false} decimals={10} />
       </CurrencyInput.Root>
