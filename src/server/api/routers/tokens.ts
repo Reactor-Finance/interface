@@ -43,11 +43,28 @@ export const tokensRouter = createTRPCRouter({
       nameAndSymbolPairs.tokens1.pairs
         .map((token) => ({
           ...token,
-          token0: { ...token.token1, id: getAddress(token.token1.id) },
+          token1: { ...token.token1, id: getAddress(token.token1.id) }, // convert checksum
         }))
         .forEach((pair) => {
           tokens.push(pair.token1);
         });
-      return { tokens: [...new Set(tokens)] };
+      return { tokens: getUniqueValues(tokens) };
     }),
 });
+function getUniqueValues(
+  arr: {
+    symbol: string;
+    id: string;
+    name: string;
+  }[]
+) {
+  const seen: Record<string, boolean> = {};
+  return arr.filter((item) => {
+    const value = item["id"];
+    if (seen[value]) {
+      return false;
+    }
+    seen[value] = true;
+    return true;
+  });
+}
