@@ -96,8 +96,9 @@ export default function Home() {
                 </TabsTrigger>
               </TabsList>
             </Tabs>
-            <CurrencyInputs />
             <div className="pt-4"></div>
+
+            <CurrencyInputs />
             <div className="pt-4"></div>
             <Button className="w-full" size="md" variant="primary">
               Connect Wallet
