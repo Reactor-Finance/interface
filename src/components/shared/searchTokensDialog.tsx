@@ -55,6 +55,7 @@ export default function SearchTokensDailog({
     }
     return [];
   }, [chainTokens]);
+  console.log(poolTokens, "POOL TOKENS");
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
@@ -74,7 +75,8 @@ export default function SearchTokensDailog({
           </div>
           <div className="relative z-0 h-[calc(100%-179px)] border-t border-gray-600  ">
             <h2 className="py-3 font-geistMono text-[14px] text-[#999999] pl-6">
-              Tokens ({foundTokens.length})
+              Tokens (
+              {!usePoolTokens ? foundTokens.length : poolTokens?.tokens.length})
             </h2>
             <div className=" h-[calc(100%-22px)] space-y-4 scrollbar overflow-y-auto pb-2 px-2">
               {!usePoolTokens &&
