@@ -82,7 +82,7 @@ export const executeGetPoolTokens = async ({
   matchToken?: string;
 }) => {
   const result0 = await graphqlClient.request(
-    getPoolTokens({ searchQuery, searchToken: "0" }),
+    getPoolTokens({ searchQuery, matchToken, searchToken: "0" }),
     {
       searchQuery,
       matchToken,
