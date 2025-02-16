@@ -65,17 +65,24 @@ function CurrencySelect({
   return (
     <button
       {...buttonProps}
-      className="w-[40%] bg-neutral-950 items-center flex justify-between border rounded-[2px] px-4  border-neutral-900"
+      className="w-[50%] bg-neutral-950 items-center flex justify-between border rounded-[2px] px-4  border-neutral-900"
     >
       <div className="flex items-center gap-x-2 text-sm ">
-        <ImageWithFallback
-          src={getLogoAsset(tokenAddress as TAddress)}
-          width={25}
-          height={25}
-          className="h-6 w-6"
-          alt="alt"
-        />
-        {token}
+        {token !== "" && tokenAddress !== "" && (
+          <>
+            <ImageWithFallback
+              src={getLogoAsset(tokenAddress as TAddress)}
+              width={25}
+              height={25}
+              className="h-6 w-6 rounded-full"
+              alt="alt"
+            />
+            {token}
+          </>
+        )}
+        {(token === "" || tokenAddress === "") && (
+          <span className="text-[12px] font-medium">Select Token</span>
+        )}
       </div>
       <ChevronDown className="text-neutral-500" />
     </button>
