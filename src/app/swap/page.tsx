@@ -7,6 +7,7 @@ import { getLogoAsset } from "@/utils";
 import { USDC_ADDRESS } from "@/data/constants";
 import { LineChart } from "./lineChart";
 import { Button } from "@/components/ui/button";
+import CurrencyInputs from "./currencyInput";
 function Stat({ title, value }: { title: string; value: string }) {
   return (
     <div>
@@ -95,6 +96,7 @@ export default function Home() {
                 </TabsTrigger>
               </TabsList>
             </Tabs>
+            <CurrencyInputs />
             <div className="pt-4"></div>
             <div className="pt-4"></div>
             <Button className="w-full" size="md" variant="primary">

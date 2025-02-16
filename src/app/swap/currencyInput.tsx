@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from "react";
 
 import SwapIconBorder from "@/components/shared/swapIconBorder";
@@ -5,6 +6,7 @@ import CurrencyInput from "@/components/shared/currencyInput";
 import { USDC_ADDRESS } from "@/data/constants";
 import SearchTokensDailog from "@/components/shared/searchTokensDialog";
 import { TToken } from "@/lib/types";
+import { api } from "@/trpc/react";
 export default function CurrencyInputs() {
   const [inputOneModal, setInputOneModal] = useState(false);
   const [inputTwoModal, setInputTwoModal] = useState(false);
@@ -16,6 +18,8 @@ export default function CurrencyInputs() {
     tokenTwo: { address: "0x", symbol: "" },
   });
   console.log(inputTwoModal, selectedTokens);
+  const { data } = api.tokens.getPoolTokens.useQuery({ searchQuery: "dai" });
+  console.log(data);
   return (
     <>
       <CurrencyInput.Root title="Sell" estimate="0">
