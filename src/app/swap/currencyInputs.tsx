@@ -111,7 +111,24 @@ export default function CurrencyInputs() {
         />
         <CurrencyInput.NumberInput disabled={false} decimals={10} />
       </CurrencyInput.Root>
-      <SwapIconBorder />
+      <SwapIconBorder
+        onClick={() => {
+          setState((prev) => ({
+            ...prev,
+            inputTwoModal: false,
+            selectedTokens: {
+              tokenOne: {
+                address: prev.selectedTokens.tokenTwo.address,
+                symbol: prev.selectedTokens.tokenTwo.symbol,
+              },
+              tokenTwo: {
+                address: prev.selectedTokens.tokenOne.address,
+                symbol: prev.selectedTokens.tokenOne.symbol,
+              },
+            },
+          }));
+        }}
+      />
       <CurrencyInput.Root title="Buy" estimate="0">
         <CurrencyInput.CurrencySelect
           onClick={() => setState((prev) => ({ ...prev, inputTwoModal: true }))}
