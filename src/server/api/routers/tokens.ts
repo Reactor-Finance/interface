@@ -22,7 +22,12 @@ export const tokensRouter = createTRPCRouter({
       return { tokensFoundByName, tokensFoundByAddress };
     }),
   getPoolTokens: publicProcedure
-    .input(z.object({ searchQuery: z.string().optional() }))
+    .input(
+      z.object({
+        searchQuery: z.string().optional(),
+        matchToken: z.string().optional(),
+      })
+    )
     .query(async ({ input }) => {
       const tokens: {
         symbol: string;
@@ -31,6 +36,7 @@ export const tokensRouter = createTRPCRouter({
       }[] = [];
       const nameAndSymbolPairs = await executeGetPoolTokens({
         searchQuery: input.searchQuery,
+        matchToken: input.matchToken,
       });
       nameAndSymbolPairs.tokens0.pairs
         .map((token) => ({

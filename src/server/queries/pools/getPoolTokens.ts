@@ -4,18 +4,18 @@ import { z } from "zod";
 
 const getPoolTokens = ({
   searchQuery,
-  token,
+  matchToken,
   searchToken,
 }: {
   searchQuery?: string;
-  token?: string;
+  matchToken?: string;
   searchToken: "0" | "1";
 }) => {
   let tokenDef = "";
   let tokenWhere = "";
-  const matchToken = searchToken === "0" ? "1" : "0";
-  if (searchQuery) {
-    tokenDef = "($searchQuery: String!, $token: ID!)";
+  const matchTokenNum = searchToken === "0" ? "1" : "0";
+  if (searchQuery && matchToken) {
+    tokenDef = "($searchQuery: String!, $matchToken: ID!)";
 
     const containsNameOrSymbl = `{or: [{name_contains_nocase: $searchQuery}, {symbol_contains_nocase: $searchQuery}]}`;
     const tokenContainsAddress = `{token${searchToken}_contains_nocase: $searchQuery}`;
@@ -24,13 +24,18 @@ const getPoolTokens = ({
     const tokenOr = `{ or: [${tokenContainsAddress}, ${tokenContainsNameSymbl}] }`;
     tokenWhere = `(where: ${tokenOr})`;
 
-    if (token) {
-      const tokenEqualsAddress = `{token${matchToken}_: $token}`;
+    if (matchToken) {
+      const tokenEqualsAddress = `{token${matchTokenNum}: $matchToken}`;
       const tokenAnd = `{ and: [${tokenOr}, ${tokenEqualsAddress}] }`;
       tokenWhere = `(where: ${tokenAnd})`;
     }
   }
-  return gql`
+  if (matchToken && !searchQuery) {
+    const tokenEqualsAddress = `{token${matchTokenNum}: $matchToken}`;
+    tokenWhere = `(where: ${tokenEqualsAddress})`;
+    tokenDef = "($matchToken: ID!)";
+  }
+  const g = gql`
     query${tokenDef} {
       pairs${tokenWhere} {
         id
@@ -42,6 +47,8 @@ const getPoolTokens = ({
       }
   }
   `;
+  console.log(g);
+  return g;
 };
 
 const PoolTokenSchema0 = z.object({
@@ -69,19 +76,23 @@ const PoolTokensSchema1 = z.object({
 });
 export const executeGetPoolTokens = async ({
   searchQuery,
+  matchToken,
 }: {
   searchQuery?: string;
+  matchToken?: string;
 }) => {
   const result0 = await graphqlClient.request(
     getPoolTokens({ searchQuery, searchToken: "0" }),
     {
       searchQuery,
+      matchToken,
     }
   );
   const result1 = await graphqlClient.request(
-    getPoolTokens({ searchQuery, searchToken: "1" }),
+    getPoolTokens({ searchQuery, matchToken, searchToken: "1" }),
     {
       searchQuery,
+      matchToken,
     }
   );
   console.log(result1, result0);
