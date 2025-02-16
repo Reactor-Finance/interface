@@ -6,44 +6,70 @@ import CurrencyInput from "@/components/shared/currencyInput";
 import { USDC_ADDRESS } from "@/data/constants";
 import SearchTokensDailog from "@/components/shared/searchTokensDialog";
 import { TToken } from "@/lib/types";
-import { api } from "@/trpc/react";
-export default function CurrencyInputs() {
-  const [inputOneModal, setInputOneModal] = useState(false);
-  const [inputTwoModal, setInputTwoModal] = useState(false);
-  const [selectedTokens, setSelectedTokens] = useState<{
+type CurrencyInputState = {
+  inputOneModal: boolean;
+  inputTwoModal: boolean;
+  selectedTokens: {
     tokenOne: TToken;
     tokenTwo: TToken;
-  }>({
-    tokenOne: { address: "0x", symbol: "" },
-    tokenTwo: { address: "0x", symbol: "" },
+  };
+};
+export default function CurrencyInputs() {
+  const [state, setState] = useState<CurrencyInputState>({
+    inputOneModal: false,
+    inputTwoModal: false,
+    selectedTokens: {
+      tokenOne: { address: "0x", symbol: "" },
+      tokenTwo: { address: "0x", symbol: "" },
+    },
   });
-  console.log(inputTwoModal, selectedTokens);
-  const { data } = api.tokens.getPoolTokens.useQuery({ searchQuery: "dai" });
-  console.log(data);
+
   return (
     <>
       <CurrencyInput.Root title="Sell" estimate="0">
         <SearchTokensDailog
-          open={inputOneModal}
-          setOpen={setInputOneModal}
-          setToken={function ({ address, symbol }: TToken): void {
-            setSelectedTokens((t) => ({ ...t, tokenOne: { address, symbol } }));
+          open={state.inputOneModal}
+          setOpen={(open) => {
+            setState((prev) => ({ ...prev, inputOneModal: open }));
           }}
+          usePoolTokens
+          setToken={({ address, symbol }: TToken) =>
+            setState((prev) => ({
+              ...prev,
+              selectedTokens: {
+                ...prev.selectedTokens,
+                tokenOne: { address, symbol },
+              },
+            }))
+          }
         />
         <CurrencyInput.CurrencySelect
-          onClick={() => {
-            setInputOneModal(true);
-          }}
+          onClick={() => setState((prev) => ({ ...prev, inputOneModal: true }))}
           token="USDC"
           tokenAddress={USDC_ADDRESS}
         />
         <CurrencyInput.NumberInput disabled={false} decimals={10} />
       </CurrencyInput.Root>
       <SwapIconBorder />
-
       <CurrencyInput.Root title="Buy" estimate="0">
+        <SearchTokensDailog
+          open={state.inputTwoModal}
+          setOpen={(open) =>
+            setState((prev) => ({ ...prev, inputTwoModal: open }))
+          }
+          setToken={({ address, symbol }: TToken) =>
+            setState((prev) => ({
+              ...prev,
+              selectedTokens: {
+                ...prev.selectedTokens,
+                tokenTwo: { address, symbol },
+              },
+            }))
+          }
+          usePoolTokens
+        />
         <CurrencyInput.CurrencySelect
-          onClick={() => setInputTwoModal(true)}
+          onClick={() => setState((prev) => ({ ...prev, inputTwoModal: true }))}
           token="USDC"
           tokenAddress={USDC_ADDRESS}
         />
