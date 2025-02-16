@@ -26,25 +26,51 @@ export default function CurrencyInputs() {
     },
   });
   const handleSetToken = ({ address, symbol }: TToken) => {
+    const bothSelected =
+      state.selectedTokens.tokenOne.address &&
+      state.selectedTokens.tokenTwo.address;
+
     if (state.inputOneModal) {
-      setState((prev) => ({
-        ...prev,
-        inputOneModal: false,
-        selectedTokens: {
-          ...prev.selectedTokens,
-          tokenOne: { address, symbol },
-        },
-      }));
+      if (bothSelected) {
+        setState((prev) => ({
+          ...prev,
+          inputOneModal: false,
+          selectedTokens: {
+            tokenOne: { address, symbol },
+            tokenTwo: { address: undefined, symbol: undefined },
+          },
+        }));
+      } else {
+        setState((prev) => ({
+          ...prev,
+          inputOneModal: false,
+          selectedTokens: {
+            ...prev.selectedTokens,
+            tokenOne: { address, symbol },
+          },
+        }));
+      }
     }
     if (state.inputTwoModal) {
-      setState((prev) => ({
-        ...prev,
-        inputTwoModal: false,
-        selectedTokens: {
-          ...prev.selectedTokens,
-          tokenTwo: { address, symbol },
-        },
-      }));
+      if (bothSelected) {
+        setState((prev) => ({
+          ...prev,
+          inputTwoModal: false,
+          selectedTokens: {
+            tokenTwo: { address, symbol },
+            tokenOne: { address: undefined, symbol: undefined },
+          },
+        }));
+      } else {
+        setState((prev) => ({
+          ...prev,
+          inputTwoModal: false,
+          selectedTokens: {
+            ...prev.selectedTokens,
+            tokenTwo: { address, symbol },
+          },
+        }));
+      }
     }
   };
   const handleSetOpen = (open: boolean) => {
