@@ -82,7 +82,7 @@ export default function Home() {
               </Tabs>
             </Card>
           </div>
-          <Card className="w-[360px] p-4 border rounded-md">
+          <Card className="min-w-[380px] p-4 border rounded-md">
             <Tabs defaultValue="swap">
               <TabsList size="md" colors="muted" display={"grow"}>
                 <TabsTrigger display={"grow"} value="swap">
