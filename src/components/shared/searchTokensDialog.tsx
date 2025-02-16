@@ -14,21 +14,31 @@ export default function SearchTokensDailog({
   open,
   setOpen,
   setToken,
+  usePoolTokens,
 }: {
   open?: boolean;
-  setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+  setOpen?: (b: boolean) => void;
   setToken: ({ address, symbol }: TToken) => void;
+  usePoolTokens?: boolean;
 }) {
   const [value, setValue] = useState("");
-  const { data } = api.tokens.searchTokensByNameAndAddress.useQuery({
-    search: value,
-  });
+  const { data: chainTokens } =
+    api.tokens.searchTokensByNameAndAddress.useQuery(
+      {
+        search: value,
+      },
+      { enabled: !usePoolTokens && open }
+    );
+  const { data: poolTokens } = api.tokens.getPoolTokens.useQuery(
+    {},
+    { enabled: usePoolTokens && open }
+  );
   const foundTokens = useMemo(() => {
-    const nameTokens = data?.tokensFoundByName;
-    const addressTokens = data?.tokensFoundByAddress;
+    const nameTokens = chainTokens?.tokensFoundByName;
+    const addressTokens = chainTokens?.tokensFoundByAddress;
     if (nameTokens && addressTokens) {
       if (nameTokens.length > 0 && addressTokens.length > 0) {
-        // if both have data, merge and remove duplicates
+        // if both have chainTokens, merge and remove duplicates
         return [...new Set([...nameTokens, ...addressTokens])];
       }
     }
@@ -44,7 +54,7 @@ export default function SearchTokensDailog({
       }
     }
     return [];
-  }, [data]);
+  }, [chainTokens]);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
@@ -67,17 +77,31 @@ export default function SearchTokensDailog({
               Tokens ({foundTokens.length})
             </h2>
             <div className=" h-[calc(100%-22px)] space-y-4 scrollbar overflow-y-auto pb-2 px-2">
-              {foundTokens?.map((token) => {
-                return (
-                  <TokenItem
-                    {...token}
-                    selectToken={({ symbol, address }) => {
-                      setToken({ address, symbol });
-                    }}
-                    key={token.address}
-                  />
-                );
-              })}
+              {!usePoolTokens &&
+                foundTokens?.map((token) => {
+                  return (
+                    <TokenItem
+                      {...token}
+                      selectToken={({ symbol, address }) => {
+                        setToken({ address, symbol });
+                      }}
+                      key={token.address}
+                    />
+                  );
+                })}
+              {usePoolTokens &&
+                poolTokens?.tokens.map((token) => {
+                  return (
+                    <TokenItem
+                      address={token.id as TAddress}
+                      symbol={token.symbol}
+                      selectToken={({ symbol, address }) => {
+                        setToken({ address, symbol });
+                      }}
+                      key={token.id}
+                    />
+                  );
+                })}
             </div>
           </div>
 
