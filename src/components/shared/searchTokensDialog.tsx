@@ -15,11 +15,13 @@ export default function SearchTokensDailog({
   setOpen,
   setToken,
   usePoolTokens,
+  matchToken,
 }: {
   open?: boolean;
   setOpen?: (b: boolean) => void;
   setToken: ({ address, symbol }: TToken) => void;
   usePoolTokens?: boolean;
+  matchToken?: TAddress;
 }) {
   const [value, setValue] = useState("");
   const { data: chainTokens } =
@@ -30,7 +32,7 @@ export default function SearchTokensDailog({
       { enabled: !usePoolTokens && open }
     );
   const { data: poolTokens } = api.tokens.getPoolTokens.useQuery(
-    { searchQuery: value },
+    { searchQuery: value, matchToken },
     { enabled: usePoolTokens && open }
   );
   const foundTokens = useMemo(() => {
