@@ -2,23 +2,39 @@ import { graphqlClient } from "@/lib/graphClient";
 import { gql } from "graphql-request";
 import { z } from "zod";
 
-const tokenNameAndSymbl = `{or: [{name_contains_nocase: $searchQuery}, {symbol_contains_nocase: $searchQuery}]}`;
-const getPoolTokens1 = ({ searchQuery }: { searchQuery?: string }) => {
+const getPoolTokens = ({
+  searchQuery,
+  token,
+  searchToken,
+}: {
+  searchQuery?: string;
+  token?: string;
+  searchToken: "0" | "1";
+}) => {
   let tokenDef = "";
   let tokenWhere = "";
-  const tokenWhereAddress = `{token1_contains_nocase:$searchQuery}`;
-  const tokenWhereNameSymbl1 = `{token1_: ${tokenNameAndSymbl}}`;
-
+  const matchToken = searchToken === "0" ? "1" : "0";
   if (searchQuery) {
-    tokenDef = "($searchQuery: String)";
-    tokenWhere = `(where: { or: [${tokenWhereAddress}, ${tokenWhereNameSymbl1}]})`;
+    tokenDef = "($searchQuery: String!, $token: ID!)";
+
+    const containsNameOrSymbl = `{or: [{name_contains_nocase: $searchQuery}, {symbol_contains_nocase: $searchQuery}]}`;
+    const tokenContainsAddress = `{token${searchToken}_contains_nocase: $searchQuery}`;
+    const tokenContainsNameSymbl = `{token${searchToken}_: ${containsNameOrSymbl}}`;
+
+    const tokenOr = `{ or: [${tokenContainsAddress}, ${tokenContainsNameSymbl}] }`;
+    tokenWhere = `(where: ${tokenOr})`;
+
+    if (token) {
+      const tokenEqualsAddress = `{token${matchToken}_: $token}`;
+      const tokenAnd = `{ and: [${tokenOr}, ${tokenEqualsAddress}] }`;
+      tokenWhere = `(where: ${tokenAnd})`;
+    }
   }
   return gql`
     query${tokenDef} {
       pairs${tokenWhere} {
-
         id
-        token1 {
+        token${searchToken} {
           id
           symbol
           name
@@ -26,31 +42,6 @@ const getPoolTokens1 = ({ searchQuery }: { searchQuery?: string }) => {
       }
   }
   `;
-};
-
-const getPoolTokens0 = ({ searchQuery }: { searchQuery?: string }) => {
-  let tokenDef = "";
-  let tokenWhere = "";
-  const tokenWhereAddress = `{token0_contains_nocase: $searchQuery} `;
-  const tokenWhereNameSymbl0 = `{token0_: ${tokenNameAndSymbl}}`;
-  if (searchQuery) {
-    tokenDef = "($searchQuery: String)";
-    tokenWhere = `(where: { or: [${tokenWhereAddress}, ${tokenWhereNameSymbl0}]})`;
-  }
-  const a = gql`
-    query${tokenDef} {
-      pairs${tokenWhere} {
-        id
-        token0 {
-          id
-          symbol
-          name
-        }
-      }
-  }
-  `;
-  console.log(a);
-  return a;
 };
 
 const PoolTokenSchema0 = z.object({
@@ -81,12 +72,19 @@ export const executeGetPoolTokens = async ({
 }: {
   searchQuery?: string;
 }) => {
-  const result0 = await graphqlClient.request(getPoolTokens0({ searchQuery }), {
-    searchQuery,
-  });
-  const result1 = await graphqlClient.request(getPoolTokens1({ searchQuery }), {
-    searchQuery,
-  });
+  const result0 = await graphqlClient.request(
+    getPoolTokens({ searchQuery, searchToken: "0" }),
+    {
+      searchQuery,
+    }
+  );
+  const result1 = await graphqlClient.request(
+    getPoolTokens({ searchQuery, searchToken: "1" }),
+    {
+      searchQuery,
+    }
+  );
+  console.log(result1, result0);
   const a = PoolTokensSchema1.safeParse(result1);
   const b = PoolTokensSchema0.safeParse(result0);
   if (a.error || b.error) {
