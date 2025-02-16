@@ -14,7 +14,7 @@ const getPoolTokens = ({
   let tokenDef = "";
   let tokenWhere = "";
   const matchTokenNum = searchToken === "0" ? "1" : "0";
-  if (searchQuery && matchToken) {
+  if (searchQuery) {
     tokenDef = "($searchQuery: String!, $matchToken: ID!)";
 
     const containsNameOrSymbl = `{or: [{name_contains_nocase: $searchQuery}, {symbol_contains_nocase: $searchQuery}]}`;
