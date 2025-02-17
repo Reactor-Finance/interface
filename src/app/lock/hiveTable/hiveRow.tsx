@@ -13,7 +13,7 @@ export default function HiveRow() {
           <HiveModal />
         </td>
       </tr>
-      <tr className="flex justify-between items-center mx-2 border-neutral-1000 py-2 px-4 border-[6px] rounded-b-md">
+      <tr className="flex justify-between items-center mx-2 mb-2 border-neutral-1000 py-2 px-4 border-[6px] rounded-b-md ">
         <LockedColumnStat title="Deposited Lock #" value="Lock #007" />
 
         <LockedColumnStat title="Deposited" value="3000" />
@@ -28,7 +28,6 @@ export default function HiveRow() {
           </button>
         </td>
       </tr>
-      <div className="pt-2"></div>
     </>
   );
 }
