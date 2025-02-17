@@ -7,7 +7,7 @@ import Link from "next/link";
 import { CustomConnectButton } from "./customConnectButton";
 export default function Header() {
   return (
-    <div className="h-[88px] px-4 items-center grid grid-cols-3">
+    <div className="h-[88px] px-8 items-center grid grid-cols-3">
       <div>
         <Image src={reactor} alt="" />
       </div>
