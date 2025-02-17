@@ -3724,7 +3724,7 @@ export const ContractsAbi = {
         stateMutability: "nonpayable",
         type: "function",
       },
-    ],
+    ] as const,
   },
   Voter: {
     contractAddress: "0x2098cb47B17082Ab6969FB2661f2759A9BF357c4",

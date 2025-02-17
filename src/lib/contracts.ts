@@ -13,6 +13,10 @@ export const Contracts = {
     abi: [...ContractsAbi.Voter.abi] as const,
     address: ContractsAbi.Voter.contractAddress as `0x${string}`,
   },
+  VotingEscrow: {
+    abi: [...ContractsAbi.VotingEscrow.abi] as const,
+    address: ContractsAbi.VotingEscrow.contractAddress as `0x${string}`,
+  },
   Router: {
     abi: [...ContractsAbi.Router.abi] as const,
     address: ContractsAbi.Router.contractAddress as `0x${string}`,
