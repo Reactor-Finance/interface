@@ -4,6 +4,8 @@ import SwapIconBorder from "@/components/shared/swapIconBorder";
 import CurrencyInput from "@/components/shared/currencyInput";
 import SearchTokensDailog from "@/components/shared/searchTokensDialog";
 import { TAddress, TToken } from "@/lib/types";
+import { useReadContract, useSimulateContract } from "wagmi";
+import { Contracts } from "@/lib/contracts";
 type Token = {
   address: TAddress | undefined;
   symbol: string | undefined;
@@ -94,6 +96,25 @@ export default function CurrencyInputs() {
     }
   }, [state.selectedTokens.tokenOne, state.selectedTokens.tokenTwo.address]);
   console.log(matchToken, "match");
+  const {} = useSimulateContract({
+    ...Contracts.Router,
+    functionName: "swap",
+    args: [
+      0n, //amountIn
+      0n, //minOut
+      [
+        {
+          from: state.selectedTokens.tokenOne.address ?? "0x",
+          to: state.selectedTokens.tokenTwo.address ?? "0x",
+          stable: false,
+        },
+      ],
+      "0x", //address
+      0n, //deadline
+      true, //useTokenAsFee
+    ],
+  });
+  useReadContract({ ...Contracts.Router, functionName: "tradeHelper" });
   return (
     <>
       <SearchTokensDailog
