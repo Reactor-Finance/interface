@@ -1,8 +1,6 @@
 import * as React from "react";
-import { SelectItem } from "@/components/ui/select";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import LockDropdown from "../lockDropdown";
 import RctInput from "../rctInput";
 import useGetRctBalance from "@/components/shared/hooks/useGetRctBalance";
 import { useSimulateContract, useWriteContract } from "wagmi";
@@ -27,13 +25,13 @@ export function IncreaseContent() {
   };
   return (
     <div className="space-y-4 pt-4">
-      <LockDropdown placeholder="Select a fruit">
-        <SelectItem value="apple">Apple</SelectItem>
-        <SelectItem value="banana">Banana</SelectItem>
-        <SelectItem value="blueberry">Blueberry</SelectItem>
-        <SelectItem value="grapes">Grapes</SelectItem>
-        <SelectItem value="pineapple">Pineapple</SelectItem>
-      </LockDropdown>
+      {/* <LockDropdown placeholder="Select a fruit"> */}
+      {/*   <SelectItem value="apple">Apple</SelectItem> */}
+      {/*   <SelectItem value="banana">Banana</SelectItem> */}
+      {/*   <SelectItem value="blueberry">Blueberry</SelectItem> */}
+      {/*   <SelectItem value="grapes">Grapes</SelectItem> */}
+      {/*   <SelectItem value="pineapple">Pineapple</SelectItem> */}
+      {/* </LockDropdown> */}
       <div className="flex justify-between">
         <h4>Add to lock</h4>
         <h5 className="text-neutral-200 text-[13px]">Available: 200.00 RCT</h5>

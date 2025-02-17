@@ -1,9 +1,7 @@
 import React from "react";
-import { SelectItem } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Alert } from "@/components/ui/alert";
 import { Slider } from "@/components/ui/slider";
-import LockDropdown from "../lockDropdown";
 import { TWO_YEARS } from "@/data/constants";
 import { useSimulateContract, useWriteContract } from "wagmi";
 import { Contracts } from "@/lib/contracts";
@@ -31,9 +29,6 @@ export default function ExtendContent() {
   };
   return (
     <div className="space-y-4 pt-4">
-      <LockDropdown placeholder="Select your veRCT">
-        <SelectItem value="apple">Apple</SelectItem>
-      </LockDropdown>
       <Slider
         value={duration}
         defaultValue={[33]}
