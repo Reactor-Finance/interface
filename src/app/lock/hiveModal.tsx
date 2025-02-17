@@ -1,10 +1,13 @@
 "use client";
+import wheel from "@/assets/wheel.svg";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import React from "react";
 import LockDropdown from "./lockDropdown";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SelectItem } from "@/components/ui/select";
+import Image from "next/image";
+import { Badge } from "@/components/ui/badge";
 
 export default function HiveDialog() {
   const [open, setOpen] = React.useState(false);
@@ -32,6 +35,21 @@ export default function HiveDialog() {
             <SelectItem value="a"></SelectItem>
           </LockDropdown>
           <h4 className="text-neutral-600">Hive Strategy</h4>
+          <div className="border-t border-neutral-800"></div>
+          <div className="flex gap-x-2">
+            <div className="w-[48px] h-[48px] rounded-[8px] bg-neutral-950 flex items-center justify-center">
+              <Image src={wheel} alt="hive" className="w-7 h-7" />
+            </div>
+            <div className="">
+              <div className="flex gap-x-2">
+                <span>veRCT Maxi</span>
+                <Badge colors={"neutral"}>ID 1234</Badge>
+              </div>
+              <span className="text-neutral-700 text-[13px]">
+                Updated 5 days ago 0x1232
+              </span>
+            </div>
+          </div>
           <div className="flex rounded-md gap-x-2 bg-neutral-950 border border-neutral-800 p-4">
             <Checkbox></Checkbox>
             <div>
