@@ -1,13 +1,12 @@
 import React from "react";
-import LockDropdown from "./lockDropdown";
 import { SelectItem } from "@/components/ui/select";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import LockDropdown from "../lockDropdown";
 
 export default function MergeContent() {
   return (
     <div className="space-y-4">
-      <div></div>
       <LockDropdown placeholder="Select your veRCT">
         <SelectItem value="apple">Apple</SelectItem>
       </LockDropdown>

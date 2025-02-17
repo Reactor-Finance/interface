@@ -1,13 +1,12 @@
 import React from "react";
-import LockDropdown from "./lockDropdown";
 import { SelectItem } from "@/components/ui/select";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import LockDropdown from "../lockDropdown";
 
 export default function WithdrawContent() {
   return (
-    <div className="space-y-4">
-      <div></div>
+    <div className="space-y-4 pt-4">
       <LockDropdown placeholder="Select your veRCT">
         <SelectItem value="re">Re</SelectItem>
       </LockDropdown>

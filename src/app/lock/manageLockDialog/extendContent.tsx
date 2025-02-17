@@ -1,14 +1,13 @@
 import React from "react";
-import LockDropdown from "./lockDropdown";
 import { SelectItem } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Alert } from "@/components/ui/alert";
 import { Slider } from "@/components/ui/slider";
+import LockDropdown from "../lockDropdown";
 
 export default function ExtendContent() {
   return (
     <div className="space-y-4">
-      <div></div>
       <LockDropdown placeholder="Select your veRCT">
         <SelectItem value="apple">Apple</SelectItem>
       </LockDropdown>

@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import LockDropdown from "./lockDropdown";
+import LockDropdown from "../lockDropdown";
 export function IncreaseContent() {
   return (
     <div className="space-y-4">

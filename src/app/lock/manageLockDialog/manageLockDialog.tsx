@@ -11,7 +11,7 @@ import TransferContent from "./transferContent";
 import MergeContent from "./mergeContent";
 import WithdrawContent from "./withdrawContent";
 
-export default function LockModal() {
+export default function ManageLockDialog() {
   const [open, setOpen] = React.useState(false);
   return (
     <div>
