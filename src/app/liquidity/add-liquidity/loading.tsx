@@ -1,11 +1,10 @@
-import Headers from "@/components/ui/headers";
 import PageMarginContainer from "@/components/ui/pageMarginContainer";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
+import Headers from "@/components/ui/headers";
 import React from "react";
-import PoolTabs from "./poolTabs";
-import LiquidityCardWrapper from "./liquidityCardWrapper";
-export default function Page() {
+
+export default function Loading() {
   return (
     <PageMarginContainer>
       <div className="flex justify-between">
@@ -26,10 +25,7 @@ export default function Page() {
             Add liquidity
           </Headers.GradiantHeaderOne>
         </div>
-
-        <PoolTabs />
       </div>
-      <LiquidityCardWrapper />
     </PageMarginContainer>
   );
 }

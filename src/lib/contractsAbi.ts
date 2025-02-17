@@ -7618,7 +7618,7 @@ export const ContractsAbi = {
         stateMutability: "view",
         type: "function",
       },
-    ],
+    ] as const,
   },
   PairHelper: {
     contractAddress: "0x3Aa338c8d5E6cefE95831cD0322b558677abA0f1",

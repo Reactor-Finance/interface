@@ -1,33 +1,47 @@
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import React from "react";
-import AssetCard from "./assetCard";
-import { USDC_ADDRESS } from "@/data/constants";
+// import AssetCard from "./assetCard";
+import { Button } from "@/components/ui/button";
+// import { USDC_ADDRESS } from "@/data/constants";
 
-export default function LiquidityCard() {
+export default function Stable() {
   return (
-    <Card border="900" bg="1000" className="p-4 space-y-4 w-[440px] rounded-md">
+    <>
       <h2 className="text-xl">Add C.Stable Liquidity</h2>
       <StableInfo />
       <div className="space-y-2">
         <div>
           <label htmlFor="">Asset 1</label>
         </div>
-        <AssetCard tokenAddress={USDC_ADDRESS} />
+        {/* <AssetCard */}
+        {/*   tokenAddress={"0x"} */}
+        {/*   set={function (address: string): void { */}
+        {/*     console.log(address); */}
+        {/*     throw new Error("Function not implemented."); */}
+        {/*   }} */}
+        {/*   tokenAmount={""} */}
+        {/* /> */}
       </div>
       <div className="space-y-2">
         <div>
           <label htmlFor="">Asset 2</label>
         </div>
-        <AssetCard tokenAddress={USDC_ADDRESS} />
+        {/* <AssetCard */}
+        {/*   tokenAddress={USDC_ADDRESS} */}
+        {/*   setTokenAmount={function (_address: string): void { */}
+        {/*     console.log(_address); */}
+        {/*     throw new Error("Function not implemented."); */}
+        {/*   }} */}
+        {/*   tokenAmount={""} */}
+        {/* /> */}
       </div>
       <StableStats />
       <Button variant="primary" disabled size="submit">
         Add Liquidity
       </Button>
-    </Card>
+    </>
   );
 }
+
 function StableInfo() {
   return (
     <Card

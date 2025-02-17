@@ -1,9 +1,5 @@
-import SearchTokensDailog from "./dex/searchTokensDialog";
+"use client";
 
 export default function Home() {
-  return (
-    <div className="min-h-screen font-geistMono ">
-      <SearchTokensDailog />
-    </div>
-  );
+  return <div className="min-h-screen font-geistMono "></div>;
 }

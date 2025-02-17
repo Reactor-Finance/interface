@@ -28,18 +28,32 @@ interface Props {
 const ImageWithFallback = (props: Props) => {
   let { fallbackImageUrl } = props;
   const { src, ...rest } = props;
-  const [imgSrc, setImgSrc] = useState<string | StaticImageData>(src);
+  const [imgSrc, setImgSrc] = useState<string | StaticImageData | undefined>(
+    undefined
+  );
   useEffect(() => {
     setImgSrc(src);
   }, [src]);
   const imgProps = { ...rest };
   fallbackImageUrl = unknownImg as string | StaticImageData;
   delete imgProps.fallbackImageUrl;
+  if (imgSrc) {
+    return (
+      // eslint-disable-next-line jsx-a11y/alt-text
+      <Image
+        {...rest}
+        src={imgSrc}
+        onError={() => {
+          setImgSrc(fallbackImageUrl);
+        }}
+      />
+    );
+  }
   return (
     // eslint-disable-next-line jsx-a11y/alt-text
     <Image
       {...rest}
-      src={imgSrc}
+      src={src}
       onError={() => {
         setImgSrc(fallbackImageUrl);
       }}

@@ -2,7 +2,7 @@ import ImageWithFallback from "@/components/shared/imageWithFallback";
 import { TAddress } from "@/lib/types";
 import { getLogoAsset } from "@/utils";
 import { useMemo } from "react";
-import { erc20Abi } from "viem";
+import { erc20Abi, getAddress } from "viem";
 import { useReadContract } from "wagmi";
 export default function AssetSymbolAndName({
   tokenAddress,
@@ -21,6 +21,9 @@ export default function AssetSymbolAndName({
       return false;
     }
   }, [tokenAddress]);
+  const assetSrc = useMemo(() => {
+    return getLogoAsset(getAddress(tokenAddress));
+  }, [tokenAddress]);
   return (
     <div
       data-is-rct={isRCT ? "true" : "false"}
@@ -29,9 +32,9 @@ export default function AssetSymbolAndName({
       <ImageWithFallback
         width={24}
         height={24}
-        className="h-6 w-6"
-        src={getLogoAsset(tokenAddress)}
-        alt={""}
+        className="h-6 w-6 rounded-full"
+        src={assetSrc}
+        alt={symbol ?? "unknown icon"}
       ></ImageWithFallback>
       <span className="text-[13px]">{symbol}</span>
     </div>

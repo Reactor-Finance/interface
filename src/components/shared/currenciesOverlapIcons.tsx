@@ -5,7 +5,7 @@ import { TAddress } from "@/lib/types";
 import { cva, VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
-const variants = cva("", {
+const variants = cva("rounded-full", {
   variants: {
     size: {
       sm: "h-4 w-4  data-[a=a]:-ml-1",

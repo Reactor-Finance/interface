@@ -22,7 +22,6 @@ function NumberInput<T extends FieldValues>({
       type="text"
       inputMode="decimal"
       autoComplete="off"
-      ring="none"
       pattern="^[0-9]*[.,]?[0-9]*$"
       placeholder="0"
       minLength={1}
@@ -48,7 +47,7 @@ function Root({
   return (
     <div className="space-y-1 ">
       <h4 className="text-sm text-neutral-300">{title}</h4>
-      <div className="flex w-full apply-focus">{children}</div>
+      <div className="flex w-full">{children}</div>
       <h4 className="text-right text-sm text-neutral-300">~{estimate}</h4>
     </div>
   );
@@ -58,24 +57,31 @@ function CurrencySelect({
   tokenAddress,
   ...buttonProps
 }: {
-  token: string;
-  tokenAddress: string;
+  token: string | undefined;
+  tokenAddress: string | undefined;
   disabled?: boolean;
 } & ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
     <button
       {...buttonProps}
-      className="w-[40%] bg-neutral-950 items-center flex justify-between border rounded-[2px] px-4  border-neutral-900"
+      className="w-[50%] bg-neutral-950 items-center flex justify-between border rounded-[2px] px-4  border-neutral-900"
     >
       <div className="flex items-center gap-x-2 text-sm ">
-        <ImageWithFallback
-          src={getLogoAsset(tokenAddress as TAddress)}
-          width={25}
-          height={25}
-          className="h-6 w-6"
-          alt="alt"
-        />
-        {token}
+        {token !== undefined && tokenAddress !== undefined && (
+          <>
+            <ImageWithFallback
+              src={getLogoAsset(tokenAddress as TAddress)}
+              width={25}
+              height={25}
+              className="h-6 w-6 rounded-full"
+              alt="alt"
+            />
+            {token}
+          </>
+        )}
+        {(token === undefined || tokenAddress === undefined) && (
+          <span className="text-[12px] font-medium">Select Token</span>
+        )}
       </div>
       <ChevronDown className="text-neutral-500" />
     </button>

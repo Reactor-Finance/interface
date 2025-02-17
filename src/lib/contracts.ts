@@ -5,7 +5,6 @@ export const Contracts = {
     abi: [...ContractsAbi.WETH.abi] as const,
     address: ContractsAbi.WETH.contractAddress as `0x${string}`,
   },
-
   Reactor: {
     abi: [...ContractsAbi.Reactor.abi] as const,
     address: ContractsAbi.Reactor.contractAddress as `0x${string}`,
