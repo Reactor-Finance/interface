@@ -3,8 +3,25 @@ import { SelectItem } from "@/components/ui/select";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import LockDropdown from "../lockDropdown";
+import { Contracts } from "@/lib/contracts";
+import { useSimulateContract, useWriteContract } from "wagmi";
+import { parseUnits } from "viem";
 
 export default function MergeContent() {
+  const tokenId0 = "1234";
+  const tokenId1 = "1234";
+  const { data: mergeSimulation } = useSimulateContract({
+    ...Contracts.VotingEscrow,
+    functionName: "merge",
+    args: [parseUnits(tokenId0, 0), parseUnits(tokenId1, 0)],
+  });
+  const { writeContract } = useWriteContract();
+  const onSubmit = () => {
+    if (mergeSimulation?.request) {
+      writeContract(mergeSimulation.request);
+    }
+  };
+
   return (
     <div className="space-y-4 pt-4">
       <LockDropdown placeholder="Select your veRCT">
@@ -26,7 +43,7 @@ export default function MergeContent() {
         increase the final Lock voting power by adding up the two underlying
         locked amounts based on the new lock time.
       </Alert>
-      <Button disabled size="submit" variant={"primary"}>
+      <Button disabled onClick={onSubmit} size="submit" variant={"primary"}>
         Approve
       </Button>
     </div>

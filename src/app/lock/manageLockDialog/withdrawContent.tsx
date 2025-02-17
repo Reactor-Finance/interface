@@ -3,15 +3,30 @@ import { SelectItem } from "@/components/ui/select";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import LockDropdown from "../lockDropdown";
+import { useSimulateContract, useWriteContract } from "wagmi";
+import { Contracts } from "@/lib/contracts";
+import { parseUnits } from "viem";
 
 export default function WithdrawContent() {
+  const tokenId = "1234";
+  const { data: withdrawSimulation } = useSimulateContract({
+    ...Contracts.VotingEscrow,
+    functionName: "withdraw",
+    args: [parseUnits(tokenId, 0)],
+  });
+  const { writeContract } = useWriteContract();
+  const onSubmit = () => {
+    if (withdrawSimulation) {
+      writeContract(withdrawSimulation.request);
+    }
+  };
   return (
     <div className="space-y-4 pt-4">
       <LockDropdown placeholder="Select your veRCT">
         <SelectItem value="re">Re</SelectItem>
       </LockDropdown>
       <Alert colors="muted">Withdraw veRCT from your expired locks.</Alert>
-      <Button disabled size="submit" variant="primary">
+      <Button onClick={onSubmit} disabled size="submit" variant="primary">
         Approve
       </Button>
     </div>

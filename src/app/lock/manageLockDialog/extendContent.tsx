@@ -4,14 +4,45 @@ import { Button } from "@/components/ui/button";
 import { Alert } from "@/components/ui/alert";
 import { Slider } from "@/components/ui/slider";
 import LockDropdown from "../lockDropdown";
+import { TWO_YEARS } from "@/data/constants";
+import { useSimulateContract, useWriteContract } from "wagmi";
+import { Contracts } from "@/lib/contracts";
+import { parseUnits } from "viem";
 
 export default function ExtendContent() {
+  const tokenId = "1234";
+  const [duration, setDuration] = React.useState([0]);
+  const { data: increaseUnlockTimeSimulation } = useSimulateContract({
+    ...Contracts.VotingEscrow,
+    functionName: "increase_unlock_time",
+    args: [
+      parseUnits(
+        duration[0].toString(), //tokenId
+        0
+      ),
+      parseUnits(tokenId, 0),
+    ],
+  });
+  const { writeContract } = useWriteContract();
+  const onSubmit = () => {
+    if (increaseUnlockTimeSimulation?.request) {
+      writeContract(increaseUnlockTimeSimulation.request);
+    }
+  };
   return (
     <div className="space-y-4 pt-4">
       <LockDropdown placeholder="Select your veRCT">
         <SelectItem value="apple">Apple</SelectItem>
       </LockDropdown>
-      <Slider defaultValue={[33]} max={100} step={1} />
+      <Slider
+        value={duration}
+        defaultValue={[33]}
+        onValueChange={(value) => {
+          setDuration(value);
+        }}
+        max={TWO_YEARS}
+        step={1000}
+      />
       <div className="w-full flex justify-between text-[13px] text-neutral-400">
         <span>Min</span>
         <span>.</span>
@@ -38,7 +69,7 @@ export default function ExtendContent() {
         You can extend lock or increase the lock amount. These actions will
         increase your voting power. The maximum lock time is 2 years.
       </Alert>
-      <Button disabled size="submit" variant="primary">
+      <Button onClick={onSubmit} disabled size="submit" variant="primary">
         Approve
       </Button>
     </div>
