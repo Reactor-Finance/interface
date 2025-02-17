@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import PageMarginContainer from "@/components/ui/pageMarginContainer";
 import ManageLockDialog from "./manageLockDialog/manageLockDialog";
 import CreateLockDialog from "./createLockDialog/createLockDialog";
-import HiveModal from "./hiveModal";
+import HiveTable from "./hiveTable/hiveTable";
 export default function Lock() {
   return (
     <div>
@@ -87,29 +87,7 @@ export default function Lock() {
         <Headers.InfoHeaderTwo popupContent={<div></div>}>
           Hive
         </Headers.InfoHeaderTwo>
-        <table className="w-full pt-6">
-          <caption className="h-0 opacity-0">Hive Table</caption>
-          <thead>
-            <tr className="grid grid-cols-8 px-6 py-2 font-medium text-neutral-400 text-sm">
-              <th className="col-span-4 text-left">Hive name</th>
-              <th>APR</th>
-              <th>Reward</th>
-              <th>Voting Power</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr className="grid text-center rounded-sm grid-cols-8 items-center bg-neutral-1000 py-2 px-6">
-              <td className="col-span-4 text-left">veRCT Maxi</td>
-              <td>11.22</td>
-              <td>11.22</td>
-              <td>11.22</td>
-              <td className="flex justify-end">
-                <HiveModal />
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <HiveTable />
       </PageMarginContainer>
     </div>
   );
