@@ -8,8 +8,7 @@ import { Button } from "@/components/ui/button";
 import LockDropdown from "../lockDropdown";
 export function IncreaseContent() {
   return (
-    <div className="space-y-4">
-      <div className="pt-2"></div>
+    <div className="space-y-4 pt-4">
       <LockDropdown placeholder="Select a fruit">
         <SelectItem value="apple">Apple</SelectItem>
         <SelectItem value="banana">Banana</SelectItem>

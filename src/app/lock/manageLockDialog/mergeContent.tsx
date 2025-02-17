@@ -6,7 +6,7 @@ import LockDropdown from "../lockDropdown";
 
 export default function MergeContent() {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pt-4">
       <LockDropdown placeholder="Select your veRCT">
         <SelectItem value="apple">Apple</SelectItem>
       </LockDropdown>
