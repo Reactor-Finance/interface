@@ -1,14 +1,42 @@
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import React from "react";
+import React, { useState } from "react";
 import RctInput from "../rctInput";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Alert } from "@/components/ui/alert";
 import EstimatesHeader from "../estimateHeader";
 import EstimateRow from "../estimateRow";
-
+import useSimulateCreateLock from "./hooks/useSimulateCreateLock";
+import { useWriteContract } from "wagmi";
+import { Contracts } from "@/lib/contracts";
+import { parseUnits } from "viem";
+import useSimulateApprove from "@/components/shared/hooks/useSimulateApprove";
+import useGetAllowance from "@/components/shared/hooks/useGetAllowance";
 export default function CreateLockDialog() {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState({ amount: "", duration: "" });
+  const { data: createLockSimulation } = useSimulateCreateLock({ form });
+  const { data: allowance } = useGetAllowance({
+    spender: Contracts.VotingEscrow.address,
+    tokenAddress: "0x", //rct address
+  });
+  const { data: approveSimulation } = useSimulateApprove({
+    spender: Contracts.VotingEscrow.address,
+    tokenAddress: "0x", //rct address
+  });
+  const { writeContract } = useWriteContract();
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setForm((prevForm) => ({ ...prevForm, [name]: value }));
+  };
+  const onSubmit = () => {
+    if ((allowance ?? 0n) < parseUnits(form.amount, 18) && approveSimulation) {
+      writeContract(approveSimulation?.request);
+    }
+    if (createLockSimulation) {
+      writeContract(createLockSimulation.request);
+    }
+  };
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <Button
@@ -31,12 +59,22 @@ export default function CreateLockDialog() {
             </span>
           </div>
           <div className="pt-2"></div>
-          <RctInput />
+          <RctInput onChange={handleInputChange} />
         </div>
         <div className="border-t border-neutral-800 my-2"></div>
         <div className="space-y-3">
           <h2 className="font-medium">Locking For</h2>
-          <Slider defaultValue={[33]} max={100} step={1} />
+          <Slider
+            onChange={(value) =>
+              setForm((prevForm) => ({
+                ...prevForm,
+                duration: value.toString(),
+              }))
+            }
+            defaultValue={[0]}
+            max={62208000}
+            step={1000}
+          />
           <div className="flex justify-between text-sm text-neutral-200 ">
             <span>14 days</span>
             <span>3 month</span>
@@ -56,7 +94,12 @@ export default function CreateLockDialog() {
           Locking will give you an NFT, referred to as a veNFT. You can increase
           the Lock amount or extend the Lock time at any point after.
         </Alert>
-        <Button type="submit" size="submit" variant="primary">
+        <Button
+          onClick={onSubmit}
+          type="submit"
+          size="submit"
+          variant="primary"
+        >
           Approve
         </Button>
       </DialogContent>
