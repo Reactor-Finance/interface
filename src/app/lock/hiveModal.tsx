@@ -3,9 +3,7 @@ import wheel from "@/assets/wheel.svg";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import React from "react";
-import LockDropdown from "./lockDropdown";
 import { Checkbox } from "@/components/ui/checkbox";
-import { SelectItem } from "@/components/ui/select";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 
@@ -31,9 +29,9 @@ export default function HiveDialog() {
               Create a new lock
             </button>
           </div>
-          <LockDropdown placeholder="RCT">
-            <SelectItem value="a"></SelectItem>
-          </LockDropdown>
+          {/* <LockDropdown placeholder="RCT"> */}
+          {/*   <SelectItem value="a"></SelectItem> */}
+          {/* </LockDropdown> */}
           <h4 className="text-neutral-600">Hive Strategy</h4>
           <div className="border-t border-neutral-800"></div>
           <div className="flex gap-x-2">
