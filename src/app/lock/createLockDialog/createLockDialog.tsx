@@ -14,7 +14,7 @@ import useSimulateApprove from "@/components/shared/hooks/useSimulateApprove";
 import useGetAllowance from "@/components/shared/hooks/useGetAllowance";
 export default function CreateLockDialog() {
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ amount: "", duration: "" });
+  const [form, setForm] = useState({ amount: "", duration: [0] });
   const { data: createLockSimulation } = useSimulateCreateLock({ form });
   const { data: allowance } = useGetAllowance({
     spender: Contracts.VotingEscrow.address,
@@ -65,10 +65,10 @@ export default function CreateLockDialog() {
         <div className="space-y-3">
           <h2 className="font-medium">Locking For</h2>
           <Slider
-            onChange={(value) =>
+            onValueChange={(value) =>
               setForm((prevForm) => ({
                 ...prevForm,
-                duration: value.toString(),
+                duration: value,
               }))
             }
             defaultValue={[0]}
