@@ -1,11 +1,9 @@
 import * as React from "react";
 import { SelectItem } from "@/components/ui/select";
-import symbl from "@/assets/reactor-symbol.svg";
-import Image from "next/image";
-import { Input } from "@/components/ui/input";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import LockDropdown from "../lockDropdown";
+import RctInput from "../rctInput";
 export function IncreaseContent() {
   return (
     <div className="space-y-4 pt-4">
@@ -20,16 +18,8 @@ export function IncreaseContent() {
         <h4>Add to lock</h4>
         <h5 className="text-neutral-200 text-[13px]">Available: 200.00 RCT</h5>
       </div>
-      <div className="apply-focus rounded-md bg-neutral-950 border-neutral-900 flex border-[1px]  px-4">
-        <div className="border-r-[1px] flex border-neutral-900 py-2 pr-4">
-          <Image src={symbl} width={24} height={24} alt="Reactor Ticker" />
-          <h2>RCT</h2>
-        </div>
-        <Input
-          ring="none"
-          className="border-none peer bg-transparent flex-grow"
-        />
-      </div>
+
+      <RctInput />
       <h3 className="text-lg">Estimates</h3>
       <div className="space-y-1">
         <div className="flex justify-between">
