@@ -3,8 +3,9 @@ import React from "react";
 import Headers from "@/components/ui/headers";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import LockModal from "./lockModal";
 import PageMarginContainer from "@/components/ui/pageMarginContainer";
+import ManageLockDialog from "./manageLockDialog/manageLockDialog";
+import CreateLockDialog from "./createLockDialog/createLockDialog";
 export default function Lock() {
   return (
     <div>
@@ -26,16 +27,14 @@ export default function Lock() {
             </h2>
           </div>
           <div>
-            <Button className="inline-flex" size="md" variant="outline">
-              Create Lock
-            </Button>
+            <CreateLockDialog />
           </div>
         </div>
         <div className="flex justify-between pt-12">
           <Headers.InfoHeaderTwo popupContent={<div></div>}>
             Locks
           </Headers.InfoHeaderTwo>
-          <LockModal />
+          <ManageLockDialog />
         </div>
         <div className="pt-8"></div>
         <table className="w-full pt-6">
