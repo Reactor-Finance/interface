@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import PageMarginContainer from "@/components/ui/pageMarginContainer";
 import ManageLockDialog from "./manageLockDialog/manageLockDialog";
 import CreateLockDialog from "./createLockDialog/createLockDialog";
+import HiveModal from "./hiveModal";
 export default function Lock() {
   return (
     <div>
@@ -104,9 +105,7 @@ export default function Lock() {
               <td>11.22</td>
               <td>11.22</td>
               <td className="flex justify-end">
-                <Button size={"sm"} variant={"outline"}>
-                  Deposit Lock
-                </Button>
+                <HiveModal />
               </td>
             </tr>
           </tbody>

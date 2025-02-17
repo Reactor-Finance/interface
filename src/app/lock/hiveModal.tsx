@@ -6,18 +6,16 @@ import LockDropdown from "./lockDropdown";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SelectItem } from "@/components/ui/select";
 
-export default function HiveModal() {
+export default function HiveDialog() {
   const [open, setOpen] = React.useState(false);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <Button onClick={() => setOpen(!open)} variant={"primary"} size="md">
-        Claim All Lock Rewards
+      <Button onClick={() => setOpen(!open)} variant={"outline"} size="sm">
+        Claim Lock
       </Button>
       <DialogContent className="px-0">
         <div className="border-b border-neutral-700 px-4 pb-4">
-          <DialogTitle className="text-[20px]">
-            <h2>Deposit hive</h2>
-          </DialogTitle>
+          <DialogTitle className="text-[20px]">Deposit Lock</DialogTitle>
 
           <h3 className="text-neutral-400 text-sm">
             Deposit through hive strategies
