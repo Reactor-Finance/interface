@@ -4,20 +4,26 @@ import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { useAccount, useSimulateContract, useWriteContract } from "wagmi";
 import { Contracts } from "@/lib/contracts";
-import { Address, parseUnits } from "viem";
+import { Address } from "viem";
+import { useLockProvider } from "../lockProvider";
 
 export default function TransferContent() {
   const [toAddress, setAddress] = React.useState("");
-  const tokenId = "1234";
+  const { selectedLockToken } = useLockProvider();
   const { address } = useAccount();
-  const { data: transferSimulation } = useSimulateContract({
+  const { data: transferSimulation, error } = useSimulateContract({
     ...Contracts.VotingEscrow,
     functionName: "safeTransferFrom",
-    args: [address as Address, toAddress as Address, parseUnits(tokenId, 0)],
+    args: [
+      address as Address,
+      toAddress as Address,
+      selectedLockToken?.id ?? 0n,
+    ],
     query: {
-      enabled: Boolean(address),
+      enabled: Boolean(address) && Boolean(selectedLockToken),
     },
   });
+  console.log({ error, transferSimulation });
   const { writeContract } = useWriteContract();
   const onSubmit = () => {
     if (transferSimulation) {
@@ -41,8 +47,13 @@ export default function TransferContent() {
         Transferring a lock will also transfer any rewards and rebases! Before
         continuing, please make sure you have claimed all available rewards.
       </Alert>
-      <Button onClick={onSubmit} disabled size="submit" variant={"primary"}>
-        Approve
+      <Button
+        onClick={onSubmit}
+        disabled={!Boolean(transferSimulation)}
+        size="submit"
+        variant={"primary"}
+      >
+        Transfer
       </Button>
     </div>
   );
