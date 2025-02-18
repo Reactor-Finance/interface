@@ -2,11 +2,11 @@
 import React, { useState } from "react";
 import ManageLockDialog from "../manageLockDialog/manageLockDialog";
 import LockRow from "./lockRow";
-import { useLockTableProvider } from "./lockTableProvider";
+import { useLockProvider } from "../lockProvider";
 
 export default function LockTable() {
   const [manageDialogState, setManageDialogState] = useState(false);
-  const { lockTokens } = useLockTableProvider();
+  const { lockTokens } = useLockProvider();
   return (
     <>
       <ManageLockDialog

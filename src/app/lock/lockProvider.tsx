@@ -21,21 +21,19 @@ export type TLockToken = {
   tokenSymbol: string;
   tokenDecimals: bigint;
 };
-interface LockTableProviderType {
+interface LockProviderType {
   lockTokens: readonly TLockToken[];
   selectedLockToken: TLockToken | undefined;
   selectedTokenId: string;
   setSelectedTokenId: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const LiquidityContext = createContext<LockTableProviderType | undefined>(
-  undefined
-);
+const LiquidityContext = createContext<LockProviderType | undefined>(undefined);
 interface Props {
   children: React.ReactNode;
 }
 
-export const LockTableProvider = ({ children }: Props) => {
+export const LockProvider = ({ children }: Props) => {
   const { address } = useAccount();
   const { data: tokens } = useReadContract({
     ...Contracts.veNFTHelper,
@@ -64,10 +62,10 @@ export const LockTableProvider = ({ children }: Props) => {
 };
 
 // Custom hook to use the context
-export const useLockTableProvider = () => {
+export const useLockProvider = () => {
   const context = useContext(LiquidityContext);
   if (!context) {
-    throw new Error("useLockTableProvider must be used within a MyProvider");
+    throw new Error("useLockProvider must be used within a LockProvider");
   }
   return context;
 };

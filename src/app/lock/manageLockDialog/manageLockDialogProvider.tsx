@@ -45,6 +45,7 @@ export const ManageLockDialogProvider = ({ children }: Props) => {
     },
   });
   const [selectedTokenId, setSelectedTokenId] = useState<string>("");
+  console.log({ selectedTokenId });
   return (
     <LiquidityContext.Provider
       value={{

@@ -2,11 +2,10 @@ import React from "react";
 import LockDropdown from "../lockDropdown";
 import { formatUnits } from "viem";
 import { formatNumber } from "@/lib/utils";
-import { useLockTableProvider } from "../lockTable/lockTableProvider";
+import { useLockProvider } from "../lockProvider";
 
 export default function ManageLockDropdown() {
-  const { lockTokens, selectedTokenId, setSelectedTokenId } =
-    useLockTableProvider();
+  const { lockTokens, selectedTokenId, setSelectedTokenId } = useLockProvider();
   return (
     <LockDropdown.Root
       onValueChange={(value) => {

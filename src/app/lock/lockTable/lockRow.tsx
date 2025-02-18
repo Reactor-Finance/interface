@@ -4,13 +4,13 @@ import Image from "next/image";
 import React from "react";
 import { TLockToken } from "../types";
 import logo from "@/assets/reactor-symbol.svg";
-import { useLockTableProvider } from "./lockTableProvider";
+import { useLockProvider } from "../lockProvider";
 interface Props {
   setOpenModal: (open: boolean) => void;
   token: TLockToken;
 }
 export default function LockRow({ setOpenModal, token }: Props) {
-  const { setSelectedTokenId } = useLockTableProvider();
+  const { setSelectedTokenId } = useLockProvider();
   return (
     <tr className="grid text-center rounded-sm grid-cols-8 items-center bg-neutral-1000 py-2 px-6">
       <td className="bg-neutral-1000 flex gap-x-2 items-center text-left col-span-2">

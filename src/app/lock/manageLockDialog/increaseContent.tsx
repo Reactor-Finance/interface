@@ -7,14 +7,14 @@ import { useSimulateContract, useWriteContract } from "wagmi";
 import { Contracts } from "@/lib/contracts";
 import { formatUnits, parseUnits } from "viem";
 import { RCT_DECIMALS } from "@/data/constants";
-import { useLockTableProvider } from "../lockTable/lockTableProvider";
 import useGetLockApproval from "./hooks/useGetLockApproval";
 import useGetAllowance from "@/components/shared/hooks/useGetAllowance";
 import useSimulateApprove from "@/components/shared/hooks/useSimulateApprove";
 import { inputPatternMatch } from "@/lib/utils";
+import { useLockProvider } from "../lockProvider";
 export function IncreaseContent() {
   const [amount, setAmount] = React.useState("");
-  const { selectedLockToken } = useLockTableProvider();
+  const { selectedLockToken } = useLockProvider();
   const tokenId = selectedLockToken?.id.toString() ?? "";
   const { rctBalance } = useGetRctBalance();
   const { data: increaseAmountSimulation } = useSimulateContract({

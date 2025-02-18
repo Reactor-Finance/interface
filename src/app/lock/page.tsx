@@ -5,53 +5,51 @@ import PageMarginContainer from "@/components/ui/pageMarginContainer";
 import CreateLockDialog from "./createLockDialog/createLockDialog";
 import HiveTable from "./hiveTable/hiveTable";
 import LockTable from "./lockTable/lockTable";
-import { LockTableProvider } from "./lockTable/lockTableProvider";
-import { Button } from "@/components/ui/button";
+import ClaimAllLocks from "./claimAllLocks";
+import { LockProvider } from "./lockProvider";
 export default function Lock() {
   return (
-    <div>
-      <PageMarginContainer>
-        <div className="flex justify-between">
-          <div className="w-[640px]">
-            <div className="">
-              <Headers.GradiantHeaderOne
-                colorOne="#A0055D"
-                colorTwo="#836EF9F2"
-              >
-                Lock
-              </Headers.GradiantHeaderOne>
+    <LockProvider>
+      <div>
+        <PageMarginContainer>
+          <div className="flex justify-between">
+            <div className="w-[640px]">
+              <div className="">
+                <Headers.GradiantHeaderOne
+                  colorOne="#A0055D"
+                  colorTwo="#836EF9F2"
+                >
+                  Lock
+                </Headers.GradiantHeaderOne>
+              </div>
+              <h2 className="text-neutral-300 pt-6 text-[13px]">
+                Lock RCT into veRCT to earn and govern. Vote with veRCT to earn
+                bribes and trading fees. veRCT can be transferred, merged and
+                split. You can hold multiple positions.
+              </h2>
             </div>
-            <h2 className="text-neutral-300 pt-6 text-[13px]">
-              Lock RCT into veRCT to earn and govern. Vote with veRCT to earn
-              bribes and trading fees. veRCT can be transferred, merged and
-              split. You can hold multiple positions.
-            </h2>
+            <div>
+              <CreateLockDialog />
+            </div>
           </div>
-          <div>
-            <CreateLockDialog />
-          </div>
-        </div>
-        <div className="flex justify-between pt-12">
-          <Headers.InfoHeaderTwo popupContent={<div></div>}>
-            Locks
-          </Headers.InfoHeaderTwo>
+          <div className="flex justify-between pt-12">
+            <Headers.InfoHeaderTwo popupContent={<div></div>}>
+              Locks
+            </Headers.InfoHeaderTwo>
 
-          <Button variant={"primary"} size="md">
-            Claim All Locks
-          </Button>
-        </div>
-        <div className="pt-8"></div>
-        <div>
-          <LockTableProvider>
+            <ClaimAllLocks />
+          </div>
+          <div className="pt-8"></div>
+          <div>
             <LockTable />
-          </LockTableProvider>
-        </div>
-        <div className="pt-16"></div>
-        <Headers.InfoHeaderTwo popupContent={<div></div>}>
-          Hive
-        </Headers.InfoHeaderTwo>
-        <HiveTable />
-      </PageMarginContainer>
-    </div>
+          </div>
+          <div className="pt-16"></div>
+          <Headers.InfoHeaderTwo popupContent={<div></div>}>
+            Hive
+          </Headers.InfoHeaderTwo>
+          <HiveTable />
+        </PageMarginContainer>
+      </div>
+    </LockProvider>
   );
 }
