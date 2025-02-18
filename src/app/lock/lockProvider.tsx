@@ -26,6 +26,7 @@ interface LockProviderType {
   selectedLockToken: TLockToken | undefined;
   selectedTokenId: string;
   setSelectedTokenId: React.Dispatch<React.SetStateAction<string>>;
+  queryKey: readonly unknown[];
 }
 
 const LiquidityContext = createContext<LockProviderType | undefined>(undefined);
@@ -35,7 +36,7 @@ interface Props {
 
 export const LockProvider = ({ children }: Props) => {
   const { address } = useAccount();
-  const { data: tokens } = useReadContract({
+  const { data: tokens, queryKey } = useReadContract({
     ...Contracts.veNFTHelper,
     functionName: "getNFTFromAddress",
     args: [address ?? "0x"],
@@ -53,6 +54,7 @@ export const LockProvider = ({ children }: Props) => {
         selectedLockToken,
         setSelectedTokenId,
         selectedTokenId,
+        queryKey,
         lockTokens: tokens ?? [],
       }}
     >
