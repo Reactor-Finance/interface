@@ -24,7 +24,7 @@ export default function ExtendContent() {
     ],
   });
   console.log({ error });
-  const { approveSimulation } = useApproveVeRct();
+  const { data: approveSimulation } = useApproveVeRct();
   const approval = useGetLockApproval();
   const { writeContract } = useWriteContract();
   const onSubmit = () => {
