@@ -1,12 +1,13 @@
 import { Contracts } from "@/lib/contracts";
-import { parseUnits } from "viem";
 import { useReadContract } from "wagmi";
+import { useLockProvider } from "../../lockProvider";
 
-export default function useGetLockApproval({ tokenId }: { tokenId: string }) {
-  const { data } = useReadContract({
+export default function useGetLockApproval() {
+  const { selectedLockToken } = useLockProvider();
+  const { data, queryKey } = useReadContract({
     ...Contracts.VotingEscrow,
     functionName: "getApproved",
-    args: [parseUnits(tokenId, 0)],
+    args: [selectedLockToken?.id ?? 0n],
   });
-  return data;
+  return { data, queryKey };
 }
