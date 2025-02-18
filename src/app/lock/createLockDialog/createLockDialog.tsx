@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import RctInput from "../rctInput";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -24,7 +24,7 @@ export default function CreateLockDialog() {
   const { queryKey } = useLockProvider();
   const queryClient = useQueryClient();
   const { data: createLockSimulation } = useSimulateCreateLock({ form });
-  const allowance = useGetAllowance({
+  const { data: allowance, queryKey: allowanceKey } = useGetAllowance({
     spender: Contracts.VotingEscrow.address,
     tokenAddress: Contracts.Reactor.address, //rct address
   });
@@ -48,14 +48,29 @@ export default function CreateLockDialog() {
       writeContract(createLockSimulation.request);
     }
   };
+  const isApproving = useMemo(() => {
+    return (allowance ?? 0n) < parseUnits(form.amount, 18);
+  }, [allowance, form.amount]);
   useEffect(() => {
     if (isSuccess) {
-      queryClient.invalidateQueries({ queryKey });
-      queryClient.invalidateQueries({ queryKey: rctQueryKey });
-      setForm({ amount: "", duration: [DAYS_14] });
+      if (isApproving) {
+        queryClient.invalidateQueries({ queryKey: allowanceKey });
+      } else {
+        queryClient.invalidateQueries({ queryKey });
+        queryClient.invalidateQueries({ queryKey: rctQueryKey });
+        setForm({ amount: "", duration: [DAYS_14] });
+      }
       reset();
     }
-  }, [isSuccess, queryClient, queryKey, rctQueryKey, reset]);
+  }, [
+    allowanceKey,
+    isApproving,
+    isSuccess,
+    queryClient,
+    queryKey,
+    rctQueryKey,
+    reset,
+  ]);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <Button
@@ -127,7 +142,7 @@ export default function CreateLockDialog() {
             size="submit"
             variant="primary"
           >
-            Create Lock
+            {isApproving ? "Approve" : "Create Lock"}
           </Button>
 
           {validationError && (
