@@ -1,17 +1,21 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Contracts } from "@/lib/contracts";
 import { useSimulateContract, useWriteContract } from "wagmi";
-import { parseUnits } from "viem";
+import LockDropdown from "../lockDropdown";
+import { useLockProvider } from "../lockProvider";
 
 export default function MergeContent() {
-  const tokenId0 = "1234";
-  const tokenId1 = "1234";
+  const [mergeToken, setMergeToken] = React.useState("");
+  const { lockTokens, selectedLockToken } = useLockProvider();
+  const tokenId1 = useMemo(() => {
+    return lockTokens.find((token) => token.id.toString() === mergeToken);
+  }, [lockTokens, mergeToken]);
   const { data: mergeSimulation } = useSimulateContract({
     ...Contracts.VotingEscrow,
     functionName: "merge",
-    args: [parseUnits(tokenId0, 0), parseUnits(tokenId1, 0)],
+    args: [selectedLockToken?.id ?? 0n, tokenId1?.id ?? 0n],
   });
   const { writeContract } = useWriteContract();
   const onSubmit = () => {
@@ -23,6 +27,24 @@ export default function MergeContent() {
   return (
     <div className="space-y-4 pt-4">
       <h2>Merge with</h2>
+      <LockDropdown.Root
+        value={mergeToken}
+        onValueChange={(value) => setMergeToken(value)}
+      >
+        <LockDropdown.Trigger></LockDropdown.Trigger>
+        <LockDropdown.SelectList>
+          {lockTokens
+            .filter((token) => token.id !== selectedLockToken?.id)
+            .map((lockToken) => (
+              <LockDropdown.Item
+                value={lockToken.id.toString()}
+                key={lockToken.id.toString()}
+              >
+                Lock #{lockToken.id.toString()}
+              </LockDropdown.Item>
+            ))}
+        </LockDropdown.SelectList>
+      </LockDropdown.Root>
       <div className="p-3 bg-neutral-950 border border-neutral-900/80 rounded-sm ">
         <h2>Estimates</h2>
       </div>
