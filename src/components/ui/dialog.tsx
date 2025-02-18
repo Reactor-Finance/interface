@@ -40,7 +40,7 @@ const dialogContentVariants = cva(
       position: {
         half: "top-[50%] translate-y-[-50%] data-[state=open]:slide-in-from-top-[48%] data-[state=closed]:slide-out-to-top-[48%] ",
         static:
-          "data-[state=open]:slide-in-from-top-[8%] top-[8%] 2xl:top-[20%] data-[state=closed]:slide-out-to-top-[8%]",
+          "data-[state=open]:slide-in-from-top-[2%] top-[8%] 2xl:top-[20%] data-[state=closed]:slide-out-to-top-[2%]",
       },
     },
     defaultVariants: { position: "half" },

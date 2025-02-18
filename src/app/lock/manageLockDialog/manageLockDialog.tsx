@@ -1,5 +1,3 @@
-"use client";
-import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DialogTitle } from "@radix-ui/react-dialog";
@@ -10,19 +8,20 @@ import ExtendContent from "./extendContent";
 import TransferContent from "./transferContent";
 import MergeContent from "./mergeContent";
 import WithdrawContent from "./withdrawContent";
-
-export default function LockModal() {
-  const [open, setOpen] = React.useState(false);
+import ManageLockDropdown from "./manageLockDropdown";
+interface Props {
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+export default function ManageLockDialog({ open, setOpen }: Props) {
   return (
     <div>
       <Dialog open={open} onOpenChange={setOpen}>
-        <Button onClick={() => setOpen(!open)} variant={"primary"} size="md">
-          Claim All Lock Rewards
-        </Button>
         <DialogContent position="static">
           <DialogTitle className="text-lg">
             Manage your <span className="text-primary-400">lock</span>
           </DialogTitle>
+
           <Tabs>
             <TabsList display={"grow"} colors={"transparent"}>
               <TabsTrigger
@@ -66,6 +65,9 @@ export default function LockModal() {
                 Merge
               </TabsTrigger>
             </TabsList>
+            <div className="py-4">
+              <ManageLockDropdown />
+            </div>
             <TabsContent value="increase">
               <IncreaseContent />
             </TabsContent>

@@ -7,13 +7,14 @@ import Link from "next/link";
 import { CustomConnectButton } from "./customConnectButton";
 export default function Header() {
   return (
-    <div className="h-[88px] px-4 items-center grid grid-cols-3">
+    <div className="h-[88px] px-8 items-center grid grid-cols-3">
       <div>
         <Image src={reactor} alt="" />
       </div>
       <div>
-        <ul className="grid justify-center grid-cols-3 place-items-center text-[14px]">
+        <ul className="grid justify-center grid-cols-4 place-items-center text-[14px]">
           <NavLink href="/swap">Swap</NavLink>
+          <NavLink href="/lock">Lock</NavLink>
           <NavLink href="/dashboard">Dashboard</NavLink>
           <NavLink href="/liquidity">Liquidity</NavLink>
         </ul>
