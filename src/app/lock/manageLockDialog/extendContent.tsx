@@ -5,24 +5,33 @@ import { Slider } from "@/components/ui/slider";
 import { TWO_YEARS } from "@/data/constants";
 import { useSimulateContract, useWriteContract } from "wagmi";
 import { Contracts } from "@/lib/contracts";
+import { useLockProvider } from "../lockProvider";
+import useApproveVeRct from "./hooks/useApproveVeRct";
+import useGetLockApproval from "./hooks/useGetLockApproval";
+import { useDebounce } from "@/components/shared/hooks/useDebounce";
 import { parseUnits } from "viem";
 
 export default function ExtendContent() {
-  const tokenId = "1234";
+  const { selectedLockToken } = useLockProvider();
   const [duration, setDuration] = React.useState([0]);
-  const { data: increaseUnlockTimeSimulation } = useSimulateContract({
+  const { debouncedValue: durationDebounced } = useDebounce(duration[0], 300);
+  const { data: increaseUnlockTimeSimulation, error } = useSimulateContract({
     ...Contracts.VotingEscrow,
     functionName: "increase_unlock_time",
     args: [
-      parseUnits(
-        duration[0].toString(), //tokenId
-        0
-      ),
-      parseUnits(tokenId, 0),
+      selectedLockToken?.id ?? 0n,
+      parseUnits(durationDebounced.toString(), 0),
     ],
   });
+  console.log({ error });
+  const { approveSimulation } = useApproveVeRct();
+  const approval = useGetLockApproval();
   const { writeContract } = useWriteContract();
   const onSubmit = () => {
+    if (!approval && approveSimulation) {
+      writeContract(approveSimulation.request);
+      return;
+    }
     if (increaseUnlockTimeSimulation?.request) {
       writeContract(increaseUnlockTimeSimulation.request);
     }
@@ -64,7 +73,12 @@ export default function ExtendContent() {
         You can extend lock or increase the lock amount. These actions will
         increase your voting power. The maximum lock time is 2 years.
       </Alert>
-      <Button onClick={onSubmit} disabled size="submit" variant="primary">
+      <Button
+        onClick={onSubmit}
+        disabled={!Boolean(increaseUnlockTimeSimulation)}
+        size="submit"
+        variant="primary"
+      >
         Approve
       </Button>
     </div>
