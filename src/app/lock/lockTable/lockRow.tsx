@@ -5,6 +5,8 @@ import React from "react";
 import { TLockToken } from "../types";
 import logo from "@/assets/reactor-symbol.svg";
 import { useLockProvider } from "../lockProvider";
+import { formatUnits } from "viem";
+import { formatNumber } from "@/lib/utils";
 interface Props {
   setOpenModal: (open: boolean) => void;
   token: TLockToken;
@@ -20,13 +22,16 @@ export default function LockRow({ setOpenModal, token }: Props) {
         <span>Lock ID {token.id.toString()}</span>
       </td>
       <td className="">
-        <span className="block">396 veRCT</span>
+        <span className="block">
+          {formatNumber(formatUnits(token.voting_amount, token.decimals))} veRCT
+        </span>
         <span className="block text-neutral-500 text-[12px]">
-          Locked 396 RCT
+          Locked{" "}
+          {formatNumber(formatUnits(token.amount, Number(token.decimals)))} RCT
         </span>
       </td>
       <td className="">11.22</td>
-      <td className="">0.00 RCT</td>
+      <td className="">0 RCT</td>
       <td className="">5 June 2025</td>
       <td className="">
         <Badge border="one" colors="success">
