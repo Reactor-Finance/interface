@@ -27,7 +27,7 @@ export default function LockTable() {
           </tr>
         </thead>
 
-        <tbody>
+        <tbody className="flex flex-col gap-y-2">
           {lockTokens?.map((lock) => (
             <LockRow
               key={lock.id.toString()}
