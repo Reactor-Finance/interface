@@ -33,7 +33,7 @@ export function IncreaseContent() {
   };
   const { data: approveRctSimulation } = useSimulateApprove(approvalParams);
   const isLockApproved = useGetLockApproval();
-  const rctAllowance = useGetAllowance(approvalParams);
+  const { data: rctAllowance } = useGetAllowance(approvalParams);
   const { writeContract } = useWriteContract();
   const onSubmit = () => {
     if (
