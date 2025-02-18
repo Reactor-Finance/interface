@@ -2,6 +2,7 @@ import Input, { InputProps } from "@/components/ui/input";
 import Image from "next/image";
 import React from "react";
 import symbl from "@/assets/reactor-symbol.svg";
+import { inputPatternMatch } from "@/lib/utils";
 
 export default function RctInput(props: InputProps) {
   return (
@@ -12,6 +13,12 @@ export default function RctInput(props: InputProps) {
       </div>
       <Input
         {...props}
+        onChange={(e) => {
+          if (props.onChange) {
+            inputPatternMatch(e.target.value, 18);
+            props?.onChange?.(e);
+          }
+        }}
         ring="none"
         className="border-none peer bg-transparent flex-grow"
       />
