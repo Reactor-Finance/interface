@@ -32,9 +32,7 @@ export function IncreaseContent() {
     spender: Contracts.VotingEscrow.address,
   };
   const { data: approveRctSimulation } = useSimulateApprove(approvalParams);
-  const isLockApproved = useGetLockApproval({
-    tokenId: selectedLockToken?.id.toString() ?? "",
-  });
+  const isLockApproved = useGetLockApproval();
   const rctAllowance = useGetAllowance(approvalParams);
   const { writeContract } = useWriteContract();
   const onSubmit = () => {
@@ -43,12 +41,15 @@ export function IncreaseContent() {
       approveRctSimulation
     ) {
       writeContract(approveRctSimulation.request);
+      return;
     }
     if (!isLockApproved && approveSimulation) {
       writeContract(approveSimulation.request);
+      return;
     }
     if (increaseAmountSimulation) {
       writeContract(increaseAmountSimulation.request);
+      return;
     }
   };
   return (
