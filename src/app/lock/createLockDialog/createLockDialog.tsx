@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import RctInput from "../rctInput";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -7,31 +7,39 @@ import { Alert } from "@/components/ui/alert";
 import EstimatesHeader from "../estimateHeader";
 import EstimateRow from "../estimateRow";
 import useSimulateCreateLock from "./hooks/useSimulateCreateLock";
-import { useWriteContract } from "wagmi";
+import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { Contracts } from "@/lib/contracts";
 import { formatUnits, parseUnits } from "viem";
 import useSimulateApprove from "@/components/shared/hooks/useSimulateApprove";
 import useGetAllowance from "@/components/shared/hooks/useGetAllowance";
 import useGetRctBalance from "@/components/shared/hooks/useGetRctBalance";
-import { RCT_DECIMALS, TWO_YEARS } from "@/data/constants";
+import { DAYS_14, RCT_DECIMALS, TWO_YEARS } from "@/data/constants";
+import useCreateLockValidation from "./hooks/useCreateLockValidation";
+import FormErrorMessage from "@/components/shared/formErrorMessage";
+import { useLockProvider } from "../lockProvider";
+import { useQueryClient } from "@tanstack/react-query";
 export default function CreateLockDialog() {
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ amount: "", duration: [0] });
+  const [form, setForm] = useState({ amount: "", duration: [DAYS_14] });
+  const { queryKey } = useLockProvider();
+  const queryClient = useQueryClient();
   const { data: createLockSimulation } = useSimulateCreateLock({ form });
   const allowance = useGetAllowance({
     spender: Contracts.VotingEscrow.address,
-    tokenAddress: "0x", //rct address
+    tokenAddress: Contracts.Reactor.address, //rct address
   });
   const { data: approveSimulation } = useSimulateApprove({
     spender: Contracts.VotingEscrow.address,
-    tokenAddress: "0x", //rct address
+    tokenAddress: Contracts.Reactor.address, //rct address
   });
-  const { rctBalance } = useGetRctBalance();
-  const { writeContract } = useWriteContract();
+  const { rctBalance, rctQueryKey } = useGetRctBalance();
+  const { writeContract, reset, data: hash } = useWriteContract();
+  const { isSuccess } = useWaitForTransactionReceipt({ hash });
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm((prevForm) => ({ ...prevForm, [name]: value }));
   };
+  const { error: validationError, isValid } = useCreateLockValidation({ form });
   const onSubmit = () => {
     if ((allowance ?? 0n) < parseUnits(form.amount, 18) && approveSimulation) {
       writeContract(approveSimulation?.request);
@@ -40,6 +48,14 @@ export default function CreateLockDialog() {
       writeContract(createLockSimulation.request);
     }
   };
+  useEffect(() => {
+    if (isSuccess) {
+      queryClient.invalidateQueries({ queryKey });
+      queryClient.invalidateQueries({ queryKey: rctQueryKey });
+      setForm({ amount: "", duration: [DAYS_14] });
+      reset();
+    }
+  }, [isSuccess, queryClient, queryKey, rctQueryKey, reset]);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <Button
@@ -63,7 +79,11 @@ export default function CreateLockDialog() {
             </span>
           </div>
           <div className="pt-2"></div>
-          <RctInput onChange={handleInputChange} />
+          <RctInput
+            value={form.amount}
+            name="amount"
+            onChange={handleInputChange}
+          />
         </div>
         <div className="border-t border-neutral-800 my-2"></div>
         <div className="space-y-3">
@@ -76,6 +96,7 @@ export default function CreateLockDialog() {
               }))
             }
             defaultValue={[0]}
+            min={DAYS_14}
             max={TWO_YEARS}
             step={1000}
           />
@@ -98,14 +119,21 @@ export default function CreateLockDialog() {
           Locking will give you an NFT, referred to as a veNFT. You can increase
           the Lock amount or extend the Lock time at any point after.
         </Alert>
-        <Button
-          onClick={onSubmit}
-          type="submit"
-          size="submit"
-          variant="primary"
-        >
-          Approve
-        </Button>
+        <div>
+          <Button
+            onClick={onSubmit}
+            disabled={!isValid}
+            type="submit"
+            size="submit"
+            variant="primary"
+          >
+            Create Lock
+          </Button>
+
+          {validationError && (
+            <FormErrorMessage>{validationError}</FormErrorMessage>
+          )}
+        </div>
       </DialogContent>
     </Dialog>
   );
