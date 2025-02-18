@@ -29,4 +29,8 @@ export const Contracts = {
     abi: [...ContractsAbi.TradeHelper.abi] as const,
     address: ContractsAbi.TradeHelper.contractAddress as `0x${string}`,
   },
+  veNFTHelper: {
+    abi: [...ContractsAbi.veNFTHelper.abi] as const,
+    address: ContractsAbi.veNFTHelper.contractAddress as `0x${string}`,
+  },
 };
