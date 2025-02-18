@@ -3,7 +3,7 @@ import { useAccount, useReadContract } from "wagmi";
 
 export default function useGetRctBalance() {
   const { address } = useAccount();
-  const { data } = useReadContract({
+  const { data, queryKey } = useReadContract({
     ...Contracts.Reactor,
     functionName: "balanceOf",
     args: [address ?? "0x"],
@@ -11,5 +11,5 @@ export default function useGetRctBalance() {
       enabled: Boolean(address),
     },
   });
-  return data;
+  return { rctBalance: data, rctQueryKey: queryKey };
 }

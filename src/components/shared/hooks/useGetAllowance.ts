@@ -16,5 +16,5 @@ export default function useGetAllowance({
     args: [address ?? "0x", spender],
     query: { enabled: Boolean(address) },
   });
-  return { data };
+  return data;
 }
