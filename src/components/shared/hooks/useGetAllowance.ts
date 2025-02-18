@@ -9,12 +9,11 @@ export default function useGetAllowance({
   spender: Address;
 }) {
   const { address } = useAccount();
-  const { data } = useReadContract({
+  return useReadContract({
     abi: erc20Abi,
     address: tokenAddress,
     functionName: "allowance",
     args: [address ?? "0x", spender],
     query: { enabled: Boolean(address) },
   });
-  return data;
 }
