@@ -9,14 +9,16 @@ import EstimateRow from "../estimateRow";
 import useSimulateCreateLock from "./hooks/useSimulateCreateLock";
 import { useWriteContract } from "wagmi";
 import { Contracts } from "@/lib/contracts";
-import { parseUnits } from "viem";
+import { formatUnits, parseUnits } from "viem";
 import useSimulateApprove from "@/components/shared/hooks/useSimulateApprove";
 import useGetAllowance from "@/components/shared/hooks/useGetAllowance";
+import useGetRctBalance from "@/components/shared/hooks/useGetRctBalance";
+import { RCT_DECIMALS, TWO_YEARS } from "@/data/constants";
 export default function CreateLockDialog() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ amount: "", duration: [0] });
   const { data: createLockSimulation } = useSimulateCreateLock({ form });
-  const { data: allowance } = useGetAllowance({
+  const allowance = useGetAllowance({
     spender: Contracts.VotingEscrow.address,
     tokenAddress: "0x", //rct address
   });
@@ -24,6 +26,7 @@ export default function CreateLockDialog() {
     spender: Contracts.VotingEscrow.address,
     tokenAddress: "0x", //rct address
   });
+  const { rctBalance } = useGetRctBalance();
   const { writeContract } = useWriteContract();
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -55,7 +58,8 @@ export default function CreateLockDialog() {
           <div className="flex justify-between">
             <label htmlFor="">Amount to Lock</label>
             <span className="text-sm">
-              <span className="text-neutral-200">Available:</span> 200 RCT
+              <span className="text-neutral-200">Available:</span>{" "}
+              {formatUnits(rctBalance ?? 0n, RCT_DECIMALS)} RCT
             </span>
           </div>
           <div className="pt-2"></div>
@@ -72,7 +76,7 @@ export default function CreateLockDialog() {
               }))
             }
             defaultValue={[0]}
-            max={62208000}
+            max={TWO_YEARS}
             step={1000}
           />
           <div className="flex justify-between text-sm text-neutral-200 ">
