@@ -1,3 +1,4 @@
+import { useDebounce } from "@/components/shared/hooks/useDebounce";
 import { Contracts } from "@/lib/contracts";
 import { parseUnits } from "viem";
 import { useSimulateContract } from "wagmi";
@@ -10,13 +11,12 @@ export default function useSimulateCreateLock({
     duration: number[];
   };
 }) {
-  const { data } = useSimulateContract({
+  const { debouncedValue: duration } = useDebounce(form.duration[0], 400);
+  const { data, error } = useSimulateContract({
     ...Contracts.VotingEscrow,
     functionName: "create_lock",
-    args: [
-      parseUnits(form.amount, 18),
-      parseUnits(form.duration[0].toString(), 0),
-    ],
+    args: [parseUnits(form.amount, 18), parseUnits(duration.toString(), 0)],
   });
+  console.log({ error });
   return { data };
 }
