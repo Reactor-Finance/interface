@@ -1,11 +1,12 @@
 import React from "react";
 import LockDropdown from "../lockDropdown";
-import { useManageLockDialogProvider } from "./manageLockDialogProvider";
 import { formatUnits } from "viem";
+import { formatNumber } from "@/lib/utils";
+import { useLockTableProvider } from "../lockTable/lockTableProvider";
 
 export default function ManageLockDropdown() {
   const { lockTokens, selectedTokenId, setSelectedTokenId } =
-    useManageLockDialogProvider();
+    useLockTableProvider();
   return (
     <LockDropdown.Root
       onValueChange={(value) => {
@@ -19,8 +20,9 @@ export default function ManageLockDropdown() {
         {lockTokens.map((token) => (
           <LockDropdown.Item key={token.id} value={token.id.toString()}>
             Lock #{token.id}{" "}
-            <span>
-              {formatUnits(token.amount, token.decimals)}rct locked for 2 years
+            <span className="text-neutral-200 text-sm">
+              {formatNumber(formatUnits(token.amount, token.decimals))} RCT
+              locked for 2 years{" "}
             </span>
           </LockDropdown.Item>
         ))}
