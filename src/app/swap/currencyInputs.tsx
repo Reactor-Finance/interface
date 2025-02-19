@@ -9,10 +9,13 @@ import { Contracts } from "@/lib/contracts";
 import useApproveWrite from "@/components/shared/hooks/useApproveWrite";
 import { useWriteContract } from "wagmi";
 import useSwapSimulate from "./hooks/useSwapSimulate";
+import SubmitButton from "@/components/shared/submitBtn";
+import { useQuoteSwap } from "./hooks/useQuoteSwap";
 export default function CurrencyInputs() {
   const { updateState, state } = useSwapProvider();
   const [isApproving, setIsApproving] = useState(false);
   console.log(isApproving);
+  const {} = useQuoteSwap();
   const handleSetToken = useHandleSetToken();
   const handleSetOpen = (open: boolean) => {
     if (state.inTokenModalOpen) {
@@ -42,8 +45,10 @@ export default function CurrencyInputs() {
     amount: state.inTokenAmount,
     token: state.inToken,
   });
-  const { data: swapSimulation } = useSwapSimulate();
+  const { data: swapSimulation, error } = useSwapSimulate();
+
   const { writeContract } = useWriteContract();
+  console.log({ error, swapSimulation, writeApprove });
   const onSubmit = useCallback(() => {
     if (writeApprove) {
       writeContract(writeApprove);
@@ -55,7 +60,7 @@ export default function CurrencyInputs() {
     }
   }, [swapSimulation, writeApprove, writeContract]);
   return (
-    <div className="relative space-y-1">
+    <div className="relative space-y-2">
       <SearchTokensDailog
         open={state.inTokenModalOpen || state.outTokenModalOpen}
         setOpen={handleSetOpen}
@@ -111,7 +116,10 @@ export default function CurrencyInputs() {
           />
         </CurrencyInput.Root>
       </CurrWrapper>
-      <button onClick={onSubmit}>Submit</button>
+
+      <div className="pt-2">
+        <SubmitButton onClick={onSubmit}>Swap</SubmitButton>
+      </div>
     </div>
   );
 }
