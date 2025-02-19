@@ -3,16 +3,19 @@ import { Input } from "../ui/input";
 import { ControllerRenderProps, FieldValues } from "react-hook-form";
 import { ChevronDown } from "lucide-react";
 import ImageWithFallback from "./imageWithFallback";
-import { getLogoAsset } from "@/utils";
-import { TAddress } from "@/lib/types";
+import { getLogoAsset, inputPatternNumberMatch } from "@/utils";
+import { TAddress, TToken } from "@/lib/types";
 /**
  * Must Wrap in Form Field
  */
 function NumberInput<T extends FieldValues>({
   disabled,
+  onChangeValue,
+  decimals,
 }: {
   disabled: boolean;
   decimals: number;
+  onChangeValue: (value: string) => void;
   field?: ControllerRenderProps<T>;
 }) {
   return (
@@ -26,11 +29,11 @@ function NumberInput<T extends FieldValues>({
       placeholder="0"
       minLength={1}
       step="any"
-      // onChange={(e) => {
-      //   if (inputPatternNumberMatch(e.target.value, decimals)) {
-      //     return field.onChange(e.target.value);
-      //   }
-      // }}
+      onChange={(e) => {
+        if (inputPatternNumberMatch(e.target.value, decimals)) {
+          return onChangeValue(e.target.value);
+        }
+      }}
     />
   );
 }
@@ -54,11 +57,9 @@ function Root({
 }
 function CurrencySelect({
   token,
-  tokenAddress,
   ...buttonProps
 }: {
-  token: string | undefined;
-  tokenAddress: string | undefined;
+  token: TToken | null;
   disabled?: boolean;
 } & ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
@@ -67,19 +68,19 @@ function CurrencySelect({
       className="w-[50%] bg-neutral-950 items-center flex justify-between border rounded-[2px] px-4  border-neutral-900"
     >
       <div className="flex items-center gap-x-2 text-sm ">
-        {token !== undefined && tokenAddress !== undefined && (
+        {token !== null && (
           <>
             <ImageWithFallback
-              src={getLogoAsset(tokenAddress as TAddress)}
+              src={getLogoAsset(token?.address as TAddress)}
               width={25}
               height={25}
               className="h-6 w-6 rounded-full"
               alt="alt"
             />
-            {token}
+            {token.symbol}
           </>
         )}
-        {(token === undefined || tokenAddress === undefined) && (
+        {token === null && (
           <span className="text-[12px] font-medium">Select Token</span>
         )}
       </div>

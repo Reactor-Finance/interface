@@ -8,10 +8,9 @@ import { Contracts } from "@/lib/contracts";
 import { formatUnits, parseUnits } from "viem";
 import { RCT_DECIMALS } from "@/data/constants";
 import useGetLockApproval from "./hooks/useGetLockApproval";
-import useGetAllowance from "@/components/shared/hooks/useGetAllowance";
-import useSimulateApprove from "@/components/shared/hooks/useSimulateApprove";
 import { inputPatternMatch } from "@/lib/utils";
 import { useLockProvider } from "../lockProvider";
+import useApproveWrite from "@/components/shared/hooks/useApproveWrite";
 export function IncreaseContent() {
   const [amount, setAmount] = React.useState("");
   const { selectedLockToken } = useLockProvider();
@@ -27,20 +26,23 @@ export function IncreaseContent() {
     functionName: "approve",
     args: [Contracts.VotingEscrow.address, parseUnits(tokenId, 0)],
   });
-  const approvalParams = {
+  const approveRctSimulation = useApproveWrite({
     tokenAddress: Contracts.Reactor.address,
     spender: Contracts.VotingEscrow.address,
-  };
-  const { data: approveRctSimulation } = useSimulateApprove(approvalParams);
+    token: selectedLockToken
+      ? {
+          address: selectedLockToken?.token ?? "0x",
+          symbol: selectedLockToken?.tokenSymbol,
+          decimals: selectedLockToken.decimals,
+        }
+      : null,
+    amount,
+  });
   const isLockApproved = useGetLockApproval();
-  const { data: rctAllowance } = useGetAllowance(approvalParams);
   const { writeContract } = useWriteContract();
   const onSubmit = () => {
-    if (
-      (rctAllowance ?? 0n) < parseUnits(amount, RCT_DECIMALS) &&
-      approveRctSimulation
-    ) {
-      writeContract(approveRctSimulation.request);
+    if (approveRctSimulation) {
+      writeContract(approveRctSimulation);
       return;
     }
     if (!isLockApproved && approveSimulation) {

@@ -22,7 +22,7 @@ const chain = {
   rpcUrls: { default: { http: ["/api/rpc"] } },
   id: parseInt(chainId),
 };
-const web3Config = getDefaultConfig({
+export const wagmiConfig = getDefaultConfig({
   appName: "Reactor Finance",
   projectId: "75ec6bc09b1280c146d750fbb7aae68a",
   ssr: true,
@@ -40,7 +40,7 @@ const queryClient = new QueryClient({
 export const Providers: FC<PropsWithChildren> = ({ children }) => {
   return (
     <TRPCReactProvider>
-      <WagmiProvider config={web3Config}>
+      <WagmiProvider config={wagmiConfig}>
         <QueryClientProvider client={queryClient}>
           <RainbowKitProvider theme={darkTheme()}>
             <HeroUIProvider className="flex min-h-svh flex-col ">

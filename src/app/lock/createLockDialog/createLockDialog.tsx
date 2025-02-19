@@ -10,7 +10,6 @@ import useSimulateCreateLock from "./hooks/useSimulateCreateLock";
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { Contracts } from "@/lib/contracts";
 import { formatUnits, parseUnits } from "viem";
-import useSimulateApprove from "@/components/shared/hooks/useSimulateApprove";
 import useGetAllowance from "@/components/shared/hooks/useGetAllowance";
 import useGetRctBalance from "@/components/shared/hooks/useGetRctBalance";
 import { DAYS_14, RCT_DECIMALS, TWO_YEARS } from "@/data/constants";
@@ -18,6 +17,7 @@ import useCreateLockValidation from "./hooks/useCreateLockValidation";
 import FormErrorMessage from "@/components/shared/formErrorMessage";
 import { useLockProvider } from "../lockProvider";
 import { useQueryClient } from "@tanstack/react-query";
+import useApproveSimulate from "@/components/shared/hooks/useApproveSimulate";
 export default function CreateLockDialog() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ amount: "", duration: [DAYS_14] });
@@ -28,7 +28,7 @@ export default function CreateLockDialog() {
     spender: Contracts.VotingEscrow.address,
     tokenAddress: Contracts.Reactor.address, //rct address
   });
-  const { data: approveSimulation } = useSimulateApprove({
+  const { data: approveSimulation } = useApproveSimulate({
     spender: Contracts.VotingEscrow.address,
     tokenAddress: Contracts.Reactor.address, //rct address
   });

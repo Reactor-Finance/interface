@@ -1,163 +1,144 @@
 "use client";
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import SwapIconBorder from "@/components/shared/swapIconBorder";
 import CurrencyInput from "@/components/shared/currencyInput";
 import SearchTokensDailog from "@/components/shared/searchTokensDialog";
-import { TAddress, TToken } from "@/lib/types";
-import { useReadContract, useSimulateContract } from "wagmi";
+import useHandleSetToken from "./hooks/useHandleSetToken";
+import { useSwapProvider } from "./swapProvider";
 import { Contracts } from "@/lib/contracts";
-type Token = {
-  address: TAddress | undefined;
-  symbol: string | undefined;
-};
-type CurrencyInputState = {
-  inputOneModal: boolean;
-  inputTwoModal: boolean;
-  selectedTokens: {
-    tokenOne: Token;
-    tokenTwo: Token;
-  };
-};
+import useApproveWrite from "@/components/shared/hooks/useApproveWrite";
+import { useWriteContract } from "wagmi";
+import useSwapSimulate from "./hooks/useSwapSimulate";
+import SubmitButton from "@/components/shared/submitBtn";
+import { useQuoteSwap } from "./hooks/useQuoteSwap";
 export default function CurrencyInputs() {
-  const [state, setState] = useState<CurrencyInputState>({
-    inputOneModal: false,
-    inputTwoModal: false,
-    selectedTokens: {
-      tokenOne: { address: undefined, symbol: undefined },
-      tokenTwo: { address: undefined, symbol: undefined },
-    },
-  });
-  const handleSetToken = ({ address, symbol }: TToken) => {
-    const bothSelected =
-      state.selectedTokens.tokenOne.address &&
-      state.selectedTokens.tokenTwo.address;
-
-    if (state.inputOneModal) {
-      if (bothSelected) {
-        setState((prev) => ({
-          ...prev,
-          inputOneModal: false,
-          selectedTokens: {
-            tokenOne: { address, symbol },
-            tokenTwo: { address: undefined, symbol: undefined },
-          },
-        }));
-      } else {
-        setState((prev) => ({
-          ...prev,
-          inputOneModal: false,
-          selectedTokens: {
-            ...prev.selectedTokens,
-            tokenOne: { address, symbol },
-          },
-        }));
-      }
-    }
-    if (state.inputTwoModal) {
-      if (bothSelected) {
-        setState((prev) => ({
-          ...prev,
-          inputTwoModal: false,
-          selectedTokens: {
-            tokenTwo: { address, symbol },
-            tokenOne: { address: undefined, symbol: undefined },
-          },
-        }));
-      } else {
-        setState((prev) => ({
-          ...prev,
-          inputTwoModal: false,
-          selectedTokens: {
-            ...prev.selectedTokens,
-            tokenTwo: { address, symbol },
-          },
-        }));
-      }
-    }
-  };
+  const { updateState, state } = useSwapProvider();
+  const [isApproving, setIsApproving] = useState(false);
+  console.log(isApproving);
+  const {} = useQuoteSwap();
+  const handleSetToken = useHandleSetToken();
   const handleSetOpen = (open: boolean) => {
-    if (state.inputOneModal) {
-      setState((prev) => ({ ...prev, inputOneModal: open }));
+    if (state.inTokenModalOpen) {
+      updateState({ inTokenModalOpen: open });
     } else {
-      setState((prev) => ({ ...prev, inputTwoModal: open }));
+      updateState({ outTokenModalOpen: open });
     }
   };
+  // @matchToken used as a query filter to get
+  // tokens in liquidity pools that have the selected token
+  // only returns if one token is selected
   const matchToken = useMemo(() => {
-    if (
-      state.selectedTokens.tokenTwo.address &&
-      state.selectedTokens.tokenOne.address
-    ) {
+    if (state.inToken && state.outToken) {
       return;
     }
-    if (state.selectedTokens.tokenOne.address) {
-      return state.selectedTokens.tokenOne.address;
-    } else {
-      return state.selectedTokens.tokenTwo.address;
+    if (state.inToken) {
+      return state.inToken?.address;
+    } else if (state.outToken) {
+      return state.outToken.address;
     }
-  }, [state.selectedTokens.tokenOne, state.selectedTokens.tokenTwo.address]);
-  console.log(matchToken, "match");
-  const {} = useSimulateContract({
-    ...Contracts.Router,
-    functionName: "swap",
-    args: [
-      0n, //amountIn
-      0n, //minOut
-      [
-        {
-          from: state.selectedTokens.tokenOne.address ?? "0x",
-          to: state.selectedTokens.tokenTwo.address ?? "0x",
-          stable: false,
-        },
-      ],
-      "0x", //address
-      0n, //deadline
-      true, //useTokenAsFee
-    ],
+  }, [state.inToken, state.outToken]);
+
+  // checks allowance
+  const writeApprove = useApproveWrite({
+    tokenAddress: state.inToken?.address,
+    spender: Contracts.Router.address,
+    amount: state.inTokenAmount,
+    token: state.inToken,
   });
-  useReadContract({ ...Contracts.Router, functionName: "tradeHelper" });
+  const { data: swapSimulation, error } = useSwapSimulate();
+
+  const { writeContract } = useWriteContract();
+  console.log({ error, swapSimulation, writeApprove });
+  const onSubmit = useCallback(() => {
+    if (writeApprove) {
+      writeContract(writeApprove);
+      setIsApproving(true);
+      return;
+    }
+    if (swapSimulation) {
+      writeContract(swapSimulation.request);
+    }
+  }, [swapSimulation, writeApprove, writeContract]);
   return (
-    <>
+    <div className="relative space-y-2">
       <SearchTokensDailog
-        open={state.inputOneModal || state.inputTwoModal}
+        open={state.inTokenModalOpen || state.outTokenModalOpen}
         setOpen={handleSetOpen}
         usePoolTokens
         setToken={handleSetToken}
         matchToken={matchToken}
       />
-      <CurrencyInput.Root title="Sell" estimate="0">
-        <CurrencyInput.CurrencySelect
-          onClick={() => setState((prev) => ({ ...prev, inputOneModal: true }))}
-          token={state.selectedTokens.tokenOne.symbol}
-          tokenAddress={state.selectedTokens.tokenOne.address}
-        />
-        <CurrencyInput.NumberInput disabled={false} decimals={10} />
-      </CurrencyInput.Root>
+      <CurrWrapper
+        active={state.inTokenSelected}
+        onClick={() =>
+          updateState({ outTokenSelected: false, inTokenSelected: true })
+        }
+      >
+        <CurrencyInput.Root title="Sell" estimate="0">
+          <CurrencyInput.CurrencySelect
+            onClick={() => updateState({ inTokenModalOpen: true })}
+            token={state.inToken}
+          />
+          <CurrencyInput.NumberInput
+            onChangeValue={(value: string) => {
+              updateState({ inTokenAmount: value });
+            }}
+            disabled={false}
+            decimals={10}
+          />
+        </CurrencyInput.Root>
+      </CurrWrapper>
       <SwapIconBorder
         swapClick={() => {
-          setState((prev) => ({
-            ...prev,
-            inputTwoModal: false,
-            selectedTokens: {
-              tokenOne: {
-                address: prev.selectedTokens.tokenTwo.address,
-                symbol: prev.selectedTokens.tokenTwo.symbol,
-              },
-              tokenTwo: {
-                address: prev.selectedTokens.tokenOne.address,
-                symbol: prev.selectedTokens.tokenOne.symbol,
-              },
-            },
-          }));
+          updateState({
+            inToken: state.outToken ? { ...state.outToken } : null,
+            outToken: state.inToken ? { ...state.inToken } : null,
+          });
         }}
       />
-      <CurrencyInput.Root title="Buy" estimate="0">
-        <CurrencyInput.CurrencySelect
-          onClick={() => setState((prev) => ({ ...prev, inputTwoModal: true }))}
-          token={state.selectedTokens.tokenTwo.symbol}
-          tokenAddress={state.selectedTokens.tokenTwo.address}
-        />
-        <CurrencyInput.NumberInput disabled={false} decimals={10} />
-      </CurrencyInput.Root>
-    </>
+      <CurrWrapper
+        active={state.outTokenSelected}
+        onClick={() =>
+          updateState({ outTokenSelected: true, inTokenSelected: false })
+        }
+      >
+        <CurrencyInput.Root title="Buy" estimate="0">
+          <CurrencyInput.CurrencySelect
+            onClick={() => updateState({ outTokenModalOpen: true })}
+            token={state.outToken}
+          />
+          <CurrencyInput.NumberInput
+            onChangeValue={(value: string) => {
+              updateState({ outTokenAmount: value });
+            }}
+            disabled={false}
+            decimals={10}
+          />
+        </CurrencyInput.Root>
+      </CurrWrapper>
+
+      <div className="pt-2">
+        <SubmitButton onClick={onSubmit}>Swap</SubmitButton>
+      </div>
+    </div>
+  );
+}
+function CurrWrapper({
+  children,
+  onClick,
+  active,
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+  active: boolean;
+}) {
+  return (
+    <div
+      data-state={active ? "active" : "inactive"}
+      onClick={onClick}
+      className="rounded-xl bg-neutral-1000 cursor-pointer data-[state=active]:bg-neutral-1050  py-6 px-4"
+    >
+      {children}
+    </div>
   );
 }

@@ -8,9 +8,11 @@ export const PoolSchema = z.object({
   token0: z.object({
     id: z.string(),
     symbol: z.string(),
+    decimals: z.string(),
   }),
   token1: z.object({
     id: z.string(),
+    decimals: z.string(),
     symbol: z.string(),
   }),
 });

@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import { useAccount } from "wagmi";
 import { Button, ButtonProps } from "../ui/button";
@@ -13,7 +14,7 @@ export default function SubmitButton(props: ButtonProps) {
         variant="primary"
         size="submit"
       >
-        Connect
+        Connect Wallet
       </Button>
     );
   }

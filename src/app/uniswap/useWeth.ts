@@ -16,7 +16,7 @@ export function useWethDeposit({ amount }: Props) {
 }
 
 export const WethContract = {
-  address: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2" as Address,
+  address: "0x633a7eB9b8912b22f3616013F3153de687F96074" as Address,
   abi: [
     {
       constant: true,

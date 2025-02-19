@@ -33,6 +33,7 @@ export const tokensRouter = createTRPCRouter({
         symbol: string;
         id: string;
         name: string;
+        decimals: number;
       }[] = [];
       const nameAndSymbolPairs = await executeGetPoolTokens({
         searchQuery: input.searchQuery,
@@ -41,7 +42,11 @@ export const tokensRouter = createTRPCRouter({
       nameAndSymbolPairs.tokens0.pairs
         .map((token) => ({
           ...token,
-          token0: { ...token.token0, id: getAddress(token.token0.id) },
+          token0: {
+            ...token.token0,
+            decimals: parseInt(token.token0.decimals),
+            id: getAddress(token.token0.id),
+          },
         }))
         .forEach((pair) => {
           tokens.push(pair.token0);
@@ -49,7 +54,11 @@ export const tokensRouter = createTRPCRouter({
       nameAndSymbolPairs.tokens1.pairs
         .map((token) => ({
           ...token,
-          token1: { ...token.token1, id: getAddress(token.token1.id) }, // convert checksum
+          token1: {
+            ...token.token1,
+            decimals: parseInt(token.token1.decimals),
+            id: getAddress(token.token1.id),
+          }, // convert checksum
         }))
         .forEach((pair) => {
           tokens.push(pair.token1);
@@ -62,6 +71,7 @@ function getUniqueValues(
     symbol: string;
     id: string;
     name: string;
+    decimals: number;
   }[]
 ) {
   const seen: Record<string, boolean> = {};

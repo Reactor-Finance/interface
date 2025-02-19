@@ -85,9 +85,9 @@ export default function SearchTokensDailog({
                 foundTokens?.map((token) => {
                   return (
                     <TokenItem
-                      {...token}
-                      selectToken={({ symbol, address }) => {
-                        setToken({ address, symbol });
+                      token={token}
+                      selectToken={({ symbol, address, decimals }) => {
+                        setToken({ address, symbol, decimals });
                       }}
                       key={token.address}
                     />
@@ -97,10 +97,9 @@ export default function SearchTokensDailog({
                 poolTokens?.tokens.map((token) => {
                   return (
                     <TokenItem
-                      address={token.id as TAddress}
-                      symbol={token.symbol}
-                      selectToken={({ symbol, address }) => {
-                        setToken({ address, symbol });
+                      token={{ ...token, address: token.id as TAddress }}
+                      selectToken={({ symbol, address, decimals }) => {
+                        setToken({ address, symbol, decimals });
                       }}
                       key={token.id}
                     />
@@ -128,31 +127,29 @@ export default function SearchTokensDailog({
 }
 
 function TokenItem({
-  symbol,
-  address,
+  token,
   selectToken,
 }: {
-  symbol: string;
-  selectToken: ({ address, symbol }: TToken) => void;
-  address: TAddress;
+  token: TToken;
+  selectToken: ({ address, symbol, decimals }: TToken) => void;
 }) {
   return (
     <button
       type="button"
-      onClick={() => selectToken({ address, symbol })}
+      onClick={() => selectToken(token)}
       className="mb-2 hover:bg-neutral-800 transition-colors flex w-full text-left justify-between rounded-md bg-neutral-900 px-4 py-2"
     >
       <div className="flex items-center gap-x-2">
         <ImageWithFallback
           className="h-10 w-10 rounded-full"
-          src={getLogoAsset(address as TAddress)}
+          src={getLogoAsset(token.address as TAddress)}
           width={40}
           height={40}
           alt=""
         />
         <div>
           <div>
-            <span>{symbol}</span>
+            <span>{token.symbol}</span>
           </div>
           <div>
             <span className="text-gray-400 text-sm">Ethereum Token</span>
