@@ -16,18 +16,26 @@ export default function LockTable() {
       <table className="w-full pt-6">
         <caption className="h-0 opacity-0">Locks Table</caption>
         <thead className="text-neutral-400 text-sm">
-          <tr className="grid grid-cols-8 px-6 py-2 font-medium">
-            <th className="col-span-2 text-left">Lock ID</th>
-            <th>Voting Power</th>
-            <th>APR</th>
-            <th>Rewards</th>
-            <th>Unlock Date</th>
-            <th>Status</th>
-            <th></th>
-          </tr>
+          {lockTokens.length > 0 && (
+            <tr className="grid grid-cols-8 px-6 py-2 font-medium">
+              <th className="col-span-2 text-left">Lock ID</th>
+              <th>Voting Power</th>
+              <th>APR</th>
+              <th>Rewards</th>
+              <th>Unlock Date</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          )}
         </thead>
 
         <tbody className="flex flex-col gap-y-2">
+          <tr className="py-4">
+            <p className="text-sm text-neutral-500 px-6">
+              To receive incentives and fees, you need to create a lock and vote
+              with it.
+            </p>
+          </tr>
           {lockTokens?.map((lock) => (
             <LockRow
               key={lock.id.toString()}
