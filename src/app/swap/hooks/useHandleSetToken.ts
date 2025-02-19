@@ -11,17 +11,28 @@ export default function useHandleSetToken() {
       if (state.inTokenModalOpen) {
         // inputOneModalOpen
         if (bothSelected) {
-          updateState({ inToken: token, outToken: undefined });
+          updateState({
+            inToken: token,
+            outToken: undefined,
+            inTokenModalOpen: false,
+          });
         } else {
-          updateState({ inToken: token });
+          updateState({ inToken: token, inTokenModalOpen: false });
         }
       }
       //inputTwoModalOpen
       if (state.outTokenModalOpen) {
         if (bothSelected) {
-          updateState({ inToken: undefined, outToken: token });
+          updateState({
+            inToken: undefined,
+            outToken: token,
+            outTokenModalOpen: false,
+          });
         } else {
-          updateState({ outToken: token });
+          updateState({
+            outToken: token,
+            outTokenModalOpen: false,
+          });
         }
       }
     },
