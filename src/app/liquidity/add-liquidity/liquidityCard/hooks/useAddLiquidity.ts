@@ -3,6 +3,7 @@ import { Contracts } from "@/lib/contracts";
 import { TAddress } from "@/lib/types";
 import { useLiquidityCardFormProvider } from "../liquidityCardFormProvider";
 import { getAddress, parseUnits } from "viem";
+import { useMemo } from "react";
 interface Props {
   tokenOne: TAddress;
   tokenTwo: TAddress;
@@ -34,6 +35,10 @@ export function useAddLiquidity({
       tokenTwoBalance;
   // TODO
   // ADD Slippage
+
+  const deadline = useMemo(() => {
+    return BigInt(Date.now() + 1000 * 20);
+  }, []);
   const { data, error } = useSimulateContract({
     ...Contracts.Router,
     functionName: "addLiquidity",
@@ -48,7 +53,7 @@ export function useAddLiquidity({
       parseUnits(tokenDeposits.tokenTwoDeposit, tokenTwoDecimals ?? 0) -
         parseUnits("1", tokenTwoDecimals ?? 0), //slippage
       address ?? "0x",
-      BigInt(Date.now() + 1000 * 20),
+      deadline,
     ],
     query: {
       enabled: Boolean(address) && !isApproving && enoughToken,
