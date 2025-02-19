@@ -1,7 +1,6 @@
 import { Address, erc20Abi, maxUint256, parseUnits } from "viem";
 import { useSimulateContract } from "wagmi";
 import useGetAllowance from "./useGetAllowance";
-import { TToken } from "@/lib/types";
 
 /**
  * Returns write data request only if the allowance is less than the amount
@@ -13,10 +12,13 @@ export default function useApproveWrite({
 }: {
   tokenAddress: Address | undefined;
   spender: Address;
-  token: TToken | null;
+  // token: TToken | null;
   amount: string;
 }) {
-  const { data: allowance } = useGetAllowance({ tokenAddress, spender });
+  const { data: allowance, queryKey } = useGetAllowance({
+    tokenAddress,
+    spender,
+  });
   const { data } = useSimulateContract({
     abi: erc20Abi,
     address: tokenAddress,
@@ -24,8 +26,16 @@ export default function useApproveWrite({
     args: [spender, maxUint256],
   });
   if ((allowance ?? 0n) < parseUnits(amount, 18) && data?.request) {
-    return data?.request;
+    return {
+      approveWriteRequest: data?.request,
+      needsApproval: true,
+      allowanceKey: queryKey,
+    };
   } else {
-    return undefined;
+    return {
+      approveWriteRequest: undefined,
+      needsApproval: false,
+      allowanceKey: queryKey,
+    };
   }
 }
