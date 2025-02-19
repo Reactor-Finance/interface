@@ -23,6 +23,7 @@ export default function CurrencyInputs() {
   };
   // @matchToken used as a query filter to get
   // tokens in liquidity pools that have the selected token
+  // only returns if one token is selected
   const matchToken = useMemo(() => {
     if (state.inToken && state.outToken) {
       return;
@@ -34,6 +35,7 @@ export default function CurrencyInputs() {
     }
   }, [state.inToken, state.outToken]);
 
+  // checks allowance
   const writeApprove = useApproveWrite({
     tokenAddress: state.inToken?.address,
     spender: Contracts.Router.address,
