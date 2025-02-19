@@ -8,8 +8,9 @@ export default function useSwapSimulate() {
   const { state } = useSwapProvider();
   const { address } = useAccount();
   const amountIn = useMemo(() => {
-    return parseUnits(state.inTokenAmount, 18);
-  }, [state.inTokenAmount]);
+    return parseUnits(state.inTokenAmount, state.inToken?.decimals ?? 18);
+  }, [state.inToken?.decimals, state.inTokenAmount]);
+  const deadline = BigInt(Date.now() + 1000 * 60 * 4);
   return useSimulateContract({
     ...Contracts.Router,
     functionName: "swap",
@@ -24,7 +25,7 @@ export default function useSwapSimulate() {
         },
       ],
       address ?? "0x", //address
-      BigInt(Date.now() + 1000 * 60 * 4), //deadline
+      deadline, //deadline
       true, //useTokenAsFee
     ],
     query: {
