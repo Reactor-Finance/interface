@@ -1,6 +1,6 @@
 export const ContractsAbi = {
   Reactor: {
-    contractAddress: "0x1E53bea57Dd5dDa7bFf1a1180a2f64a5c9e222f5",
+    contractAddress: "0x2ac430E52F47420A00984E11Ef0DDba80652419a",
     abi: [
       {
         inputs: [],
@@ -628,7 +628,7 @@ export const ContractsAbi = {
     ] as const,
   },
   WETH: {
-    contractAddress: "0x27f7785b17c6B4d034094a1B16Bc928bD697f386",
+    contractAddress: "0x2550d6424b46f78F4E31F1CCf88Da26dda7826C6",
     abi: [
       {
         inputs: [
@@ -981,7 +981,7 @@ export const ContractsAbi = {
     ] as const,
   },
   PermissionsRegistry: {
-    contractAddress: "0x17f4B55A352Be71CC03856765Ad04147119Aa09B",
+    contractAddress: "0xDb731EaaFA0FFA7854A24C2379585a85D768Ed5C",
     abi: [
       {
         inputs: [],
@@ -1373,7 +1373,7 @@ export const ContractsAbi = {
     ] as const,
   },
   PairFactory: {
-    contractAddress: "0xa7480B62a657555f6727bCdb96953bCC211FFbaC",
+    contractAddress: "0xa86582Ad5E80abc19F95f8A9Fb3905Cda0dAbd59",
     abi: [
       {
         inputs: [
@@ -1756,7 +1756,7 @@ export const ContractsAbi = {
     ] as const,
   },
   GaugeFactory: {
-    contractAddress: "0x87a2688d6E41b23d802F74c6B1F06a8e8d118929",
+    contractAddress: "0x97915c43511f8cB4Fbe7Ea03B96EEe940eC4AF12",
     abi: [
       {
         inputs: [],
@@ -2056,7 +2056,7 @@ export const ContractsAbi = {
     ] as const,
   },
   VeArtProxyUpgradeable: {
-    contractAddress: "0x8797847c9d63D8Ed9C30B058F408d4257A33B76C",
+    contractAddress: "0xA002B84Ca3c9e8748209F286Ecf99300CA50161A",
     abi: [
       {
         inputs: [],
@@ -2172,7 +2172,7 @@ export const ContractsAbi = {
     ] as const,
   },
   VotingEscrow: {
-    contractAddress: "0xa9Ea7F91E63896d852c4FCA6124c974adC68Af3B",
+    contractAddress: "0x039d7496e432c6Aea4c24648a59318b3cbe09942",
     abi: [
       {
         inputs: [
@@ -3751,7 +3751,7 @@ export const ContractsAbi = {
     ] as const,
   },
   Voter: {
-    contractAddress: "0xDB259fa7d7f9F68aE3ffC3c748516ba9567a7576",
+    contractAddress: "0xbF97DEfeb6a387215E3e67DFb988c675c9bb1a29",
     abi: [
       {
         inputs: [],
@@ -5287,7 +5287,7 @@ export const ContractsAbi = {
     ] as const,
   },
   BribeFactory: {
-    contractAddress: "0x71d75C9A9e1a4fFa5a16556b51D6e630A4FA902A",
+    contractAddress: "0xaE7b7A1c6C4d859e19301ccAc2C6eD28A4C51288",
     abi: [
       {
         inputs: [],
@@ -5701,7 +5701,7 @@ export const ContractsAbi = {
     ] as const,
   },
   RewardsDistributor: {
-    contractAddress: "0xbaee9B65349929Bd78f9878555bF78027Df7f101",
+    contractAddress: "0xeA2e668d430e5AA15babA2f5c5edfd4F9Ef6EB73",
     abi: [
       {
         inputs: [
@@ -6094,7 +6094,7 @@ export const ContractsAbi = {
     ] as const,
   },
   MinterUpgradeable: {
-    contractAddress: "0x012D720e7d2E84b24b68989e0f4aD824fE5B294C",
+    contractAddress: "0xA7240bcff60Eef40F31B8eD5d921BaD6DB13B199",
     abi: [
       {
         inputs: [],
@@ -6662,7 +6662,7 @@ export const ContractsAbi = {
     ] as const,
   },
   TradeHelper: {
-    contractAddress: "0x5E0399B4C3c4C31036DcA08d53c0c5b5c29C113e",
+    contractAddress: "0xdA796117bF6905DD8DB2fF1ab4397f6d2c4ADda3",
     abi: [
       {
         inputs: [
@@ -7015,7 +7015,7 @@ export const ContractsAbi = {
     ] as const,
   },
   Router: {
-    contractAddress: "0x512a0E8bAeb6Ac3D52A11780c92517627005b0b1",
+    contractAddress: "0x222D74f33b0d07687a769A44399E2272A4cB9FfE",
     abi: [
       {
         inputs: [
@@ -7645,7 +7645,7 @@ export const ContractsAbi = {
     ] as const,
   },
   PairHelper: {
-    contractAddress: "0x5aA185fbEFc205072FaecC6B9D564383e761f8C2",
+    contractAddress: "0x88777418972fB3F58489303d763d4DaF398A6527",
     abi: [
       {
         inputs: [],
@@ -8283,7 +8283,7 @@ export const ContractsAbi = {
     ] as const,
   },
   RewardHelper: {
-    contractAddress: "0x5A61c51C6745b3F509f4a1BF54BFD04e04aF430a",
+    contractAddress: "0x37d0eD258f37a966f33b75b5AE7486917a0ae614",
     abi: [
       {
         inputs: [],
@@ -8491,7 +8491,7 @@ export const ContractsAbi = {
     ] as const,
   },
   veNFTHelper: {
-    contractAddress: "0x832092FDF1D32A3A1b196270590fB0E25DF129FF",
+    contractAddress: "0x48288D0e3079A03f6EC1846554CFc58C2696Aaee",
     abi: [
       {
         inputs: [],
@@ -9194,5 +9194,284 @@ export const ContractsAbi = {
         type: "function",
       },
     ] as const,
+  },
+  Oracle: {
+    contractAddress: "0x7c77704007C9996Ee591C516f7319828BA49d91E",
+    abi: [
+      {
+        inputs: [
+          {
+            internalType: "contract IPriceSource[]",
+            name: "_priceSources",
+            type: "address[]",
+          },
+        ],
+        stateMutability: "nonpayable",
+        type: "constructor",
+      },
+      {
+        inputs: [
+          {
+            internalType: "address",
+            name: "owner",
+            type: "address",
+          },
+        ],
+        name: "OwnableInvalidOwner",
+        type: "error",
+      },
+      {
+        inputs: [
+          {
+            internalType: "address",
+            name: "account",
+            type: "address",
+          },
+        ],
+        name: "OwnableUnauthorizedAccount",
+        type: "error",
+      },
+      {
+        inputs: [],
+        name: "UnrecognizedPriceSource",
+        type: "error",
+      },
+      {
+        anonymous: false,
+        inputs: [
+          {
+            indexed: true,
+            internalType: "address",
+            name: "previousOwner",
+            type: "address",
+          },
+          {
+            indexed: true,
+            internalType: "address",
+            name: "newOwner",
+            type: "address",
+          },
+        ],
+        name: "OwnershipTransferred",
+        type: "event",
+      },
+      {
+        anonymous: false,
+        inputs: [
+          {
+            indexed: false,
+            internalType: "contract IPriceSource[]",
+            name: "priceSources",
+            type: "address[]",
+          },
+        ],
+        name: "SetPriceSources",
+        type: "event",
+      },
+      {
+        inputs: [],
+        name: "getAllPriceSources",
+        outputs: [
+          {
+            internalType: "contract IPriceSource[]",
+            name: "",
+            type: "address[]",
+          },
+        ],
+        stateMutability: "view",
+        type: "function",
+      },
+      {
+        inputs: [
+          {
+            internalType: "address",
+            name: "_token",
+            type: "address",
+          },
+          {
+            internalType: "uint256",
+            name: "_value",
+            type: "uint256",
+          },
+        ],
+        name: "getAverageValueInETH",
+        outputs: [
+          {
+            internalType: "uint256",
+            name: "",
+            type: "uint256",
+          },
+          {
+            internalType: "int256",
+            name: "",
+            type: "int256",
+          },
+        ],
+        stateMutability: "view",
+        type: "function",
+      },
+      {
+        inputs: [
+          {
+            internalType: "address",
+            name: "_token",
+            type: "address",
+          },
+          {
+            internalType: "uint256",
+            name: "_value",
+            type: "uint256",
+          },
+        ],
+        name: "getAverageValueInUSD",
+        outputs: [
+          {
+            internalType: "uint256",
+            name: "",
+            type: "uint256",
+          },
+          {
+            internalType: "int256",
+            name: "",
+            type: "int256",
+          },
+        ],
+        stateMutability: "view",
+        type: "function",
+      },
+      {
+        inputs: [
+          {
+            internalType: "contract IPriceSource",
+            name: "_pS",
+            type: "address",
+          },
+          {
+            internalType: "address",
+            name: "_token",
+            type: "address",
+          },
+          {
+            internalType: "uint256",
+            name: "_value",
+            type: "uint256",
+          },
+        ],
+        name: "getAverageValueInUSDBySource",
+        outputs: [
+          {
+            internalType: "uint256",
+            name: "_avgEXP",
+            type: "uint256",
+          },
+          {
+            internalType: "int256",
+            name: "_avgNormal",
+            type: "int256",
+          },
+        ],
+        stateMutability: "view",
+        type: "function",
+      },
+      {
+        inputs: [
+          {
+            internalType: "contract IPriceSource",
+            name: "_pS",
+            type: "address",
+          },
+          {
+            internalType: "address",
+            name: "_token",
+            type: "address",
+          },
+          {
+            internalType: "uint256",
+            name: "_value",
+            type: "uint256",
+          },
+        ],
+        name: "getValueInETH",
+        outputs: [
+          {
+            internalType: "uint256",
+            name: "_avgEXP",
+            type: "uint256",
+          },
+          {
+            internalType: "int256",
+            name: "_avgNormal",
+            type: "int256",
+          },
+        ],
+        stateMutability: "view",
+        type: "function",
+      },
+      {
+        inputs: [],
+        name: "owner",
+        outputs: [
+          {
+            internalType: "address",
+            name: "",
+            type: "address",
+          },
+        ],
+        stateMutability: "view",
+        type: "function",
+      },
+      {
+        inputs: [
+          {
+            internalType: "uint256",
+            name: "",
+            type: "uint256",
+          },
+        ],
+        name: "priceSources",
+        outputs: [
+          {
+            internalType: "contract IPriceSource",
+            name: "",
+            type: "address",
+          },
+        ],
+        stateMutability: "view",
+        type: "function",
+      },
+      {
+        inputs: [],
+        name: "renounceOwnership",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function",
+      },
+      {
+        inputs: [
+          {
+            internalType: "contract IPriceSource[]",
+            name: "_priceSources",
+            type: "address[]",
+          },
+        ],
+        name: "setPriceSources",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function",
+      },
+      {
+        inputs: [
+          {
+            internalType: "address",
+            name: "newOwner",
+            type: "address",
+          },
+        ],
+        name: "transferOwnership",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function",
+      },
+    ],
   },
 };
