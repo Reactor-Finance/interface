@@ -91,12 +91,17 @@ export default function InitializePool() {
   ]);
   useEffect(() => {
     if (!isSuccess) return;
-    if (needsApprovals?.tokenOne) {
-      queryClient.invalidateQueries({ queryKey: tokenOneQueryKey });
-      return;
-    }
-    if (needsApprovals?.tokenTwo) {
-      queryClient.invalidateQueries({ queryKey: tokenTwoQueryKey });
+    if (isSuccess) {
+      if (needsApprovals?.tokenOne) {
+        queryClient.invalidateQueries({ queryKey: tokenOneQueryKey });
+        reset();
+        return;
+      }
+      if (needsApprovals?.tokenTwo) {
+        queryClient.invalidateQueries({ queryKey: tokenTwoQueryKey });
+        reset();
+        return;
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
