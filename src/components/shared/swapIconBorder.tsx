@@ -10,10 +10,10 @@ const SwapIconBorder = forwardRef<HTMLDivElement, Props>(
     return (
       <div
         ref={ref}
-        className={`w-full flex items-center py-8 ${className}`}
+        className={`w-full flex absolute  translate-y-[-50%] items-center  ${className}`}
         {...props}
       >
-        <div className="flex-grow h-[2px] bg-neutral-950"></div>
+        <div className="flex-grow h-[2px] bg-transparent"></div>
         <button
           type="button"
           onClick={swapClick}
