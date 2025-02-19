@@ -1,10 +1,15 @@
 import React, { useMemo } from "react";
 import { Alert } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
 import { Contracts } from "@/lib/contracts";
-import { useSimulateContract, useWriteContract } from "wagmi";
+import {
+  useSimulateContract,
+  useWaitForTransactionReceipt,
+  useWriteContract,
+} from "wagmi";
 import LockDropdown from "../lockDropdown";
 import { useLockProvider } from "../lockProvider";
+import useGetButtonStatuses from "@/components/shared/hooks/useGetButtonStatuses";
+import SubmitButton from "@/components/shared/submitBtn";
 
 export default function MergeContent() {
   const [mergeToken, setMergeToken] = React.useState("");
@@ -17,12 +22,14 @@ export default function MergeContent() {
     functionName: "merge",
     args: [selectedLockToken?.id ?? 0n, tokenId1?.id ?? 0n],
   });
-  const { writeContract } = useWriteContract();
+  const { writeContract, isPending, data: hash } = useWriteContract();
+  const { isLoading } = useWaitForTransactionReceipt({ hash });
   const onSubmit = () => {
     if (mergeSimulation?.request) {
       writeContract(mergeSimulation.request);
     }
   };
+  const { state } = useGetButtonStatuses({ isLoading, isPending });
 
   return (
     <div className="space-y-4 pt-4">
@@ -57,9 +64,13 @@ export default function MergeContent() {
         increase the final Lock voting power by adding up the two underlying
         locked amounts based on the new lock time.
       </Alert>
-      <Button disabled onClick={onSubmit} size="submit" variant={"primary"}>
-        Approve
-      </Button>
+      <SubmitButton
+        onClick={onSubmit}
+        state={state}
+        isValid={Boolean(mergeSimulation)}
+      >
+        Merge
+      </SubmitButton>
     </div>
   );
 }

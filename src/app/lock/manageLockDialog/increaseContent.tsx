@@ -1,9 +1,12 @@
 import * as React from "react";
 import { Alert } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
 import RctInput from "../rctInput";
 import useGetRctBalance from "@/components/shared/hooks/useGetRctBalance";
-import { useSimulateContract, useWriteContract } from "wagmi";
+import {
+  useSimulateContract,
+  useWaitForTransactionReceipt,
+  useWriteContract,
+} from "wagmi";
 import { Contracts } from "@/lib/contracts";
 import { formatUnits, parseUnits } from "viem";
 import { RCT_DECIMALS } from "@/data/constants";
@@ -11,6 +14,8 @@ import useGetLockApproval from "./hooks/useGetLockApproval";
 import { inputPatternMatch } from "@/lib/utils";
 import { useLockProvider } from "../lockProvider";
 import useApproveWrite from "@/components/shared/hooks/useApproveWrite";
+import useGetButtonStatuses from "@/components/shared/hooks/useGetButtonStatuses";
+import SubmitButton from "@/components/shared/submitBtn";
 export function IncreaseContent() {
   const [amount, setAmount] = React.useState("");
   const { selectedLockToken } = useLockProvider();
@@ -26,23 +31,17 @@ export function IncreaseContent() {
     functionName: "approve",
     args: [Contracts.VotingEscrow.address, parseUnits(tokenId, 0)],
   });
-  const approveRctSimulation = useApproveWrite({
+  const { approveWriteRequest, needsApproval } = useApproveWrite({
     tokenAddress: Contracts.Reactor.address,
     spender: Contracts.VotingEscrow.address,
-    token: selectedLockToken
-      ? {
-          address: selectedLockToken?.token ?? "0x",
-          symbol: selectedLockToken?.tokenSymbol,
-          decimals: selectedLockToken.decimals,
-        }
-      : null,
     amount,
   });
   const isLockApproved = useGetLockApproval();
-  const { writeContract } = useWriteContract();
+  const { writeContract, isPending, data: hash } = useWriteContract();
+  const { isLoading } = useWaitForTransactionReceipt({ hash });
   const onSubmit = () => {
-    if (approveRctSimulation) {
-      writeContract(approveRctSimulation);
+    if (approveWriteRequest) {
+      writeContract(approveWriteRequest);
       return;
     }
     if (!isLockApproved && approveSimulation) {
@@ -54,6 +53,11 @@ export function IncreaseContent() {
       return;
     }
   };
+  const { state } = useGetButtonStatuses({
+    isLoading,
+    isPending,
+    needsApproval,
+  });
   return (
     <div className="space-y-4 pt-4">
       <div className="flex justify-between">
@@ -88,14 +92,9 @@ export function IncreaseContent() {
         Depositing into the lock will increase your voting power and rewards.
         You can also extend the lock duration.
       </Alert>
-      <Button
-        disabled={false}
-        onClick={onSubmit}
-        size="submit"
-        variant={"primary"}
-      >
-        Approve
-      </Button>
+      <SubmitButton state={state} onClick={onSubmit} isValid={true}>
+        Increase Lock
+      </SubmitButton>
     </div>
   );
 }
