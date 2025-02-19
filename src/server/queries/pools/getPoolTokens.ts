@@ -57,7 +57,7 @@ const tokenSchema = z.object({
   id: z.string(),
   symbol: z.string(),
   name: z.string(),
-  decimals: z.number(),
+  decimals: z.string(),
 });
 const PoolTokenSchema0 = z.object({
   id: z.string(),
