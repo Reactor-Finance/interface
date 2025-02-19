@@ -28,7 +28,6 @@ export default function Home() {
           </div>
           <Card className="min-w-[380px] p-0 rounded-md">
             <CurrencyInputs />
-            <div className="pt-4"></div>
           </Card>
         </div>
       </div>
