@@ -5,7 +5,7 @@ export default function useGetAllowance({
   tokenAddress,
   spender,
 }: {
-  tokenAddress: Address;
+  tokenAddress: Address | undefined;
   spender: Address;
 }) {
   const { address } = useAccount();
