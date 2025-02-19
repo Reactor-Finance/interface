@@ -71,7 +71,7 @@ function CurrencySelect({
         {token !== null && (
           <>
             <ImageWithFallback
-              src={getLogoAsset(token.address as TAddress)}
+              src={getLogoAsset(token?.address as TAddress)}
               width={25}
               height={25}
               className="h-6 w-6 rounded-full"
