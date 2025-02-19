@@ -30,12 +30,12 @@ export default function PoolRow({
           tokenOne={{
             address: getAddress(tokenOneAddress),
             symbol: token0.symbol,
-            decimals: token0.decimals,
+            decimals: parseInt(token0.decimals),
           }}
           tokenTwo={{
             address: getAddress(tokenTwoAddress),
             symbol: token1.symbol,
-            decimals: token1.decimals,
+            decimals: parseInt(token1.decimals),
           }}
           poolType={isStable ? TPoolType.STABLE : TPoolType.VOLATILE}
         />

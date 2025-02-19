@@ -94,12 +94,12 @@ export default function Page() {
                 tokenOne={{
                   address: getAddress(pool.token0.id),
                   symbol: pool.token0.symbol,
-                  decimals: pool.token0.decimals,
+                  decimals: parseInt(pool.token0.decimals),
                 }}
                 tokenTwo={{
                   address: getAddress(pool.token1.id),
                   symbol: pool.token1.symbol,
-                  decimals: pool.token1.decimals,
+                  decimals: parseInt(pool.token1.decimals),
                 }}
                 poolType={pool.isStable ? TPoolType.STABLE : TPoolType.VOLATILE}
               ></AvailablePoolRow>
