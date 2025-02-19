@@ -1,11 +1,6 @@
 "use client";
 import { useToRawAmount } from "@/lib/liquidityHub/hooks";
 import { TToken } from "@/lib/types";
-import {
-  constructSDK,
-  LiquidityHubSDK,
-  Quote,
-} from "@orbs-network/liquidity-hub-sdk";
 import React, {
   createContext,
   useCallback,
@@ -17,7 +12,7 @@ import React, {
 import { useAccount } from "wagmi";
 interface SwapProviderType {
   inputAmount: string;
-  acceptedQuote: Quote | undefined;
+  // acceptedQuote: Quote | undefined;
   signature?: string;
   liquidityHubDisabled: boolean;
   acceptedOptimalRate: undefined;
@@ -45,7 +40,7 @@ const initialState: SwapProviderType = {
   inToken: null,
   outToken: null,
   inputAmount: "",
-  acceptedQuote: undefined,
+  // acceptedQuote: undefined,
   acceptedOptimalRate: undefined,
   liquidityHubDisabled: false,
   confirmationModalOpen: false,
@@ -57,7 +52,7 @@ interface ContextType {
   state: SwapProviderType;
   updateState: (payload: Partial<SwapProviderType>) => void;
   resetState: () => void;
-  sdk: LiquidityHubSDK;
+  // sdk: LiquidityHubSDK;
   parsedInputAmount?: string;
 }
 const SwapContext = createContext<ContextType | undefined>(undefined);
@@ -113,13 +108,13 @@ export const SwapProvider = ({ children }: Props) => {
     }
   }, [chainId, resetState]);
 
-  const sdk = useMemo(
-    () => constructSDK({ partner: "widget", chainId }),
-    [chainId]
-  );
+  // const sdk = useMemo(
+  //   () => constructSDK({ partner: "widget", chainId }),
+  //   [chainId]
+  // );
   return (
     <SwapContext.Provider
-      value={{ state: _state, resetState, sdk, updateState, parsedInputAmount }}
+      value={{ state: _state, resetState, updateState, parsedInputAmount }}
     >
       {children}
     </SwapContext.Provider>
