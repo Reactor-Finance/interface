@@ -6,7 +6,7 @@ import { useEffect } from "react";
 
 export function useQuoteSwap() {
   const { state, updateState } = useSwapProvider();
-  const { data: amountOut } = useReadContract({
+  const { data: amountOut, error: errorOut } = useReadContract({
     ...Contracts.TradeHelper,
     functionName: "getAmountOut",
     args: [
@@ -21,11 +21,11 @@ export function useQuoteSwap() {
         Boolean(state.outTokenSelected),
     },
   });
-  const { data: amountIn } = useReadContract({
+  const { data: amountIn, error } = useReadContract({
     ...Contracts.TradeHelper,
     functionName: "getAmountIn",
     args: [
-      parseUnits(state.inTokenAmount, 18),
+      parseUnits(state.inTokenAmount, state.inToken?.decimals ?? 18),
       state.inToken?.address ?? ("0x" as Address),
       state.outToken?.address ?? ("0x" as Address),
     ],
@@ -51,5 +51,6 @@ export function useQuoteSwap() {
     state.outTokenSelected,
     updateState,
   ]);
+  console.log({ amountOut, amountIn, error, errorOut });
   return { amountOut, amountIn };
 }
