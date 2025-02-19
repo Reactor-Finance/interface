@@ -44,6 +44,7 @@ const getPoolTokens = ({
           id
           symbol
           name
+          decimals
         }
       }
   }
@@ -52,22 +53,19 @@ const getPoolTokens = ({
   return g;
 };
 
+const tokenSchema = z.object({
+  id: z.string(),
+  symbol: z.string(),
+  name: z.string(),
+  decimals: z.number(),
+});
 const PoolTokenSchema0 = z.object({
   id: z.string(),
-  token0: z.object({
-    id: z.string(),
-    symbol: z.string(),
-    name: z.string(),
-  }),
+  token0: tokenSchema,
 });
-
 const PoolTokenSchema1 = z.object({
   id: z.string(),
-  token1: z.object({
-    id: z.string(),
-    symbol: z.string(),
-    name: z.string(),
-  }),
+  token1: tokenSchema,
 });
 const PoolTokensSchema0 = z.object({
   pairs: z.array(PoolTokenSchema0),

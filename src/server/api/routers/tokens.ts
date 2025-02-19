@@ -33,6 +33,7 @@ export const tokensRouter = createTRPCRouter({
         symbol: string;
         id: string;
         name: string;
+        decimals: number;
       }[] = [];
       const nameAndSymbolPairs = await executeGetPoolTokens({
         searchQuery: input.searchQuery,
@@ -62,6 +63,7 @@ function getUniqueValues(
     symbol: string;
     id: string;
     name: string;
+    decimals: number;
   }[]
 ) {
   const seen: Record<string, boolean> = {};
