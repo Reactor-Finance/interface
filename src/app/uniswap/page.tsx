@@ -1,10 +1,16 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import {
+  useAccount,
+  useSimulateContract,
+  useWaitForTransactionReceipt,
+  useWriteContract,
+} from "wagmi";
 import { useEthSwap } from "./useEthSwap";
 import { TAddress } from "@/lib/types";
 import { useWethDeposit } from "./useWeth";
 import { parseUnits } from "viem";
+import { Contracts } from "@/lib/contracts";
 
 export default function Page() {
   const [formData, setFormData] = useState({ token: "", deposit: "" });
@@ -25,9 +31,18 @@ export default function Page() {
       writeContract(data?.request);
     }
   };
+  const { address } = useAccount();
+  const { data: mintRct } = useSimulateContract({
+    ...Contracts.Reactor,
+    functionName: "mintRct",
+    args: [address ?? "0x", parseUnits("1000", 18)],
+  });
   const { data: getWeth } = useWethDeposit({ amount: parseUnits("1", 18) });
   const onSubmit2 = () => {
     if (getWeth?.request) writeContract(getWeth?.request);
+  };
+  const onSubmit3 = () => {
+    if (mintRct?.request) writeContract(mintRct?.request);
   };
   return (
     <div className="flex justify-center">
@@ -69,6 +84,7 @@ export default function Page() {
           Submit
         </button>
         <button onClick={onSubmit2}>Get WETH</button>
+        <button onClick={onSubmit3}>Get RCT</button>
       </div>
     </div>
   );

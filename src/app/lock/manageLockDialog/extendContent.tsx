@@ -1,21 +1,26 @@
 import React from "react";
-import { Button } from "@/components/ui/button";
 import { Alert } from "@/components/ui/alert";
 import { Slider } from "@/components/ui/slider";
 import { TWO_YEARS } from "@/data/constants";
-import { useSimulateContract, useWriteContract } from "wagmi";
+import {
+  useSimulateContract,
+  useWaitForTransactionReceipt,
+  useWriteContract,
+} from "wagmi";
 import { Contracts } from "@/lib/contracts";
 import { useLockProvider } from "../lockProvider";
 import useApproveVeRct from "./hooks/useApproveVeRct";
 import useGetLockApproval from "./hooks/useGetLockApproval";
 import { useDebounce } from "@/components/shared/hooks/useDebounce";
 import { parseUnits } from "viem";
+import useGetButtonStatuses from "@/components/shared/hooks/useGetButtonStatuses";
+import SubmitButton from "@/components/shared/submitBtn";
 
 export default function ExtendContent() {
   const { selectedLockToken } = useLockProvider();
   const [duration, setDuration] = React.useState([0]);
   const { debouncedValue: durationDebounced } = useDebounce(duration[0], 300);
-  const { data: increaseUnlockTimeSimulation, error } = useSimulateContract({
+  const { data: increaseUnlockTimeSimulation } = useSimulateContract({
     ...Contracts.VotingEscrow,
     functionName: "increase_unlock_time",
     args: [
@@ -23,12 +28,13 @@ export default function ExtendContent() {
       parseUnits(durationDebounced.toString(), 0),
     ],
   });
-  console.log({ error });
   const { data: approveSimulation } = useApproveVeRct();
   const approval = useGetLockApproval();
-  const { writeContract } = useWriteContract();
+  const needsApproval = !Boolean(approval.data);
+  const { writeContract, isPending, data: hash } = useWriteContract();
+  const { isLoading } = useWaitForTransactionReceipt({ hash });
   const onSubmit = () => {
-    if (!approval && approveSimulation) {
+    if (needsApproval && approveSimulation) {
       writeContract(approveSimulation.request);
       return;
     }
@@ -36,6 +42,11 @@ export default function ExtendContent() {
       writeContract(increaseUnlockTimeSimulation.request);
     }
   };
+  const { state } = useGetButtonStatuses({
+    isLoading,
+    isPending,
+    needsApproval,
+  });
   return (
     <div className="space-y-4 pt-4">
       <Slider
@@ -73,14 +84,13 @@ export default function ExtendContent() {
         You can extend lock or increase the lock amount. These actions will
         increase your voting power. The maximum lock time is 2 years.
       </Alert>
-      <Button
+      <SubmitButton
         onClick={onSubmit}
-        disabled={!Boolean(increaseUnlockTimeSimulation)}
-        size="submit"
-        variant="primary"
+        isValid={Boolean(increaseUnlockTimeSimulation)}
+        state={state}
       >
-        Approve
-      </Button>
+        Extend Lock
+      </SubmitButton>
     </div>
   );
 }

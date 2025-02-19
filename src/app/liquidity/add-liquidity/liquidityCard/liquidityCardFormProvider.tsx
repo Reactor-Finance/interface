@@ -11,6 +11,8 @@ interface LiquidityCardFormProviderType {
   tokenTwo: TAddress;
   tokenOneBalance: bigint;
   tokenTwoBalance: bigint;
+  tokenOneSymbol: string | undefined;
+  tokenTwoSymbol: string | undefined;
   poolType: TPoolType | undefined;
 }
 
@@ -55,18 +57,32 @@ export const LiquidityCardFormProvider = ({
         functionName: "balanceOf",
         args: [address ?? "0x"],
       },
+      {
+        address: tokenOne,
+        abi: erc20Abi,
+        functionName: "symbol",
+      },
+      {
+        address: tokenTwo,
+        abi: erc20Abi,
+        functionName: "symbol",
+      },
     ],
   });
   const tokenOneDecimals = data?.[0].result;
   const tokenTwoDecimals = data?.[1].result;
   const tokenOneBalance = data?.[2].result ?? 0n;
   const tokenTwoBalance = data?.[3].result ?? 0n;
+  const tokenOneSymbol = data?.[4].result;
+  const tokenTwoSymbol = data?.[5].result;
   return (
     <LiquidityContext.Provider
       value={{
         poolType,
         tokenOne,
         tokenTwo,
+        tokenOneSymbol,
+        tokenTwoSymbol,
         tokenOneDecimals,
         tokenTwoDecimals,
         tokenOneBalance,

@@ -1,5 +1,4 @@
-import { Button } from "@/components/ui/button";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import AssetCard from "./assetCard";
 import { TPoolType } from "@/lib/types";
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
@@ -11,6 +10,8 @@ import useApproveTokens from "./hooks/useApproveTokens";
 import useInitializePoolValidation from "./hooks/useInitializePoolValidation";
 import { useQueryClient } from "@tanstack/react-query";
 import { api } from "@/trpc/react";
+import SubmitButton from "@/components/shared/submitBtn";
+import useGetButtonStatuses from "@/components/shared/hooks/useGetButtonStatuses";
 export default function InitializePool() {
   const {
     tokenOne,
@@ -19,6 +20,8 @@ export default function InitializePool() {
     tokenTwoDecimals,
     tokenOneBalance,
     tokenTwoBalance,
+    tokenOneSymbol,
+    tokenTwoSymbol,
     poolType,
   } = useLiquidityCardFormProvider();
   const { data: pool } = api.pool.findPool.useQuery({
@@ -112,9 +115,24 @@ export default function InitializePool() {
     tokenTwoQueryKey,
   ]);
 
-  const action = isApproving
-    ? `Approve ${needsApprovals?.tokenOne ? "USDT" : "DAI"}`
-    : "Add Liquidity";
+  const approveTokenSymbol = useMemo(() => {
+    if (needsApprovals?.tokenOne) {
+      return tokenOneSymbol;
+    }
+    if (needsApprovals?.tokenTwo) {
+      return tokenTwoSymbol;
+    }
+  }, [
+    needsApprovals?.tokenOne,
+    needsApprovals?.tokenTwo,
+    tokenOneSymbol,
+    tokenTwoSymbol,
+  ]);
+  const { state } = useGetButtonStatuses({
+    isLoading,
+    isPending,
+    needsApproval: needsApprovals?.tokenOne || needsApprovals?.tokenTwo,
+  });
   return (
     <>
       <h2 className="text-xl">
@@ -162,18 +180,14 @@ export default function InitializePool() {
           </div>
         </div>
       </div>
-      <Button
-        data-pending={isPending || isLoading || isSuccess ? "true" : "false"}
+      <SubmitButton
+        state={state}
+        isValid={poolValidation.isValid}
+        approveTokenSymbol={approveTokenSymbol}
         onClick={onSubmit}
-        variant="primary"
-        disabled={isPending || isLoading || !poolValidation.isValid}
-        size="submit"
       >
-        {!isPending && !isLoading && !isSuccess && action}
-        {isPending && "Waiting for Signature..."}
-        {isLoading && "Transction Pending..."}
-        {isSuccess && "Success!"}
-      </Button>
+        Add Liquidity
+      </SubmitButton>
       <span className="text-[13px] text-red-400 pt-3 text-center">
         {poolValidation.error}
       </span>

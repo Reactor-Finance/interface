@@ -7,10 +7,11 @@ import useHandleSetToken from "./hooks/useHandleSetToken";
 import { useSwapProvider } from "./swapProvider";
 import { Contracts } from "@/lib/contracts";
 import useApproveWrite from "@/components/shared/hooks/useApproveWrite";
-import { useWriteContract } from "wagmi";
+import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import useSwapSimulate from "./hooks/useSwapSimulate";
 import SubmitButton from "@/components/shared/submitBtn";
 import { useQuoteSwap } from "./hooks/useQuoteSwap";
+import useGetButtonStatuses from "@/components/shared/hooks/useGetButtonStatuses";
 export default function CurrencyInputs() {
   const { updateState, state } = useSwapProvider();
   const [isApproving, setIsApproving] = useState(false);
@@ -39,26 +40,30 @@ export default function CurrencyInputs() {
   }, [state.inToken, state.outToken]);
 
   // checks allowance
-  const writeApprove = useApproveWrite({
+  const { approveWriteRequest, needsApproval } = useApproveWrite({
     tokenAddress: state.inToken?.address,
     spender: Contracts.Router.address,
     amount: state.inTokenAmount,
-    token: state.inToken,
   });
-  const { data: swapSimulation, error } = useSwapSimulate();
+  const { data: swapSimulation } = useSwapSimulate();
 
-  const { writeContract } = useWriteContract();
-  console.log({ error, swapSimulation, writeApprove });
+  const { writeContract, isPending, data: hash } = useWriteContract();
+  const { isLoading } = useWaitForTransactionReceipt({ hash });
   const onSubmit = useCallback(() => {
-    if (writeApprove) {
-      writeContract(writeApprove);
+    if (approveWriteRequest) {
+      writeContract(approveWriteRequest);
       setIsApproving(true);
       return;
     }
     if (swapSimulation) {
       writeContract(swapSimulation.request);
     }
-  }, [swapSimulation, writeApprove, writeContract]);
+  }, [approveWriteRequest, swapSimulation, writeContract]);
+  const { state: buttonState } = useGetButtonStatuses({
+    isPending,
+    isLoading,
+    needsApproval,
+  });
   return (
     <div className="relative space-y-2">
       <SearchTokensDailog
@@ -118,7 +123,14 @@ export default function CurrencyInputs() {
       </CurrWrapper>
 
       <div className="pt-2">
-        <SubmitButton onClick={onSubmit}>Swap</SubmitButton>
+        <SubmitButton
+          state={buttonState}
+          isValid={Boolean(swapSimulation)}
+          approveTokenSymbol={state.inToken?.symbol}
+          onClick={onSubmit}
+        >
+          Swap
+        </SubmitButton>
       </div>
     </div>
   );

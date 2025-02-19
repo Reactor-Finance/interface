@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { Alert } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
 import {
   useSimulateContract,
   useWaitForTransactionReceipt,
@@ -11,6 +10,8 @@ import useApproveVeRct from "./hooks/useApproveVeRct";
 import useGetLockApproval from "./hooks/useGetLockApproval";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLockProvider } from "../lockProvider";
+import useGetButtonStatuses from "@/components/shared/hooks/useGetButtonStatuses";
+import SubmitButton from "@/components/shared/submitBtn";
 
 export default function WithdrawContent() {
   const { selectedLockToken } = useLockProvider();
@@ -22,8 +23,10 @@ export default function WithdrawContent() {
     });
   const { data: approved, queryKey: getLockKey } = useGetLockApproval();
   const { data: approveSimulation } = useApproveVeRct();
-  const { writeContract, reset, data: hash } = useWriteContract();
-  const { isSuccess, isError } = useWaitForTransactionReceipt({ hash });
+  const { writeContract, reset, isPending, data: hash } = useWriteContract();
+  const { isSuccess, isError, isLoading } = useWaitForTransactionReceipt({
+    hash,
+  });
   const queryClient = useQueryClient();
   useEffect(() => {
     if (isSuccess) {
@@ -51,17 +54,22 @@ export default function WithdrawContent() {
       writeContract(withdrawSimulation.request);
     }
   };
+  const { state } = useGetButtonStatuses({
+    isPending,
+    isLoading,
+    needsApproval: !Boolean(approved),
+  });
   return (
     <div className="space-y-4 pt-4">
       <Alert colors="muted">Withdraw veRCT from your expired locks.</Alert>
-      <Button
+      <SubmitButton
         onClick={onSubmit}
-        disabled={Boolean(!withdrawSimulation)}
-        size="submit"
-        variant="primary"
+        state={state}
+        isValid={Boolean(withdrawSimulation)}
+        approveTokenSymbol="veRCT"
       >
         Withdraw
-      </Button>
+      </SubmitButton>
     </div>
   );
 }

@@ -1,17 +1,23 @@
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Alert } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { useAccount, useSimulateContract, useWriteContract } from "wagmi";
+import {
+  useAccount,
+  useSimulateContract,
+  useWaitForTransactionReceipt,
+  useWriteContract,
+} from "wagmi";
 import { Contracts } from "@/lib/contracts";
 import { Address } from "viem";
 import { useLockProvider } from "../lockProvider";
+import useGetButtonStatuses from "@/components/shared/hooks/useGetButtonStatuses";
+import SubmitButton from "@/components/shared/submitBtn";
 
 export default function TransferContent() {
   const [toAddress, setAddress] = React.useState("");
   const { selectedLockToken } = useLockProvider();
   const { address } = useAccount();
-  const { data: transferSimulation, error } = useSimulateContract({
+  const { data: transferSimulation } = useSimulateContract({
     ...Contracts.VotingEscrow,
     functionName: "safeTransferFrom",
     args: [
@@ -23,14 +29,14 @@ export default function TransferContent() {
       enabled: Boolean(address) && Boolean(selectedLockToken),
     },
   });
-  console.log({ error, transferSimulation });
-  const { writeContract } = useWriteContract();
+  const { writeContract, data: hash, isPending } = useWriteContract();
+  const { isLoading } = useWaitForTransactionReceipt({ hash });
   const onSubmit = () => {
     if (transferSimulation) {
       writeContract(transferSimulation.request);
     }
   };
-
+  const { state } = useGetButtonStatuses({ isLoading, isPending });
   return (
     <div className="space-y-4 pt-4">
       <div className="pt-2">
@@ -47,14 +53,13 @@ export default function TransferContent() {
         Transferring a lock will also transfer any rewards and rebases! Before
         continuing, please make sure you have claimed all available rewards.
       </Alert>
-      <Button
+      <SubmitButton
         onClick={onSubmit}
-        disabled={!Boolean(transferSimulation)}
-        size="submit"
-        variant={"primary"}
+        state={state}
+        isValid={Boolean(transferSimulation)}
       >
         Transfer
-      </Button>
+      </SubmitButton>
     </div>
   );
 }
