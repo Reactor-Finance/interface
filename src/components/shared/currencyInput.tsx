@@ -77,7 +77,7 @@ function CurrencySelect({
               className="h-6 w-6 rounded-full"
               alt="alt"
             />
-            {token}
+            {token.symbol}
           </>
         )}
         {token === null && (
