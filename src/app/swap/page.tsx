@@ -1,7 +1,6 @@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CurrencyInputs from "./currencyInputs";
 import { Card } from "@/components/ui/card";
-import SubmitButton from "@/components/shared/submitBtn";
 import { SwapProvider } from "./swapProvider";
 export default function Home() {
   return (
@@ -31,9 +30,6 @@ export default function Home() {
             <CurrencyInputs />
             <div className="pt-4"></div>
           </Card>
-          <div className="">
-            <SubmitButton>Swap</SubmitButton>
-          </div>
         </div>
       </div>
     </SwapProvider>
