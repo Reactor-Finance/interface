@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { useEthSwap } from "./useEthSwap";
 import { TAddress } from "@/lib/types";
+import { useWethDeposit } from "./useWeth";
+import { parseUnits } from "viem";
 
 export default function Page() {
   const [formData, setFormData] = useState({ token: "", deposit: "" });
@@ -22,6 +24,10 @@ export default function Page() {
     if (data?.request) {
       writeContract(data?.request);
     }
+  };
+  const { data: getWeth } = useWethDeposit({ amount: parseUnits("1", 18) });
+  const onSubmit2 = () => {
+    if (getWeth?.request) writeContract(getWeth?.request);
   };
   return (
     <div className="flex justify-center">
@@ -62,6 +68,7 @@ export default function Page() {
         >
           Submit
         </button>
+        <button onClick={onSubmit2}>Get WETH</button>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 export const ContractsAbi = {
   Reactor: {
-    contractAddress: "0x2ac430E52F47420A00984E11Ef0DDba80652419a",
+    contractAddress: "0x897945A56464616a525C9e5F11a8D400a72a8f3A",
     abi: [
       {
         inputs: [],
@@ -628,7 +628,7 @@ export const ContractsAbi = {
     ] as const,
   },
   WETH: {
-    contractAddress: "0x2550d6424b46f78F4E31F1CCf88Da26dda7826C6",
+    contractAddress: "0x633a7eB9b8912b22f3616013F3153de687F96074",
     abi: [
       {
         inputs: [
@@ -981,7 +981,7 @@ export const ContractsAbi = {
     ] as const,
   },
   PermissionsRegistry: {
-    contractAddress: "0xDb731EaaFA0FFA7854A24C2379585a85D768Ed5C",
+    contractAddress: "0x1E53bea57Dd5dDa7bFf1a1180a2f64a5c9e222f5",
     abi: [
       {
         inputs: [],
@@ -1373,7 +1373,7 @@ export const ContractsAbi = {
     ] as const,
   },
   PairFactory: {
-    contractAddress: "0xa86582Ad5E80abc19F95f8A9Fb3905Cda0dAbd59",
+    contractAddress: "0x17f4B55A352Be71CC03856765Ad04147119Aa09B",
     abi: [
       {
         inputs: [
@@ -1756,7 +1756,7 @@ export const ContractsAbi = {
     ] as const,
   },
   GaugeFactory: {
-    contractAddress: "0x97915c43511f8cB4Fbe7Ea03B96EEe940eC4AF12",
+    contractAddress: "0x08677Af0A7F54fE2a190bb1F75DE682fe596317e",
     abi: [
       {
         inputs: [],
@@ -2056,7 +2056,7 @@ export const ContractsAbi = {
     ] as const,
   },
   VeArtProxyUpgradeable: {
-    contractAddress: "0xA002B84Ca3c9e8748209F286Ecf99300CA50161A",
+    contractAddress: "0x87a2688d6E41b23d802F74c6B1F06a8e8d118929",
     abi: [
       {
         inputs: [],
@@ -2172,7 +2172,7 @@ export const ContractsAbi = {
     ] as const,
   },
   VotingEscrow: {
-    contractAddress: "0x039d7496e432c6Aea4c24648a59318b3cbe09942",
+    contractAddress: "0x8797847c9d63D8Ed9C30B058F408d4257A33B76C",
     abi: [
       {
         inputs: [
@@ -3751,7 +3751,7 @@ export const ContractsAbi = {
     ] as const,
   },
   Voter: {
-    contractAddress: "0xbF97DEfeb6a387215E3e67DFb988c675c9bb1a29",
+    contractAddress: "0xF816b7FfDa4a8aB6B68540D1993fCa98E462b3bc",
     abi: [
       {
         inputs: [],
@@ -5287,7 +5287,7 @@ export const ContractsAbi = {
     ] as const,
   },
   BribeFactory: {
-    contractAddress: "0xaE7b7A1c6C4d859e19301ccAc2C6eD28A4C51288",
+    contractAddress: "0xa9Ea7F91E63896d852c4FCA6124c974adC68Af3B",
     abi: [
       {
         inputs: [],
@@ -5701,7 +5701,7 @@ export const ContractsAbi = {
     ] as const,
   },
   RewardsDistributor: {
-    contractAddress: "0xeA2e668d430e5AA15babA2f5c5edfd4F9Ef6EB73",
+    contractAddress: "0x2D6E6A6430F0121d6949D743DF54730b40C5c74F",
     abi: [
       {
         inputs: [
@@ -6094,7 +6094,7 @@ export const ContractsAbi = {
     ] as const,
   },
   MinterUpgradeable: {
-    contractAddress: "0xA7240bcff60Eef40F31B8eD5d921BaD6DB13B199",
+    contractAddress: "0x701dC26AcaD119E892695bb6A06956e2165C2052",
     abi: [
       {
         inputs: [],
@@ -6662,7 +6662,7 @@ export const ContractsAbi = {
     ] as const,
   },
   TradeHelper: {
-    contractAddress: "0xdA796117bF6905DD8DB2fF1ab4397f6d2c4ADda3",
+    contractAddress: "0x886a2A3ABF5B79AA5dFF1C73016BD07CFc817e04",
     abi: [
       {
         inputs: [
@@ -7015,7 +7015,7 @@ export const ContractsAbi = {
     ] as const,
   },
   Router: {
-    contractAddress: "0x222D74f33b0d07687a769A44399E2272A4cB9FfE",
+    contractAddress: "0x449C286Ab90639fd9F6604F4f15Ec86bce2b8A61",
     abi: [
       {
         inputs: [
@@ -7645,7 +7645,7 @@ export const ContractsAbi = {
     ] as const,
   },
   PairHelper: {
-    contractAddress: "0x88777418972fB3F58489303d763d4DaF398A6527",
+    contractAddress: "0x5E0399B4C3c4C31036DcA08d53c0c5b5c29C113e",
     abi: [
       {
         inputs: [],
@@ -8283,7 +8283,7 @@ export const ContractsAbi = {
     ] as const,
   },
   RewardHelper: {
-    contractAddress: "0x37d0eD258f37a966f33b75b5AE7486917a0ae614",
+    contractAddress: "0x5aA185fbEFc205072FaecC6B9D564383e761f8C2",
     abi: [
       {
         inputs: [],
@@ -8491,7 +8491,7 @@ export const ContractsAbi = {
     ] as const,
   },
   veNFTHelper: {
-    contractAddress: "0x48288D0e3079A03f6EC1846554CFc58C2696Aaee",
+    contractAddress: "0x5A61c51C6745b3F509f4a1BF54BFD04e04aF430a",
     abi: [
       {
         inputs: [],
@@ -9196,7 +9196,7 @@ export const ContractsAbi = {
     ] as const,
   },
   Oracle: {
-    contractAddress: "0x7c77704007C9996Ee591C516f7319828BA49d91E",
+    contractAddress: "0x832092FDF1D32A3A1b196270590fB0E25DF129FF",
     abi: [
       {
         inputs: [
