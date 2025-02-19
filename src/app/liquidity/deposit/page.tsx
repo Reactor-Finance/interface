@@ -17,13 +17,13 @@ export default function Page() {
   const [openTwo, setOpenTokenTwo] = useState(false);
   const [tokenOne, setTokenOne] = useState<TToken | undefined>();
   const [tokenTwo, setTokenTwo] = useState<TToken | undefined>();
-  const setToken = ({ address, symbol }: TToken) => {
+  const setToken = ({ address, symbol, decimals }: TToken) => {
     if (openOne) {
-      setTokenOne({ address, symbol });
+      setTokenOne({ address, symbol, decimals });
       setOpenTokenOne(false);
     }
     if (openTwo) {
-      setTokenTwo({ address, symbol });
+      setTokenTwo({ address, symbol, decimals });
       setOpenTokenTwo(false);
     }
   };
@@ -94,10 +94,12 @@ export default function Page() {
                 tokenOne={{
                   address: getAddress(pool.token0.id),
                   symbol: pool.token0.symbol,
+                  decimals: pool.token0.decimals,
                 }}
                 tokenTwo={{
                   address: getAddress(pool.token1.id),
                   symbol: pool.token1.symbol,
+                  decimals: pool.token1.decimals,
                 }}
                 poolType={pool.isStable ? TPoolType.STABLE : TPoolType.VOLATILE}
               ></AvailablePoolRow>
