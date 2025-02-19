@@ -7,4 +7,10 @@ export enum TPoolType {
   "VOLATILE",
 }
 
-export type TToken = { address: TAddress; symbol: string };
+export type TToken = { address: TAddress; symbol: string; decimals: number };
+
+export enum SwapSteps {
+  Wrap,
+  Approve,
+  Swap,
+}
