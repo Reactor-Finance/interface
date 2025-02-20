@@ -17,9 +17,11 @@ export function joinWheres(
       whereConditions.push(`${key}: $${key}`);
     }
   }
-  whereConditions = [...whereConditions, add];
-  const whereClause = whereConditions.length
-    ? `where: { ${whereConditions.join(", ")} }`
-    : "";
+  if (add) {
+    whereConditions = [...whereConditions, add];
+  }
+  console.log(whereConditions, "WHERE CONDITIONSKj");
+  const whereClause =
+    whereConditions.length > 0 ? `${whereConditions.join(", ")}` : "";
   return whereClause;
 }
