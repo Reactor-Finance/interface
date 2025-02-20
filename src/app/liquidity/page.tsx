@@ -54,7 +54,10 @@ export default function Page() {
             <TabsTrigger value="concentrated">Concentrated</TabsTrigger>
           </TabsList>
         </Tabs>
-        <SearchInput value=""></SearchInput>
+        <SearchInput
+          className="bg-neutral-950 w-[285px]"
+          value=""
+        ></SearchInput>
       </div>
       <div className="pt-4">
         <PoolsTable />
