@@ -8,12 +8,23 @@ export const FilterSchema = z.object({
   isStable: z.boolean().optional(),
   totalSupply_lt: z.number().optional(),
   totalSupply_gt: z.number().optional(),
+  searchQuery: z.string().optional(),
 });
 
 type Filter = z.infer<typeof FilterSchema>;
 
+const tokenContainsSymb = (t: string) =>
+  `{token${t}_:{symbol_contains_nocase:$searchQuery}}`;
+const tokenContainsAddr = (t: string) =>
+  `{token${t}_contains_nocase:$searchQuery}`;
 const getPools = (filter: Filter) => {
-  const whereClause = joinWheres(filter);
+  const [a, b] = ["0", "1"].map((s) => tokenContainsSymb(s));
+  const [c, d] = ["0", "1"].map((s) => tokenContainsAddr(s));
+  const searchClause = `or: [${a}, ${b}, ${c}, ${d}]`;
+  const whereClause = joinWheres(filter, {
+    exclude: ["searchQuery"],
+    add: filter.searchQuery ? [searchClause] : undefined,
+  });
   const defs = [];
   let tokenDef = ``;
   if (filter.isStable !== undefined) {
@@ -24,6 +35,9 @@ const getPools = (filter: Filter) => {
   }
   if (filter.totalSupply_lt !== undefined) {
     defs.push("$totalSupply_lt:BigInt");
+  }
+  if (filter.searchQuery !== undefined) {
+    defs.push("$searchQuery:String");
   }
   tokenDef = defs.join(", ");
   const grp = gql`
