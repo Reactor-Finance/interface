@@ -1,4 +1,3 @@
-"use client";
 import CurrenciesOverlapIcons from "@/components/shared/currenciesOverlapIcons";
 import PoolHeader from "@/components/shared/poolHeader";
 import { Button } from "@/components/ui/button";

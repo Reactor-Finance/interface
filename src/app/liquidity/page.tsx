@@ -7,10 +7,10 @@ import coin from "@/assets/coin.svg";
 import house from "@/assets/house.svg";
 import Image, { StaticImageData } from "next/image";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import SearchInput from "@/components/shared/searchInput";
 import PoolsTable from "./poolsTable";
-export default function Page() {
+import { api } from "@/trpc/server";
+export default async function Page() {
+  const initialPools = await api.pool.getPools({});
   return (
     <PageMarginContainer>
       <Headers.GradiantHeaderOne colorOne="#A0055D" colorTwo="#836EF9">
@@ -45,23 +45,7 @@ export default function Page() {
       </Card>
       <div className="pt-12"></div>
       <h2 className="text-2xl">Pools</h2>
-      <div className="flex justify-between pt-4 items-center">
-        <Tabs defaultValue="all">
-          <TabsList>
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="stable">Stable</TabsTrigger>
-            <TabsTrigger value="volatile">Volatile</TabsTrigger>
-            <TabsTrigger value="concentrated">Concentrated</TabsTrigger>
-          </TabsList>
-        </Tabs>
-        <SearchInput
-          className="bg-neutral-950 w-[285px]"
-          value=""
-        ></SearchInput>
-      </div>
-      <div className="pt-4">
-        <PoolsTable />
-      </div>
+      <PoolsTable initialPools={initialPools} />
     </PageMarginContainer>
   );
 }
