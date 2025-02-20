@@ -12,7 +12,7 @@ export const FilterSchema = z.object({
   searchQuery: z.string().optional(),
 });
 
-type Filter = z.infer<typeof FilterSchema>;
+export type Filter = z.infer<typeof FilterSchema>;
 
 const tokenContainsSymb = (t: string) =>
   `{token${t}_:{symbol_contains_nocase:$searchQuery}}`;
@@ -22,10 +22,15 @@ const getPools = (filter: Filter) => {
   const [a, b] = ["0", "1"].map((s) => tokenContainsSymb(s));
   const [c, d] = ["0", "1"].map((s) => tokenContainsAddr(s));
   const searchClause = `or: [${a}, ${b}, ${c}, ${d}]`;
-  const whereClause = joinWheres(filter, {
+  // pairs(where: { or: [{token0_:{symbol_contains_nocase:$searchQuery}}, {token1_:{symbol_contains_nocase:$searchQuery}},
+  // {token0_contains_nocase:$searchQuery}, {token1_contains_nocase:$searchQuery}] }, first:10,  ) {
+  //id
+  let whereClause = joinWheres(filter, {
     exclude: ["searchQuery", "skip"],
-    add: filter.searchQuery ? [searchClause] : undefined,
   });
+
+  const and = `and: [{${searchClause}}, {${whereClause}}]`;
+  console.log({ and });
   const defs = [];
   let tokenDef = ``;
   if (filter.isStable !== undefined) {
@@ -43,9 +48,19 @@ const getPools = (filter: Filter) => {
   if (filter.skip !== undefined) {
     defs.push("$skip:Int");
   }
-  tokenDef = defs.join(", ");
+  if (defs.length) {
+    tokenDef = defs.join(", ");
+    tokenDef = `(${tokenDef})`;
+  }
+  if (whereClause) {
+    if (and) {
+      whereClause = `where: {${and}},`;
+    } else {
+      whereClause = `where: {${whereClause}},`;
+    }
+  }
   const grp = gql`
-    query(${tokenDef},  ){
+    query${tokenDef}{
       pairs(${whereClause} first:10, ${Boolean(filter.skip) ? "skip:$skip" : ""} ) {
         id
         totalSupply
@@ -70,7 +85,13 @@ const getPools = (filter: Filter) => {
 
 export type TPool = z.infer<typeof PoolSchema>;
 export const executeGetPools = async (filter: Filter) => {
-  const result = await graphqlClient.request(getPools(filter), filter);
-  const safe = PoolsSchema.safeParse(result);
-  return safe.data;
+  console.log("made it here");
+  try {
+    const result = await graphqlClient.request(getPools(filter), { ...filter });
+    const safe = PoolsSchema.safeParse(result);
+    return safe.data;
+  } catch (e) {
+    console.log(e);
+    throw Error("Error fetching pools");
+  }
 };
