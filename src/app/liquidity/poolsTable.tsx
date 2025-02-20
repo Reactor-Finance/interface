@@ -2,7 +2,7 @@ import { ChevronRight, ChevronLeft } from "lucide-react";
 import PoolRow from "./poolRow";
 import { api } from "@/trpc/server";
 export default async function PoolsTable() {
-  const pools = await api.pool.getPools();
+  const pools = await api.pool.getPools({ isStable: true, totalSupply_lt: 5 });
   return (
     <>
       <table className="w-full">

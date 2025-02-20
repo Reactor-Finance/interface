@@ -1,30 +1,16 @@
-import { graphqlClient } from "@/lib/graphClient";
-import { gql } from "graphql-request";
-import { z } from "zod";
-
-const blockNumber = gql`
-  query GetBlockNumber {
-    _meta {
-      block {
-        number
-      }
+/**
+ * Joins a filter object into a where clause
+ * ex. where:{$a:a, $b:b}
+ */
+export function joinWheres(filter: Record<string, string | number | boolean>) {
+  const whereConditions = [];
+  for (const key in filter) {
+    if (filter[key] !== undefined) {
+      whereConditions.push(`${key}: $${key}`);
     }
   }
-`;
-
-export const blockNumberSchema = z.object({
-  _meta: z.object({
-    block: z.object({
-      number: z.number(),
-    }),
-  }),
-});
-export const executeGetBlockNumber = async () => {
-  const result = await graphqlClient.request(blockNumber);
-  const safe = blockNumberSchema.safeParse(result);
-  if (safe.success) {
-    return safe.data;
-  } else {
-    return;
-  }
-};
+  const whereClause = whereConditions.length
+    ? `where: { ${whereConditions.join(", ")} }`
+    : "";
+  return whereClause;
+}
