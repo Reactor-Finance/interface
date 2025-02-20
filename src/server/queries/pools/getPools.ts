@@ -8,6 +8,7 @@ export const FilterSchema = z.object({
   isStable: z.boolean().optional(),
   totalSupply_lt: z.number().optional(),
   totalSupply_gt: z.number().optional(),
+  skip: z.number().optional(),
   searchQuery: z.string().optional(),
 });
 
@@ -22,7 +23,7 @@ const getPools = (filter: Filter) => {
   const [c, d] = ["0", "1"].map((s) => tokenContainsAddr(s));
   const searchClause = `or: [${a}, ${b}, ${c}, ${d}]`;
   const whereClause = joinWheres(filter, {
-    exclude: ["searchQuery"],
+    exclude: ["searchQuery", "skip"],
     add: filter.searchQuery ? [searchClause] : undefined,
   });
   const defs = [];
@@ -39,10 +40,13 @@ const getPools = (filter: Filter) => {
   if (filter.searchQuery !== undefined) {
     defs.push("$searchQuery:String");
   }
+  if (filter.skip !== undefined) {
+    defs.push("$skip:Int");
+  }
   tokenDef = defs.join(", ");
   const grp = gql`
-    query(${tokenDef}){
-      pairs(${whereClause}) {
+    query(${tokenDef},  ){
+      pairs(${whereClause} first:10, ${Boolean(filter.skip) ? "skip:$skip" : ""} ) {
         id
         totalSupply
         volumeUSD
