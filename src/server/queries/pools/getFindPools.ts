@@ -9,7 +9,7 @@ export const findPoolSchema = z.object({
   isStable: z.boolean().optional(),
 });
 
-type Pool = z.infer<typeof findPoolSchema>;
+type TPool = z.infer<typeof findPoolSchema>;
 const findPoolQuery = ({ isStable }: { isStable?: boolean }) => {
   let stableWhere = "";
   let stableDef = "";
@@ -43,7 +43,7 @@ export const executeFindPool = async ({
   tokenOneAddress,
   tokenTwoAddress,
   isStable,
-}: Pool) => {
+}: TPool) => {
   const result = await graphqlClient.request(findPoolQuery({ isStable }), {
     token0Id: tokenOneAddress,
     token1Id: tokenTwoAddress,

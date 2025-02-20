@@ -17,3 +17,4 @@ export const PoolSchema = z.object({
   }),
 });
 export const PoolsSchema = z.object({ pairs: z.array(PoolSchema) });
+export type TPools = z.infer<typeof PoolSchema>;
