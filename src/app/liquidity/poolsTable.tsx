@@ -25,6 +25,7 @@ export default function PoolsTable({
 }: {
   initialPools: { pairs: TPools[] } | undefined;
 }) {
+  const [loadingBounced, setLoadingBounced] = useState(false);
   const [filters, setFilters] = useState<QueryFilters>({
     searchQuery: "",
     isStable: undefined,
@@ -44,7 +45,7 @@ export default function PoolsTable({
   });
   const { debouncedValue: searchQueryBounced } = useDebounce(
     filters.searchQuery,
-    400
+    300
   );
   useEffect(() => {
     setPage(1);
@@ -61,6 +62,19 @@ export default function PoolsTable({
       staleTime: 1000 * 60 * 5,
     }
   );
+  useEffect(() => {
+    if (isFetching) {
+      setLoadingBounced(true);
+    } else {
+      const timer = setTimeout(() => {
+        setLoadingBounced(false);
+      }, 400);
+
+      return () => {
+        clearTimeout(timer);
+      };
+    }
+  }, [isFetching]);
   const handleTabChange = (value: string) => {
     if (value === TabValues.ALL) {
       updateState({ isStable: undefined });
@@ -109,11 +123,11 @@ export default function PoolsTable({
             </tr>
           </thead>
           <tbody className="gap-y-2 pt-2 flex flex-col">
-            {isFetching &&
+            {loadingBounced &&
               [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
                 <PoolRowSkeleton key={i} />
               ))}
-            {!isFetching &&
+            {!loadingBounced &&
               pools?.pairs.map((pool) => <PoolRow {...pool} key={pool.id} />)}
           </tbody>
         </table>
