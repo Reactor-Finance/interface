@@ -30,7 +30,6 @@ const getPools = (filter: Filter) => {
   });
 
   const and = `and: [{${searchClause}}, {${whereClause}}]`;
-  console.log({ and });
   const defs = [];
   let tokenDef = ``;
   if (filter.isStable !== undefined) {
@@ -48,6 +47,7 @@ const getPools = (filter: Filter) => {
   if (filter.skip !== undefined) {
     defs.push("$skip:Int");
   }
+  console.log(defs, "defs");
   if (defs.length) {
     tokenDef = defs.join(", ");
     tokenDef = `(${tokenDef})`;
@@ -59,6 +59,10 @@ const getPools = (filter: Filter) => {
       whereClause = `where: {${whereClause}},`;
     }
   }
+  if (!whereClause && filter.searchQuery) {
+    whereClause = `where: {${searchClause}},`;
+  }
+
   const grp = gql`
     query${tokenDef}{
       pairs(${whereClause} first:10, ${Boolean(filter.skip) ? "skip:$skip" : ""} ) {
