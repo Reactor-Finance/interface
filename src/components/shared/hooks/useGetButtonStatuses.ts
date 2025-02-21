@@ -4,7 +4,7 @@ interface Props {
   isLoading: boolean;
   isPending: boolean;
   needsApproval?: boolean | undefined;
-  isFetching: boolean | undefined;
+  isFetching?: boolean | undefined;
 }
 export default function useGetButtonStatuses({
   isLoading,
