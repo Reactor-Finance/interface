@@ -1,5 +1,5 @@
 "use client";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import PoolRow from "./poolRow";
 import { api } from "@/trpc/react";
@@ -8,6 +8,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SearchInput from "@/components/shared/searchInput";
 import { useDebounce } from "@/components/shared/hooks/useDebounce";
 import useInitializePage from "./hooks/useInitializePage";
+import PoolRowSkeleton from "./poolRowSkeleton";
 type QueryFilters = {
   searchQuery: string;
   isStable: boolean | undefined;
@@ -45,6 +46,9 @@ export default function PoolsTable({
     filters.searchQuery,
     400
   );
+  useEffect(() => {
+    setPage(1);
+  }, [filters.searchQuery, filters.isStable]);
   const { data: pools, isFetching } = api.pool.getPools.useQuery(
     {
       isStable: filters.isStable,
@@ -105,8 +109,12 @@ export default function PoolsTable({
             </tr>
           </thead>
           <tbody className="gap-y-2 pt-2 flex flex-col">
-            {isFetching && <span>Loading...</span>}
-            {pools?.pairs.map((pool) => <PoolRow {...pool} key={pool.id} />)}
+            {isFetching &&
+              [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
+                <PoolRowSkeleton key={i} />
+              ))}
+            {!isFetching &&
+              pools?.pairs.map((pool) => <PoolRow {...pool} key={pool.id} />)}
           </tbody>
         </table>
 
