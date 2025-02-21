@@ -1,5 +1,5 @@
 "use client";
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback } from "react";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import PoolRow from "./poolRow";
 import { api } from "@/trpc/react";
@@ -7,6 +7,7 @@ import { TPools } from "@/server/queries/pools";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SearchInput from "@/components/shared/searchInput";
 import { useDebounce } from "@/components/shared/hooks/useDebounce";
+import useInitializePage from "./hooks/useInitializePage";
 type QueryFilters = {
   searchQuery: string;
   isStable: boolean | undefined;
@@ -27,38 +28,35 @@ export default function PoolsTable({
     searchQuery: "",
     isStable: undefined,
   });
-  const [enabled, setEnabled] = useState(false);
-  const initialized = useRef<boolean>(false);
+  // const [page, setPage] = useState(1);
   const updateState = useCallback(
     (value: Partial<QueryFilters>) => {
       setFilters({ ...filters, ...value });
     },
     [filters]
   );
-  useEffect(() => {
-    if (!initialized.current) {
-      initialized.current = true;
-    } else {
-      if (!enabled) setEnabled(true);
-    }
-  }, [enabled, filters.searchQuery]);
+
+  // ** this stops react query refetching our data from server
+  // until one of the filters changes
+  const { enabled } = useInitializePage({
+    dependencies: [filters.searchQuery, filters.isStable],
+  });
   const { debouncedValue: searchQueryBounced } = useDebounce(
     filters.searchQuery,
     400
   );
-
   const { data: pools, isFetching } = api.pool.getPools.useQuery(
     {
       isStable: filters.isStable,
       searchQuery: searchQueryBounced,
     },
     {
-      initialData: initialPools,
+      placeholderData: initialPools,
       enabled,
+      // staleTime: 1000 * 60 * 5,
     }
   );
   const handleTabChange = (value: string) => {
-    console.log({ value });
     if (value === TabValues.ALL) {
       updateState({ isStable: undefined });
     }
@@ -117,10 +115,10 @@ export default function PoolsTable({
             <span className="text-neutral-300">(1 - 250 results)</span>
           </p>
           <div className="flex">
-            <button>
+            <button aria-label="Next Page of Pools">
               <ChevronLeft className="text-white" />
             </button>
-            <button>
+            <button aria-label="Previous Page of Pools">
               <ChevronRight className="text-white" />
             </button>
           </div>
