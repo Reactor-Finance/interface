@@ -4,6 +4,12 @@ import useGetAllowance from "./useGetAllowance";
 
 /**
  * Returns write data request only if the allowance is less than the amount
+ * returns
+ *
+ * @approveWriteRequest: undefined,
+ * @needsApproval: false,
+ * @allowanceKey: queryKey,
+ * @isFetching,
  */
 export default function useApproveWrite({
   spender,
