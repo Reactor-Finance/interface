@@ -18,7 +18,7 @@ export default function useGetButtonStatuses({
     };
   }
   if (isFetching) {
-    return { state: ButtonState.Loading };
+    return { state: ButtonState.Fetching };
   }
   if (isPending) {
     return {
