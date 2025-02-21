@@ -15,7 +15,11 @@ export default function useApproveWrite({
   // token: TToken | null;
   amount: string;
 }) {
-  const { data: allowance, queryKey } = useGetAllowance({
+  const {
+    data: allowance,
+    queryKey,
+    isFetching,
+  } = useGetAllowance({
     tokenAddress,
     spender,
   });
@@ -36,6 +40,7 @@ export default function useApproveWrite({
       approveWriteRequest: undefined,
       needsApproval: false,
       allowanceKey: queryKey,
+      isFetching,
     };
   }
 }
