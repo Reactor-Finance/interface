@@ -13,11 +13,13 @@ interface Props extends ButtonProps {
   state: ButtonState;
   isValid: boolean;
   approveTokenSymbol?: string;
+  validationError: string | null;
 }
 export default function SubmitButton({
   state,
   isValid,
   approveTokenSymbol,
+  validationError,
   ...props
 }: Props) {
   const { isConnected } = useAccount();
@@ -25,9 +27,9 @@ export default function SubmitButton({
   const buttonText = useMemo(() => {
     switch (state) {
       case ButtonState.Signing:
-        return "Waiting for Signature";
+        return "Waiting for Signature...";
       case ButtonState.Loading:
-        return "Loading";
+        return "Loading...";
       case ButtonState.Approve:
         return "Approve " + (approveTokenSymbol ?? "");
       default:
@@ -55,7 +57,7 @@ export default function SubmitButton({
       variant="primary"
       size="submit"
     >
-      {buttonText}
+      {validationError ?? buttonText}
     </Button>
   );
 }
