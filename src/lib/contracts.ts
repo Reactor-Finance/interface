@@ -1,4 +1,5 @@
-import { ContractsAbi } from "./contractsAbi";
+import { ContractsAbi } from "./abis/contractsAbi";
+
 const ABIs = {
   PRIVATE_NET: ContractsAbi,
   TESTNET: ContractsAbi,
