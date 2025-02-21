@@ -1,5 +1,5 @@
 "use client";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import PoolRow from "./poolRow";
 import { api } from "@/trpc/react";
@@ -7,48 +7,80 @@ import { TPools } from "@/server/queries/pools";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SearchInput from "@/components/shared/searchInput";
 import { useDebounce } from "@/components/shared/hooks/useDebounce";
-import { Filter } from "@/server/queries/pools/getPools";
+type QueryFilters = {
+  searchQuery: string;
+  isStable: boolean | undefined;
+};
+
+enum TabValues {
+  ALL = "all",
+  STABLE = "stable",
+  VOLATILE = "volatile",
+  CONCENTRATED = "concentrated",
+}
 export default function PoolsTable({
   initialPools,
 }: {
   initialPools: { pairs: TPools[] } | undefined;
 }) {
-  const [filters, setFilters] = useState({ searchQuery: "" });
+  const [filters, setFilters] = useState<QueryFilters>({
+    searchQuery: "",
+    isStable: undefined,
+  });
   const [enabled, setEnabled] = useState(false);
+  const initialized = useRef<boolean>(false);
   const updateState = useCallback(
-    (value: Record<string, string>) => {
+    (value: Partial<QueryFilters>) => {
       setFilters({ ...filters, ...value });
     },
     [filters]
   );
   useEffect(() => {
-    if (filters.searchQuery) {
-      setEnabled(true);
+    if (!initialized.current) {
+      initialized.current = true;
+    } else {
+      if (!enabled) setEnabled(true);
     }
-  }, [filters]);
+  }, [enabled, filters.searchQuery]);
   const { debouncedValue: searchQueryBounced } = useDebounce(
     filters.searchQuery,
     400
   );
-  console.log(searchQueryBounced);
-  const filtersParams: Filter = {
-    isStable: true,
-    searchQuery: searchQueryBounced,
+
+  const { data: pools, isFetching } = api.pool.getPools.useQuery(
+    {
+      isStable: filters.isStable,
+      searchQuery: searchQueryBounced,
+    },
+    {
+      initialData: initialPools,
+      enabled,
+    }
+  );
+  const handleTabChange = (value: string) => {
+    console.log({ value });
+    if (value === TabValues.ALL) {
+      updateState({ isStable: undefined });
+    }
+    if (value === TabValues.STABLE) {
+      updateState({ isStable: true });
+    }
+    if (value === TabValues.VOLATILE) {
+      updateState({ isStable: false });
+    }
   };
-  const { data: pools } = api.pool.getPools.useQuery(filtersParams, {
-    initialData: initialPools,
-    enabled,
-  });
 
   return (
     <>
       <div className="flex justify-between pt-4 items-center">
-        <Tabs defaultValue="all">
+        <Tabs defaultValue="all" onValueChange={handleTabChange}>
           <TabsList>
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="stable">Stable</TabsTrigger>
-            <TabsTrigger value="volatile">Volatile</TabsTrigger>
-            <TabsTrigger value="concentrated">Concentrated</TabsTrigger>
+            <TabsTrigger value={TabValues.ALL}>All</TabsTrigger>
+            <TabsTrigger value={TabValues.STABLE}>Stable</TabsTrigger>
+            <TabsTrigger value={TabValues.VOLATILE}>Volatile</TabsTrigger>
+            {/* <TabsTrigger value={TabValues.CONCENTRATED}> */}
+            {/*   Concentrated */}
+            {/* </TabsTrigger> */}
           </TabsList>
         </Tabs>
         <SearchInput
@@ -74,6 +106,7 @@ export default function PoolsTable({
             </tr>
           </thead>
           <tbody className="gap-y-2 pt-2 flex flex-col">
+            {isFetching && <span>Loading...</span>}
             {pools?.pairs.map((pool) => <PoolRow {...pool} key={pool.id} />)}
           </tbody>
         </table>
