@@ -19,6 +19,7 @@ import SubmitButton from "@/components/shared/submitBtn";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useIncreaseLockValidation } from "./hooks/useIncreaseLockValidation";
+import usePadLoading from "@/components/shared/hooks/usePadLoading";
 export function IncreaseContent() {
   const [amount, setAmount] = React.useState("");
   const [isApproving, setIsApproving] = React.useState(false);
@@ -84,11 +85,15 @@ export function IncreaseContent() {
       return;
     }
   };
+  const paddedIsFetching = usePadLoading({
+    value: isFetching,
+    duration: 300,
+  });
   const { state } = useGetButtonStatuses({
     isLoading,
     isPending,
     needsApproval,
-    isFetching,
+    isFetching: paddedIsFetching,
   });
   return (
     <div className="space-y-4 pt-4">

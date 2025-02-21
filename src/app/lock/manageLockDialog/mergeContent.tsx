@@ -10,6 +10,7 @@ import LockDropdown from "../lockDropdown";
 import { useLockProvider } from "../lockProvider";
 import useGetButtonStatuses from "@/components/shared/hooks/useGetButtonStatuses";
 import SubmitButton from "@/components/shared/submitBtn";
+import usePadLoading from "@/components/shared/hooks/usePadLoading";
 
 export default function MergeContent() {
   const [mergeToken, setMergeToken] = React.useState("");
@@ -17,10 +18,11 @@ export default function MergeContent() {
   const tokenId1 = useMemo(() => {
     return lockTokens.find((token) => token.id.toString() === mergeToken);
   }, [lockTokens, mergeToken]);
-  const { data: mergeSimulation } = useSimulateContract({
+  const { data: mergeSimulation, isFetching } = useSimulateContract({
     ...Contracts.VotingEscrow,
     functionName: "merge",
     args: [selectedLockToken?.id ?? 0n, tokenId1?.id ?? 0n],
+    query: { enabled: Boolean(selectedLockToken) && Boolean(tokenId1) },
   });
   const { writeContract, isPending, data: hash } = useWriteContract();
   const { isLoading } = useWaitForTransactionReceipt({ hash });
@@ -29,7 +31,15 @@ export default function MergeContent() {
       writeContract(mergeSimulation.request);
     }
   };
-  const { state } = useGetButtonStatuses({ isLoading, isPending });
+  const paddedIsFetching = usePadLoading({
+    value: isFetching,
+    duration: 300,
+  });
+  const { state } = useGetButtonStatuses({
+    isLoading,
+    isPending,
+    isFetching: paddedIsFetching,
+  });
 
   return (
     <div className="space-y-4 pt-4">
