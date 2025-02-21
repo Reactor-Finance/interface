@@ -15,7 +15,7 @@ interface Props extends ButtonProps {
   state: ButtonState;
   isValid: boolean;
   approveTokenSymbol?: string;
-  validationError: string | null;
+  validationError?: string | null;
 }
 export default function SubmitButton({
   state,
