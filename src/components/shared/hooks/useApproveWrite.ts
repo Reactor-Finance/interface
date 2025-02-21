@@ -40,6 +40,7 @@ export default function useApproveWrite({
       approveWriteRequest: data?.request,
       needsApproval: true,
       allowanceKey: queryKey,
+      isFetching,
     };
   } else {
     return {
