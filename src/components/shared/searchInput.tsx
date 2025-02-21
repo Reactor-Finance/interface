@@ -4,13 +4,17 @@ import React, { useState } from "react";
 interface Props {
   value: string;
   setValue?: (s: string) => void;
+  className?: string;
 }
-export default function SearchInput({ value, setValue }: Props) {
+export default function SearchInput({ value, setValue, className }: Props) {
   const [isFocused, setIsFocused] = useState(false);
   return (
     <div
       data-focused={isFocused ? "focused" : "not-focused"}
-      className="flex gap-x-3 bg-neutral-900 rounded-md p-2 outline-1  data-[focused=focused]:outline data-[focused=focused]:outline-white"
+      className={
+        "flex gap-x-3 bg-neutral-900 rounded-md p-2 outline-1 data-[focused=focused]:outline data-[focused=focused]:outline-white " +
+        className
+      }
     >
       <div className="flex items-center">
         <Search className="text-gray-400 h-5 w-5" />

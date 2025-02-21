@@ -1,7 +1,15 @@
 import { graphqlClient } from "@/lib/graphClient";
 import { gql } from "graphql-request";
 import { PoolsSchema } from ".";
+import { z } from "zod";
 
+export const findPoolSchema = z.object({
+  tokenOneAddress: z.string(),
+  tokenTwoAddress: z.string(),
+  isStable: z.boolean().optional(),
+});
+
+type TPool = z.infer<typeof findPoolSchema>;
 const findPoolQuery = ({ isStable }: { isStable?: boolean }) => {
   let stableWhere = "";
   let stableDef = "";
@@ -35,11 +43,7 @@ export const executeFindPool = async ({
   tokenOneAddress,
   tokenTwoAddress,
   isStable,
-}: {
-  tokenOneAddress: string;
-  tokenTwoAddress: string;
-  isStable?: boolean;
-}) => {
+}: TPool) => {
   const result = await graphqlClient.request(findPoolQuery({ isStable }), {
     token0Id: tokenOneAddress,
     token1Id: tokenTwoAddress,
