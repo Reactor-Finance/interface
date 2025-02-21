@@ -28,7 +28,7 @@ export default function PoolsTable({
     searchQuery: "",
     isStable: undefined,
   });
-  // const [page, setPage] = useState(1);
+  const [page, setPage] = useState(1);
   const updateState = useCallback(
     (value: Partial<QueryFilters>) => {
       setFilters({ ...filters, ...value });
@@ -39,7 +39,7 @@ export default function PoolsTable({
   // ** this stops react query refetching our data from server
   // until one of the filters changes
   const { enabled } = useInitializePage({
-    dependencies: [filters.searchQuery, filters.isStable],
+    dependencies: [filters.searchQuery, filters.isStable, page],
   });
   const { debouncedValue: searchQueryBounced } = useDebounce(
     filters.searchQuery,
@@ -49,6 +49,7 @@ export default function PoolsTable({
     {
       isStable: filters.isStable,
       searchQuery: searchQueryBounced,
+      skip: (page - 1) * 10,
     },
     {
       placeholderData: initialPools,
@@ -111,14 +112,32 @@ export default function PoolsTable({
 
         <div className="pt-2  flex justify-between">
           <p className="text-[13px]">
-            Page 1 of 34{" "}
-            <span className="text-neutral-300">(1 - 250 results)</span>
+            Page {page} <span className="text-neutral-300">(10 results)</span>
           </p>
           <div className="flex">
-            <button aria-label="Next Page of Pools">
+            <button
+              onClick={() => {
+                if (page > 1) {
+                  setPage(page - 1);
+                }
+              }}
+              aria-label="Previous Page of Pools"
+              disabled={page === 1}
+              className="disabled:opacity-50"
+            >
               <ChevronLeft className="text-white" />
             </button>
-            <button aria-label="Previous Page of Pools">
+            <button
+              onClick={() => {
+                if ((pools?.pairs?.length ?? 0) < 10) {
+                } else {
+                  setPage(page + 1);
+                }
+              }}
+              aria-label="Next Page of Pools"
+              disabled={(pools?.pairs?.length ?? 0) < 10}
+              className="disabled:opacity-50"
+            >
               <ChevronRight className="text-white" />
             </button>
           </div>
