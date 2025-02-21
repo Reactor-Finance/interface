@@ -31,10 +31,12 @@ export default function LockTable() {
 
         <tbody className="flex flex-col gap-y-2">
           <tr className="py-4">
-            <p className="text-sm text-neutral-500 px-6">
-              To receive incentives and fees, you need to create a lock and vote
-              with it.
-            </p>
+            <td>
+              <p className="text-sm text-neutral-500 px-6">
+                To receive incentives and fees, you need to create a lock and
+                vote with it.
+              </p>
+            </td>
           </tr>
           {lockTokens?.map((lock) => (
             <LockRow
