@@ -53,7 +53,7 @@ export default function PoolsTable({
     {
       placeholderData: initialPools,
       enabled,
-      // staleTime: 1000 * 60 * 5,
+      staleTime: 1000 * 60 * 5,
     }
   );
   const handleTabChange = (value: string) => {
