@@ -10,6 +10,7 @@ export enum LiquidityActions {
 interface StateType {
   actionType: LiquidityActions | undefined;
   dialogOpen: boolean;
+  sliderValue: number;
 }
 interface ContextType {
   updateState: (payload: Partial<StateType>) => void;
@@ -25,12 +26,13 @@ export const DashboardLiquidityProvider = ({ children }: Props) => {
   const [state, setState] = React.useState<StateType>({
     actionType: undefined,
     dialogOpen: false,
+    sliderValue: 0,
   });
   const updateState = (payload: Partial<StateType>) => {
     setState((prevState) => ({ ...prevState, ...payload }));
   };
   const openModal = (actionType: LiquidityActions) => {
-    setState({ actionType, dialogOpen: true });
+    setState({ ...state, actionType, dialogOpen: true });
   };
   return (
     <LiquidityContext.Provider value={{ state, openModal, updateState }}>
