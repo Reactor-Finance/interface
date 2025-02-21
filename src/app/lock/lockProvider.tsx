@@ -44,6 +44,7 @@ export const LockProvider = ({ children }: Props) => {
       enabled: Boolean(address),
     },
   });
+  console.log(tokens, "tokens");
   const [selectedTokenId, setSelectedTokenId] = useState<string>("");
   const selectedLockToken = useMemo(() => {
     return tokens?.find((token) => token.id.toString() === selectedTokenId);

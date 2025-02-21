@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Contracts } from "@/lib/contracts";
 import React, { useMemo } from "react";
-import { useSimulateContract, useWriteContract } from "wagmi";
+import { useAccount, useSimulateContract, useWriteContract } from "wagmi";
 import { useLockProvider } from "./lockProvider";
 
 export default function ClaimAllLocks() {
@@ -21,6 +21,8 @@ export default function ClaimAllLocks() {
       writeContract(claimAllSimulation.request);
     }
   };
+  const { isConnected } = useAccount();
+  if (!isConnected) return;
   return (
     <Button
       onClick={onSubmit}
