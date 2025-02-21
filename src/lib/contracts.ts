@@ -1,17 +1,27 @@
 import { ContractsAbi } from "./abis/contractsAbi";
+import { env } from "@/app/env";
+import { monadTestnet } from "./abis/monadTestnet";
 
 const ABIs = {
   PRIVATE_NET: ContractsAbi,
-  TESTNET: ContractsAbi,
+  TESTNET: monadTestnet,
   PROD: ContractsAbi,
 };
-const EnvContracts = ABIs.PRIVATE_NET;
-export const Contracts = {
-  WETH: {
-    abi: [...EnvContracts.WETH.abi] as const,
-    address: EnvContracts.WETH.contractAddress as `0x${string}`,
-  },
 
+const getContracts = () => {
+  if (env.NEXT_PUBLIC_CONTRACTS === "PRIVATE_NET") {
+    return ABIs.PRIVATE_NET;
+  }
+  if (env.NEXT_PUBLIC_CONTRACTS === "TESTNET") {
+    return ABIs.TESTNET;
+  }
+  if (env.NEXT_PUBLIC_CONTRACTS === "PROD") {
+    return ABIs.PROD;
+  }
+  return ABIs.PRIVATE_NET;
+};
+const EnvContracts = getContracts();
+export const Contracts = {
   Reactor: {
     abi: [...EnvContracts.Reactor.abi] as const,
     address: EnvContracts.Reactor.contractAddress as `0x${string}`,
