@@ -16,11 +16,15 @@ import { useLockProvider } from "../lockProvider";
 import useApproveWrite from "@/components/shared/hooks/useApproveWrite";
 import useGetButtonStatuses from "@/components/shared/hooks/useGetButtonStatuses";
 import SubmitButton from "@/components/shared/submitBtn";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { useIncreaseLockValidation } from "./hooks/useIncreaseLockValidation";
 export function IncreaseContent() {
   const [amount, setAmount] = React.useState("");
+  const [isApproving, setIsApproving] = React.useState(false);
   const { selectedLockToken } = useLockProvider();
   const tokenId = selectedLockToken?.id.toString() ?? "";
-  const { rctBalance } = useGetRctBalance();
+  const { rctBalance, rctQueryKey } = useGetRctBalance();
   const { data: increaseAmountSimulation } = useSimulateContract({
     ...Contracts.VotingEscrow,
     functionName: "increase_amount",
@@ -31,21 +35,48 @@ export function IncreaseContent() {
     functionName: "approve",
     args: [Contracts.VotingEscrow.address, parseUnits(tokenId, 0)],
   });
-  const { approveWriteRequest, needsApproval } = useApproveWrite({
-    tokenAddress: Contracts.Reactor.address,
-    spender: Contracts.VotingEscrow.address,
-    amount,
-  });
+  const { approveWriteRequest, needsApproval, isFetching, allowanceKey } =
+    useApproveWrite({
+      tokenAddress: Contracts.Reactor.address,
+      spender: Contracts.VotingEscrow.address,
+      amount,
+    });
   const isLockApproved = useGetLockApproval();
-  const { writeContract, isPending, data: hash } = useWriteContract();
-  const { isLoading } = useWaitForTransactionReceipt({ hash });
+  const { writeContract, reset, isPending, data: hash } = useWriteContract();
+  const { isLoading, isSuccess } = useWaitForTransactionReceipt({
+    hash,
+  });
+  const { isValid, validationError } = useIncreaseLockValidation({
+    needsApproval,
+    isLockApproved: Boolean(isLockApproved),
+    rctBalance,
+    increaseAmountSimulation: Boolean(increaseAmountSimulation?.request),
+    amount,
+    approveSimulation: Boolean(approveSimulation?.request),
+    approveWriteRequest: Boolean(approveWriteRequest),
+  });
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    if (isSuccess) {
+      if (isApproving) {
+        queryClient.invalidateQueries({ queryKey: allowanceKey });
+        setIsApproving(false);
+      } else {
+        queryClient.invalidateQueries({ queryKey: rctQueryKey });
+        setAmount("");
+      }
+      reset();
+    }
+  }, [allowanceKey, isApproving, isSuccess, queryClient, rctQueryKey, reset]);
   const onSubmit = () => {
     if (approveWriteRequest) {
       writeContract(approveWriteRequest);
+      setIsApproving(true);
       return;
     }
     if (!isLockApproved && approveSimulation) {
       writeContract(approveSimulation.request);
+      setIsApproving(true);
       return;
     }
     if (increaseAmountSimulation) {
@@ -57,14 +88,15 @@ export function IncreaseContent() {
     isLoading,
     isPending,
     needsApproval,
+    isFetching,
   });
   return (
     <div className="space-y-4 pt-4">
       <div className="flex justify-between">
         <h4>Add to lock</h4>
-        <h5 className="text-neutral-200 text-[13px]">
+        <h5 className="text-neutral-300 text-[13px]">
           Available:{" "}
-          <span className="text-neutral-100">
+          <span className="text-white">
             {formatUnits(rctBalance ?? 0n, RCT_DECIMALS)} RCT
           </span>
         </h5>
@@ -73,8 +105,9 @@ export function IncreaseContent() {
       <RctInput
         value={amount}
         onChange={(e) => {
-          inputPatternMatch(e.target.value, RCT_DECIMALS);
-          setAmount(e.target.value);
+          if (inputPatternMatch(e.target.value, RCT_DECIMALS)) {
+            setAmount(e.target.value);
+          }
         }}
       />
       <h3 className="text-lg">Estimates</h3>
@@ -92,7 +125,12 @@ export function IncreaseContent() {
         Depositing into the lock will increase your voting power and rewards.
         You can also extend the lock duration.
       </Alert>
-      <SubmitButton state={state} onClick={onSubmit} isValid={true}>
+      <SubmitButton
+        validationError={validationError}
+        state={state}
+        onClick={onSubmit}
+        isValid={isValid}
+      >
         Increase Lock
       </SubmitButton>
     </div>
