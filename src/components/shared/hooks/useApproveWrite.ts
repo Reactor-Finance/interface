@@ -4,6 +4,12 @@ import useGetAllowance from "./useGetAllowance";
 
 /**
  * Returns write data request only if the allowance is less than the amount
+ * returns
+ *
+ * @approveWriteRequest: undefined,
+ * @needsApproval: false,
+ * @allowanceKey: queryKey,
+ * @isFetching,
  */
 export default function useApproveWrite({
   spender,
@@ -15,7 +21,11 @@ export default function useApproveWrite({
   // token: TToken | null;
   amount: string;
 }) {
-  const { data: allowance, queryKey } = useGetAllowance({
+  const {
+    data: allowance,
+    queryKey,
+    isFetching,
+  } = useGetAllowance({
     tokenAddress,
     spender,
   });
@@ -30,12 +40,14 @@ export default function useApproveWrite({
       approveWriteRequest: data?.request,
       needsApproval: true,
       allowanceKey: queryKey,
+      isFetching,
     };
   } else {
     return {
       approveWriteRequest: undefined,
       needsApproval: false,
       allowanceKey: queryKey,
+      isFetching,
     };
   }
 }

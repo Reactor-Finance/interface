@@ -2,6 +2,10 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import numeral from "numeral";
 
+export const enum ErrorCodes {
+  InsufficientBalance = "Insufficient balance",
+  EnterAmount = "Enter amount",
+}
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
