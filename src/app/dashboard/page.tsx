@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState } from "react";
 import Headers from "@/components/ui/headers";
 import Image from "next/image";
@@ -7,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import InnerLabelInput from "./input";
 import PageMarginContainer from "@/components/ui/pageMarginContainer";
 import wheel from "@/assets/wheel.svg";
-import PoolTable from "./pool_table";
 import { DashboardLiquidityProvider } from "./dashLiquidityProvider";
+import DashboardLiquidityTable from "./dashboardLiquidityTable";
 
 export default function Dashboard() {
   const [isPoolTableOpen, setIsPoolTableOpen] = useState(false);
@@ -48,8 +47,9 @@ export default function Dashboard() {
               </Button>
             </div>
             <div className="pt-6"></div>
+            <DashboardLiquidityTable />
             {isPoolTableOpen ? (
-              <PoolTable />
+              <></>
             ) : (
               <div className="text-start rounded-sm bg-neutral-1000 font-medium text-neutral-400 py-4 px-6">
                 To receive emissions{" "}
