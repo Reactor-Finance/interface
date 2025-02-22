@@ -1,7 +1,6 @@
 "use client";
 import React, { useCallback, useMemo, useState } from "react";
 import SwapIconBorder from "@/components/shared/swapIconBorder";
-import CurrencyInput from "@/components/shared/currencyInput";
 import SearchTokensDailog from "@/components/shared/searchTokensDialog";
 import useHandleSetToken from "./hooks/useHandleSetToken";
 import { useSwapProvider } from "./swapProvider";
@@ -12,7 +11,10 @@ import useSwapSimulate from "./hooks/useSwapSimulate";
 import SubmitButton from "@/components/shared/submitBtn";
 import { useQuoteSwap } from "./hooks/useQuoteSwap";
 import useGetButtonStatuses from "@/components/shared/hooks/useGetButtonStatuses";
-export default function CurrencyInputs() {
+import SwapCard from "./swapCard";
+import { Card } from "@/components/ui/card";
+import { ChevronDown } from "lucide-react";
+export default function SwapCards() {
   const { updateState, state } = useSwapProvider();
   const [isApproving, setIsApproving] = useState(false);
   console.log(isApproving);
@@ -73,26 +75,7 @@ export default function CurrencyInputs() {
         setToken={handleSetToken}
         matchToken={matchToken}
       />
-      <CurrWrapper
-        active={state.inTokenSelected}
-        onClick={() =>
-          updateState({ outTokenSelected: false, inTokenSelected: true })
-        }
-      >
-        <CurrencyInput.Root title="Sell" estimate="0">
-          <CurrencyInput.CurrencySelect
-            onClick={() => updateState({ inTokenModalOpen: true })}
-            token={state.inToken}
-          />
-          <CurrencyInput.NumberInput
-            onChangeValue={(value: string) => {
-              updateState({ inTokenAmount: value });
-            }}
-            disabled={false}
-            decimals={10}
-          />
-        </CurrencyInput.Root>
-      </CurrWrapper>
+      <SwapCard onSelect={() => {}} />
       <SwapIconBorder
         swapClick={() => {
           updateState({
@@ -101,27 +84,18 @@ export default function CurrencyInputs() {
           });
         }}
       />
-      <CurrWrapper
-        active={state.outTokenSelected}
-        onClick={() =>
-          updateState({ outTokenSelected: true, inTokenSelected: false })
-        }
-      >
-        <CurrencyInput.Root title="Buy" estimate="0">
-          <CurrencyInput.CurrencySelect
-            onClick={() => updateState({ outTokenModalOpen: true })}
-            token={state.outToken}
-          />
-          <CurrencyInput.NumberInput
-            onChangeValue={(value: string) => {
-              updateState({ outTokenAmount: value });
-            }}
-            disabled={false}
-            decimals={10}
-          />
-        </CurrencyInput.Root>
-      </CurrWrapper>
+      <SwapCard onSelect={() => {}} />
 
+      <Card className="bg-transparent space-y-4 text-sm border border-neutral-800">
+        <div className="flex justify-between">
+          <span>Recieved</span>
+          <span>Recieved</span>
+        </div>
+        <button className="flex gap-x-1 text-blue-light">
+          <span>Show Detailed Breakdown</span>
+          <ChevronDown />
+        </button>
+      </Card>
       <div className="pt-2">
         <SubmitButton
           state={buttonState}
@@ -132,25 +106,6 @@ export default function CurrencyInputs() {
           Swap
         </SubmitButton>
       </div>
-    </div>
-  );
-}
-function CurrWrapper({
-  children,
-  onClick,
-  active,
-}: {
-  children: React.ReactNode;
-  onClick: () => void;
-  active: boolean;
-}) {
-  return (
-    <div
-      data-state={active ? "active" : "inactive"}
-      onClick={onClick}
-      className="rounded-xl bg-neutral-1000 cursor-pointer data-[state=active]:bg-neutral-1050  py-6 px-4"
-    >
-      {children}
     </div>
   );
 }
