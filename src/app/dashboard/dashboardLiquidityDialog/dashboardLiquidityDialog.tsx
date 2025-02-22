@@ -11,15 +11,19 @@ import {
 } from "../dashLiquidityProvider";
 import { Slider } from "@/components/ui/slider";
 import EstimatesHeader from "@/app/lock/estimateHeader";
+import PoolHeader from "@/components/shared/poolHeader";
+import { TPoolType } from "@/lib/types";
+import SubmitButton, { ButtonState } from "@/components/shared/submitBtn";
 
 export default function DashboardLiquidityDialog() {
   const { state, updateState } = useDashboardLiquidityProvider();
+  console.log(state.actionType, "ACTION");
   const header = useMemo(() => {
     switch (state.actionType) {
       case LiquidityActions.Stake:
         return <StakeHeader />;
       case LiquidityActions.Unstake:
-        <UnstakeHeader />;
+        return <UnstakeHeader />;
       case LiquidityActions.Withdraw:
         return <WithdrawHeader />;
     }
@@ -29,27 +33,39 @@ export default function DashboardLiquidityDialog() {
       open={state.dialogOpen}
       onOpenChange={(open) => updateState({ dialogOpen: open })}
     >
-      <DialogContent position="static">
-        {header}
-
+      <DialogContent className="p-0">
         <div>
-          <Slider
-            value={[state.sliderValue]}
-            onValueChange={(value) => {
-              updateState({ sliderValue: value[0] });
-            }}
-            min={0}
-            max={100}
-            step={1}
-          />
-          <div className="flex justify-between">
-            <span>0%</span>
-            <span>25%</span>
-            <span>50%</span>
-            <span>75%</span>
-            <span>100%</span>
+          {header}
+
+          <div className="space-y-6 p-4 border-b border-neutral-800">
+            <PoolHeader
+              tokenOne={{ address: "0x", symbol: "a", decimals: 1 }}
+              tokenTwo={{ address: "0x", symbol: "a", decimals: 1 }}
+              poolType={TPoolType.STABLE}
+            ></PoolHeader>
+            <Slider
+              value={[state.sliderValue]}
+              onValueChange={(value) => {
+                updateState({ sliderValue: value[0] });
+              }}
+              min={0}
+              max={100}
+              step={1}
+            />
+            <div className="flex justify-between">
+              <span>0%</span>
+              <span>25%</span>
+              <span>50%</span>
+              <span>75%</span>
+              <span>100%</span>
+            </div>
+            <EstimatesHeader />
           </div>
-          <EstimatesHeader />
+          <div className="p-4">
+            <SubmitButton isValid={false} state={ButtonState.Default}>
+              {getActionTypeString(state.actionType)}
+            </SubmitButton>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
@@ -69,11 +85,24 @@ const UnstakeHeader = () => (
 );
 function DialogHeader({ title, desc }: { title: string; desc: string }) {
   return (
-    <>
+    <div className="py-3 px-4 border-b border-neutral-800">
       <DialogTitle className="text-lg">
         {title} <span className="text-primary-400">Position</span>
       </DialogTitle>
       <DialogDescription>{desc}</DialogDescription>
-    </>
+    </div>
   );
+}
+
+function getActionTypeString(actionType: LiquidityActions | undefined): string {
+  switch (actionType) {
+    case LiquidityActions.Stake:
+      return "Stake";
+    case LiquidityActions.Unstake:
+      return "Unstake";
+    case LiquidityActions.Withdraw:
+      return "Withdraw";
+    default:
+      return "";
+  }
 }

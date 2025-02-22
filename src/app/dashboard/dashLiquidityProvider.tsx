@@ -11,11 +11,12 @@ interface StateType {
   actionType: LiquidityActions | undefined;
   dialogOpen: boolean;
   sliderValue: number;
+  positionId: string | undefined;
 }
 interface ContextType {
   updateState: (payload: Partial<StateType>) => void;
   state: StateType;
-  openModal: (actionType: LiquidityActions) => void;
+  openModal: (actionType: LiquidityActions, positionId: string) => void;
 }
 const LiquidityContext = createContext<ContextType | undefined>(undefined);
 interface Props {
@@ -26,14 +27,16 @@ export const DashboardLiquidityProvider = ({ children }: Props) => {
   const [state, setState] = React.useState<StateType>({
     actionType: undefined,
     dialogOpen: false,
+    positionId: undefined,
     sliderValue: 0,
   });
   const updateState = (payload: Partial<StateType>) => {
     setState((prevState) => ({ ...prevState, ...payload }));
   };
-  const openModal = (actionType: LiquidityActions) => {
-    setState({ ...state, actionType, dialogOpen: true });
+  const openModal = (actionType: LiquidityActions, positionId: string) => {
+    setState({ ...state, actionType, dialogOpen: true, positionId });
   };
+
   return (
     <LiquidityContext.Provider value={{ state, openModal, updateState }}>
       {" "}
