@@ -16,6 +16,7 @@ export const env = createEnv({
    * `NEXT_PUBLIC_`.
    */
   client: {
+    NEXT_PUBLIC_CONTRACTS: z.string(),
     NEXT_PUBLIC_CHAIN_ID: z.string(),
     NEXT_PUBLIC_RPC_URL: z.string(),
   },
@@ -25,6 +26,7 @@ export const env = createEnv({
    * middlewares) or client-side so we need to destruct manually.
    */
   runtimeEnv: {
+    NEXT_PUBLIC_CONTRACTS: process.env.NEXT_PUBLIC_CONTRACTS,
     NEXT_PUBLIC_RPC_URL: process.env.NEXT_PUBLIC_RPC_URL,
     NEXT_PUBLIC_CHAIN_ID: process.env.NEXT_PUBLIC_CHAIN_ID,
     RPC_URL: process.env.RPC_URL,
