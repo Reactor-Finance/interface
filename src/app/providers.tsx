@@ -11,9 +11,9 @@ import { mainnet } from "wagmi/chains";
 import { hashFn } from "@wagmi/core/query";
 import { FC, PropsWithChildren } from "react";
 import { WagmiProvider } from "wagmi";
-import { HeroUIProvider } from "@heroui/react";
 import { TRPCReactProvider } from "@/trpc/react";
 import { env } from "./env";
+import { TransactionToastProvider } from "@/providers/TransactionToastProvider";
 const chainId = env.NEXT_PUBLIC_CHAIN_ID;
 const chain = {
   ...mainnet,
@@ -44,11 +44,11 @@ export const Providers: FC<PropsWithChildren> = ({ children }) => {
       <WagmiProvider config={wagmiConfig}>
         <QueryClientProvider client={queryClient}>
           <RainbowKitProvider theme={darkTheme()}>
-            <HeroUIProvider className="flex min-h-svh flex-col ">
-              {/* Header goes here */}
-              {children}
-              {/* Footer goes here */}
-            </HeroUIProvider>
+            <TransactionToastProvider>{children}</TransactionToastProvider>
+            {/* <HeroUIProvider className="flex min-h-svh flex-col "> */}
+            {/* Header goes here */}
+            {/* Footer goes here */}
+            {/* </HeroUIProvider> */}
           </RainbowKitProvider>
         </QueryClientProvider>
       </WagmiProvider>
