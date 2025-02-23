@@ -3,8 +3,9 @@ import { Input } from "../ui/input";
 import { ControllerRenderProps, FieldValues } from "react-hook-form";
 import { ChevronDown } from "lucide-react";
 import ImageWithFallback from "./imageWithFallback";
-import { getLogoAsset, inputPatternNumberMatch } from "@/utils";
-import { TAddress, TToken } from "@/lib/types";
+import { inputPatternNumberMatch } from "@/utils";
+import { TToken } from "@/lib/types";
+
 /**
  * Must Wrap in Form Field
  */
@@ -71,7 +72,7 @@ function CurrencySelect({
         {token !== null && (
           <>
             <ImageWithFallback
-              src={getLogoAsset(token?.address as TAddress)}
+              src={token.logoURI}
               width={25}
               height={25}
               className="h-6 w-6 rounded-full"
@@ -88,6 +89,7 @@ function CurrencySelect({
     </button>
   );
 }
+
 const CurrencyInput = {
   Root,
   CurrencySelect,

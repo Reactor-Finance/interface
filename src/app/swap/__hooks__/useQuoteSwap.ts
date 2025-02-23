@@ -1,57 +1,51 @@
-import { useSwapProvider } from "../provider";
-import { useReadContract } from "wagmi";
+import { useChainId, useReadContract, useWatchBlocks } from "wagmi";
 import * as TradeHelper from "@/lib/abis/TradeHelper";
-import { Address, formatUnits, parseUnits } from "viem";
-import { useEffect } from "react";
+import { formatUnits, parseUnits, zeroAddress } from "viem";
+import { useMemo } from "react";
+import { TToken } from "@/lib/types";
+import { TRADE_HELPER } from "@/data/constants";
 
-export function useQuoteSwap() {
-  const { state, updateState } = useSwapProvider();
-  const { data: amountOut, error: errorOut } = useReadContract({
-    address: "0x0",
+export function useQuoteSwap(
+  amountIn: number = 0,
+  tokenIn: TToken | null,
+  tokenOut: TToken | null
+) {
+  const chainId = useChainId();
+  const address = useMemo(() => TRADE_HELPER[chainId], []);
+  const {
+    data: [receivedAmount] = [BigInt(0), false],
+    error,
+    isLoading,
+    refetch,
+  } = useReadContract({
+    address,
     ...TradeHelper,
     functionName: "getAmountOut",
     args: [
-      parseUnits(state.inTokenAmount, state.),
-      state.inToken?.address ?? ("0x" as Address),
-      state.outToken?.address ?? ("0x" as Address),
+      parseUnits(String(amountIn), tokenIn?.decimals ?? 18),
+      tokenIn?.address ?? zeroAddress,
+      tokenOut?.address ?? zeroAddress,
     ],
     query: {
-      enabled:
-        Boolean(state.inToken) &&
-        Boolean(state.outToken) &&
-        Boolean(state.outTokenSelected),
+      enabled: amountIn > 0 && tokenIn !== null && tokenOut !== null,
     },
   });
-  const { data: amountIn, error } = useReadContract({
-    ...Contracts.TradeHelper,
-    functionName: "getAmountIn",
-    args: [
-      parseUnits(state.inTokenAmount, state.inToken?.decimals ?? 18),
-      state.inToken?.address ?? ("0x" as Address),
-      state.outToken?.address ?? ("0x" as Address),
-    ],
-    query: {
-      enabled:
-        Boolean(state.inToken) &&
-        Boolean(state.outToken) &&
-        Boolean(state.outTokenSelected),
+
+  const amountOut = useMemo(
+    () =>
+      tokenOut ? Number(formatUnits(receivedAmount, tokenOut.decimals)) : 0,
+    [receivedAmount, tokenOut?.decimals]
+  );
+
+  useWatchBlocks({
+    onBlock: () => {
+      refetch()
+        .then(() => {
+          console.info("Refetching swap quote");
+        })
+        .catch(console.debug);
     },
   });
-  // Use token amount inputs as quote display
-  useEffect(() => {
-    if (state.outTokenSelected) {
-      updateState({ inTokenAmount: formatUnits(amountIn?.[0] ?? 0n, 18) });
-    }
-    if (state.inTokenSelected) {
-      updateState({ outTokenAmount: formatUnits(amountOut?.[0] ?? 0n, 18) });
-    }
-  }, [
-    amountIn,
-    amountOut,
-    state.inTokenSelected,
-    state.outTokenSelected,
-    updateState,
-  ]);
-  console.log({ amountOut, amountIn, error, errorOut });
-  return { amountOut, amountIn };
+
+  return { amountOut, error, isLoading };
 }
