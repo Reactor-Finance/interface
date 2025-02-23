@@ -15,7 +15,7 @@ export function useQuoteSwap({
   tokenOut: TToken | null;
 }) {
   const chainId = useChainId();
-  const address = useMemo(() => TRADE_HELPER[chainId], []);
+  const address = useMemo(() => TRADE_HELPER[chainId], [chainId]);
   const {
     data: [receivedAmount] = [BigInt(0), false],
     error,
