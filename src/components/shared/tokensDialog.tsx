@@ -1,5 +1,5 @@
 import Image from "next/image";
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import verified from "@/assets/verified.svg";
 import info from "@/assets/info.svg";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -7,59 +7,25 @@ import { Switch } from "@/components/ui/switch";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import SearchInput from "@/components/shared/searchInput";
 import ImageWithFallback from "@/components/shared/imageWithFallback";
-import { getLogoAsset } from "@/utils";
 import { api } from "@/trpc/react";
-import { TAddress, TToken } from "@/lib/types";
-export default function SearchTokensDailog({
+import { TToken } from "@/lib/types";
+
+export default function TokensDailog({
   open,
-  setOpen,
-  setToken,
-  usePoolTokens,
-  matchToken,
+  onOpen,
+  onTokenSelected,
 }: {
   open?: boolean;
-  setOpen?: (b: boolean) => void;
-  setToken: ({ address, symbol }: TToken) => void;
-  usePoolTokens?: boolean;
-  matchToken?: TAddress;
+  onOpen?: (b: boolean) => void;
+  onTokenSelected: (token: TToken) => void;
 }) {
   const [value, setValue] = useState("");
-  const { data: chainTokens } =
-    api.tokens.searchTokensByNameAndAddress.useQuery(
-      {
-        search: value,
-      },
-      { enabled: !usePoolTokens && open }
-    );
-  const { data: poolTokens } = api.tokens.getPoolTokens.useQuery(
-    { searchQuery: value, matchToken },
-    { enabled: usePoolTokens && open }
-  );
-  const foundTokens = useMemo(() => {
-    const nameTokens = chainTokens?.tokensFoundByName;
-    const addressTokens = chainTokens?.tokensFoundByAddress;
-    if (nameTokens && addressTokens) {
-      if (nameTokens.length > 0 && addressTokens.length > 0) {
-        // if both have chainTokens, merge and remove duplicates
-        return [...new Set([...nameTokens, ...addressTokens])];
-      }
-    }
+  const { data: tokenlist = [] } = api.tokens.getTokens.useQuery({
+    searchQuery: value,
+  });
 
-    if (nameTokens) {
-      if (nameTokens.length > 0) {
-        return nameTokens;
-      }
-    }
-    if (addressTokens) {
-      if (addressTokens.length > 0) {
-        return addressTokens;
-      }
-    }
-    return [];
-  }, [chainTokens]);
-  console.log(poolTokens, "POOL TOKENS");
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={onOpen}>
       <DialogContent
         title="Search Tokens"
         className="w-[440px] overflow-hidden border-none bg-[#1a1a1a] p-0 text-white"
@@ -77,34 +43,20 @@ export default function SearchTokensDailog({
           </div>
           <div className="relative z-0 h-[calc(100%-179px)] border-t border-gray-600  ">
             <h2 className="py-3 font-geistMono text-[14px] text-[#999999] pl-6">
-              Tokens (
-              {!usePoolTokens ? foundTokens.length : poolTokens?.tokens.length})
+              Tokens ({tokenlist.length})
             </h2>
             <div className=" h-[calc(100%-22px)] space-y-2 scrollbar overflow-y-auto pb-2 px-2">
-              {!usePoolTokens &&
-                foundTokens?.map((token) => {
-                  return (
-                    <TokenItem
-                      token={token}
-                      selectToken={({ symbol, address, decimals }) => {
-                        setToken({ address, symbol, decimals });
-                      }}
-                      key={token.address}
-                    />
-                  );
-                })}
-              {usePoolTokens &&
-                poolTokens?.tokens.map((token) => {
-                  return (
-                    <TokenItem
-                      token={{ ...token, address: token.id as TAddress }}
-                      selectToken={({ symbol, address, decimals }) => {
-                        setToken({ address, symbol, decimals });
-                      }}
-                      key={token.id}
-                    />
-                  );
-                })}
+              {tokenlist.map((token) => {
+                return (
+                  <TokenItem
+                    token={token}
+                    selectToken={(token) => {
+                      onTokenSelected(token);
+                    }}
+                    key={token.address}
+                  />
+                );
+              })}
             </div>
           </div>
 
@@ -131,7 +83,7 @@ function TokenItem({
   selectToken,
 }: {
   token: TToken;
-  selectToken: ({ address, symbol, decimals }: TToken) => void;
+  selectToken: (token: TToken) => void;
 }) {
   return (
     <button
@@ -142,7 +94,7 @@ function TokenItem({
       <div className="flex items-center gap-x-2">
         <ImageWithFallback
           className="h-10 w-10 rounded-full"
-          src={getLogoAsset(token.address as TAddress)}
+          src={token.logoURI}
           width={40}
           height={40}
           alt=""
@@ -152,7 +104,7 @@ function TokenItem({
             <span>{token.symbol}</span>
           </div>
           <div>
-            <span className="text-gray-400 text-sm">Ethereum Token</span>
+            <span className="text-gray-400 text-sm">{token.name}</span>
           </div>
         </div>
       </div>

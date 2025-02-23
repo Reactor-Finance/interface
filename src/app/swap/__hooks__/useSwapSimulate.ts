@@ -1,5 +1,5 @@
 import { Contracts } from "@/lib/contracts";
-import { useSwapProvider } from "../swapProvider";
+import { useSwapProvider } from "../provider";
 import { useAccount, useSimulateContract } from "wagmi";
 import { useMemo } from "react";
 import { parseUnits } from "viem";

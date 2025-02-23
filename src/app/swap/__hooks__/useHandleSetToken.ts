@@ -1,4 +1,4 @@
-import { useSwapProvider } from "../swapProvider";
+import { useSwapProvider } from "../provider";
 import { useCallback } from "react";
 import { TToken } from "@/lib/types";
 

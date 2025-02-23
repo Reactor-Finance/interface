@@ -1,16 +1,17 @@
-import { useSwapProvider } from "../swapProvider";
+import { useSwapProvider } from "../provider";
 import { useReadContract } from "wagmi";
-import { Contracts } from "@/lib/contracts";
+import * as TradeHelper from "@/lib/abis/TradeHelper";
 import { Address, formatUnits, parseUnits } from "viem";
 import { useEffect } from "react";
 
 export function useQuoteSwap() {
   const { state, updateState } = useSwapProvider();
   const { data: amountOut, error: errorOut } = useReadContract({
-    ...Contracts.TradeHelper,
+    address: "0x0",
+    ...TradeHelper,
     functionName: "getAmountOut",
     args: [
-      parseUnits(state.outTokenAmount, 18),
+      parseUnits(state.inTokenAmount, state.),
       state.inToken?.address ?? ("0x" as Address),
       state.outToken?.address ?? ("0x" as Address),
     ],

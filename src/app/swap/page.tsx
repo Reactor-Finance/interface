@@ -1,7 +1,7 @@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CurrencyInputs from "./currencyInputs";
 import { Card } from "@/components/ui/card";
-import { SwapProvider } from "./swapProvider";
+import { SwapProvider } from "./provider";
 export default function Home() {
   return (
     <SwapProvider>

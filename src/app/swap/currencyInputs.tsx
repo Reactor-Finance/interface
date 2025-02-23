@@ -2,15 +2,15 @@
 import React, { useCallback, useMemo, useState } from "react";
 import SwapIconBorder from "@/components/shared/swapIconBorder";
 import CurrencyInput from "@/components/shared/currencyInput";
-import SearchTokensDailog from "@/components/shared/searchTokensDialog";
-import useHandleSetToken from "./hooks/useHandleSetToken";
-import { useSwapProvider } from "./swapProvider";
+import SearchTokensDailog from "@/components/shared/tokensDialog";
+import useHandleSetToken from "./__hooks__/useHandleSetToken";
+import { useSwapProvider } from "./provider";
 import { Contracts } from "@/lib/contracts";
 import useApproveWrite from "@/components/shared/hooks/useApproveWrite";
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
-import useSwapSimulate from "./hooks/useSwapSimulate";
+import useSwapSimulate from "./__hooks__/useSwapSimulate";
 import SubmitButton from "@/components/shared/submitBtn";
-import { useQuoteSwap } from "./hooks/useQuoteSwap";
+import { useQuoteSwap } from "./__hooks__/useQuoteSwap";
 import useGetButtonStatuses from "@/components/shared/hooks/useGetButtonStatuses";
 export default function CurrencyInputs() {
   const { updateState, state } = useSwapProvider();

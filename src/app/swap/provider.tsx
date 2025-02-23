@@ -10,8 +10,9 @@ import React, {
   useReducer,
 } from "react";
 import { useAccount } from "wagmi";
+
 interface SwapProviderType {
-  inputAmount: string;
+  inputAmount: number;
   // acceptedQuote: Quote | undefined;
   signature?: string;
   liquidityHubDisabled: boolean;
