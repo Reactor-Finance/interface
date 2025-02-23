@@ -13,7 +13,7 @@ type SwapRoute = {
   stable: boolean;
 };
 
-export default function useSwapSimulation({
+export function useSwapSimulation({
   amount,
   token0,
   token1,

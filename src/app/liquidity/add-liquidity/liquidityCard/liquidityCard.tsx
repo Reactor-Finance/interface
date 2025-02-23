@@ -23,13 +23,15 @@ export default function LiquidityCard({ poolType }: { poolType: TPoolType }) {
     const param = { token0, token1 };
 
     const afterParse = searchParamsSchema.safeParse(param);
-    return afterParse.success ? {
-      token0: afterParse.data.token0,
-      token1: afterParse.data.token1,
-    } : {
-      token0: undefined,
-      token1: undefined,
-    } 
+    return afterParse.success
+      ? {
+          token0: afterParse.data.token0,
+          token1: afterParse.data.token1,
+        }
+      : {
+          token0: undefined,
+          token1: undefined,
+        };
   }, [params]);
 
   useEffect(() => {

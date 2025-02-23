@@ -9,7 +9,7 @@ import {
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
-import useSwapSimulation from "../__hooks__/useSwapSimulation";
+import { useSwapSimulation } from "../__hooks__/useSwapSimulation";
 import SubmitButton from "@/components/shared/submitBtn";
 import { useQuoteSwap } from "../__hooks__/useQuoteSwap";
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
