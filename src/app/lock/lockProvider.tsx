@@ -1,6 +1,12 @@
 "use client";
 import { Contracts } from "@/lib/contracts";
-import React, { createContext, useContext, useMemo, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useAccount, useReadContract } from "wagmi";
 export type TLockToken = {
   decimals: number;
@@ -44,11 +50,15 @@ export const LockProvider = ({ children }: Props) => {
       enabled: Boolean(address),
     },
   });
-  console.log(tokens, "tokens");
   const [selectedTokenId, setSelectedTokenId] = useState<string>("");
   const selectedLockToken = useMemo(() => {
     return tokens?.find((token) => token.id.toString() === selectedTokenId);
   }, [selectedTokenId, tokens]);
+  useEffect(() => {
+    if (address) {
+      setSelectedTokenId("");
+    }
+  }, [address]);
   return (
     <LiquidityContext.Provider
       value={{

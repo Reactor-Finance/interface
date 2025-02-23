@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Alert } from "@/components/ui/alert";
 import {
@@ -12,12 +12,13 @@ import { Address } from "viem";
 import { useLockProvider } from "../lockProvider";
 import useGetButtonStatuses from "@/components/shared/hooks/useGetButtonStatuses";
 import SubmitButton from "@/components/shared/submitBtn";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function TransferContent() {
   const [toAddress, setAddress] = React.useState("");
   const { selectedLockToken } = useLockProvider();
   const { address } = useAccount();
-  const { data: transferSimulation } = useSimulateContract({
+  const { data: transferSimulation, queryKey } = useSimulateContract({
     ...Contracts.VotingEscrow,
     functionName: "safeTransferFrom",
     args: [
@@ -29,13 +30,21 @@ export default function TransferContent() {
       enabled: Boolean(address) && Boolean(selectedLockToken),
     },
   });
-  const { writeContract, data: hash, isPending } = useWriteContract();
-  const { isLoading } = useWaitForTransactionReceipt({ hash });
+  const { writeContract, data: hash, reset, isPending } = useWriteContract();
+  const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash });
   const onSubmit = () => {
     if (transferSimulation) {
       writeContract(transferSimulation.request);
     }
   };
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    if (isSuccess) {
+      queryClient.invalidateQueries({ queryKey });
+      reset();
+      setAddress("");
+    }
+  }, [isSuccess, queryClient, queryKey, reset]);
   const { state } = useGetButtonStatuses({ isLoading, isPending });
   return (
     <div className="space-y-4 pt-4">
@@ -46,7 +55,7 @@ export default function TransferContent() {
           placeholder="0x..."
           onChange={(e) => setAddress(e.target.value)}
           value={toAddress}
-          className="bg-neutral-950"
+          className="bg-neutral-1000"
         />
       </div>
       <Alert colors={"muted"}>

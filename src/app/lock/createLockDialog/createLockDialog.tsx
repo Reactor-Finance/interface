@@ -13,7 +13,6 @@ import { formatUnits } from "viem";
 import useGetRctBalance from "@/components/shared/hooks/useGetRctBalance";
 import { DAYS_14, RCT_DECIMALS, TWO_YEARS } from "@/data/constants";
 import useCreateLockValidation from "./hooks/useCreateLockValidation";
-import FormErrorMessage from "@/components/shared/formErrorMessage";
 import { useLockProvider } from "../lockProvider";
 import { useQueryClient } from "@tanstack/react-query";
 import SubmitButton from "@/components/shared/submitBtn";
@@ -25,7 +24,6 @@ export default function CreateLockDialog() {
   const [isApproving, setIsApproving] = useState(false);
   const { queryKey } = useLockProvider();
   const queryClient = useQueryClient();
-  const { data: createLockSimulation } = useSimulateCreateLock({ form });
   const { rctBalance, rctQueryKey } = useGetRctBalance();
   const { writeContract, reset, data: hash, isPending } = useWriteContract();
   const { isSuccess, isLoading, isError } = useWaitForTransactionReceipt({
@@ -36,10 +34,15 @@ export default function CreateLockDialog() {
     setForm((prevForm) => ({ ...prevForm, [name]: value }));
   };
   const { error: validationError, isValid } = useCreateLockValidation({ form });
-  const { approveWriteRequest, needsApproval, allowanceKey } = useApproveWrite({
-    spender: Contracts.VotingEscrow.address,
-    tokenAddress: Contracts.Reactor.address, //rct address
-    amount: form.amount,
+  const { approveWriteRequest, needsApproval, allowanceKey, isFetching } =
+    useApproveWrite({
+      spender: Contracts.VotingEscrow.address,
+      tokenAddress: Contracts.Reactor.address, //rct address
+      amount: form.amount,
+    });
+  const { data: createLockSimulation } = useSimulateCreateLock({
+    form,
+    needsApproval,
   });
   const onSubmit = () => {
     if (approveWriteRequest) {
@@ -55,13 +58,14 @@ export default function CreateLockDialog() {
     if (isSuccess || isError) {
       if (isApproving) {
         queryClient.invalidateQueries({ queryKey: allowanceKey });
+        reset();
         setIsApproving(false);
       } else {
         queryClient.invalidateQueries({ queryKey });
         queryClient.invalidateQueries({ queryKey: rctQueryKey });
         setForm({ amount: "", duration: [DAYS_14] });
+        reset();
       }
-      reset();
     }
   }, [
     allowanceKey,
@@ -77,6 +81,7 @@ export default function CreateLockDialog() {
     isLoading,
     isPending,
     needsApproval,
+    isFetching,
   });
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -141,19 +146,16 @@ export default function CreateLockDialog() {
           Locking will give you an NFT, referred to as a veNFT. You can increase
           the Lock amount or extend the Lock time at any point after.
         </Alert>
-        <div>
+        <div className="pt-2">
           <SubmitButton
             state={state}
             onClick={onSubmit}
             isValid={isValid}
             approveTokenSymbol="RCT"
+            validationError={validationError}
           >
             Create Lock
           </SubmitButton>
-
-          {validationError && (
-            <FormErrorMessage>{validationError}</FormErrorMessage>
-          )}
         </div>
       </DialogContent>
     </Dialog>

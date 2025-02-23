@@ -49,10 +49,11 @@ export default function InitializePool() {
     tokenOneAllowance,
     tokenDeposits,
   });
-  const { data: approveSimulation } = useApproveTokens({
-    approveTokenOne: needsApprovals?.tokenOne ?? false,
-    approveTokenTwo: needsApprovals?.tokenTwo ?? false,
-  });
+  const { data: approveSimulation, isLoading: isApproveTokensLoading } =
+    useApproveTokens({
+      approveTokenOne: needsApprovals?.tokenOne ?? false,
+      approveTokenTwo: needsApprovals?.tokenTwo ?? false,
+    });
 
   const isApproving = Boolean(
     needsApprovals?.tokenOne || needsApprovals?.tokenTwo
@@ -131,6 +132,7 @@ export default function InitializePool() {
   const { state } = useGetButtonStatuses({
     isLoading,
     isPending,
+    isFetching: isApproveTokensLoading,
     needsApproval: needsApprovals?.tokenOne || needsApprovals?.tokenTwo,
   });
   return (

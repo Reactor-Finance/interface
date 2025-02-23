@@ -31,25 +31,27 @@ export default function useApproveTokens({
   approveTokenTwo: boolean;
 }) {
   const { tokenOne, tokenTwo } = useLiquidityCardFormProvider();
-  const { data: approveTokenOneRequest } = useSimulateContract({
-    address: tokenOne,
-    abi,
-    functionName: "approve",
-    args: [Contracts.Router.address, maxUint256],
-    query: { enabled: approveTokenOne },
-  });
-  const { data: approveTokenTwoRequest } = useSimulateContract({
-    address: tokenTwo,
-    abi,
-    functionName: "approve",
-    args: [Contracts.Router.address, maxUint256],
-    query: { enabled: approveTokenTwo },
-  });
+  const { data: approveTokenOneRequest, isLoading: isOneLoading } =
+    useSimulateContract({
+      address: tokenOne,
+      abi,
+      functionName: "approve",
+      args: [Contracts.Router.address, maxUint256],
+      query: { enabled: approveTokenOne },
+    });
+  const { data: approveTokenTwoRequest, isLoading: isTwoLoading } =
+    useSimulateContract({
+      address: tokenTwo,
+      abi,
+      functionName: "approve",
+      args: [Contracts.Router.address, maxUint256],
+      query: { enabled: approveTokenTwo },
+    });
   if (approveTokenOne) {
-    return { data: approveTokenOneRequest };
+    return { data: approveTokenOneRequest, isLoading: isOneLoading };
   }
   if (approveTokenTwo) {
-    return { data: approveTokenTwoRequest };
+    return { data: approveTokenTwoRequest, isLoading: isTwoLoading };
   }
-  return { data: undefined };
+  return { data: undefined, isLoading: false };
 }
