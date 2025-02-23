@@ -7,7 +7,7 @@ import { Alert } from "@/components/ui/alert";
 import EstimatesHeader from "../estimateHeader";
 import EstimateRow from "../estimateRow";
 import useSimulateCreateLock from "./hooks/useSimulateCreateLock";
-import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import { useWriteContract } from "wagmi";
 import { Contracts } from "@/lib/contracts";
 import { formatUnits } from "viem";
 import useGetRctBalance from "@/components/shared/hooks/useGetRctBalance";
@@ -18,7 +18,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import SubmitButton from "@/components/shared/submitBtn";
 import useGetButtonStatuses from "@/components/shared/hooks/useGetButtonStatuses";
 import useApproveWrite from "@/components/shared/hooks/useApproveWrite";
+import { useTransactionToastProvider } from "@/providers/TransactionToastProvider";
 export default function CreateLockDialog() {
+  const { txReceipt, updateState } = useTransactionToastProvider();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ amount: "", duration: [DAYS_14] });
   const [isApproving, setIsApproving] = useState(false);
@@ -26,9 +28,13 @@ export default function CreateLockDialog() {
   const queryClient = useQueryClient();
   const { rctBalance, rctQueryKey } = useGetRctBalance();
   const { writeContract, reset, data: hash, isPending } = useWriteContract();
-  const { isSuccess, isLoading, isError } = useWaitForTransactionReceipt({
-    hash,
-  });
+
+  useEffect(() => {
+    updateState({ hash });
+  }, [hash, updateState]);
+
+  const { isSuccess, isLoading, isError } = txReceipt;
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm((prevForm) => ({ ...prevForm, [name]: value }));
@@ -99,7 +105,9 @@ export default function CreateLockDialog() {
         </DialogTitle>
         <div>
           <div className="flex justify-between">
-            <label htmlFor="">Amount to Lock</label>
+            <label className="" htmlFor="">
+              Amount to Lock
+            </label>
             <span className="text-sm">
               <span className="text-neutral-200">Available:</span>{" "}
               {formatUnits(rctBalance ?? 0n, RCT_DECIMALS)} RCT
