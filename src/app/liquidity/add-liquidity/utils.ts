@@ -1,6 +1,6 @@
 import { TPoolType } from "@/lib/types";
 
-export function covertToPoolType(version: string) {
+export function convertToPoolType(version: string) {
   switch (version) {
     case "stable":
       return TPoolType.STABLE;

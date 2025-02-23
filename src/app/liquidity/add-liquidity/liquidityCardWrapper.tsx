@@ -3,7 +3,7 @@ import React, { useMemo } from "react";
 import LiquidityCard from "./liquidityCard/liquidityCard";
 import { useSearchParams } from "next/navigation";
 import { searchParamsSchema } from "./types";
-import { covertToPoolType } from "./utils";
+import { convertToPoolType } from "./utils";
 
 export default function LiquidityCardWrapper() {
   const params = useSearchParams();
@@ -15,7 +15,7 @@ export default function LiquidityCardWrapper() {
     if (a.success) {
       return {
         version: a.data.version,
-        poolType: covertToPoolType(a.data.version),
+        poolType: convertToPoolType(a.data.version),
       };
     }
     return {

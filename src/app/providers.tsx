@@ -14,6 +14,9 @@ import { WagmiProvider } from "wagmi";
 import { HeroUIProvider } from "@heroui/react";
 import { TRPCReactProvider } from "@/trpc/react";
 import { TokenlistContextProvider } from "@/contexts/tokenlistContext";
+import { PersistGate } from "redux-persist/integration/react";
+import { Provider as ReduxProvider } from "react-redux";
+import { persistor, store } from "@/store";
 
 export const wagmiConfig = getDefaultConfig({
   appName: "Reactor Finance",
@@ -33,20 +36,24 @@ const queryClient = new QueryClient({
 
 export const Providers: FC<PropsWithChildren> = ({ children }) => {
   return (
-    <WagmiProvider config={wagmiConfig}>
-      <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider theme={darkTheme()}>
-          <TokenlistContextProvider>
-            <TRPCReactProvider>
-              <HeroUIProvider className="flex min-h-svh flex-col ">
-                {/* Header goes here */}
-                {children}
-                {/* Footer goes here */}
-              </HeroUIProvider>
-            </TRPCReactProvider>
-          </TokenlistContextProvider>
-        </RainbowKitProvider>
-      </QueryClientProvider>
-    </WagmiProvider>
+    <ReduxProvider store={store}>
+      <PersistGate persistor={persistor}>
+        <WagmiProvider config={wagmiConfig}>
+          <QueryClientProvider client={queryClient}>
+            <RainbowKitProvider theme={darkTheme()}>
+              <TokenlistContextProvider>
+                <TRPCReactProvider>
+                  <HeroUIProvider className="flex min-h-svh flex-col ">
+                    {/* Header goes here */}
+                    {children}
+                    {/* Footer goes here */}
+                  </HeroUIProvider>
+                </TRPCReactProvider>
+              </TokenlistContextProvider>
+            </RainbowKitProvider>
+          </QueryClientProvider>
+        </WagmiProvider>
+      </PersistGate>
+    </ReduxProvider>
   );
 };

@@ -4,12 +4,14 @@ interface SettingsType {
   slippage: number;
   transactionDeadlineInMinutes: number;
   liquidityHubEnabled: boolean;
+  multihopsEnabled: boolean;
 }
 
 const initialState: SettingsType = {
   transactionDeadlineInMinutes: 10,
   slippage: 0.1,
   liquidityHubEnabled: false,
+  multihopsEnabled: false,
 };
 
 const settingsSlice = createSlice({
@@ -24,6 +26,9 @@ const settingsSlice = createSlice({
     },
     switchLiquidityHub: (state) => {
       state.liquidityHubEnabled = !state.liquidityHubEnabled;
+    },
+    switchMultihopsOptions: (state) => {
+      state.multihopsEnabled = !state.multihopsEnabled;
     },
   },
 });

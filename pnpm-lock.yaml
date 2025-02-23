@@ -57,7 +57,7 @@ importers:
         version: 2.2.3(@tanstack/react-query@5.66.0(react@18.3.1))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(viem@2.23.0(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1))(wagmi@2.14.11(@tanstack/query-core@5.66.0)(@tanstack/react-query@5.66.0(react@18.3.1))(@types/react@18.3.18)(bufferutil@4.0.9)(immer@10.1.1)(react@18.3.1)(typescript@5.7.3)(utf-8-validate@5.0.10)(viem@2.23.0(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1))(zod@3.24.1))
       "@reduxjs/toolkit":
         specifier: ^2.5.1
-        version: 2.5.1(react@18.3.1)
+        version: 2.5.1(react-redux@9.2.0(@types/react@18.3.18)(react@18.3.1)(redux@5.0.1))(react@18.3.1)
       "@t3-oss/env-nextjs":
         specifier: ^0.12.0
         version: 0.12.0(typescript@5.7.3)(zod@3.24.1)
@@ -136,6 +136,9 @@ importers:
       react-query-kit:
         specifier: ^3.3.1
         version: 3.3.1(@tanstack/react-query@5.66.0(react@18.3.1))
+      react-redux:
+        specifier: ^9.2.0
+        version: 9.2.0(@types/react@18.3.18)(react@18.3.1)(redux@5.0.1)
       recharts:
         specifier: ^2.15.1
         version: 2.15.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -5440,6 +5443,12 @@ packages:
     resolution:
       {
         integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==,
+      }
+
+  "@types/use-sync-external-store@0.0.6":
+    resolution:
+      {
+        integrity: sha512-zFDAD+tlpf2r4asuHEj0XH6pY6i0g5NeAHPn+15wk3BV6JA69eERFXC1gyGThDkVa1zCyKr5jox1+2LbV/AMLg==,
       }
 
   "@types/yargs-parser@21.0.3":
@@ -10761,6 +10770,21 @@ packages:
       "@tanstack/react-query": "*"
     peerDependenciesMeta:
       "@tanstack/react-query":
+        optional: true
+
+  react-redux@9.2.0:
+    resolution:
+      {
+        integrity: sha512-ROY9fvHhwOD9ySfrF0wmvu//bKCQ6AeZZq1nJNtbDC+kk5DuSuNX/n6YWYF/SYy7bSba4D4FSz8DJeKY/S/r+g==,
+      }
+    peerDependencies:
+      "@types/react": ^18.2.25 || ^19
+      react: ^18.0 || ^19
+      redux: ^5.0.0
+    peerDependenciesMeta:
+      "@types/react":
+        optional: true
+      redux:
         optional: true
 
   react-remove-scroll-bar@2.3.8:
@@ -17297,7 +17321,7 @@ snapshots:
       "@react-types/shared": 3.27.0(react@18.3.1)
       react: 18.3.1
 
-  "@reduxjs/toolkit@2.5.1(react@18.3.1)":
+  "@reduxjs/toolkit@2.5.1(react-redux@9.2.0(@types/react@18.3.18)(react@18.3.1)(redux@5.0.1))(react@18.3.1)":
     dependencies:
       immer: 10.1.1
       redux: 5.0.1
@@ -17305,6 +17329,7 @@ snapshots:
       reselect: 5.1.1
     optionalDependencies:
       react: 18.3.1
+      react-redux: 9.2.0(@types/react@18.3.18)(react@18.3.1)(redux@5.0.1)
 
   "@rollup/plugin-babel@5.3.1(@babel/core@7.26.8)(@types/babel__core@7.20.5)(rollup@2.79.2)":
     dependencies:
@@ -17738,6 +17763,8 @@ snapshots:
   "@types/tough-cookie@4.0.5": {}
 
   "@types/trusted-types@2.0.7": {}
+
+  "@types/use-sync-external-store@0.0.6": {}
 
   "@types/yargs-parser@21.0.3": {}
 
@@ -21495,6 +21522,15 @@ snapshots:
   react-query-kit@3.3.1(@tanstack/react-query@5.66.0(react@18.3.1)):
     optionalDependencies:
       "@tanstack/react-query": 5.66.0(react@18.3.1)
+
+  react-redux@9.2.0(@types/react@18.3.18)(react@18.3.1)(redux@5.0.1):
+    dependencies:
+      "@types/use-sync-external-store": 0.0.6
+      react: 18.3.1
+      use-sync-external-store: 1.4.0(react@18.3.1)
+    optionalDependencies:
+      "@types/react": 18.3.18
+      redux: 5.0.1
 
   react-remove-scroll-bar@2.3.8(@types/react@18.3.18)(react@18.3.1):
     dependencies:

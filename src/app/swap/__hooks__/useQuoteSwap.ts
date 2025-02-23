@@ -5,11 +5,15 @@ import { useMemo } from "react";
 import { TToken } from "@/lib/types";
 import { TRADE_HELPER } from "@/data/constants";
 
-export function useQuoteSwap(
-  amountIn: number = 0,
-  tokenIn: TToken | null,
-  tokenOut: TToken | null
-) {
+export function useQuoteSwap({
+  amountIn = 0,
+  tokenIn,
+  tokenOut,
+}: {
+  amountIn: number;
+  tokenIn: TToken | null;
+  tokenOut: TToken | null;
+}) {
   const chainId = useChainId();
   const address = useMemo(() => TRADE_HELPER[chainId], []);
   const {
@@ -39,11 +43,7 @@ export function useQuoteSwap(
 
   useWatchBlocks({
     onBlock: () => {
-      refetch()
-        .then(() => {
-          console.info("Refetching swap quote");
-        })
-        .catch(console.debug);
+      void refetch();
     },
   });
 

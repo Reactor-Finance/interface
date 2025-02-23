@@ -5,46 +5,47 @@ import { useSearchParams, useRouter } from "next/navigation";
 import InitializePool from "./initializePool";
 import Stable from "./stable";
 import { z } from "zod";
-import { TAddress, TPoolType } from "@/lib/types";
+import { TPoolType } from "@/lib/types";
 import { LiquidityCardFormProvider } from "./liquidityCardFormProvider";
+import { isAddress } from "viem";
+
 const searchParamsSchema = z.object({
-  tokenOneAddress: z.string().length(42).startsWith("0x"),
-  tokenTwoAddress: z.string().length(42).startsWith("0x"),
+  token0: z.string().refine((arg) => isAddress(arg)),
+  token1: z.string().refine((arg) => isAddress(arg)),
 });
+
 export default function LiquidityCard({ poolType }: { poolType: TPoolType }) {
   const params = useSearchParams();
   const router = useRouter();
-  const { tokenOneAddress, tokenTwoAddress } = useMemo(() => {
-    const tokenOneAddress = params.get("tokenOne");
-    const tokenTwoAddress = params.get("tokenTwo");
-    const param = { tokenOneAddress, tokenTwoAddress };
+  const { token0, token1 } = useMemo(() => {
+    const token0 = params.get("tokenO");
+    const token1 = params.get("token1");
+    const param = { token0, token1 };
 
-    const a = searchParamsSchema.safeParse(param);
-    if (a.success) {
-      return {
-        tokenOneAddress: a.data.tokenOneAddress as TAddress,
-        tokenTwoAddress: a.data.tokenTwoAddress as TAddress,
-      };
-    }
-    return {
-      tokenOneAddress: undefined,
-      tokenTwoAddress: undefined,
-    };
+    const afterParse = searchParamsSchema.safeParse(param);
+    return afterParse.success ? {
+      token0: afterParse.data.token0,
+      token1: afterParse.data.token1,
+    } : {
+      token0: undefined,
+      token1: undefined,
+    } 
   }, [params]);
+
   useEffect(() => {
-    if (!tokenOneAddress || !tokenTwoAddress) {
+    if (!token0 || !token1) {
       // router.push("/");
     }
-  }, [router, tokenOneAddress, tokenTwoAddress]);
+  }, [router, token0, token1]);
   const found = false;
-  if (!tokenOneAddress || !tokenTwoAddress) {
+  if (!token0 || !token1) {
     return;
   }
-  return (
+  return !token0 || !token1 ? undefined : (
     <LiquidityCardFormProvider
       poolType={poolType}
-      tokenOne={tokenOneAddress}
-      tokenTwo={tokenTwoAddress}
+      tokenOne={token0}
+      tokenTwo={token1}
     >
       <Card
         border="900"

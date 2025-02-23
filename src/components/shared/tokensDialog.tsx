@@ -14,10 +14,12 @@ export default function TokensDailog({
   open,
   onOpen,
   onTokenSelected,
+  selectedTokens,
 }: {
   open?: boolean;
   onOpen?: (b: boolean) => void;
   onTokenSelected: (token: TToken) => void;
+  selectedTokens: `0x${string}`[];
 }) {
   const [value, setValue] = useState("");
   const { data: tokenlist = [] } = api.tokens.getTokens.useQuery({
@@ -46,17 +48,19 @@ export default function TokensDailog({
               Tokens ({tokenlist.length})
             </h2>
             <div className=" h-[calc(100%-22px)] space-y-2 scrollbar overflow-y-auto pb-2 px-2">
-              {tokenlist.map((token) => {
-                return (
-                  <TokenItem
-                    token={token}
-                    selectToken={(token) => {
-                      onTokenSelected(token);
-                    }}
-                    key={token.address}
-                  />
-                );
-              })}
+              {tokenlist
+                .filter((token) => !selectedTokens.includes(token.address))
+                .map((token) => {
+                  return (
+                    <TokenItem
+                      token={token}
+                      selectToken={(token) => {
+                        onTokenSelected(token);
+                      }}
+                      key={token.address}
+                    />
+                  );
+                })}
             </div>
           </div>
 

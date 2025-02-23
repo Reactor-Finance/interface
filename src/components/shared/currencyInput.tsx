@@ -13,11 +13,13 @@ function NumberInput<T extends FieldValues>({
   disabled,
   onChangeValue,
   decimals,
+  value,
 }: {
   disabled: boolean;
   decimals: number;
-  onChangeValue: (value: string) => void;
+  onChangeValue?: (value: string) => void;
   field?: ControllerRenderProps<T>;
+  value?: string | number;
 }) {
   return (
     <Input
@@ -30,8 +32,12 @@ function NumberInput<T extends FieldValues>({
       placeholder="0"
       minLength={1}
       step="any"
+      value={value}
       onChange={(e) => {
-        if (inputPatternNumberMatch(e.target.value, decimals)) {
+        if (
+          inputPatternNumberMatch(e.target.value, decimals) &&
+          onChangeValue
+        ) {
           return onChangeValue(e.target.value);
         }
       }}

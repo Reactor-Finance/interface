@@ -1,5 +1,5 @@
 import { Address, erc20Abi, maxUint256, parseUnits } from "viem";
-import { useSimulateContract } from "wagmi";
+import { useSimulateContract, useWatchBlocks } from "wagmi";
 import useGetAllowance from "./useGetAllowance";
 
 /**
@@ -15,16 +15,19 @@ export default function useApproveWrite({
   spender,
   tokenAddress,
   amount,
+  decimals = 18,
 }: {
   tokenAddress: Address | undefined;
   spender: Address;
   // token: TToken | null;
   amount: string;
+  decimals?: number;
 }) {
   const {
-    data: allowance,
+    data: allowance = BigInt(0),
     queryKey,
     isFetching,
+    refetch,
   } = useGetAllowance({
     tokenAddress,
     spender,
@@ -35,19 +38,24 @@ export default function useApproveWrite({
     functionName: "approve",
     args: [spender, maxUint256],
   });
-  if ((allowance ?? 0n) < parseUnits(amount, 18) && data?.request) {
-    return {
-      approveWriteRequest: data?.request,
-      needsApproval: true,
-      allowanceKey: queryKey,
-      isFetching,
-    };
-  } else {
-    return {
-      approveWriteRequest: undefined,
-      needsApproval: false,
-      allowanceKey: queryKey,
-      isFetching,
-    };
-  }
+
+  useWatchBlocks({
+    onBlock: () => {
+      void refetch();
+    },
+  });
+
+  return allowance < parseUnits(amount, decimals) && !!data?.request
+    ? {
+        approveWriteRequest: data.request,
+        needsApproval: true,
+        allowanceKey: queryKey,
+        isFetching,
+      }
+    : {
+        approveWriteRequest: undefined,
+        needsApproval: false,
+        allowanceKey: queryKey,
+        isFetching,
+      };
 }
