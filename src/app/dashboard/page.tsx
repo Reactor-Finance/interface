@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState } from "react";
 import Headers from "@/components/ui/headers";
 import Image from "next/image";
@@ -7,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import InnerLabelInput from "./input";
 import PageMarginContainer from "@/components/ui/pageMarginContainer";
 import wheel from "@/assets/wheel.svg";
-import PoolTable from "./pool_table";
+import { DashboardLiquidityProvider } from "./dashLiquidityProvider";
+import DashboardLiquidityTable from "./dashboardLiquidityTable";
 
 export default function Dashboard() {
   const [isPoolTableOpen, setIsPoolTableOpen] = useState(false);
@@ -34,35 +34,38 @@ export default function Dashboard() {
           </div>
         </div>
         <div className="pt-6"></div>
-        <div>
-          <div className="flex justify-between">
-            <Headers.InfoHeaderTwo
-              popupContent={<div>explanation goes here</div>}
-            >
-              Deposit & Staked Liquidity
-            </Headers.InfoHeaderTwo>
-            <Button variant={"primary"} size="md">
-              New Deposit
-            </Button>
-          </div>
-          <div className="pt-6"></div>
-          {isPoolTableOpen ? (
-            <PoolTable />
-          ) : (
-            <div className="text-start rounded-sm bg-neutral-1000 font-medium text-neutral-400 py-4 px-6">
-              To receive emissions{" "}
-              <span
-                className="underline decoration-gray-500 font-semibold cursor-pointer text-white"
-                onClick={() => {
-                  setIsPoolTableOpen(true);
-                }}
+        <DashboardLiquidityProvider>
+          <div>
+            <div className="flex justify-between">
+              <Headers.InfoHeaderTwo
+                popupContent={<div>explanation goes here</div>}
               >
-                deposit and stake
-              </span>{" "}
-              your liquidity first.
+                Deposit & Staked Liquidity
+              </Headers.InfoHeaderTwo>
+              <Button variant={"primary"} size="md">
+                New Deposit
+              </Button>
             </div>
-          )}
-        </div>
+            <div className="pt-6"></div>
+            <DashboardLiquidityTable />
+            {isPoolTableOpen ? (
+              <></>
+            ) : (
+              <div className="text-start rounded-sm bg-neutral-1000 font-medium text-neutral-400 py-4 px-6">
+                To receive emissions{" "}
+                <span
+                  className="underline decoration-gray-500 font-semibold cursor-pointer text-white"
+                  onClick={() => {
+                    setIsPoolTableOpen(true);
+                  }}
+                >
+                  deposit and stake
+                </span>{" "}
+                your liquidity first.
+              </div>
+            )}
+          </div>
+        </DashboardLiquidityProvider>
         <div className="pt-16"></div>
         <Headers.InfoHeaderTwo popupContent={<div>explanation goes here</div>}>
           Locks

@@ -6,11 +6,17 @@ interface Props {
   poolType: TPoolType;
   tokenOne: TToken;
   tokenTwo: TToken;
+  number?: string;
 }
-export default function PoolHeader({ poolType, tokenOne, tokenTwo }: Props) {
+export default function PoolHeader({
+  poolType,
+  tokenOne,
+  tokenTwo,
+  number,
+}: Props) {
   return (
     <div className="flex gap-x-4 items-center">
-      <span>1</span>
+      {number && <span>{number}</span>}
       <div className="flex gap-x-2 items-center">
         <CurrenciesOverlapIcons
           tokenOne={{
