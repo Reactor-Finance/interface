@@ -10,7 +10,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { monadTestnet } from "wagmi/chains";
 import { hashFn } from "@wagmi/core/query";
 import { FC, PropsWithChildren } from "react";
-import { http, WagmiProvider } from "wagmi";
+import { WagmiProvider } from "wagmi";
 import { HeroUIProvider } from "@heroui/react";
 import { TRPCReactProvider } from "@/trpc/react";
 import { TokenlistContextProvider } from "@/contexts/tokenlistContext";
