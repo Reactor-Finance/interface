@@ -2,11 +2,13 @@ import React from "react";
 import swap from "@/assets/swap.svg";
 import Image from "next/image";
 import { forwardRef } from "react";
+
 interface Props extends React.HTMLProps<HTMLDivElement> {
-  swapClick: () => void;
+  swapIconClick: () => void;
 }
+
 const SwapIconBorder = forwardRef<HTMLDivElement, Props>(
-  ({ className, swapClick, ...props }, ref) => {
+  ({ className, swapIconClick, ...props }, ref) => {
     return (
       <div
         ref={ref}
@@ -15,7 +17,7 @@ const SwapIconBorder = forwardRef<HTMLDivElement, Props>(
       >
         <button
           type="button"
-          onClick={swapClick}
+          onClick={swapIconClick}
           className="bg-neutral-950 cursor-pointer p-2 rounded-md"
         >
           <Image src={swap} alt="swap" width={18} height={18} />

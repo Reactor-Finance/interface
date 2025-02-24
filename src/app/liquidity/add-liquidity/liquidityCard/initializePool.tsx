@@ -11,7 +11,8 @@ import useInitializePoolValidation from "./hooks/useInitializePoolValidation";
 import { useQueryClient } from "@tanstack/react-query";
 import { api } from "@/trpc/react";
 import SubmitButton from "@/components/shared/submitBtn";
-import useGetButtonStatuses from "@/components/shared/hooks/useGetButtonStatuses";
+import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
+
 export default function InitializePool() {
   const {
     tokenOne,

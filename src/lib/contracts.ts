@@ -1,5 +1,5 @@
 import { ContractsAbi } from "./abis/contractsAbi";
-import { env } from "@/app/env";
+import { env } from "@/env";
 import { monadTestnet } from "./abis/monadTestnet";
 
 const ABIs = {

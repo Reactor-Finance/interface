@@ -1,37 +1,30 @@
 import React from "react";
 import CurrenciesOverlapIcons from "./currenciesOverlapIcons";
 import { Badge } from "../ui/badge";
-import { TAddress, TPoolType, TToken } from "@/lib/types";
+import { TPoolType, TToken } from "@/lib/types";
+
 interface Props {
   poolType: TPoolType;
-  tokenOne: TToken;
-  tokenTwo: TToken;
+  token0: TToken;
+  token1: TToken;
   number?: string;
 }
+
 export default function PoolHeader({
   poolType,
-  tokenOne,
-  tokenTwo,
+  token0,
+  token1,
   number,
 }: Props) {
   return (
     <div className="flex gap-x-4 items-center">
       {number && <span>{number}</span>}
       <div className="flex gap-x-2 items-center">
-        <CurrenciesOverlapIcons
-          tokenOne={{
-            alt: tokenOne.symbol,
-            address: tokenOne.address as TAddress,
-          }}
-          tokenTwo={{
-            alt: tokenTwo.symbol,
-            address: tokenTwo.address as TAddress,
-          }}
-        />
+        <CurrenciesOverlapIcons token0={token0} token1={token1} />
         <div>
           <h4>
-            {`${poolType === TPoolType.STABLE ? "s" : "v"}AMM`}-
-            {tokenOne.symbol}/{tokenTwo.symbol}
+            {`${poolType === TPoolType.STABLE ? "sAMM" : "vAMM"}`}-
+            {token0.symbol}/{token1.symbol}
           </h4>
           <div className="space-x-1">
             <PoolBadge poolType={poolType} />

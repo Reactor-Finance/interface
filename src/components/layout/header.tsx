@@ -5,6 +5,7 @@ import reactor from "@/assets/reactor.svg";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { CustomConnectButton } from "./customConnectButton";
+
 export default function Header() {
   return (
     <div className="h-[88px] px-8 items-center grid grid-cols-3">

@@ -5,13 +5,14 @@ import PageMarginContainer from "@/components/ui/pageMarginContainer";
 import React, { useCallback, useMemo, useState } from "react";
 import { Alert } from "@/components/ui/alert";
 import { ChevronDown } from "lucide-react";
-import SearchTokensDailog from "@/components/shared/searchTokensDialog";
+import SearchTokensDailog from "@/components/shared/tokensDialog";
 import ImageWithFallback from "@/components/shared/imageWithFallback";
 import { getLogoAsset } from "@/utils";
 import { TAddress, TPoolType, TToken } from "@/lib/types";
 import AvailablePoolRow from "./availablePoolRow";
 import { api } from "@/trpc/react";
 import { getAddress } from "viem";
+
 export default function Page() {
   const [openOne, setOpenTokenOne] = useState(false);
   const [openTwo, setOpenTokenTwo] = useState(false);

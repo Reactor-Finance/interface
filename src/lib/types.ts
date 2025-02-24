@@ -1,13 +1,33 @@
 // GLOBAL TYPES
 
-export type TAddress = `0x${string}`;
+import { isAddress } from "viem";
+import { z } from "zod";
+
+export const TokenlistSchema = z.array(
+  z
+    .object({
+      name: z.string(),
+      symbol: z.string(),
+      address: z.string().refine((arg) => isAddress(arg)),
+      logoURI: z.union([z.string().url().min(1), z.string().base64().min(1)]),
+      decimals: z
+        .number()
+        .int()
+        .max(2 ** 8),
+      chainId: z.number().int(),
+    })
+    .strict()
+);
+
+export type TAddress = `0x${string}` | string;
+
 export enum TPoolType {
   "CONCENTRATED",
   "STABLE",
   "VOLATILE",
 }
 
-export type TToken = { address: TAddress; symbol: string; decimals: number };
+export type TToken = z.infer<typeof TokenlistSchema.element>;
 
 export enum SwapSteps {
   Wrap,
