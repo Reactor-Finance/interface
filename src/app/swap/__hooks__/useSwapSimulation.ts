@@ -1,8 +1,8 @@
 import * as Router from "@/lib/abis/Router";
 import { useAccount, useChainId, useSimulateContract } from "wagmi";
 import { useMemo } from "react";
-import { parseUnits, zeroAddress } from "viem";
-import { ROUTER, WETH } from "@/data/constants";
+import { parseEther, parseUnits, zeroAddress } from "viem";
+import { ETHER, ROUTER, WETH } from "@/data/constants";
 import { TToken } from "@/lib/types";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
@@ -37,7 +37,11 @@ export function useSwapSimulation({
   );
   const routes: SwapRoute[] = useMemo(
     () =>
-      multihopsEnabled
+      multihopsEnabled &&
+      token0?.address.toLowerCase() !== weth.toLowerCase() &&
+      token1?.address.toLowerCase() !== weth.toLowerCase() &&
+      token0?.address.toLowerCase() !== ETHER.toLowerCase() &&
+      token1?.address.toLowerCase() !== ETHER.toLowerCase()
         ? [
             { from: token0?.address ?? zeroAddress, to: weth, stable: false },
             { from: weth, to: token1?.address ?? zeroAddress, stable: false },
@@ -54,8 +58,16 @@ export function useSwapSimulation({
   const deadline = useMemo(() => {
     const ttl =
       Math.floor(Date.now() / 1000) + transactionDeadlineInMinutes * 60;
-    return BigInt(ttl);
+    return () => BigInt(ttl);
   }, [transactionDeadlineInMinutes]);
+  const msgValue = useMemo(
+    () =>
+      token0?.address.toLowerCase() === weth.toLowerCase() ||
+      token0?.address.toLowerCase() === ETHER.toLowerCase()
+        ? parseEther(String(amount))
+        : BigInt(0),
+    []
+  );
   return useSimulateContract({
     ...Router,
     address: router,
@@ -65,9 +77,10 @@ export function useSwapSimulation({
       calculateMinOut(amountIn, slippage),
       routes,
       address ?? zeroAddress,
-      deadline,
+      deadline(),
       true,
     ],
+    value: msgValue,
     query: {
       enabled: !!address && !!token0 && !!token1 && amount !== null,
     },
@@ -75,7 +88,7 @@ export function useSwapSimulation({
 }
 
 function calculateMinOut(amount: bigint, slippagePercentage: number) {
-  const slippage = (amount * BigInt(slippagePercentage)) / BigInt(100);
-  const minAmount = amount - slippage;
-  return minAmount;
+  const slippage = (Number(amount) * slippagePercentage) / 100;
+  const minAmount = Number(amount) - slippage;
+  return BigInt(minAmount);
 }

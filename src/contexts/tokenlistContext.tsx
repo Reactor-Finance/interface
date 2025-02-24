@@ -1,5 +1,7 @@
+"use client";
+
 import { TToken } from "@/lib/types";
-import { getTokenlist } from "@/server/queries/tokens";
+import { api } from "@/trpc/react";
 import React, {
   createContext,
   ReactNode,
@@ -13,40 +15,47 @@ interface TokenlistContextType {
   tokenlist: TToken[];
   loading: boolean;
   error?: any;
+  setSearchQuery: (query: string) => void;
+  searchQuery: string;
 }
 
 const TokenlistContext = createContext<TokenlistContextType>({
   tokenlist: [],
   loading: false,
   error: null,
+  setSearchQuery: console.log,
+  searchQuery: "",
 });
+
+function useSetInterval(cb: () => void, INTERVAL = 60000) {
+  return useEffect(() => {
+    const interval = setInterval(cb, INTERVAL);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [INTERVAL]);
+}
 
 export const TokenlistContextProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<any>(null);
-  const [tokenlist, setTokenlist] = useState<TToken[]>([]);
   const chainId = useChainId();
+  const [searchQuery, setSearchQuery] = useState("");
+  const {
+    data: tokenlist = [],
+    isLoading: loading,
+    error,
+    refetch,
+  } = api.tokens.getTokens.useQuery({ chainId, searchQuery });
 
-  useEffect(() => {
-    async function fetchTokens() {
-      try {
-        setLoading(true);
-        const list = await getTokenlist(chainId);
-        setTokenlist(list);
-        setLoading(false);
-      } catch (error: any) {
-        setError(error);
-        setLoading(false);
-      }
-    }
-
-    fetchTokens();
-  }, [chainId]);
+  useSetInterval(() => {
+    void refetch();
+  });
 
   return (
-    <TokenlistContext.Provider value={{ tokenlist, loading, error }}>
+    <TokenlistContext.Provider
+      value={{ tokenlist, loading, error, setSearchQuery, searchQuery }}
+    >
       {children}
     </TokenlistContext.Provider>
   );

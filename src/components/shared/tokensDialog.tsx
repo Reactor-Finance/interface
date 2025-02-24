@@ -9,6 +9,9 @@ import SearchInput from "@/components/shared/searchInput";
 import ImageWithFallback from "@/components/shared/imageWithFallback";
 import { api } from "@/trpc/react";
 import { TToken } from "@/lib/types";
+import { useTokenlistContext } from "@/contexts/tokenlistContext";
+import { useGetBalance } from "@/lib/hooks/useGetBalance";
+import { formatUnits } from "viem";
 
 export default function TokensDailog({
   open,
@@ -21,10 +24,7 @@ export default function TokensDailog({
   onTokenSelected: (token: TToken) => void;
   selectedTokens: `0x${string}`[];
 }) {
-  const [value, setValue] = useState("");
-  const { data: tokenlist = [] } = api.tokens.getTokens.useQuery({
-    searchQuery: value,
-  });
+  const { tokenlist, setSearchQuery, searchQuery } = useTokenlistContext();
 
   return (
     <Dialog open={open} onOpenChange={onOpen}>
@@ -36,12 +36,7 @@ export default function TokensDailog({
           <div className="space-y-6 px-6">
             <DialogTitle className="font-geistMono">Select a token</DialogTitle>
             {/* <h1 className="font-geistMono">Select a token</h1> */}
-            <SearchInput
-              setValue={(s: string) => {
-                setValue(s);
-              }}
-              value={value}
-            />
+            <SearchInput setValue={setSearchQuery} value={searchQuery} />
           </div>
           <div className="relative z-0 h-[calc(100%-179px)] border-t border-gray-600  ">
             <h2 className="py-3 font-geistMono text-[14px] text-[#999999] pl-6">
@@ -56,6 +51,7 @@ export default function TokensDailog({
                       token={token}
                       selectToken={(token) => {
                         onTokenSelected(token);
+                        if (onOpen) onOpen(false);
                       }}
                       key={token.address}
                     />
@@ -89,6 +85,7 @@ function TokenItem({
   token: TToken;
   selectToken: (token: TToken) => void;
 }) {
+  const balance = useGetBalance({ tokenAddress: token.address });
   return (
     <button
       type="button"
@@ -114,7 +111,15 @@ function TokenItem({
       </div>
       <div className="flex flex-col items-end font-geistMono">
         <div>
-          <span>0</span>
+          <span>
+            {Number(formatUnits(balance, token.decimals)).toLocaleString(
+              "en-US",
+              {
+                useGrouping: true,
+                maximumFractionDigits: 3,
+              }
+            )}
+          </span>
         </div>
         <div>
           <span className="text-gray-400">$0</span>

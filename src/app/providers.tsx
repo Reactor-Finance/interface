@@ -10,7 +10,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { monadTestnet } from "wagmi/chains";
 import { hashFn } from "@wagmi/core/query";
 import { FC, PropsWithChildren } from "react";
-import { WagmiProvider } from "wagmi";
+import { http, WagmiProvider } from "wagmi";
 import { HeroUIProvider } from "@heroui/react";
 import { TRPCReactProvider } from "@/trpc/react";
 import { TokenlistContextProvider } from "@/contexts/tokenlistContext";
@@ -41,15 +41,15 @@ export const Providers: FC<PropsWithChildren> = ({ children }) => {
         <WagmiProvider config={wagmiConfig}>
           <QueryClientProvider client={queryClient}>
             <RainbowKitProvider theme={darkTheme()}>
-              <TokenlistContextProvider>
-                <TRPCReactProvider>
+              <TRPCReactProvider>
+                <TokenlistContextProvider>
                   <HeroUIProvider className="flex min-h-svh flex-col ">
                     {/* Header goes here */}
                     {children}
                     {/* Footer goes here */}
                   </HeroUIProvider>
-                </TRPCReactProvider>
-              </TokenlistContextProvider>
+                </TokenlistContextProvider>
+              </TRPCReactProvider>
             </RainbowKitProvider>
           </QueryClientProvider>
         </WagmiProvider>

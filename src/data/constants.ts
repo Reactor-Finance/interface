@@ -19,3 +19,4 @@ export const ROUTER: { [key: number]: `0x${string}` } = {
 export const WETH: { [key: number]: `0x${string}` } = {
   [ChainId.MONAD_TESTNET]: "0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701",
 };
+export const ETHER = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";

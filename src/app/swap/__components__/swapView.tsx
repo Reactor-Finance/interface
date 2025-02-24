@@ -16,6 +16,7 @@ import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStat
 import { TToken } from "@/lib/types";
 import { ROUTER } from "@/data/constants";
 import { zeroAddress } from "viem";
+import { useWETHExecutions } from "../__hooks__/useWETHExecutions";
 
 export default function SwapView() {
   // Wagmi parameters
@@ -52,11 +53,21 @@ export default function SwapView() {
     decimals: token0?.decimals,
   });
 
+  // Simulate swap
   const { data: swapSimulation } = useSwapSimulation({
     amount: amountIn,
     token0,
     token1,
   });
+
+  // Simulate WETH process
+  const { isIntrinsicWETHProcess, WETHProcessSimulation, isWETHToEther } =
+    useWETHExecutions({
+      amount: amountIn,
+      token0,
+      token1,
+    });
+
   const { writeContract, isPending, data: hash } = useWriteContract();
   const { isLoading } = useWaitForTransactionReceipt({ hash });
 
@@ -69,6 +80,12 @@ export default function SwapView() {
   }, [token0, token1]);
 
   const onSubmit = useCallback(() => {
+    if (isIntrinsicWETHProcess && WETHProcessSimulation.data) {
+      const request = WETHProcessSimulation.data.request;
+      writeContract(request as any);
+      return;
+    }
+
     if (approveWriteRequest && needsApproval) {
       writeContract(approveWriteRequest);
       return;
@@ -134,11 +151,17 @@ export default function SwapView() {
       <div className="pt-2">
         <SubmitButton
           state={buttonState}
-          isValid={Boolean(swapSimulation)}
+          isValid={
+            Boolean(swapSimulation) || Boolean(WETHProcessSimulation.data)
+          }
           approveTokenSymbol={token0?.symbol}
           onClick={onSubmit}
         >
-          Swap
+          {isIntrinsicWETHProcess
+            ? isWETHToEther
+              ? "Unwrap"
+              : "Wrap"
+            : "Swap"}
         </SubmitButton>
       </div>
     </div>
