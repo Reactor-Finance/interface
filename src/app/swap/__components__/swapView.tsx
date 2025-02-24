@@ -112,12 +112,14 @@ export default function SwapView() {
       writeContract(swapSimulation.request);
     }
   }, [
+    isIntrinsicWETHProcess,
     approveWriteRequest,
     needsApproval,
     swapSimulation,
+    isToken0,
+    WETHProcessSimulation?.depositSimulation?.data?.request,
+    WETHProcessSimulation?.withdrawalSimulation?.data?.request,
     writeContract,
-    isIntrinsicWETHProcess,
-    WETHProcessSimulation,
   ]);
 
   const { state: buttonState } = useGetButtonStatuses({
@@ -184,7 +186,9 @@ export default function SwapView() {
         <SubmitButton
           state={buttonState}
           isValid={
-            Boolean(swapSimulation) || Boolean(WETHProcessSimulation.data)
+            Boolean(swapSimulation) ||
+            Boolean(WETHProcessSimulation.depositSimulation.data) ||
+            Boolean(WETHProcessSimulation.withdrawalSimulation.data)
           }
           approveTokenSymbol={token0?.symbol}
           onClick={onSubmit}
