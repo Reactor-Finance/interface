@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import SwapIconBorder from "@/components/shared/swapIconBorder";
 import CurrencyInput from "@/components/shared/currencyInput";
 import TokensDailog from "@/components/shared/tokensDialog";
@@ -68,7 +68,12 @@ export default function SwapView() {
       token1,
     });
 
-  const { writeContract, isPending, data: hash } = useWriteContract();
+  const {
+    writeContract,
+    isPending,
+    data: hash,
+    error: writeError,
+  } = useWriteContract();
   const { isLoading } = useWaitForTransactionReceipt({ hash });
 
   const switchTokens = useCallback(() => {
@@ -93,13 +98,27 @@ export default function SwapView() {
     if (swapSimulation) {
       writeContract(swapSimulation.request);
     }
-  }, [approveWriteRequest, needsApproval, swapSimulation, writeContract]);
+  }, [
+    approveWriteRequest,
+    needsApproval,
+    swapSimulation,
+    writeContract,
+    isIntrinsicWETHProcess,
+    WETHProcessSimulation,
+  ]);
 
   const { state: buttonState } = useGetButtonStatuses({
     isPending,
     isLoading,
     needsApproval,
   });
+
+  useEffect(() => {
+    if (writeError) {
+      console.error(writeError);
+    }
+  }, [writeError]);
+
   return (
     <div className="relative space-y-2">
       <TokensDailog

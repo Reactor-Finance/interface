@@ -45,9 +45,18 @@ export function useQuoteSwap({
     },
   });
 
+  const isIntrinsicWETHProcess = useMemo(
+    () =>
+      (tokenIn?.address.toLowerCase() === weth.toLowerCase() &&
+        tokenOut?.address.toLowerCase() === ETHER.toLowerCase()) ||
+      (tokenIn?.address.toLowerCase() === ETHER.toLowerCase() &&
+        tokenOut?.address.toLowerCase() === weth.toLowerCase()),
+    [weth, tokenIn?.address, tokenOut?.address]
+  );
+
   const amountOut = useMemo(
     () =>
-      tokenOut ? Number(formatUnits(receivedAmount, tokenOut.decimals)) : 0,
+      isIntrinsicWETHProcess ? amountIn : tokenOut ? Number(formatUnits(receivedAmount, tokenOut.decimals)) : 0,
     [receivedAmount, tokenOut?.decimals]
   );
 
