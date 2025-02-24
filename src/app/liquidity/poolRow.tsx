@@ -3,10 +3,11 @@ import PoolHeader from "@/components/shared/poolHeader";
 import { Button } from "@/components/ui/button";
 import { TableRow } from "@/components/ui/table";
 import { TPoolType } from "@/lib/types";
-import { getAddress } from "viem";
+import { Address, getAddress } from "viem";
 import React from "react";
 import { useRouter } from "next/navigation";
 import { TPool } from "@/server/queries/pools/getPools";
+import { getLogoAsset } from "@/utils";
 
 export default function PoolRow({
   isStable,
@@ -61,7 +62,7 @@ export default function PoolRow({
                   address: getAddress(tokenOneAddress),
                   symbol: token0.symbol,
                   decimals: parseInt(token1.decimals),
-                  logoURI: "",
+                  logoURI: getLogoAsset(token1.id as Address),
                   name: "",
                   chainId: 1,
                 }}
@@ -69,7 +70,7 @@ export default function PoolRow({
                   address: getAddress(tokenTwoAddress),
                   symbol: token1.symbol,
                   decimals: parseInt(token1.decimals),
-                  logoURI: "",
+                  logoURI: getLogoAsset(token1.id as Address),
                   name: "",
                   chainId: 1,
                 }}
