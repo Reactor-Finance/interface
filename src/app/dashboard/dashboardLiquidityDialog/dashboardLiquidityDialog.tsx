@@ -39,8 +39,22 @@ export default function DashboardLiquidityDialog() {
 
           <div className="space-y-6 p-4 border-b border-neutral-800">
             <PoolHeader
-              tokenOne={{ address: "0x", symbol: "a", decimals: 1 }}
-              tokenTwo={{ address: "0x", symbol: "a", decimals: 1 }}
+              token0={{
+                address: "0x",
+                symbol: "a",
+                decimals: 1,
+                logoURI: "",
+                chainId: 1,
+                name: "",
+              }}
+              token1={{
+                address: "0x",
+                symbol: "a",
+                decimals: 1,
+                logoURI: "",
+                chainId: 1,
+                name: "",
+              }}
               poolType={TPoolType.STABLE}
             ></PoolHeader>
             <Slider

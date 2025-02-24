@@ -10,9 +10,9 @@ import {
 import { Contracts } from "@/lib/contracts";
 import { Address } from "viem";
 import { useLockProvider } from "../lockProvider";
-import useGetButtonStatuses from "@/components/shared/hooks/useGetButtonStatuses";
 import SubmitButton from "@/components/shared/submitBtn";
 import { useQueryClient } from "@tanstack/react-query";
+import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
 
 export default function TransferContent() {
   const [toAddress, setAddress] = React.useState("");

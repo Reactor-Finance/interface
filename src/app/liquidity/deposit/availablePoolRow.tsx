@@ -6,22 +6,14 @@ import Link from "next/link";
 import React from "react";
 interface Props {
   poolType: TPoolType;
-  tokenOne: TToken;
-  tokenTwo: TToken;
+  token0: TToken;
+  token1: TToken;
 }
-export default function AvailablePoolRow({
-  poolType,
-  tokenOne,
-  tokenTwo,
-}: Props) {
+export default function AvailablePoolRow({ poolType, token0, token1 }: Props) {
   return (
     <Card bg="1000" className="grid py-3 grid-cols-6 text-sm">
       <div className="col-span-2">
-        <PoolHeader
-          tokenOne={tokenOne}
-          tokenTwo={tokenTwo}
-          poolType={poolType}
-        />
+        <PoolHeader token0={token0} token1={token1} poolType={poolType} />
       </div>
       <div className="flex flex-col">
         <span className="text-neutral-300">TVL</span>
@@ -37,7 +29,7 @@ export default function AvailablePoolRow({
       </div>
       <div className="flex justify-end items-center">
         <Link
-          href={`/liquidity/add-liquidity?tokenOne=${tokenOne.address}&tokenTwo=${tokenTwo.address}&version=${convertPoolTypeToString(poolType)}`}
+          href={`/liquidity/add-liquidity?tokenOne=${token0.address}&tokenTwo=${token1.address}&version=${convertPoolTypeToString(poolType)}`}
         >
           <Button size="md" variant="filled">
             Deposit

@@ -10,8 +10,8 @@ import useApproveVeRct from "./hooks/useApproveVeRct";
 import useGetLockApproval from "./hooks/useGetLockApproval";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLockProvider } from "../lockProvider";
-import useGetButtonStatuses from "@/components/shared/hooks/useGetButtonStatuses";
 import SubmitButton from "@/components/shared/submitBtn";
+import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
 
 export default function WithdrawContent() {
   const { selectedLockToken } = useLockProvider();

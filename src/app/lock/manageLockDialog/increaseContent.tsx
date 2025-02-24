@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Alert } from "@/components/ui/alert";
 import RctInput from "../rctInput";
-import useGetRctBalance from "@/components/shared/hooks/useGetRctBalance";
 import {
   useSimulateContract,
   useWaitForTransactionReceipt,
@@ -13,13 +12,14 @@ import { RCT_DECIMALS } from "@/data/constants";
 import useGetLockApproval from "./hooks/useGetLockApproval";
 import { inputPatternMatch } from "@/lib/utils";
 import { useLockProvider } from "../lockProvider";
-import useApproveWrite from "@/components/shared/hooks/useApproveWrite";
-import useGetButtonStatuses from "@/components/shared/hooks/useGetButtonStatuses";
 import SubmitButton from "@/components/shared/submitBtn";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useIncreaseLockValidation } from "./hooks/useIncreaseLockValidation";
-import usePadLoading from "@/components/shared/hooks/usePadLoading";
+import useGetRctBalance from "@/lib/hooks/useGetRctBalance";
+import useApproveWrite from "@/lib/hooks/useApproveWrite";
+import usePadLoading from "@/lib/hooks/usePadLoading";
+import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
 export function IncreaseContent() {
   const [amount, setAmount] = React.useState("");
   const [isApproving, setIsApproving] = React.useState(false);

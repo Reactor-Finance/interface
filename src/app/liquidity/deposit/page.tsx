@@ -2,7 +2,7 @@
 import { Card } from "@/components/ui/card";
 import Headers from "@/components/ui/headers";
 import PageMarginContainer from "@/components/ui/pageMarginContainer";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Alert } from "@/components/ui/alert";
 import { ChevronDown } from "lucide-react";
 import SearchTokensDailog from "@/components/shared/tokensDialog";
@@ -20,22 +20,29 @@ export default function Page() {
   const [tokenTwo, setTokenTwo] = useState<TToken | undefined>();
   const setToken = ({ address, symbol, decimals }: TToken) => {
     if (openOne) {
-      setTokenOne({ address, symbol, decimals });
+      setTokenOne({
+        address,
+        symbol,
+        decimals,
+        chainId: 1,
+        name: "",
+        logoURI: "",
+      });
       setOpenTokenOne(false);
     }
     if (openTwo) {
-      setTokenTwo({ address, symbol, decimals });
+      setTokenTwo({
+        address,
+        symbol,
+        decimals,
+        chainId: 1,
+        name: "",
+        logoURI: "",
+      });
       setOpenTokenTwo(false);
     }
   };
-  const setOpen = useCallback(() => {
-    if (openOne) {
-      setOpenTokenOne(false);
-    }
-    if (openTwo) {
-      setOpenTokenTwo(false);
-    }
-  }, [openOne, openTwo]);
+
   const { data: pools } = api.pool.findPool.useQuery(
     {
       tokenOneAddress: tokenOne?.address ?? "0x",
@@ -62,9 +69,12 @@ export default function Page() {
       <div className="pt-6"></div>
       <div className=" gap-x-4 grid grid-cols-2">
         <SearchTokensDailog
-          setToken={setToken}
+          onTokenSelected={setToken}
           open={openOne || openTwo}
-          setOpen={setOpen}
+          selectedTokens={[
+            tokenOne?.address ?? "0x",
+            tokenTwo?.address ?? "0x",
+          ]}
         />
         <Card bg="1000">
           <SearchTokensTrigger
@@ -92,15 +102,21 @@ export default function Page() {
             return (
               <AvailablePoolRow
                 key={pool.id}
-                tokenOne={{
+                token0={{
                   address: getAddress(pool.token0.id),
                   symbol: pool.token0.symbol,
                   decimals: parseInt(pool.token0.decimals),
+                  name: "",
+                  logoURI: "",
+                  chainId: 1,
                 }}
-                tokenTwo={{
+                token1={{
                   address: getAddress(pool.token1.id),
                   symbol: pool.token1.symbol,
                   decimals: parseInt(pool.token1.decimals),
+                  name: "",
+                  logoURI: "",
+                  chainId: 1,
                 }}
                 poolType={pool.isStable ? TPoolType.STABLE : TPoolType.VOLATILE}
               ></AvailablePoolRow>
@@ -109,16 +125,16 @@ export default function Page() {
           {isTokensSelected && !stablePoolExist && (
             <>
               <AvailablePoolRow
-                tokenOne={tokenOne}
-                tokenTwo={tokenTwo}
+                token0={tokenOne}
+                token1={tokenTwo}
                 poolType={TPoolType.STABLE}
               />
             </>
           )}
           {isTokensSelected && !volatilePoolExist && (
             <AvailablePoolRow
-              tokenOne={tokenOne}
-              tokenTwo={tokenTwo}
+              token0={tokenOne}
+              token1={tokenTwo}
               poolType={TPoolType.VOLATILE}
             />
           )}

@@ -11,11 +11,11 @@ import { Contracts } from "@/lib/contracts";
 import { useLockProvider } from "../lockProvider";
 import useApproveVeRct from "./hooks/useApproveVeRct";
 import useGetLockApproval from "./hooks/useGetLockApproval";
-import { useDebounce } from "@/components/shared/hooks/useDebounce";
 import { parseUnits } from "viem";
-import useGetButtonStatuses from "@/components/shared/hooks/useGetButtonStatuses";
 import SubmitButton from "@/components/shared/submitBtn";
 import { useQueryClient } from "@tanstack/react-query";
+import { useDebounce } from "@/lib/hooks/useDebounce";
+import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
 
 export default function ExtendContent() {
   const { selectedLockToken } = useLockProvider();
