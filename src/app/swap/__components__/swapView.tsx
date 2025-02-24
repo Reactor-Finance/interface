@@ -61,12 +61,16 @@ export default function SwapView() {
   });
 
   // Simulate WETH process
-  const { isIntrinsicWETHProcess, WETHProcessSimulation, isWETHToEther } =
-    useWETHExecutions({
-      amount: amountIn,
-      token0,
-      token1,
-    });
+  const {
+    isIntrinsicWETHProcess,
+    isToken0,
+    WETHProcessSimulation,
+    isWETHToEther,
+  } = useWETHExecutions({
+    amount: amountIn,
+    token0,
+    token1,
+  });
 
   const {
     writeContract,
@@ -85,9 +89,18 @@ export default function SwapView() {
   }, [token0, token1]);
 
   const onSubmit = useCallback(() => {
-    if (isIntrinsicWETHProcess && WETHProcessSimulation.data) {
-      const request = WETHProcessSimulation.data.request;
-      writeContract(request as any);
+    if (isIntrinsicWETHProcess) {
+      if (isToken0) {
+        const req = WETHProcessSimulation?.depositSimulation?.data?.request;
+        if (req) {
+          writeContract(req);
+        }
+      } else {
+        const req = WETHProcessSimulation?.withdrawalSimulation?.data?.request;
+        if (req) {
+          writeContract(req);
+        }
+      }
       return;
     }
 

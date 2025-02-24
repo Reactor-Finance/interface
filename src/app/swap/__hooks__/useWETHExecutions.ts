@@ -50,10 +50,17 @@ export function useWETHExecutions({
     },
   });
 
-  const WETHProcessSimulation = useMemo(
-    () => (weth === token0?.address ? withdrawalSimulation : depositSimulation),
-    [weth, token0, withdrawalSimulation, depositSimulation]
-  );
+  const WETHProcessSimulation = useMemo(() => {
+    return { withdrawalSimulation, depositSimulation };
+  }, [withdrawalSimulation, depositSimulation]);
 
-  return { isIntrinsicWETHProcess, WETHProcessSimulation, isWETHToEther };
+  const isToken0 = weth === token0?.address;
+
+  return {
+    isToken0,
+    isIntrinsicWETHProcess,
+    WETHProcessSimulation,
+    withdrawalSimulation,
+    isWETHToEther,
+  };
 }
