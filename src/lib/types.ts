@@ -19,7 +19,7 @@ export const TokenlistSchema = z.array(
     .strict()
 );
 
-export type TAddress = `0x${string}` | string;
+export type TAddress = `0x${string}`;
 
 export enum TPoolType {
   "CONCENTRATED",

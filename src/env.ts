@@ -17,13 +17,16 @@ export const env = createEnv({
    * isn't built with invalid env vars. To expose them to the client, prefix them with
    * `NEXT_PUBLIC_`.
    */
-  client: {},
+  client: {
+    NEXT_PUBLIC_CONTRACTS: z.string().optional(),
+  },
 
   /**
    * You can't destruct `process.env` as a regular object in the Next.js edge runtimes (e.g.
    * middlewares) or client-side so we need to destruct manually.
    */
   runtimeEnv: {
+    NEXT_PUBLIC_CONTRACTS: process.env.NEXT_PUBLIC_CONTRACTS,
     SUBGRAPH_URL: process.env.SUBGRAPH_URL,
     ASSETS_REPO_SLUG: process.env.ASSETS_REPO_SLUG,
     GITHUB_TOKEN: process.env.GITHUB_TOKEN,

@@ -61,12 +61,16 @@ export default function SwapView() {
   });
 
   // Simulate WETH process
-  const { isIntrinsicWETHProcess, WETHProcessSimulation, isWETHToEther } =
-    useWETHExecutions({
-      amount: amountIn,
-      token0,
-      token1,
-    });
+  const {
+    isIntrinsicWETHProcess,
+    isToken0,
+    WETHProcessSimulation,
+    isWETHToEther,
+  } = useWETHExecutions({
+    amount: amountIn,
+    token0,
+    token1,
+  });
 
   const {
     writeContract,
@@ -85,9 +89,18 @@ export default function SwapView() {
   }, [token0, token1]);
 
   const onSubmit = useCallback(() => {
-    if (isIntrinsicWETHProcess && WETHProcessSimulation.data) {
-      const request = WETHProcessSimulation.data.request;
-      writeContract(request as any);
+    if (isIntrinsicWETHProcess) {
+      if (isToken0) {
+        const req = WETHProcessSimulation?.depositSimulation?.data?.request;
+        if (req) {
+          writeContract(req);
+        }
+      } else {
+        const req = WETHProcessSimulation?.withdrawalSimulation?.data?.request;
+        if (req) {
+          writeContract(req);
+        }
+      }
       return;
     }
 
@@ -99,12 +112,14 @@ export default function SwapView() {
       writeContract(swapSimulation.request);
     }
   }, [
+    isIntrinsicWETHProcess,
     approveWriteRequest,
     needsApproval,
     swapSimulation,
+    isToken0,
+    WETHProcessSimulation?.depositSimulation?.data?.request,
+    WETHProcessSimulation?.withdrawalSimulation?.data?.request,
     writeContract,
-    isIntrinsicWETHProcess,
-    WETHProcessSimulation,
   ]);
 
   const { state: buttonState } = useGetButtonStatuses({
@@ -171,7 +186,9 @@ export default function SwapView() {
         <SubmitButton
           state={buttonState}
           isValid={
-            Boolean(swapSimulation) || Boolean(WETHProcessSimulation.data)
+            Boolean(swapSimulation) ||
+            Boolean(WETHProcessSimulation.depositSimulation.data) ||
+            Boolean(WETHProcessSimulation.withdrawalSimulation.data)
           }
           approveTokenSymbol={token0?.symbol}
           onClick={onSubmit}

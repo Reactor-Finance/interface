@@ -26,15 +26,21 @@ export default function PoolRow({
     <TableRow>
       <th className="col-span-4 text-left">
         <PoolHeader
-          tokenOne={{
+          token0={{
             address: getAddress(tokenOneAddress),
             symbol: token0.symbol,
             decimals: parseInt(token0.decimals),
+            logoURI: "",
+            name: "",
+            chainId: 1,
           }}
-          tokenTwo={{
+          token1={{
             address: getAddress(tokenTwoAddress),
             symbol: token1.symbol,
             decimals: parseInt(token1.decimals),
+            logoURI: "",
+            name: "",
+            chainId: 1,
           }}
           poolType={isStable ? TPoolType.STABLE : TPoolType.VOLATILE}
         />
@@ -51,13 +57,21 @@ export default function PoolRow({
               <span>Add</span>
               <CurrenciesOverlapIcons
                 size="sm"
-                tokenOne={{
-                  alt: token0.symbol,
+                token0={{
                   address: getAddress(tokenOneAddress),
+                  symbol: token0.symbol,
+                  decimals: parseInt(token1.decimals),
+                  logoURI: "",
+                  name: "",
+                  chainId: 1,
                 }}
-                tokenTwo={{
-                  alt: token1.symbol,
+                token1={{
                   address: getAddress(tokenTwoAddress),
+                  symbol: token1.symbol,
+                  decimals: parseInt(token1.decimals),
+                  logoURI: "",
+                  name: "",
+                  chainId: 1,
                 }}
               />
             </div>
