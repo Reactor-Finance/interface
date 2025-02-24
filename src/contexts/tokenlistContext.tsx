@@ -14,7 +14,7 @@ import { useChainId } from "wagmi";
 interface TokenlistContextType {
   tokenlist: TToken[];
   loading: boolean;
-  error?: any;
+  hasError?: boolean | null;
   setSearchQuery: (query: string) => void;
   searchQuery: string;
 }
@@ -22,7 +22,7 @@ interface TokenlistContextType {
 const TokenlistContext = createContext<TokenlistContextType>({
   tokenlist: [],
   loading: false,
-  error: null,
+  hasError: null,
   setSearchQuery: console.log,
   searchQuery: "",
 });
@@ -33,7 +33,7 @@ function useSetInterval(cb: () => void, INTERVAL = 60000) {
     return () => {
       clearInterval(interval);
     };
-  }, [INTERVAL]);
+  }, [INTERVAL, cb]);
 }
 
 export const TokenlistContextProvider: React.FC<{ children: ReactNode }> = ({
@@ -47,14 +47,18 @@ export const TokenlistContextProvider: React.FC<{ children: ReactNode }> = ({
     error,
     refetch,
   } = api.tokens.getTokens.useQuery({ chainId, searchQuery });
-
   useSetInterval(() => {
     void refetch();
   });
-
   return (
     <TokenlistContext.Provider
-      value={{ tokenlist, loading, error, setSearchQuery, searchQuery }}
+      value={{
+        tokenlist,
+        loading,
+        hasError: Boolean(error),
+        setSearchQuery,
+        searchQuery,
+      }}
     >
       {children}
     </TokenlistContext.Provider>
