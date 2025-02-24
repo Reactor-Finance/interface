@@ -31,7 +31,7 @@ export default function PoolRow({
             address: getAddress(tokenOneAddress),
             symbol: token0.symbol,
             decimals: parseInt(token0.decimals),
-            logoURI: "",
+            logoURI: getLogoAsset(token0.id as Address),
             name: "",
             chainId: 1,
           }}
@@ -39,7 +39,7 @@ export default function PoolRow({
             address: getAddress(tokenTwoAddress),
             symbol: token1.symbol,
             decimals: parseInt(token1.decimals),
-            logoURI: "",
+            logoURI: getLogoAsset(token1.id as Address),
             name: "",
             chainId: 1,
           }}
