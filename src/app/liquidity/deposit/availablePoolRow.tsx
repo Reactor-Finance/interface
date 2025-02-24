@@ -29,7 +29,7 @@ export default function AvailablePoolRow({ poolType, token0, token1 }: Props) {
       </div>
       <div className="flex justify-end items-center">
         <Link
-          href={`/liquidity/add-liquidity?tokenOne=${token0.address}&tokenTwo=${token1.address}&version=${convertPoolTypeToString(poolType)}`}
+          href={`/liquidity/add-liquidity?token0=${token0.address}&token1=${token1.address}&version=${convertPoolTypeToString(poolType)}`}
         >
           <Button size="md" variant="filled">
             Deposit

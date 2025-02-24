@@ -18,10 +18,10 @@ export default function LiquidityCard({ poolType }: { poolType: TPoolType }) {
   const params = useSearchParams();
   const router = useRouter();
   const { token0, token1 } = useMemo(() => {
-    const token0 = params.get("tokenO");
+    const token0 = params.get("token0");
     const token1 = params.get("token1");
     const param = { token0, token1 };
-
+    console.log(param);
     const afterParse = searchParamsSchema.safeParse(param);
     return afterParse.success
       ? {
@@ -40,6 +40,7 @@ export default function LiquidityCard({ poolType }: { poolType: TPoolType }) {
     }
   }, [router, token0, token1]);
   const found = false;
+  console.log(token1, token0, "TOKENS");
   if (!token0 || !token1) {
     return;
   }
