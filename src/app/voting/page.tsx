@@ -140,7 +140,13 @@ function ExampleRow() {
       <td>131331</td>
       <td>
         <div className="bg-neutral-800 justify-between rounded-md p-2 flex gap-x-2">
-          <input placeholder="0 %" className="w-[30px] bg-transparent" />
+          <div className="flex gap-x-1">
+            <input
+              placeholder="0"
+              className="w-[20px] focus:ring-transparent transition-all focus:w-[35px] bg-transparent"
+            />
+            <span className="text-neutral-400">%</span>
+          </div>
           <button className="text-primary-400 disabled:text-neutral-500">
             Max
           </button>
