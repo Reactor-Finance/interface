@@ -3,10 +3,11 @@ import PoolHeader from "@/components/shared/poolHeader";
 import { Button } from "@/components/ui/button";
 import { TableRow } from "@/components/ui/table";
 import { TPoolType } from "@/lib/types";
-import { getAddress } from "viem";
+import { Address, getAddress } from "viem";
 import React from "react";
 import { useRouter } from "next/navigation";
 import { TPool } from "@/server/queries/pools/getPools";
+import { getLogoAsset } from "@/utils";
 
 export default function PoolRow({
   isStable,
@@ -26,15 +27,21 @@ export default function PoolRow({
     <TableRow>
       <th className="col-span-4 text-left">
         <PoolHeader
-          tokenOne={{
+          token0={{
             address: getAddress(tokenOneAddress),
             symbol: token0.symbol,
             decimals: parseInt(token0.decimals),
+            logoURI: getLogoAsset(token0.id as Address),
+            name: "",
+            chainId: 1,
           }}
-          tokenTwo={{
+          token1={{
             address: getAddress(tokenTwoAddress),
             symbol: token1.symbol,
             decimals: parseInt(token1.decimals),
+            logoURI: getLogoAsset(token1.id as Address),
+            name: "",
+            chainId: 1,
           }}
           poolType={isStable ? TPoolType.STABLE : TPoolType.VOLATILE}
         />
@@ -51,13 +58,21 @@ export default function PoolRow({
               <span>Add</span>
               <CurrenciesOverlapIcons
                 size="sm"
-                tokenOne={{
-                  alt: token0.symbol,
+                token0={{
                   address: getAddress(tokenOneAddress),
+                  symbol: token0.symbol,
+                  decimals: parseInt(token1.decimals),
+                  logoURI: getLogoAsset(token1.id as Address),
+                  name: "",
+                  chainId: 1,
                 }}
-                tokenTwo={{
-                  alt: token1.symbol,
+                token1={{
                   address: getAddress(tokenTwoAddress),
+                  symbol: token1.symbol,
+                  decimals: parseInt(token1.decimals),
+                  logoURI: getLogoAsset(token1.id as Address),
+                  name: "",
+                  chainId: 1,
                 }}
               />
             </div>

@@ -17,10 +17,9 @@ const searchParamsSchema = z.object({
 export default function LiquidityCard({ poolType }: { poolType: TPoolType }) {
   const params = useSearchParams();
   const { token0, token1 } = useMemo(() => {
-    const token0 = params.get("tokenO");
+    const token0 = params.get("token0");
     const token1 = params.get("token1");
     const param = { token0, token1 };
-
     const afterParse = searchParamsSchema.safeParse(param);
     return afterParse.success
       ? {

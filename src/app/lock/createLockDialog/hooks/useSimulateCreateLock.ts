@@ -1,5 +1,5 @@
-import { useDebounce } from "@/components/shared/hooks/useDebounce";
 import { Contracts } from "@/lib/contracts";
+import { useDebounce } from "@/lib/hooks/useDebounce";
 import { parseUnits } from "viem";
 import { useSimulateContract } from "wagmi";
 

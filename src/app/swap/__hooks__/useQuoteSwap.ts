@@ -15,7 +15,7 @@ export function useQuoteSwap({
   tokenOut: TToken | null;
 }) {
   const chainId = useChainId();
-  const weth = useMemo(() => WETH[chainId], []);
+  const weth = useMemo(() => WETH[chainId], [chainId]);
   const address = useMemo(() => TRADE_HELPER[chainId], [chainId]);
   const address0 = useMemo(
     () => (tokenIn?.address.toLowerCase() === ETHER ? weth : tokenIn?.address),

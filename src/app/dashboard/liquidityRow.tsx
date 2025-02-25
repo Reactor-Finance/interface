@@ -21,8 +21,22 @@ export function LiquidityRow({ id }: { id: string }) {
       <td className="bg-neutral-1000 text-left col-span-2">
         <div className="flex items-center justify-start gap-4">
           <CurrenciesOverlapIcons
-            tokenOne={{ address: "0x0", alt: "RCT" }}
-            tokenTwo={{ address: "0x0", alt: "RCT" }}
+            token0={{
+              address: "0x0",
+              symbol: "",
+              decimals: 1,
+              logoURI: "",
+              name: "",
+              chainId: 1,
+            }}
+            token1={{
+              address: "0x0",
+              symbol: "",
+              decimals: 1,
+              logoURI: "",
+              name: "",
+              chainId: 1,
+            }}
           />
           <div className="flex flex-col">
             <span className="text-sm tracking-tight">vAMM-ETH/USDC</span>

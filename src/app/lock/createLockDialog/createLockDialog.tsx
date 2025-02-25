@@ -10,14 +10,14 @@ import useSimulateCreateLock from "./hooks/useSimulateCreateLock";
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { Contracts } from "@/lib/contracts";
 import { formatUnits } from "viem";
-import useGetRctBalance from "@/components/shared/hooks/useGetRctBalance";
 import { DAYS_14, RCT_DECIMALS, TWO_YEARS } from "@/data/constants";
 import useCreateLockValidation from "./hooks/useCreateLockValidation";
 import { useLockProvider } from "../lockProvider";
 import { useQueryClient } from "@tanstack/react-query";
 import SubmitButton from "@/components/shared/submitBtn";
-import useGetButtonStatuses from "@/components/shared/hooks/useGetButtonStatuses";
-import useApproveWrite from "@/components/shared/hooks/useApproveWrite";
+import useGetRctBalance from "@/lib/hooks/useGetRctBalance";
+import useApproveWrite from "@/lib/hooks/useApproveWrite";
+import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
 export default function CreateLockDialog() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ amount: "", duration: [DAYS_14] });

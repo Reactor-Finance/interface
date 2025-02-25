@@ -8,9 +8,9 @@ import {
 } from "wagmi";
 import LockDropdown from "../lockDropdown";
 import { useLockProvider } from "../lockProvider";
-import useGetButtonStatuses from "@/components/shared/hooks/useGetButtonStatuses";
 import SubmitButton from "@/components/shared/submitBtn";
-import usePadLoading from "@/components/shared/hooks/usePadLoading";
+import usePadLoading from "@/lib/hooks/usePadLoading";
+import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
 
 export default function MergeContent() {
   const [mergeToken, setMergeToken] = React.useState("");

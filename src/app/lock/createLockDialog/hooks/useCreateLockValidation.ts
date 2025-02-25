@@ -1,4 +1,4 @@
-import useGetRctBalance from "@/components/shared/hooks/useGetRctBalance";
+import useGetRctBalance from "@/lib/hooks/useGetRctBalance";
 import { formatUnits } from "viem";
 interface Props {
   form: {
