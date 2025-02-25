@@ -9,7 +9,6 @@ import SearchInput from "@/components/shared/searchInput";
 import ImageWithFallback from "@/components/shared/imageWithFallback";
 import { TToken } from "@/lib/types";
 import { useTokenlistContext } from "@/contexts/tokenlistContext";
-import { useGetBalance } from "@/lib/hooks/useGetBalance";
 import { formatUnits } from "viem";
 
 export default function TokensDailog({
@@ -84,7 +83,11 @@ function TokenItem({
   token: TToken;
   selectToken: (token: TToken) => void;
 }) {
-  const balance = useGetBalance({ tokenAddress: token.address });
+  // n+1 problem
+  // https://planetscale.com/blog/what-is-n-1-query-problem-and-how-to-solve-it
+  // need backend endpoint that returns portfolio of token bals
+  // instead of querying each token
+  // const balance = useGetBalance({ tokenAddress: token.address });
   return (
     <button
       type="button"
@@ -111,13 +114,10 @@ function TokenItem({
       <div className="flex flex-col items-end font-geistMono">
         <div>
           <span>
-            {Number(formatUnits(balance, token.decimals)).toLocaleString(
-              "en-US",
-              {
-                useGrouping: true,
-                maximumFractionDigits: 3,
-              }
-            )}
+            {Number(formatUnits(0n, token.decimals)).toLocaleString("en-US", {
+              useGrouping: true,
+              maximumFractionDigits: 3,
+            })}
           </span>
         </div>
         <div>
