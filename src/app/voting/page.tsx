@@ -8,6 +8,7 @@ import { SelectItem } from "@/components/ui/select";
 import { TableBody, TableRow } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TPoolType } from "@/lib/types";
+import { Button } from "@/components/ui/button";
 import React from "react";
 
 export default function Page() {
@@ -75,33 +76,41 @@ export default function Page() {
         </div>
       </div>
       <div className="pt-4"></div>
-      <table className="w-full">
-        <thead>
-          <tr className="grid grid-cols-10 px-4 text-neutral-500 text-sm font-normal">
-            <th className="col-span-3 text-left">Pool Name</th>
-            <th>Pool Name</th>
-            <th>Pool Name</th>
-            <th>Pool Name</th>
-            <th>Pool Name</th>
-            <th>Pool Name</th>
-            <th>Pool Name</th>
-            <th>Pool Name</th>
-          </tr>
-        </thead>
-        <TableBody>
-          <ExampleRow />
-          <ExampleRow />
-          <ExampleRow />
-          <ExampleRow />
-          <ExampleRow />
-        </TableBody>
-      </table>
+      <div className="relative">
+        <div className="py-2 z-20 px-3 flex gap-x-10 absolute rounded-md bottom-5 -translate-x-1/2 left-1/2 items-center bg-neutral-950">
+          <span>
+            Voting power used: <span className="text-blue-light">0.3%</span>
+          </span>
+          <Button variant="filled">Vote</Button>
+        </div>
+        <table className="w-full">
+          <thead>
+            <tr className="grid grid-cols-10 gap-x-4 px-4 text-neutral-500 text-sm font-normal text-right">
+              <th className="col-span-3 text-left">Pool Name</th>
+              <th className="text-right">Pool Name</th>
+              <th>Pool Name</th>
+              <th>Pool Name</th>
+              <th>Pool Name</th>
+              <th>Pool Name</th>
+              <th>Pool Name</th>
+              <th className="text-right">Pool Name</th>
+            </tr>
+          </thead>
+          <TableBody>
+            <ExampleRow />
+            <ExampleRow />
+            <ExampleRow />
+            <ExampleRow />
+            <ExampleRow />
+          </TableBody>
+        </table>
+      </div>
     </PageMarginContainer>
   );
 }
 function ExampleRow() {
   return (
-    <TableRow cols="10">
+    <TableRow cols="10" className="z-10">
       <td className="col-span-3">
         <PoolHeader
           poolType={TPoolType.CONCENTRATED}
@@ -123,13 +132,20 @@ function ExampleRow() {
           }}
         />
       </td>
-      <td>!108,198,100</td>
+      <td className="text-right">!108,198,100</td>
       <td>11.22%</td>
       <td>~43,279.55</td>
       <td>131331</td>
       <td>131331</td>
       <td>131331</td>
-      <td>131331</td>
+      <td>
+        <div className="bg-neutral-800 justify-between rounded-md p-2 flex gap-x-2">
+          <input placeholder="0 %" className="w-[30px] bg-transparent" />
+          <button className="text-primary-400 disabled:text-neutral-500">
+            Max
+          </button>
+        </div>
+      </td>
     </TableRow>
   );
 }
