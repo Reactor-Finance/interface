@@ -61,7 +61,7 @@ export function useQuoteSwap({
         : tokenOut
           ? Number(formatUnits(receivedAmount, tokenOut.decimals))
           : 0,
-    [receivedAmount, tokenOut?.decimals]
+    [receivedAmount, amountIn, tokenOut, isIntrinsicWETHProcess]
   );
 
   useWatchBlocks({

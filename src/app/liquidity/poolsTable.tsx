@@ -21,6 +21,7 @@ enum TabValues {
   VOLATILE = "volatile",
   CONCENTRATED = "concentrated",
 }
+
 export default function PoolsTable({
   initialPools,
 }: {
@@ -125,9 +126,7 @@ export default function PoolsTable({
           </thead>
           <tbody className="gap-y-2 pt-2 flex flex-col">
             {loadingBounced &&
-              [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
-                <PoolRowSkeleton key={i} />
-              ))}
+              Array.from({ length: 10 }, (_, i) => <PoolRowSkeleton key={i} />)}
             {!loadingBounced &&
               pools?.pairs.map((pool) => <PoolRow {...pool} key={pool.id} />)}
           </tbody>

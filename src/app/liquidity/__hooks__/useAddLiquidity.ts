@@ -1,8 +1,5 @@
 import { useAccount, useChainId, useSimulateContract } from "wagmi";
-import { Contracts } from "@/lib/contracts";
-import { TAddress } from "@/lib/types";
-import { useLiquidityCardFormProvider } from "../add-liquidity/__components__/liquidityCard/liquidityCardFormProvider";
-import { getAddress, parseUnits, zeroAddress } from "viem";
+import { zeroAddress } from "viem";
 import { useMemo } from "react";
 import { ETHER, ROUTER } from "@/data/constants";
 import * as Router from "@/lib/abis/Router";
@@ -98,5 +95,5 @@ export function useAddLiquidity({
     [isAddLiquidityETH, addLiquidityETHSimulation, addLiquiditySimulation]
   );
 
-  return { simulation };
+  return { request: simulation.data?.request };
 }

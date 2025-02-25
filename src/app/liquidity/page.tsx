@@ -9,6 +9,7 @@ import Image, { StaticImageData } from "next/image";
 import { Button } from "@/components/ui/button";
 import PoolsTable from "./poolsTable";
 import { api } from "@/trpc/server";
+
 export default async function Page() {
   const initialPools = await api.pool.getPools({});
   return (
@@ -34,7 +35,7 @@ export default async function Page() {
         <div className="flex justify-between items-center">
           <h4 className="text-[13px] text-neutral-500">
             There are currently{" "}
-            <span className="text-neutral-200">250 tokens</span> listed.{" "}
+            <span className="text-neutral-200">10 tokens</span> listed.{" "}
             <span className="underline text-neutral-300">View Tokens</span> or{" "}
             <span className="underline text-neutral-300">List new token</span>
           </h4>

@@ -11,12 +11,18 @@ interface Props {
   token: TToken;
   onValueChange: (value: number) => any;
   value: number;
+  disableInput?: boolean;
 }
 
-export default function AssetCard({ token, onValueChange, value }: Props) {
+export default function AssetCard({
+  token,
+  onValueChange,
+  value,
+  disableInput,
+}: Props) {
   const balance = useGetBalance({ tokenAddress: token.address });
   const formattedBalance = useMemo(
-    () => Number(formatNumber(formatUnits(balance, token.decimals))),
+    () => formatNumber(formatUnits(balance, token.decimals)),
     [balance, token.decimals]
   );
   return (
@@ -28,8 +34,12 @@ export default function AssetCard({ token, onValueChange, value }: Props) {
             className="w-[200px] md:text-lg px-1 py-1 bg-transparent border-none"
             placeholder="0"
             value={value}
+            disabled={disableInput}
             onChange={(s) => {
-              onValueChange(Number(s));
+              // Add this check to prevent NaN errors
+              const parsedNumber = Number(s.target.value ?? "0");
+              const validNumber = isNaN(parsedNumber) ? value : parsedNumber;
+              onValueChange(validNumber);
             }}
           />
         </div>
@@ -40,7 +50,9 @@ export default function AssetCard({ token, onValueChange, value }: Props) {
         <div className="flex gap-x-1">
           <div>{formattedBalance} </div>
           <button
-            onClick={() => onValueChange(formattedBalance)}
+            onClick={() =>
+              onValueChange(Number(formatUnits(balance, token.decimals)))
+            }
             aria-label="Set Max Balance"
             className="text-primary-400"
           >

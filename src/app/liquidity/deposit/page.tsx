@@ -12,6 +12,8 @@ import AvailablePoolRow from "./availablePoolRow";
 import { api } from "@/trpc/react";
 import { zeroAddress } from "viem";
 import { useCheckPair } from "@/lib/hooks/useCheckPair";
+import { ETHER, WETH } from "@/data/constants";
+import { useChainId } from "wagmi";
 
 export default function Page() {
   const [token0DialogOpen, setOpenToken0Dialog] = useState(false);
@@ -47,6 +49,20 @@ export default function Page() {
     [token0, token1]
   );
 
+  const chainId = useChainId();
+  const weth = useMemo(() => WETH[chainId], [chainId]);
+
+  const selectedTokens = useMemo(
+    () =>
+      token0?.address.toLowerCase() === ETHER.toLowerCase() ||
+      token0?.address.toLowerCase() === weth.toLowerCase() ||
+      token1?.address.toLowerCase() === ETHER.toLowerCase() ||
+      token0?.address.toLowerCase() === weth.toLowerCase()
+        ? [weth, ETHER]
+        : [token0?.address ?? zeroAddress, token1?.address ?? zeroAddress],
+    [token0, token1, weth]
+  );
+
   return (
     <PageMarginContainer>
       <Headers.GradiantHeaderOne colorOne="#A0055D" colorTwo="#836EF9">
@@ -58,19 +74,13 @@ export default function Page() {
           onTokenSelected={setToken0}
           open={token0DialogOpen}
           onOpen={setOpenToken0Dialog}
-          selectedTokens={[
-            token0?.address ?? zeroAddress,
-            token1?.address ?? zeroAddress,
-          ]}
+          selectedTokens={selectedTokens as `0x${string}`[]}
         />
         <TokensDialog
           onTokenSelected={setToken1}
           open={token1DialogOpen}
           onOpen={setOpenToken1Dialog}
-          selectedTokens={[
-            token0?.address ?? zeroAddress,
-            token1?.address ?? zeroAddress,
-          ]}
+          selectedTokens={selectedTokens as `0x${string}`[]}
         />
         <Card bg="1000">
           <SearchTokensTrigger

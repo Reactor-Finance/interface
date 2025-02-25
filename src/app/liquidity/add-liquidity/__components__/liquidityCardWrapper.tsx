@@ -14,17 +14,15 @@ export default function LiquidityCardWrapper() {
     const payload = searchParamsSchema.safeParse(param);
     return payload.success
       ? {
-          version: payload.data.version,
           poolType: convertToPoolType(payload.data.version),
         }
       : {
           poolType: undefined,
         };
   }, [params]);
-  console.log(poolType);
   return (
     <div className="flex justify-center p-4">
-      {poolType !== undefined && <LiquidityCard poolType={poolType} />}
+      {poolType !== undefined && <LiquidityCard />}
     </div>
   );
 }

@@ -1,22 +1,26 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+"use client";
+
+import React, { useCallback, useMemo, useState } from "react";
 import AssetCard from "./assetCard";
-import { TPoolType, TToken } from "@/lib/types";
-import { useChainId, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
-import useGetAllowances from "./hooks/useGetAllowances";
-import useCheckNeedsApproval from "./hooks/useCheckNeedsApproval";
+import { TToken } from "@/lib/types";
+import {
+  useChainId,
+  useWaitForTransactionReceipt,
+  useWriteContract,
+} from "wagmi";
 import { useAddLiquidity } from "../../../__hooks__/useAddLiquidity";
-import useApproveTokens from "./hooks/useApproveTokens";
-import useInitializePoolValidation from "./hooks/useInitializePoolValidation";
 import { useQueryClient } from "@tanstack/react-query";
 import SubmitButton from "@/components/shared/submitBtn";
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
-import { isAddress, zeroAddress } from "viem";
+import { formatUnits, isAddress, parseUnits, zeroAddress } from "viem";
 import { z } from "zod";
 import { useSearchParams } from "next/navigation";
 import { useTokenlistContext } from "@/contexts/tokenlistContext";
 import { useCheckPair } from "@/lib/hooks/useCheckPair";
 import useApproveWrite from "@/lib/hooks/useApproveWrite";
 import { ROUTER } from "@/data/constants";
+import { useQuoteLiquidity } from "@/app/liquidity/__hooks__/useQuoteLiquidity";
+import { BaseError } from "@wagmi/core";
 
 const searchParamsSchema = z.object({
   token0: z.string().refine((arg) => isAddress(arg)),
@@ -74,153 +78,152 @@ export default function InitializePool() {
     stable: version === "stable",
   });
 
+  // Quote liquidity
+  const quoteLiquidity = useQuoteLiquidity({
+    token0: t0 ?? zeroAddress,
+    token1: t1 ?? zeroAddress,
+    stable: version === "stable",
+    amountIn: parseUnits(String(amount0), token0?.decimals ?? 18),
+  });
+
   // Check approval required
-  const { approveWriteRequest: token0ApprovalWriteRequest, needsApproval: token0NeedsApproval } = useApproveWrite({
+  const {
+    approveWriteRequest: token0ApprovalWriteRequest,
+    needsApproval: token0NeedsApproval,
+    isFetching: token0ApprovalFetching,
+  } = useApproveWrite({
     spender: router,
     tokenAddress: token0?.address ?? zeroAddress,
     decimals: token0?.decimals,
-    amount: String(amount0)
+    amount: String(amount0),
   });
 
-  const { approveWriteRequest: token1ApprovalWriteRequest, needsApproval: token1NeedsApproval } = useApproveWrite({
+  const {
+    approveWriteRequest: token1ApprovalWriteRequest,
+    needsApproval: token1NeedsApproval,
+    isFetching: token1ApprovalFetching,
+  } = useApproveWrite({
     spender: router,
     tokenAddress: token1?.address ?? zeroAddress,
     decimals: token1?.decimals,
-    amount: String(amount1)
+    amount: String(amount1),
+  });
+
+  // Amounts parsed
+  const amountADesired = useMemo(
+    () => parseUnits(String(amount0), token0?.decimals ?? 18),
+    [amount0, token0]
+  );
+  const amountBDesired = useMemo(
+    () =>
+      pairExists && quoteLiquidity > BigInt(0)
+        ? quoteLiquidity
+        : parseUnits(String(amount1), token1?.decimals ?? 18),
+    [amount1, token1, pairExists, quoteLiquidity]
+  );
+  const { request: addLiquidityRequest } = useAddLiquidity({
+    token0: token0?.address ?? zeroAddress,
+    token1: token1?.address ?? zeroAddress,
+    amountADesired,
+    amountBDesired,
+    stable: version === "stable",
   });
 
   const queryClient = useQueryClient();
-  const [tokenDeposits, setTokenDeposits] = React.useState({
-    tokenOneDeposit: "",
-    tokenTwoDeposit: "",
-  });
+
   const {
-    tokenTwoAllowance,
-    tokenOneAllowance,
-    tokenOneQueryKey,
-    tokenTwoQueryKey,
-  } = useGetAllowances({
-    tokenOne,
-    tokenTwo,
-  });
-  const needsApprovals = useCheckNeedsApproval({
-    tokenTwoAllowance,
-    tokenOneAllowance,
-    tokenDeposits,
-  });
-  const { data: approveSimulation, isLoading: isApproveTokensLoading } =
-    useApproveTokens({
-      approveTokenOne: needsApprovals?.tokenOne ?? false,
-      approveTokenTwo: needsApprovals?.tokenTwo ?? false,
-    });
-
-  const isApproving = Boolean(
-    needsApprovals?.tokenOne || needsApprovals?.tokenTwo
-  );
-
-  const { data: addLiquiditySimulation } = useAddLiquidity({
-    tokenOne,
-    tokenTwo,
-    tokenDeposits,
-    isApproving,
-    stable: poolType === TPoolType.STABLE,
-  });
-  const { writeContract, isPending, data: hash, reset } = useWriteContract();
-  const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash });
-  
-  const onSubmit = useCallback(() => {
-    if (isSuccess) {
-      reset();
-      return;
-    }
-    if (approveSimulation?.request) {
-      writeContract(approveSimulation?.request);
-      return;
-    }
-    if (addLiquiditySimulation?.request)
-      writeContract(addLiquiditySimulation?.request);
-  }, [
-    addLiquiditySimulation?.request,
-    approveSimulation?.request,
-    isSuccess,
-    reset,
     writeContract,
-  ]);
-  useEffect(() => {
-    if (!isSuccess) return;
-    if (isSuccess) {
-      if (needsApprovals?.tokenOne) {
-        queryClient.invalidateQueries({ queryKey: tokenOneQueryKey });
-        reset();
-        return;
-      }
-      if (needsApprovals?.tokenTwo) {
-        queryClient.invalidateQueries({ queryKey: tokenTwoQueryKey });
-        reset();
-        return;
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
+    isPending,
+    data: hash,
+    reset,
+    error: writeContractError,
+  } = useWriteContract(); // We'll also call reset when transaction toast is closed
+  const {
+    isLoading,
     isSuccess,
-    needsApprovals?.tokenOne,
-    needsApprovals?.tokenTwo,
-    tokenOneQueryKey,
-    tokenTwoQueryKey,
+    error: transactionReceiptError,
+  } = useWaitForTransactionReceipt({ hash });
+
+  const onSubmit = useCallback(() => {
+    if (token0NeedsApproval && token0ApprovalWriteRequest) {
+      reset(); // Call reset first to clear internal state
+      writeContract(token0ApprovalWriteRequest);
+      return;
+    }
+
+    if (token1NeedsApproval && token1ApprovalWriteRequest) {
+      reset(); // Call reset first to clear internal state
+      writeContract(token1ApprovalWriteRequest);
+      return;
+    }
+
+    if (addLiquidityRequest) {
+      reset(); // Call reset first to clear internal state
+      writeContract(addLiquidityRequest as any);
+    }
+  }, [
+    token0NeedsApproval,
+    token1NeedsApproval,
+    token0ApprovalWriteRequest,
+    token1ApprovalWriteRequest,
+    addLiquidityRequest,
+    writeContract,
+    reset,
   ]);
 
   const approveTokenSymbol = useMemo(() => {
-    if (needsApprovals?.tokenOne) {
-      return tokenOneSymbol;
+    if (token0NeedsApproval && token0) {
+      return token0.symbol;
     }
-    if (needsApprovals?.tokenTwo) {
-      return tokenTwoSymbol;
+    if (token1NeedsApproval && token1) {
+      return token1.symbol;
     }
   }, [
-    needsApprovals?.tokenOne,
-    needsApprovals?.tokenTwo,
-    tokenOneSymbol,
-    tokenTwoSymbol,
+    token0?.symbol,
+    token1?.symbol,
+    token0NeedsApproval,
+    token1NeedsApproval,
   ]);
   const { state } = useGetButtonStatuses({
     isLoading,
     isPending,
-    isFetching: isApproveTokensLoading,
-    needsApproval: needsApprovals?.tokenOne || needsApprovals?.tokenTwo,
+    isFetching: token0ApprovalFetching || token1ApprovalFetching,
+    needsApproval: token0NeedsApproval || token1NeedsApproval,
   });
   return (
     <>
       <h2 className="text-xl">
         {pairExists ? "Add Liquidity" : "Initialize Pool"}
       </h2>{" "}
-      <div className="space-y-2">
-        <div>
-          <label htmlFor="">Asset 1</label>
+      {!!token0 && (
+        <div className="space-y-2">
+          <div>
+            <label htmlFor="">Asset 1</label>
+          </div>
+          <AssetCard
+            onValueChange={setAmount0}
+            token={token0}
+            value={amount0}
+          />
         </div>
-        <AssetCard
-          setTokenDeposit={(s: string) => {
-            setTokenDeposits((d) => ({ ...d, tokenOneDeposit: s }));
-          }}
-          tokenDeposit={tokenDeposits.tokenOneDeposit}
-          balanceOf={tokenOneBalance}
-          decimals={tokenOneDecimals}
-          tokenAddress={tokenOne}
-        />
-      </div>
-      <div className="space-y-2">
-        <div>
-          <label htmlFor="">Asset 2</label>
+      )}
+      {!!token1 && (
+        <div className="space-y-2">
+          <div>
+            <label htmlFor="">Asset 2</label>
+          </div>
+          <AssetCard
+            onValueChange={setAmount1}
+            token={token1}
+            value={
+              pairExists && quoteLiquidity > 0n
+                ? Number(formatUnits(quoteLiquidity, token1.decimals))
+                : amount1
+            }
+            disableInput={pairExists && quoteLiquidity > 0n}
+          />
         </div>
-        <AssetCard
-          setTokenDeposit={(s: string) => {
-            setTokenDeposits((d) => ({ ...d, tokenTwoDeposit: s }));
-          }}
-          tokenDeposit={tokenDeposits.tokenTwoDeposit}
-          balanceOf={tokenTwoBalance}
-          decimals={tokenTwoDecimals}
-          tokenAddress={tokenTwo}
-        />
-      </div>
+      )}
       <div className="">
         <h5>Starting Liquidity Info</h5>
         <div className="pt-1"></div>
@@ -237,15 +240,18 @@ export default function InitializePool() {
       </div>
       <SubmitButton
         state={state}
-        isValid={poolValidation.isValid}
+        isValid={!!token0 && !!token1}
         approveTokenSymbol={approveTokenSymbol}
         onClick={onSubmit}
       >
         Add Liquidity
       </SubmitButton>
-      <span className="text-[13px] text-red-400 pt-3 text-center">
-        {poolValidation.error}
-      </span>
+      {writeContractError && (
+        <span className="text-[13px] text-red-400 pt-3 text-center">
+          {(writeContractError as BaseError).shortMessage ||
+            writeContractError.message}
+        </span>
+      )}
     </>
   );
 }

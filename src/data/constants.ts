@@ -13,6 +13,9 @@ export enum ChainId {
 export const TRADE_HELPER: { [key: number]: `0x${string}` } = {
   [ChainId.MONAD_TESTNET]: "0xEeeC1d828520fC26541624c4e2E34376220CB93a",
 };
+export const PAIR_HELPER: { [key: number]: `0x${string}` } = {
+  [ChainId.MONAD_TESTNET]: "0xa45328cB9B5215cc18937AB123fCf44a6815b6C1",
+};
 export const ROUTER: { [key: number]: `0x${string}` } = {
   [ChainId.MONAD_TESTNET]: "0x2D67FC1622099Ed068a2049c83773D9016c4aaEf",
 };
