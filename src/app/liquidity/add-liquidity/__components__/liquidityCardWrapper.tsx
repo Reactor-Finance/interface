@@ -2,8 +2,8 @@
 import React, { useMemo } from "react";
 import LiquidityCard from "./liquidityCard/liquidityCard";
 import { useSearchParams } from "next/navigation";
-import { searchParamsSchema } from "./types";
-import { convertToPoolType } from "./utils";
+import { searchParamsSchema } from "../types";
+import { convertToPoolType } from "../utils";
 
 export default function LiquidityCardWrapper() {
   const params = useSearchParams();
@@ -11,16 +11,15 @@ export default function LiquidityCardWrapper() {
     const version = params.get("version");
     const param = { version };
 
-    const a = searchParamsSchema.safeParse(param);
-    if (a.success) {
-      return {
-        version: a.data.version,
-        poolType: convertToPoolType(a.data.version),
-      };
-    }
-    return {
-      poolType: undefined,
-    };
+    const payload = searchParamsSchema.safeParse(param);
+    return payload.success
+      ? {
+          version: payload.data.version,
+          poolType: convertToPoolType(payload.data.version),
+        }
+      : {
+          poolType: undefined,
+        };
   }, [params]);
   return (
     <div className="flex justify-center p-4">

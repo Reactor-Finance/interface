@@ -1,5 +1,5 @@
 import Image from "next/image";
-import React, { useState } from "react";
+import React from "react";
 import verified from "@/assets/verified.svg";
 import info from "@/assets/info.svg";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -7,11 +7,13 @@ import { Switch } from "@/components/ui/switch";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import SearchInput from "@/components/shared/searchInput";
 import ImageWithFallback from "@/components/shared/imageWithFallback";
-import { api } from "@/trpc/react";
 import { TToken } from "@/lib/types";
 import { useTokenlistContext } from "@/contexts/tokenlistContext";
 import { useGetBalance } from "@/lib/hooks/useGetBalance";
-import { formatUnits } from "viem";
+import { formatEther, formatUnits } from "viem";
+import { useGetMarketQuote } from "@/lib/hooks/useGetMarketQuote";
+import { formatNumber } from "@/lib/utils";
+import Spinner from "../ui/spinner";
 
 export default function TokensDailog({
   open,
@@ -86,6 +88,11 @@ function TokenItem({
   selectToken: (token: TToken) => void;
 }) {
   const balance = useGetBalance({ tokenAddress: token.address });
+  const { quote, isLoading: quoteLoading } = useGetMarketQuote({
+    tokenAddress: token.address,
+    value: balance,
+  });
+
   return (
     <button
       type="button"
@@ -111,18 +118,16 @@ function TokenItem({
       </div>
       <div className="flex flex-col items-end font-geistMono">
         <div>
-          <span>
-            {Number(formatUnits(balance, token.decimals)).toLocaleString(
-              "en-US",
-              {
-                useGrouping: true,
-                maximumFractionDigits: 3,
-              }
-            )}
-          </span>
+          <span>{formatNumber(formatUnits(balance, token.decimals))}</span>
         </div>
         <div>
-          <span className="text-gray-400">$0</span>
+          {quoteLoading ? (
+            <Spinner />
+          ) : (
+            <span className="text-gray-400">
+              ${formatNumber(formatEther(quote[0]))}
+            </span>
+          )}
         </div>
       </div>
     </button>

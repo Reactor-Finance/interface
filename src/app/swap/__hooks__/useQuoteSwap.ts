@@ -56,7 +56,11 @@ export function useQuoteSwap({
 
   const amountOut = useMemo(
     () =>
-      isIntrinsicWETHProcess ? amountIn : tokenOut ? Number(formatUnits(receivedAmount, tokenOut.decimals)) : 0,
+      isIntrinsicWETHProcess
+        ? amountIn
+        : tokenOut
+          ? Number(formatUnits(receivedAmount, tokenOut.decimals))
+          : 0,
     [receivedAmount, tokenOut?.decimals]
   );
 

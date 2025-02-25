@@ -1,34 +1,92 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import AssetCard from "./assetCard";
-import { TPoolType } from "@/lib/types";
-import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
-import { useLiquidityCardFormProvider } from "./liquidityCardFormProvider";
+import { TPoolType, TToken } from "@/lib/types";
+import { useChainId, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import useGetAllowances from "./hooks/useGetAllowances";
 import useCheckNeedsApproval from "./hooks/useCheckNeedsApproval";
-import { useAddLiquidity } from "./hooks/useAddLiquidity";
+import { useAddLiquidity } from "../../../__hooks__/useAddLiquidity";
 import useApproveTokens from "./hooks/useApproveTokens";
 import useInitializePoolValidation from "./hooks/useInitializePoolValidation";
 import { useQueryClient } from "@tanstack/react-query";
-import { api } from "@/trpc/react";
 import SubmitButton from "@/components/shared/submitBtn";
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
+import { isAddress, zeroAddress } from "viem";
+import { z } from "zod";
+import { useSearchParams } from "next/navigation";
+import { useTokenlistContext } from "@/contexts/tokenlistContext";
+import { useCheckPair } from "@/lib/hooks/useCheckPair";
+import useApproveWrite from "@/lib/hooks/useApproveWrite";
+import { ROUTER } from "@/data/constants";
+
+const searchParamsSchema = z.object({
+  token0: z.string().refine((arg) => isAddress(arg)),
+  token1: z.string().refine((arg) => isAddress(arg)),
+  version: z.enum(["stable", "concentrated", "volatile"]),
+});
 
 export default function InitializePool() {
-  const {
-    tokenOne,
-    tokenTwo,
-    tokenOneDecimals,
-    tokenTwoDecimals,
-    tokenOneBalance,
-    tokenTwoBalance,
-    tokenOneSymbol,
-    tokenTwoSymbol,
-    poolType,
-  } = useLiquidityCardFormProvider();
-  const { data: pool } = api.pool.findPool.useQuery({
-    tokenOneAddress: tokenOne,
-    tokenTwoAddress: tokenTwo,
-    isStable: poolType === TPoolType.STABLE,
+  // Wagmi parameters
+  const chainId = useChainId();
+  // Token list
+  const { tokenlist } = useTokenlistContext();
+  // Search params
+  const params = useSearchParams();
+  const [t0, t1, version] = useMemo(() => {
+    const t0 = params.get("token0");
+    const t1 = params.get("token1");
+    const version = params.get("version");
+    const param = { token0: t0, token1: t1, version };
+
+    const afterParse = searchParamsSchema.safeParse(param);
+    return (
+      afterParse.success
+        ? [
+            afterParse.data.token0,
+            afterParse.data.token1,
+            afterParse.data.version,
+          ]
+        : [null, null, "volatile"]
+    ) as [
+      `0x${string}` | null,
+      `0x${string}` | null,
+      "stable" | "concentrated" | "volatile",
+    ];
+  }, [params]);
+
+  // Tokens
+  const [token0, token1] = useMemo(() => {
+    const token0 = tokenlist.find((token) => token.address === t0);
+    const token1 = tokenlist.find((token) => token.address === t1);
+    return [token0, token1] as [TToken | undefined, TToken | undefined];
+  }, [t0, t1, tokenlist]);
+
+  // Amounts
+  const [amount0, setAmount0] = useState(0);
+  const [amount1, setAmount1] = useState(0);
+
+  // Router
+  const router = useMemo(() => ROUTER[chainId], [chainId]);
+
+  // Check if pair exists
+  const { pairExists } = useCheckPair({
+    token0: t0 ?? zeroAddress,
+    token1: t1 ?? zeroAddress,
+    stable: version === "stable",
+  });
+
+  // Check approval required
+  const { approveWriteRequest: token0ApprovalWriteRequest, needsApproval: token0NeedsApproval } = useApproveWrite({
+    spender: router,
+    tokenAddress: token0?.address ?? zeroAddress,
+    decimals: token0?.decimals,
+    amount: String(amount0)
+  });
+
+  const { approveWriteRequest: token1ApprovalWriteRequest, needsApproval: token1NeedsApproval } = useApproveWrite({
+    spender: router,
+    tokenAddress: token1?.address ?? zeroAddress,
+    decimals: token1?.decimals,
+    amount: String(amount1)
   });
 
   const queryClient = useQueryClient();
@@ -69,13 +127,7 @@ export default function InitializePool() {
   });
   const { writeContract, isPending, data: hash, reset } = useWriteContract();
   const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash });
-  const poolValidation = useInitializePoolValidation({
-    isApproveSimulationValid: Boolean(approveSimulation?.request),
-    isAddLiquiditySimulationValid: Boolean(addLiquiditySimulation?.request),
-    isApproving,
-    tokenDeposits,
-    isSuccess,
-  });
+  
   const onSubmit = useCallback(() => {
     if (isSuccess) {
       reset();
@@ -139,7 +191,7 @@ export default function InitializePool() {
   return (
     <>
       <h2 className="text-xl">
-        {(pool?.pairs.length ?? 0) > 0 ? "Add Liquidity" : "Initialize Pool"}
+        {pairExists ? "Add Liquidity" : "Initialize Pool"}
       </h2>{" "}
       <div className="space-y-2">
         <div>

@@ -3,8 +3,9 @@ import PageMarginContainer from "@/components/ui/pageMarginContainer";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import React from "react";
-import PoolTabs from "./poolTabs";
-import LiquidityCardWrapper from "./liquidityCardWrapper";
+import PoolTabs from "./__components__/poolTabs";
+import LiquidityCardWrapper from "./__components__/liquidityCardWrapper";
+
 export default function Page() {
   return (
     <PageMarginContainer>

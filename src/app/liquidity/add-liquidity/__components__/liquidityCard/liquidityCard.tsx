@@ -1,7 +1,7 @@
 "use client";
 import { Card } from "@/components/ui/card";
-import React, { useEffect, useMemo } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import React, { useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 import InitializePool from "./initializePool";
 import Stable from "./stable";
 import { z } from "zod";
@@ -16,7 +16,6 @@ const searchParamsSchema = z.object({
 
 export default function LiquidityCard({ poolType }: { poolType: TPoolType }) {
   const params = useSearchParams();
-  const router = useRouter();
   const { token0, token1 } = useMemo(() => {
     const token0 = params.get("tokenO");
     const token1 = params.get("token1");
@@ -34,15 +33,8 @@ export default function LiquidityCard({ poolType }: { poolType: TPoolType }) {
         };
   }, [params]);
 
-  useEffect(() => {
-    if (!token0 || !token1) {
-      // router.push("/");
-    }
-  }, [router, token0, token1]);
-  const found = false;
-  if (!token0 || !token1) {
-    return;
-  }
+  const found = useMemo(() => !!token0 && !!token1, [token0, token1]);
+
   return !token0 || !token1 ? undefined : (
     <LiquidityCardFormProvider
       poolType={poolType}

@@ -2,58 +2,51 @@
 import { Card } from "@/components/ui/card";
 import Headers from "@/components/ui/headers";
 import PageMarginContainer from "@/components/ui/pageMarginContainer";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Alert } from "@/components/ui/alert";
 import { ChevronDown } from "lucide-react";
-import SearchTokensDailog from "@/components/shared/tokensDialog";
+import TokensDialog from "@/components/shared/tokensDialog";
 import ImageWithFallback from "@/components/shared/imageWithFallback";
-import { getLogoAsset } from "@/utils";
-import { TAddress, TPoolType, TToken } from "@/lib/types";
+import { TPoolType, TToken } from "@/lib/types";
 import AvailablePoolRow from "./availablePoolRow";
 import { api } from "@/trpc/react";
-import { getAddress } from "viem";
+import { zeroAddress } from "viem";
+import { useCheckPair } from "@/lib/hooks/useCheckPair";
 
 export default function Page() {
-  const [openOne, setOpenTokenOne] = useState(false);
-  const [openTwo, setOpenTokenTwo] = useState(false);
-  const [tokenOne, setTokenOne] = useState<TToken | undefined>();
-  const [tokenTwo, setTokenTwo] = useState<TToken | undefined>();
-  const setToken = ({ address, symbol, decimals }: TToken) => {
-    if (openOne) {
-      setTokenOne({ address, symbol, decimals });
-      setOpenTokenOne(false);
-    }
-    if (openTwo) {
-      setTokenTwo({ address, symbol, decimals });
-      setOpenTokenTwo(false);
-    }
-  };
-  const setOpen = useCallback(() => {
-    if (openOne) {
-      setOpenTokenOne(false);
-    }
-    if (openTwo) {
-      setOpenTokenTwo(false);
-    }
-  }, [openOne, openTwo]);
+  const [token0DialogOpen, setOpenToken0Dialog] = useState(false);
+  const [token1DialogOpen, setOpenToken1Dialog] = useState(false);
+
+  // Selected tokens
+  const [token0, setToken0] = useState<TToken | undefined>();
+  const [token1, setToken1] = useState<TToken | undefined>();
+
   const { data: pools } = api.pool.findPool.useQuery(
     {
-      tokenOneAddress: tokenOne?.address ?? "0x",
-      tokenTwoAddress: tokenTwo?.address ?? "0x",
+      tokenOneAddress: token0?.address ?? "0x",
+      tokenTwoAddress: token1?.address ?? "0x",
     },
-    { enabled: Boolean(tokenOne) && Boolean(tokenTwo) }
+    { enabled: Boolean(token0) && Boolean(token1) }
   );
-  const { stablePoolExist, volatilePoolExist } = useMemo(() => {
-    if ((pools?.pairs.length ?? 0) <= 0) {
-      return { stablePoolExist: false, volatilePoolExist: false };
-    }
-    const stablePoolExist = Boolean(pools?.pairs.find((pool) => pool.isStable));
-    const volatilePoolExist = Boolean(
-      pools?.pairs.find((pool) => !pool.isStable)
-    );
-    return { stablePoolExist, volatilePoolExist };
-  }, [pools]);
-  const isTokensSelected = tokenOne && tokenTwo;
+
+  // Check pairs
+  const { pairExists: stablePoolExists } = useCheckPair({
+    token0: token0?.address ?? zeroAddress,
+    token1: token1?.address ?? zeroAddress,
+    stable: true,
+  });
+  const { pairExists: volatilePoolExists } = useCheckPair({
+    token0: token0?.address ?? zeroAddress,
+    token1: token1?.address ?? zeroAddress,
+    stable: false,
+  });
+
+  // Tokens have been selected
+  const isTokensSelected = useMemo(
+    () => !!token0 && !!token1,
+    [token0, token1]
+  );
+
   return (
     <PageMarginContainer>
       <Headers.GradiantHeaderOne colorOne="#A0055D" colorTwo="#836EF9">
@@ -61,21 +54,36 @@ export default function Page() {
       </Headers.GradiantHeaderOne>
       <div className="pt-6"></div>
       <div className=" gap-x-4 grid grid-cols-2">
-        <SearchTokensDailog
-          setToken={setToken}
-          open={openOne || openTwo}
-          setOpen={setOpen}
+        <TokensDialog
+          onTokenSelected={setToken0}
+          open={token0DialogOpen}
+          onOpen={setOpenToken0Dialog}
+          selectedTokens={[
+            token0?.address ?? zeroAddress,
+            token1?.address ?? zeroAddress,
+          ]}
+        />
+        <TokensDialog
+          onTokenSelected={setToken1}
+          open={token1DialogOpen}
+          onOpen={setOpenToken1Dialog}
+          selectedTokens={[
+            token0?.address ?? zeroAddress,
+            token1?.address ?? zeroAddress,
+          ]}
         />
         <Card bg="1000">
           <SearchTokensTrigger
-            token={tokenOne}
-            onClick={() => setOpenTokenOne(true)}
+            token={token0}
+            onClick={() => setOpenToken0Dialog(true)}
+            placeholder="Select first token"
           />
         </Card>
         <Card bg="1000">
           <SearchTokensTrigger
-            token={tokenTwo}
-            onClick={() => setOpenTokenTwo(true)}
+            token={token1}
+            onClick={() => setOpenToken1Dialog(true)}
+            placeholder="Select second token"
           />
         </Card>
       </div>
@@ -88,37 +96,34 @@ export default function Page() {
       <div className="pt-8">
         <h3>Available pools</h3>
         <div className="space-y-2 pt-4">
-          {pools?.pairs.map((pool) => {
-            return (
-              <AvailablePoolRow
-                key={pool.id}
-                tokenOne={{
-                  address: getAddress(pool.token0.id),
-                  symbol: pool.token0.symbol,
-                  decimals: parseInt(pool.token0.decimals),
-                }}
-                tokenTwo={{
-                  address: getAddress(pool.token1.id),
-                  symbol: pool.token1.symbol,
-                  decimals: parseInt(pool.token1.decimals),
-                }}
-                poolType={pool.isStable ? TPoolType.STABLE : TPoolType.VOLATILE}
-              ></AvailablePoolRow>
-            );
-          })}
-          {isTokensSelected && !stablePoolExist && (
+          {!!pools &&
+            !!token0 &&
+            !!token1 &&
+            pools.pairs.map((pool) => {
+              return (
+                <AvailablePoolRow
+                  key={pool.id}
+                  token0={token0}
+                  token1={token1}
+                  poolType={
+                    pool.isStable ? TPoolType.STABLE : TPoolType.VOLATILE
+                  }
+                />
+              );
+            })}
+          {isTokensSelected && !stablePoolExists && !!token0 && !!token1 && (
             <>
               <AvailablePoolRow
-                tokenOne={tokenOne}
-                tokenTwo={tokenTwo}
+                token0={token0}
+                token1={token1}
                 poolType={TPoolType.STABLE}
               />
             </>
           )}
-          {isTokensSelected && !volatilePoolExist && (
+          {isTokensSelected && !volatilePoolExists && !!token0 && !!token1 && (
             <AvailablePoolRow
-              tokenOne={tokenOne}
-              tokenTwo={tokenTwo}
+              token0={token0}
+              token1={token1}
               poolType={TPoolType.VOLATILE}
             />
           )}
@@ -131,9 +136,11 @@ export default function Page() {
 function SearchTokensTrigger({
   onClick,
   token,
+  placeholder = "Select token",
 }: {
   onClick: () => void;
   token?: TToken;
+  placeholder?: string;
 }) {
   return (
     <button
@@ -149,12 +156,12 @@ function SearchTokensTrigger({
             width={24}
             height={24}
             className="rounded-full h-5 w-5"
-            src={getLogoAsset(token.address as TAddress)}
+            src={token.logoURI}
             alt={token.symbol}
           />
         </div>
       ) : (
-        <span className="text-neutral-200">Select first token</span>
+        <span className="text-neutral-200">{placeholder}</span>
       )}
       <div>
         <ChevronDown className="w-5 h-5" />

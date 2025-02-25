@@ -6,9 +6,10 @@ import { api } from "@/trpc/react";
 import { TPools } from "@/server/queries/pools";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SearchInput from "@/components/shared/searchInput";
-import { useDebounce } from "@/components/shared/hooks/useDebounce";
-import useInitializePage from "./hooks/useInitializePage";
+import { useDebounce } from "@/lib/hooks/useDebounce";
+import useInitializePage from "./__hooks__/useInitializePage";
 import PoolRowSkeleton from "./poolRowSkeleton";
+
 type QueryFilters = {
   searchQuery: string;
   isStable: boolean | undefined;
