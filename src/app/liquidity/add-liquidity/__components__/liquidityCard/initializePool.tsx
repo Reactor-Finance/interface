@@ -120,7 +120,11 @@ export default function InitializePool() {
         : parseUnits(String(amount1), token1?.decimals ?? 18),
     [amount1, token1, pairExists, quoteLiquidity]
   );
-  const { request: addLiquidityRequest } = useAddLiquidity({
+  const {
+    addLiquidityETHSimulation,
+    addLiquiditySimulation,
+    isAddLiquidityETH,
+  } = useAddLiquidity({
     token0: token0?.address ?? zeroAddress,
     token1: token1?.address ?? zeroAddress,
     amountADesired,
@@ -149,19 +153,27 @@ export default function InitializePool() {
       writeContract(token1ApprovalWriteRequest);
       return;
     }
-
-    if (addLiquidityRequest) {
-      reset(); // Call reset first to clear internal state
-      writeContract(addLiquidityRequest as any);
+    if (isAddLiquidityETH) {
+      if (addLiquidityETHSimulation.data?.request) {
+        reset();
+        writeContract(addLiquidityETHSimulation.data.request);
+      }
+    } else {
+      if (addLiquiditySimulation.data?.request) {
+        reset();
+        writeContract(addLiquiditySimulation.data.request);
+      }
     }
   }, [
     token0NeedsApproval,
-    token1NeedsApproval,
     token0ApprovalWriteRequest,
+    token1NeedsApproval,
     token1ApprovalWriteRequest,
-    addLiquidityRequest,
-    writeContract,
+    isAddLiquidityETH,
     reset,
+    writeContract,
+    addLiquidityETHSimulation,
+    addLiquiditySimulation,
   ]);
 
   const approveTokenSymbol = useMemo(() => {
@@ -178,6 +190,17 @@ export default function InitializePool() {
     isFetching: token0ApprovalFetching || token1ApprovalFetching,
     needsApproval: token0NeedsApproval || token1NeedsApproval,
   });
+  const addLiquidityRequest = useMemo(
+    () =>
+      isAddLiquidityETH
+        ? addLiquidityETHSimulation.data?.request
+        : addLiquiditySimulation.data?.request,
+    [
+      addLiquidityETHSimulation.data?.request,
+      addLiquiditySimulation.data?.request,
+      isAddLiquidityETH,
+    ]
+  );
   return (
     <>
       <h2 className="text-xl">

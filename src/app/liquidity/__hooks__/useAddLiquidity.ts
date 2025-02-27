@@ -97,11 +97,6 @@ export function useAddLiquidity({
       token1.toLowerCase() === ETHER.toLowerCase(),
     [token0, token1]
   );
-  const simulation = useMemo(
-    () =>
-      isAddLiquidityETH ? addLiquidityETHSimulation : addLiquiditySimulation,
-    [isAddLiquidityETH, addLiquidityETHSimulation, addLiquiditySimulation]
-  );
 
   useEffect(() => {
     if (addLiquidityETHSimulation.data || addLiquidityETHSimulation.error) {
@@ -117,5 +112,9 @@ export function useAddLiquidity({
     }
   }, [addLiquiditySimulation]);
 
-  return { request: simulation.data?.request };
+  return {
+    addLiquiditySimulation,
+    addLiquidityETHSimulation,
+    isAddLiquidityETH,
+  };
 }
