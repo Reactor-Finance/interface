@@ -1,8 +1,15 @@
 "use client";
+import { api } from "@/trpc/react";
 import DashboardLiquidityDialog from "./dashboardLiquidityDialog/dashboardLiquidityDialog";
 import { LiquidityRow } from "./liquidityRow";
+import { useAccount } from "wagmi";
 
 export default function DashboardLiquidityTable() {
+  const { address } = useAccount();
+  const { data } = api.user.getLiquidityPositions.useQuery(
+    { userAddress: address ?? "0x" },
+    { enabled: !!address }
+  );
   return (
     <>
       <DashboardLiquidityDialog />
@@ -19,7 +26,9 @@ export default function DashboardLiquidityTable() {
           </tr>
         </thead>
         <tbody>
-          <LiquidityRow id="1"></LiquidityRow>
+          {data?.user.liquidityPositions.map((position) => (
+            <LiquidityRow key={position.id} id="1"></LiquidityRow>
+          ))}
         </tbody>
       </table>
     </>
