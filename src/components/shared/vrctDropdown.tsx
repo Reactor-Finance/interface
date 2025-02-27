@@ -19,7 +19,7 @@ export default function VrctDropdown({
 }) {
   return (
     <Select>
-      <SelectTrigger className="flex  p-4">
+      <SelectTrigger className="flex  py-2">
         <div className="flex justify-center items-center gap-x-2 ">
           <Image src={symbl} width={24} height={24} alt="Reactor Ticker" />
           <SelectValue placeholder={placeholder} />
