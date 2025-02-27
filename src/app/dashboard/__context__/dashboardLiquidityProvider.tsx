@@ -1,8 +1,5 @@
 "use client";
-import { UserLiquidityPositions } from "@/server/queries/user";
-import { api } from "@/trpc/react";
 import React, { createContext, useContext } from "react";
-import { useAccount } from "wagmi";
 
 export enum LiquidityActions {
   Stake,
@@ -20,7 +17,6 @@ interface ContextType {
   updateState: (payload: Partial<StateType>) => void;
   state: StateType;
   openModal: (actionType: LiquidityActions, positionId: string) => void;
-  userLiquidityPositions: UserLiquidityPositions | undefined;
 }
 const LiquidityContext = createContext<ContextType | undefined>(undefined);
 interface Props {
@@ -34,12 +30,6 @@ export const DashboardLiquidityProvider = ({ children }: Props) => {
     positionId: undefined,
     sliderValue: 0,
   });
-
-  const { address } = useAccount();
-  const { data } = api.user.getLiquidityPositions.useQuery(
-    { userAddress: address ?? "0x" },
-    { enabled: !!address }
-  );
   const updateState = (payload: Partial<StateType>) => {
     setState((prevState) => ({ ...prevState, ...payload }));
   };
@@ -48,9 +38,7 @@ export const DashboardLiquidityProvider = ({ children }: Props) => {
   };
 
   return (
-    <LiquidityContext.Provider
-      value={{ state, userLiquidityPositions: data, openModal, updateState }}
-    >
+    <LiquidityContext.Provider value={{ state, openModal, updateState }}>
       {" "}
       {children}
     </LiquidityContext.Provider>

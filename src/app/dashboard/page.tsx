@@ -3,11 +3,11 @@ import React, { useState } from "react";
 import Headers from "@/components/ui/headers";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import InnerLabelInput from "./input";
+import InnerLabelInput from "./__components__/input";
 import PageMarginContainer from "@/components/ui/pageMarginContainer";
 import wheel from "@/assets/wheel.svg";
-import { DashboardLiquidityProvider } from "./dashLiquidityProvider";
-import DashboardLiquidityTable from "./dashboardLiquidityTable";
+import DashboardLiquidityTable from "./__components__/dashboardLiquidityTable";
+import { DashboardLiquidityProvider } from "./__context__/dashboardLiquidityProvider";
 
 export default function Dashboard() {
   const [isPoolTableOpen, setIsPoolTableOpen] = useState(false);
