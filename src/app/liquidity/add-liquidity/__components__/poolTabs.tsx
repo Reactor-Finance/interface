@@ -41,6 +41,7 @@ export default function PoolTabs() {
   useEffect(() => {
     if (poolType === undefined) router.push("/");
   }, [poolType, router]);
+
   // Get a new searchParams string by merging the current
   // searchParams with a provided key/value pair
   const createQueryString = useCallback(
@@ -51,6 +52,7 @@ export default function PoolTabs() {
     },
     [params]
   );
+
   const tabTriggerHandle = useCallback(
     (poolType: TPoolType) => {
       if (poolType === TPoolType.STABLE) {

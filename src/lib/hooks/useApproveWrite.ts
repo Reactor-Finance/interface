@@ -1,6 +1,7 @@
 import { Address, erc20Abi, maxUint256, parseUnits } from "viem";
 import { useSimulateContract, useWatchBlocks } from "wagmi";
 import useGetAllowance from "./useGetAllowance";
+import { ETHER } from "@/data/constants";
 
 /**
  * Returns write data request only if the allowance is less than the amount
@@ -45,17 +46,12 @@ export default function useApproveWrite({
     },
   });
 
-  return allowance < parseUnits(amount, decimals) && !!data?.request
-    ? {
-        approveWriteRequest: data.request,
-        needsApproval: true,
-        allowanceKey: queryKey,
-        isFetching,
-      }
-    : {
-        approveWriteRequest: undefined,
-        needsApproval: false,
-        allowanceKey: queryKey,
-        isFetching,
-      };
+  return {
+    approveWriteRequest: data?.request,
+    needsApproval:
+      allowance < parseUnits(amount, decimals) &&
+      tokenAddress?.toLowerCase() !== ETHER.toLowerCase(),
+    allowanceKey: queryKey,
+    isFetching,
+  };
 }

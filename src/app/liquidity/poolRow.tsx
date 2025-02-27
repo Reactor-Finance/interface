@@ -3,11 +3,10 @@ import PoolHeader from "@/components/shared/poolHeader";
 import { Button } from "@/components/ui/button";
 import { TableRow } from "@/components/ui/table";
 import { TPoolType } from "@/lib/types";
-import { Address, getAddress } from "viem";
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { TPool } from "@/server/queries/pools/getPools";
-import { getLogoAsset } from "@/utils";
+import { useTokenlistContext } from "@/contexts/tokenlistContext";
 
 export default function PoolRow({
   isStable,
@@ -16,35 +15,38 @@ export default function PoolRow({
   volumeUSD,
 }: TPool) {
   const router = useRouter();
-  const tokenOneAddress = getAddress(token0.id);
-  const tokenTwoAddress = getAddress(token1.id);
-  const addLiquidityHandler = () => {
+  const { tokenlist } = useTokenlistContext();
+  const t0 = useMemo(
+    () =>
+      tokenlist.find(
+        (token) => token.address.toLowerCase() === token0.id.toLowerCase()
+      ),
+    [tokenlist, token0]
+  );
+  const t1 = useMemo(
+    () =>
+      tokenlist.find(
+        (token) => token.address.toLowerCase() === token1.id.toLowerCase()
+      ),
+    [tokenlist, token1]
+  );
+
+  const addLiquidityHandler = useCallback(() => {
     router.push(
-      `/liquidity/add-liquidity?tokenOne=${tokenOneAddress}&tokenTwo=${tokenTwoAddress}&version=${isStable ? "stable" : "volatile"}`
+      `/liquidity/add-liquidity?token0=${t0?.address}&token1=${t1?.address}&version=${isStable ? "stable" : "volatile"}`
     );
-  };
+  }, [router, t0?.address, t1?.address, isStable]);
+
   return (
     <TableRow>
       <th className="col-span-4 text-left">
-        <PoolHeader
-          token0={{
-            address: getAddress(tokenOneAddress),
-            symbol: token0.symbol,
-            decimals: parseInt(token0.decimals),
-            logoURI: getLogoAsset(token0.id as Address),
-            name: "",
-            chainId: 1,
-          }}
-          token1={{
-            address: getAddress(tokenTwoAddress),
-            symbol: token1.symbol,
-            decimals: parseInt(token1.decimals),
-            logoURI: getLogoAsset(token1.id as Address),
-            name: "",
-            chainId: 1,
-          }}
-          poolType={isStable ? TPoolType.STABLE : TPoolType.VOLATILE}
-        />
+        {!!t0 && !!t1 && (
+          <PoolHeader
+            token0={t0}
+            token1={t1}
+            poolType={isStable ? TPoolType.STABLE : TPoolType.VOLATILE}
+          />
+        )}
       </th>
       <th className="">$5,505,444</th>
       <th className="text-blue-light">11%</th>
@@ -56,25 +58,9 @@ export default function PoolRow({
           <Button variant="filled" onClick={addLiquidityHandler}>
             <div className="flex items-center gap-x-1">
               <span>Add</span>
-              <CurrenciesOverlapIcons
-                size="sm"
-                token0={{
-                  address: getAddress(tokenOneAddress),
-                  symbol: token0.symbol,
-                  decimals: parseInt(token1.decimals),
-                  logoURI: getLogoAsset(token1.id as Address),
-                  name: "",
-                  chainId: 1,
-                }}
-                token1={{
-                  address: getAddress(tokenTwoAddress),
-                  symbol: token1.symbol,
-                  decimals: parseInt(token1.decimals),
-                  logoURI: getLogoAsset(token1.id as Address),
-                  name: "",
-                  chainId: 1,
-                }}
-              />
+              {!!t0 && !!t1 && (
+                <CurrenciesOverlapIcons size="sm" token0={t0} token1={t1} />
+              )}
             </div>
           </Button>
         </div>

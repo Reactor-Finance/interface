@@ -6,9 +6,11 @@ export const enum ErrorCodes {
   InsufficientBalance = "Insufficient balance",
   EnterAmount = "Enter amount",
 }
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
+
 /**
  * @returns string | Will round down to 10th decimal
  */

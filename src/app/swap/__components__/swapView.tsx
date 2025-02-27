@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import SwapIconBorder from "@/components/shared/swapIconBorder";
 import CurrencyInput from "@/components/shared/currencyInput";
-import TokensDailog from "@/components/shared/tokensDialog";
+import TokensDialog from "@/components/shared/tokensDialog";
 import useApproveWrite from "@/lib/hooks/useApproveWrite";
 import {
   useChainId,
@@ -15,8 +15,10 @@ import { useQuoteSwap } from "../__hooks__/useQuoteSwap";
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
 import { TToken } from "@/lib/types";
 import { ROUTER } from "@/data/constants";
-import { zeroAddress } from "viem";
+import { formatUnits, parseUnits, zeroAddress } from "viem";
 import { useWETHExecutions } from "../__hooks__/useWETHExecutions";
+import { useGetBalance } from "@/lib/hooks/useGetBalance";
+import { formatNumber } from "@/lib/utils";
 
 export default function SwapView() {
   // Wagmi parameters
@@ -27,6 +29,14 @@ export default function SwapView() {
   // Selected tokens
   const [token0, setToken0] = useState<TToken | null>(null);
   const [token1, setToken1] = useState<TToken | null>(null);
+
+  // Balances
+  const token0Balance = useGetBalance({
+    tokenAddress: token0?.address ?? zeroAddress,
+  });
+  const token1Balance = useGetBalance({
+    tokenAddress: token1?.address ?? zeroAddress,
+  });
 
   // Modal state
   const [firstDialogOpen, setFirstDialogOpen] = useState(false);
@@ -54,23 +64,24 @@ export default function SwapView() {
   });
 
   // Simulate swap
-  const { data: swapSimulation } = useSwapSimulation({
-    amount: amountIn,
-    token0,
-    token1,
-  });
+  const { data: swapSimulation, error: swapSimulationError } =
+    useSwapSimulation({
+      amount: amountIn,
+      token0,
+      token1,
+      minAmountOut: parseUnits(
+        String(amountOut.toFixed(4)),
+        token1?.decimals ?? 18
+      ),
+    });
 
   // Simulate WETH process
-  const {
-    isIntrinsicWETHProcess,
-    isToken0,
-    WETHProcessSimulation,
-    isWETHToEther,
-  } = useWETHExecutions({
-    amount: amountIn,
-    token0,
-    token1,
-  });
+  const { isIntrinsicWETHProcess, WETHProcessSimulation, isWETHToEther } =
+    useWETHExecutions({
+      amount: amountIn,
+      token0,
+      token1,
+    });
 
   const {
     writeContract,
@@ -90,13 +101,13 @@ export default function SwapView() {
 
   const onSubmit = useCallback(() => {
     if (isIntrinsicWETHProcess) {
-      if (isToken0) {
-        const req = WETHProcessSimulation?.depositSimulation?.data?.request;
+      if (isWETHToEther) {
+        const req = WETHProcessSimulation?.withdrawalSimulation?.data?.request;
         if (req) {
           writeContract(req);
         }
       } else {
-        const req = WETHProcessSimulation?.withdrawalSimulation?.data?.request;
+        const req = WETHProcessSimulation?.depositSimulation?.data?.request;
         if (req) {
           writeContract(req);
         }
@@ -116,7 +127,7 @@ export default function SwapView() {
     approveWriteRequest,
     needsApproval,
     swapSimulation,
-    isToken0,
+    isWETHToEther,
     WETHProcessSimulation?.depositSimulation?.data?.request,
     WETHProcessSimulation?.withdrawalSimulation?.data?.request,
     writeContract,
@@ -125,18 +136,31 @@ export default function SwapView() {
   const { state: buttonState } = useGetButtonStatuses({
     isPending,
     isLoading,
-    needsApproval,
+    needsApproval: needsApproval && !isIntrinsicWETHProcess,
   });
+
+  const stateValid = useMemo(
+    () =>
+      Boolean(swapSimulation?.request) ||
+      Boolean(WETHProcessSimulation.depositSimulation.data) ||
+      Boolean(WETHProcessSimulation.withdrawalSimulation.data) ||
+      needsApproval,
+    [swapSimulation, WETHProcessSimulation, needsApproval]
+  );
 
   useEffect(() => {
     if (writeError) {
       console.error(writeError);
     }
-  }, [writeError]);
+
+    if (swapSimulationError) {
+      console.error(swapSimulationError);
+    }
+  }, [writeError, swapSimulationError]);
 
   return (
     <div className="relative space-y-2">
-      <TokensDailog
+      <TokensDialog
         open={firstDialogOpen}
         onOpen={setFirstDialogOpen}
         onTokenSelected={setToken0}
@@ -145,7 +169,7 @@ export default function SwapView() {
           token1?.address ?? zeroAddress,
         ]}
       />
-      <TokensDailog
+      <TokensDialog
         open={secondDialogOpen}
         onOpen={setSecondDialogOpen}
         onTokenSelected={setToken1}
@@ -155,7 +179,12 @@ export default function SwapView() {
         ]}
       />
       <InputPane active={activePane === 0} onClick={() => setActivePane(0)}>
-        <CurrencyInput.Root title="Sell" estimate="0">
+        <CurrencyInput.Root
+          title="Sell"
+          estimate={formatNumber(
+            formatUnits(token0Balance, token0?.decimals ?? 18)
+          )}
+        >
           <CurrencyInput.CurrencySelect
             onClick={() => setFirstDialogOpen(true)}
             token={token0}
@@ -169,7 +198,12 @@ export default function SwapView() {
       </InputPane>
       <SwapIconBorder swapIconClick={switchTokens} />
       <InputPane active={activePane === 1} onClick={() => setActivePane(1)}>
-        <CurrencyInput.Root title="Buy" estimate="0">
+        <CurrencyInput.Root
+          title="Buy"
+          estimate={formatNumber(
+            formatUnits(token1Balance, token1?.decimals ?? 18)
+          )}
+        >
           <CurrencyInput.CurrencySelect
             onClick={() => setSecondDialogOpen(true)}
             token={token1}
@@ -185,11 +219,7 @@ export default function SwapView() {
       <div className="pt-2">
         <SubmitButton
           state={buttonState}
-          isValid={
-            Boolean(swapSimulation) ||
-            Boolean(WETHProcessSimulation.depositSimulation.data) ||
-            Boolean(WETHProcessSimulation.withdrawalSimulation.data)
-          }
+          isValid={stateValid}
           approveTokenSymbol={token0?.symbol}
           onClick={onSubmit}
         >

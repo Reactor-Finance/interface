@@ -6,9 +6,10 @@ import { api } from "@/trpc/react";
 import { TPools } from "@/server/queries/pools";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SearchInput from "@/components/shared/searchInput";
-import useInitializePage from "./hooks/useInitializePage";
-import PoolRowSkeleton from "./poolRowSkeleton";
 import { useDebounce } from "@/lib/hooks/useDebounce";
+import useInitializePage from "./__hooks__/useInitializePage";
+import PoolRowSkeleton from "./poolRowSkeleton";
+
 type QueryFilters = {
   searchQuery: string;
   isStable: boolean | undefined;
@@ -20,6 +21,7 @@ enum TabValues {
   VOLATILE = "volatile",
   CONCENTRATED = "concentrated",
 }
+
 export default function PoolsTable({
   initialPools,
 }: {
@@ -124,9 +126,7 @@ export default function PoolsTable({
           </thead>
           <tbody className="gap-y-2 pt-2 flex flex-col">
             {loadingBounced &&
-              [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
-                <PoolRowSkeleton key={i} />
-              ))}
+              Array.from({ length: 10 }, (_, i) => <PoolRowSkeleton key={i} />)}
             {!loadingBounced &&
               pools?.pairs.map((pool) => <PoolRow {...pool} key={pool.id} />)}
           </tbody>
