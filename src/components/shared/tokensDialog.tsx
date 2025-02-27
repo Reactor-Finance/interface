@@ -9,7 +9,8 @@ import SearchInput from "@/components/shared/searchInput";
 import ImageWithFallback from "@/components/shared/imageWithFallback";
 import { TToken } from "@/lib/types";
 import { useTokenlistContext } from "@/contexts/tokenlistContext";
-import { formatUnits } from "viem";
+// import { useGetBalance } from "@/lib/hooks/useGetBalance";
+// import { useGetMarketQuote } from "@/lib/hooks/useGetMarketQuote";
 
 export default function TokensDailog({
   open,
@@ -112,16 +113,17 @@ function TokenItem({
         </div>
       </div>
       <div className="flex flex-col items-end font-geistMono">
+        {/* <div> */}
+        {/*   <span>{formatNumber(formatUnits(0n, token.decimals))}</span> */}
+        {/* </div> */}
         <div>
-          <span>
-            {Number(formatUnits(0n, token.decimals)).toLocaleString("en-US", {
-              useGrouping: true,
-              maximumFractionDigits: 3,
-            })}
-          </span>
-        </div>
-        <div>
-          <span className="text-gray-400">$0</span>
+          {/* {quoteLoading ? ( */}
+          {/*   <Spinner /> */}
+          {/* ) : ( */}
+          {/*   <span className="text-gray-400"> */}
+          {/*     ${formatNumber(formatEther(quote[0]))} */}
+          {/*   </span> */}
+          {/* )} */}
         </div>
       </div>
     </button>

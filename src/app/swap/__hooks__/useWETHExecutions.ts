@@ -54,10 +54,7 @@ export function useWETHExecutions({
     return { withdrawalSimulation, depositSimulation };
   }, [withdrawalSimulation, depositSimulation]);
 
-  const isToken0 = weth === token0?.address;
-
   return {
-    isToken0,
     isIntrinsicWETHProcess,
     WETHProcessSimulation,
     withdrawalSimulation,

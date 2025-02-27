@@ -10,7 +10,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { monadTestnet } from "wagmi/chains";
 import { hashFn } from "@wagmi/core/query";
 import { FC, PropsWithChildren } from "react";
-import { WagmiProvider } from "wagmi";
+import { http, WagmiProvider } from "wagmi";
 import { HeroUIProvider } from "@heroui/react";
 import { TRPCReactProvider } from "@/trpc/react";
 import { TokenlistContextProvider } from "@/contexts/tokenlistContext";
@@ -23,6 +23,11 @@ export const wagmiConfig = getDefaultConfig({
   projectId: "75ec6bc09b1280c146d750fbb7aae68a",
   ssr: true,
   chains: [monadTestnet],
+  transports: {
+    [monadTestnet.id]: http(
+      "https://monad-testnet.g.alchemy.com/v2/7wbWB2YsEDHzMwUul1uwHcOapXgLevhY"
+    ),
+  },
 });
 
 const queryClient = new QueryClient({

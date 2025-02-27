@@ -624,4 +624,8 @@ export const abi = [
     stateMutability: "view",
     type: "function",
   },
+  {
+    stateMutability: "payable",
+    type: "receive",
+  },
 ] as const;
