@@ -5,15 +5,15 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import React, { useMemo } from "react";
-import {
-  LiquidityActions,
-  useDashboardLiquidityProvider,
-} from "../dashLiquidityProvider";
 import { Slider } from "@/components/ui/slider";
 import EstimatesHeader from "@/app/lock/estimateHeader";
 import PoolHeader from "@/components/shared/poolHeader";
 import { TPoolType } from "@/lib/types";
 import SubmitButton, { ButtonState } from "@/components/shared/submitBtn";
+import {
+  LiquidityActions,
+  useDashboardLiquidityProvider,
+} from "../../__context__/dashboardLiquidityProvider";
 
 export default function DashboardLiquidityDialog() {
   const { state, updateState } = useDashboardLiquidityProvider();

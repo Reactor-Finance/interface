@@ -1,6 +1,6 @@
 "use client";
+import { useDashboardLiquidityProvider } from "../__context__/dashboardLiquidityProvider";
 import DashboardLiquidityDialog from "./dashboardLiquidityDialog/dashboardLiquidityDialog";
-import { useDashboardLiquidityProvider } from "./dashLiquidityProvider";
 import { LiquidityRow } from "./liquidityRow";
 
 export default function DashboardLiquidityTable() {

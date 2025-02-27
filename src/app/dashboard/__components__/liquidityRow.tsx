@@ -5,11 +5,11 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import symbol from "@/assets/reactor-symbol.svg";
 import greenDot from "@/assets/green-dot.svg";
 import { Button } from "@/components/ui/button";
+import { EllipsisIcon } from "lucide-react";
 import {
   LiquidityActions,
   useDashboardLiquidityProvider,
-} from "./dashLiquidityProvider";
-import { EllipsisIcon } from "lucide-react";
+} from "../__context__/dashboardLiquidityProvider";
 
 export function LiquidityRow({ id }: { id: string }) {
   const { openModal } = useDashboardLiquidityProvider();
