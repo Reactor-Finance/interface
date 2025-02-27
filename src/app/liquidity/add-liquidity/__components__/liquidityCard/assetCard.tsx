@@ -9,7 +9,7 @@ import { formatNumber } from "@/lib/utils";
 
 interface Props {
   token: TToken;
-  onValueChange: (value: number) => any;
+  onValueChange: (value: number) => void;
   value: number;
   disableInput?: boolean;
 }
