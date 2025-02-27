@@ -30,6 +30,7 @@ const UserSchemaDetails = z.object({
 const UserSchema = z.object({
   user: UserSchemaDetails,
 });
+export type UserLiquidityPositions = z.infer<typeof UserSchema>;
 
 export const userQuery = gql`
   query UserLiquidityPositions($id: ID!) {
