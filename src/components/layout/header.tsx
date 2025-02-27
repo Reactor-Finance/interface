@@ -13,11 +13,12 @@ export default function Header() {
         <Image src={reactor} alt="" />
       </div>
       <div>
-        <ul className="grid justify-center grid-cols-4 place-items-center text-[14px]">
+        <ul className="grid justify-center grid-cols-5 place-items-center text-[14px]">
           <NavLink href="/swap">Swap</NavLink>
           <NavLink href="/lock">Lock</NavLink>
           <NavLink href="/dashboard">Dashboard</NavLink>
           <NavLink href="/liquidity">Liquidity</NavLink>
+          <NavLink href="/voting">Voting</NavLink>
         </ul>
       </div>
       <div className="flex justify-end">

@@ -9,11 +9,8 @@ import SearchInput from "@/components/shared/searchInput";
 import ImageWithFallback from "@/components/shared/imageWithFallback";
 import { TToken } from "@/lib/types";
 import { useTokenlistContext } from "@/contexts/tokenlistContext";
-import { useGetBalance } from "@/lib/hooks/useGetBalance";
-import { formatEther, formatUnits } from "viem";
-import { useGetMarketQuote } from "@/lib/hooks/useGetMarketQuote";
-import { formatNumber } from "@/lib/utils";
-import Spinner from "../ui/spinner";
+// import { useGetBalance } from "@/lib/hooks/useGetBalance";
+// import { useGetMarketQuote } from "@/lib/hooks/useGetMarketQuote";
 
 export default function TokensDailog({
   open,
@@ -87,12 +84,11 @@ function TokenItem({
   token: TToken;
   selectToken: (token: TToken) => void;
 }) {
-  const balance = useGetBalance({ tokenAddress: token.address });
-  const { quote, isLoading: quoteLoading } = useGetMarketQuote({
-    tokenAddress: token.address,
-    value: balance,
-  });
-
+  // n+1 problem
+  // https://planetscale.com/blog/what-is-n-1-query-problem-and-how-to-solve-it
+  // need backend endpoint that returns portfolio of token bals
+  // instead of querying each token
+  // const balance = useGetBalance({ tokenAddress: token.address });
   return (
     <button
       type="button"
@@ -117,17 +113,17 @@ function TokenItem({
         </div>
       </div>
       <div className="flex flex-col items-end font-geistMono">
+        {/* <div> */}
+        {/*   <span>{formatNumber(formatUnits(0n, token.decimals))}</span> */}
+        {/* </div> */}
         <div>
-          <span>{formatNumber(formatUnits(balance, token.decimals))}</span>
-        </div>
-        <div>
-          {quoteLoading ? (
-            <Spinner />
-          ) : (
-            <span className="text-gray-400">
-              ${formatNumber(formatEther(quote[0]))}
-            </span>
-          )}
+          {/* {quoteLoading ? ( */}
+          {/*   <Spinner /> */}
+          {/* ) : ( */}
+          {/*   <span className="text-gray-400"> */}
+          {/*     ${formatNumber(formatEther(quote[0]))} */}
+          {/*   </span> */}
+          {/* )} */}
         </div>
       </div>
     </button>
