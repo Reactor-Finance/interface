@@ -3,7 +3,6 @@ import PoolHeader from "@/components/shared/poolHeader";
 import { Button } from "@/components/ui/button";
 import { TableRow } from "@/components/ui/table";
 import { TPoolType } from "@/lib/types";
-import { Address, getAddress } from "viem";
 import React, { useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { TPool } from "@/server/queries/pools/getPools";
