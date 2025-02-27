@@ -139,6 +139,15 @@ export default function SwapView() {
     needsApproval: needsApproval && !isIntrinsicWETHProcess,
   });
 
+  const stateValid = useMemo(
+    () =>
+      Boolean(swapSimulation?.request) ||
+      Boolean(WETHProcessSimulation.depositSimulation.data) ||
+      Boolean(WETHProcessSimulation.withdrawalSimulation.data) ||
+      needsApproval,
+    [swapSimulation, WETHProcessSimulation, needsApproval]
+  );
+
   useEffect(() => {
     if (writeError) {
       console.error(writeError);
@@ -210,12 +219,7 @@ export default function SwapView() {
       <div className="pt-2">
         <SubmitButton
           state={buttonState}
-          isValid={
-            Boolean(swapSimulation?.request) ||
-            Boolean(WETHProcessSimulation.depositSimulation.data) ||
-            Boolean(WETHProcessSimulation.withdrawalSimulation.data) ||
-            needsApproval
-          }
+          isValid={stateValid}
           approveTokenSymbol={token0?.symbol}
           onClick={onSubmit}
         >

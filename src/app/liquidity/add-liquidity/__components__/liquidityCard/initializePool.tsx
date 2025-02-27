@@ -164,20 +164,42 @@ export default function InitializePool() {
     reset,
   ]);
 
-  const approveTokenSymbol = useMemo(() => {
+  const tokenNeedingApproval = useMemo(() => {
     if (token0NeedsApproval && token0) {
-      return token0.symbol;
+      return token0;
     }
     if (token1NeedsApproval && token1) {
-      return token1.symbol;
+      return token1;
     }
   }, [token0, token1, token0NeedsApproval, token1NeedsApproval]);
-  const { state } = useGetButtonStatuses({
+
+  const stateValid = useMemo(
+    () =>
+      !!token0 &&
+      !!token1 &&
+      (!token0NeedsApproval && !token1NeedsApproval
+        ? Boolean(addLiquidityRequest) &&
+          amountADesired > 0n &&
+          amountBDesired > 0n
+        : true),
+    [
+      token0,
+      token1,
+      token0NeedsApproval,
+      token1NeedsApproval,
+      addLiquidityRequest,
+      amountADesired,
+      amountBDesired,
+    ]
+  );
+
+  const { state: buttonState } = useGetButtonStatuses({
     isLoading,
     isPending,
     isFetching: token0ApprovalFetching || token1ApprovalFetching,
     needsApproval: token0NeedsApproval || token1NeedsApproval,
   });
+
   return (
     <>
       <h2 className="text-xl">
@@ -210,6 +232,7 @@ export default function InitializePool() {
             }
             disableInput={pairExists && quoteLiquidity > 0n}
           />
+          o{" "}
         </div>
       )}
       <div className="">
@@ -227,15 +250,9 @@ export default function InitializePool() {
         </div>
       </div>
       <SubmitButton
-        state={state}
-        isValid={
-          !!token0 &&
-          !!token1 &&
-          (!token0NeedsApproval && !token1NeedsApproval
-            ? Boolean(addLiquidityRequest)
-            : true)
-        }
-        approveTokenSymbol={approveTokenSymbol}
+        state={buttonState}
+        isValid={stateValid}
+        approveTokenSymbol={tokenNeedingApproval?.symbol}
         onClick={onSubmit}
       >
         Add Liquidity
