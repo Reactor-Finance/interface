@@ -50,7 +50,7 @@ export default function useApproveWrite({
     approveWriteRequest: data?.request,
     needsApproval:
       allowance < parseUnits(amount, decimals) &&
-      tokenAddress?.toLowerCase() !== ETHER,
+      tokenAddress?.toLowerCase() !== ETHER.toLowerCase(),
     allowanceKey: queryKey,
     isFetching,
   };

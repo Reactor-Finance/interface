@@ -1,6 +1,6 @@
 import { useAccount, useChainId, useSimulateContract } from "wagmi";
 import { zeroAddress } from "viem";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { ETHER, ROUTER } from "@/data/constants";
 import * as Router from "@/lib/abis/Router";
 import { useSelector } from "react-redux";
@@ -28,15 +28,21 @@ export function useAddLiquidity({
   );
   const router = useMemo(() => ROUTER[chainId], [chainId]);
   const liquidityETHNonETHToken = useMemo(
-    () => (token0 !== ETHER ? token0 : token1),
+    () => (token0.toLowerCase() !== ETHER.toLowerCase() ? token0 : token1),
     [token0, token1]
   );
   const amountDesiredLiquidityETH = useMemo(
-    () => (token0 !== ETHER ? amountADesired : amountBDesired),
+    () =>
+      token0.toLowerCase() !== ETHER.toLowerCase()
+        ? amountADesired
+        : amountBDesired,
     [token0, amountADesired, amountBDesired]
   );
   const msgValueLiquidityETH = useMemo(
-    () => (token0 !== ETHER ? amountBDesired : amountADesired),
+    () =>
+      token0.toLowerCase() !== ETHER.toLowerCase()
+        ? amountBDesired
+        : amountADesired,
     [token0, amountBDesired, amountADesired]
   );
 
@@ -86,7 +92,9 @@ export function useAddLiquidity({
   });
 
   const isAddLiquidityETH = useMemo(
-    () => token0 === ETHER || token1 === ETHER,
+    () =>
+      token0.toLowerCase() === ETHER.toLowerCase() ||
+      token1.toLowerCase() === ETHER.toLowerCase(),
     [token0, token1]
   );
   const simulation = useMemo(
@@ -94,6 +102,20 @@ export function useAddLiquidity({
       isAddLiquidityETH ? addLiquidityETHSimulation : addLiquiditySimulation,
     [isAddLiquidityETH, addLiquidityETHSimulation, addLiquiditySimulation]
   );
+
+  useEffect(() => {
+    if (addLiquidityETHSimulation.data || addLiquidityETHSimulation.error) {
+      console.error(addLiquidityETHSimulation.error);
+      console.log(addLiquidityETHSimulation.data);
+    }
+  }, [addLiquidityETHSimulation]);
+
+  useEffect(() => {
+    if (addLiquiditySimulation.data || addLiquiditySimulation.error) {
+      console.error(addLiquiditySimulation.error);
+      console.log(addLiquiditySimulation.data);
+    }
+  }, [addLiquiditySimulation]);
 
   return { request: simulation.data?.request };
 }

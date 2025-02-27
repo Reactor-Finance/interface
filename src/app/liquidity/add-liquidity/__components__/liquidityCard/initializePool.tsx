@@ -9,7 +9,6 @@ import {
   useWriteContract,
 } from "wagmi";
 import { useAddLiquidity } from "../../../__hooks__/useAddLiquidity";
-import { useQueryClient } from "@tanstack/react-query";
 import SubmitButton from "@/components/shared/submitBtn";
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
 import { formatUnits, isAddress, parseUnits, zeroAddress } from "viem";
@@ -129,8 +128,6 @@ export default function InitializePool() {
     stable: version === "stable",
   });
 
-  const queryClient = useQueryClient();
-
   const {
     writeContract,
     isPending,
@@ -138,11 +135,7 @@ export default function InitializePool() {
     reset,
     error: writeContractError,
   } = useWriteContract(); // We'll also call reset when transaction toast is closed
-  const {
-    isLoading,
-    isSuccess,
-    error: transactionReceiptError,
-  } = useWaitForTransactionReceipt({ hash });
+  const { isLoading } = useWaitForTransactionReceipt({ hash });
 
   const onSubmit = useCallback(() => {
     if (token0NeedsApproval && token0ApprovalWriteRequest) {
@@ -178,12 +171,7 @@ export default function InitializePool() {
     if (token1NeedsApproval && token1) {
       return token1.symbol;
     }
-  }, [
-    token0?.symbol,
-    token1?.symbol,
-    token0NeedsApproval,
-    token1NeedsApproval,
-  ]);
+  }, [token0, token1, token0NeedsApproval, token1NeedsApproval]);
   const { state } = useGetButtonStatuses({
     isLoading,
     isPending,
@@ -240,7 +228,13 @@ export default function InitializePool() {
       </div>
       <SubmitButton
         state={state}
-        isValid={!!token0 && !!token1}
+        isValid={
+          !!token0 &&
+          !!token1 &&
+          (!token0NeedsApproval && !token1NeedsApproval
+            ? Boolean(addLiquidityRequest)
+            : true)
+        }
         approveTokenSymbol={approveTokenSymbol}
         onClick={onSubmit}
       >

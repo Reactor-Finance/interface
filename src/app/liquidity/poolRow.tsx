@@ -34,7 +34,7 @@ export default function PoolRow({
 
   const addLiquidityHandler = useCallback(() => {
     router.push(
-      `/liquidity/add-liquidity?tokenOne=${t0?.address}&tokenTwo=${t1?.address}&version=${isStable ? "stable" : "volatile"}`
+      `/liquidity/add-liquidity?token0=${t0?.address}&token1=${t1?.address}&version=${isStable ? "stable" : "volatile"}`
     );
   }, [router, t0?.address, t1?.address, isStable]);
 

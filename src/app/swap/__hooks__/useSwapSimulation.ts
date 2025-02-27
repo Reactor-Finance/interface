@@ -17,10 +17,12 @@ export function useSwapSimulation({
   amount,
   token0,
   token1,
+  minAmountOut = BigInt(0),
 }: {
   amount: number | null;
   token0: TToken | null;
   token1: TToken | null;
+  minAmountOut?: bigint;
 }) {
   const { address } = useAccount();
   const chainId = useChainId();
@@ -53,7 +55,7 @@ export function useSwapSimulation({
               stable: false,
             },
           ],
-    []
+    [token0, token1, weth, multihopsEnabled]
   );
   const deadline = useMemo(() => {
     const ttl =
@@ -66,7 +68,7 @@ export function useSwapSimulation({
       token0?.address.toLowerCase() === ETHER.toLowerCase()
         ? parseEther(String(amount))
         : BigInt(0),
-    []
+    [token0, weth, amount]
   );
   return useSimulateContract({
     ...Router,
@@ -74,7 +76,7 @@ export function useSwapSimulation({
     functionName: "swap",
     args: [
       amountIn,
-      calculateMinOut(amountIn, slippage),
+      calculateMinOut(minAmountOut, slippage),
       routes,
       address ?? zeroAddress,
       deadline(),
@@ -82,7 +84,12 @@ export function useSwapSimulation({
     ],
     value: msgValue,
     query: {
-      enabled: !!address && !!token0 && !!token1 && amount !== null,
+      enabled:
+        !!address &&
+        !!token0 &&
+        !!token1 &&
+        amount !== null &&
+        address !== zeroAddress,
     },
   });
 }

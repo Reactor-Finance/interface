@@ -18,12 +18,17 @@ export function useQuoteSwap({
   const weth = useMemo(() => WETH[chainId], [chainId]);
   const address = useMemo(() => TRADE_HELPER[chainId], [chainId]);
   const address0 = useMemo(
-    () => (tokenIn?.address.toLowerCase() === ETHER ? weth : tokenIn?.address),
+    () =>
+      tokenIn?.address.toLowerCase() === ETHER.toLowerCase()
+        ? weth
+        : tokenIn?.address,
     [tokenIn?.address, weth]
   );
   const address1 = useMemo(
     () =>
-      tokenOut?.address.toLowerCase() === ETHER ? weth : tokenOut?.address,
+      tokenOut?.address.toLowerCase() === ETHER.toLowerCase()
+        ? weth
+        : tokenOut?.address,
     [tokenOut?.address, weth]
   );
   const {

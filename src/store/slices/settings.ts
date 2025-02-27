@@ -9,7 +9,7 @@ interface SettingsType {
 
 const initialState: SettingsType = {
   transactionDeadlineInMinutes: 10,
-  slippage: 0.1,
+  slippage: 10,
   liquidityHubEnabled: false,
   multihopsEnabled: false,
 };

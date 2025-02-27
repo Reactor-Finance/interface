@@ -15,7 +15,7 @@ import { useQuoteSwap } from "../__hooks__/useQuoteSwap";
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
 import { TToken } from "@/lib/types";
 import { ROUTER } from "@/data/constants";
-import { formatUnits, zeroAddress } from "viem";
+import { formatUnits, parseUnits, zeroAddress } from "viem";
 import { useWETHExecutions } from "../__hooks__/useWETHExecutions";
 import { useGetBalance } from "@/lib/hooks/useGetBalance";
 import { formatNumber } from "@/lib/utils";
@@ -64,11 +64,16 @@ export default function SwapView() {
   });
 
   // Simulate swap
-  const { data: swapSimulation } = useSwapSimulation({
-    amount: amountIn,
-    token0,
-    token1,
-  });
+  const { data: swapSimulation, error: swapSimulationError } =
+    useSwapSimulation({
+      amount: amountIn,
+      token0,
+      token1,
+      minAmountOut: parseUnits(
+        String(amountOut.toFixed(4)),
+        token1?.decimals ?? 18
+      ),
+    });
 
   // Simulate WETH process
   const { isIntrinsicWETHProcess, WETHProcessSimulation, isWETHToEther } =
@@ -138,7 +143,11 @@ export default function SwapView() {
     if (writeError) {
       console.error(writeError);
     }
-  }, [writeError]);
+
+    if (swapSimulationError) {
+      console.error(swapSimulationError);
+    }
+  }, [writeError, swapSimulationError]);
 
   return (
     <div className="relative space-y-2">
@@ -202,9 +211,10 @@ export default function SwapView() {
         <SubmitButton
           state={buttonState}
           isValid={
-            Boolean(swapSimulation) ||
+            Boolean(swapSimulation?.request) ||
             Boolean(WETHProcessSimulation.depositSimulation.data) ||
-            Boolean(WETHProcessSimulation.withdrawalSimulation.data)
+            Boolean(WETHProcessSimulation.withdrawalSimulation.data) ||
+            needsApproval
           }
           approveTokenSymbol={token0?.symbol}
           onClick={onSubmit}

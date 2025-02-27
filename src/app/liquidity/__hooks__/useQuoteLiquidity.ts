@@ -24,6 +24,6 @@ export function useQuoteLiquidity({
         ? [pairInfo.reserve0, pairInfo.reserve1]
         : [pairInfo.reserve1, pairInfo.reserve0];
     return (amountIn * reserveB) / reserveA;
-  }, [pair, pairExists, pairInfo, token0]);
+  }, [pair, pairExists, pairInfo, token0, amountIn]);
   return amountOut;
 }
