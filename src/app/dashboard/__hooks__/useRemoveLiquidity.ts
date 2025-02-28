@@ -6,6 +6,7 @@ import useRemoveLiquidityValidation from "./useRemoveLiquidityValidation";
 import { useWriteContract } from "wagmi";
 import useRemoveLiquiditySimulation from "./useRemoveLiquiditySimulation";
 import { useGetBalance } from "@/lib/hooks/useGetBalance";
+import { useDebounce } from "@/lib/hooks/useDebounce";
 
 interface Props {
   position: UserLiquidityPosition | undefined;
@@ -13,7 +14,10 @@ interface Props {
 }
 export default function useRemoveLiquidity({ position, enabled }: Props) {
   const { state } = useDashboardLiquidityProvider();
-  const amount = parseUnits(state.sliderValue.toString(), 18);
+  const { debouncedValue: amount } = useDebounce(
+    parseUnits(state.sliderValue.toString(), 18),
+    400
+  );
   const token0 = position?.pair.token0.id;
   const token1 = position?.pair.token1.id;
   const isEth = false;

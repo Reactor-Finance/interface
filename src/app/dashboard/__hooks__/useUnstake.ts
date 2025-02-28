@@ -4,6 +4,7 @@ import { useWriteContract } from "wagmi";
 import { useGetBalance } from "@/lib/hooks/useGetBalance";
 import { useMemo } from "react";
 import useWithdrawSimulation from "./useUnstakeSimulation";
+import { useDebounce } from "@/lib/hooks/useDebounce";
 
 export default function useUnstake({
   gaugeAddress,
@@ -11,7 +12,10 @@ export default function useUnstake({
   gaugeAddress: Address | undefined;
 }) {
   const { state } = useDashboardLiquidityProvider();
-  const amount = parseUnits(state.sliderValue.toString(), 18);
+  const { debouncedValue: amount } = useDebounce(
+    parseUnits(state.sliderValue.toString(), 18),
+    400
+  );
   const { data: unstakeSimulation } = useWithdrawSimulation({
     amount,
     address: gaugeAddress,
