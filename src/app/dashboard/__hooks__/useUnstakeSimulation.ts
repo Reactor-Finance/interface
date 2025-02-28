@@ -7,11 +7,11 @@ export default function useWithdrawSimulation({
   amount,
 }: {
   amount: bigint;
-  address: Address;
+  address: Address | undefined;
 }) {
   return useSimulateContract({
     abi: GauageAbi,
-    address,
+    address: address ?? "0x",
     functionName: "withdraw",
     args: [amount],
   });
