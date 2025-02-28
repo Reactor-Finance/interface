@@ -3,7 +3,7 @@ import { UserLiquidityPosition } from "@/server/queries/user";
 import { Address } from "viem";
 interface Props {
   amount: bigint;
-  position: UserLiquidityPosition;
+  position: UserLiquidityPosition | undefined;
   isEth: boolean;
   removeLiquidityRequest: boolean;
   removeLiquidityEthRequest: boolean;
@@ -15,7 +15,7 @@ export default function useRemoveLiquidityValidation({
   removeLiquidityEthRequest,
   removeLiquidityRequest,
 }: Props) {
-  const bal = useGetBalance({ tokenAddress: position.id as Address });
+  const bal = useGetBalance({ tokenAddress: position?.id as Address });
 
   if (bal < amount) {
     return {
@@ -39,4 +39,5 @@ export default function useRemoveLiquidityValidation({
       };
     }
   }
+  return { isValid: false, message: null };
 }
