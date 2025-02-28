@@ -12,6 +12,8 @@ import {
 import { useGetTokenInfo } from "@/utils";
 import { useGetHeader } from "./dialogHeaders";
 import useRemoveLiquidity from "../../__hooks__/useRemoveLiquidity";
+import { useGetGaugeAddress } from "../../__hooks__/useGetGaugeAddress";
+import { Address } from "viem";
 
 export default function DashboardLiquidityDialog() {
   const {
@@ -19,17 +21,22 @@ export default function DashboardLiquidityDialog() {
     updateState,
     selectedUserLiquidityPosition: position,
   } = useDashboardLiquidityProvider();
+  const gaugeAddress = useGetGaugeAddress({ poolId: position?.id as Address });
+  console.log(gaugeAddress);
   const header = useGetHeader();
   useEffect(() => {
     if (!position && state.dialogOpen) {
       updateState({ dialogOpen: false });
     }
   }, [position, state.dialogOpen, updateState]);
-  const { onSubmit: removeLiquiditySubmit, isValid: isRemoveLiqValid } =
-    useRemoveLiquidity({
-      position,
-      enabled: state.actionType === LiquidityActions.Withdraw,
-    });
+  const {
+    onSubmit: removeLiquiditySubmit,
+    isValid: isRemoveLiqValid,
+    errorMessage,
+  } = useRemoveLiquidity({
+    position,
+    enabled: state.actionType === LiquidityActions.Withdraw,
+  });
   const isValid = isRemoveLiqValid;
   const token0 = useGetTokenInfo(position?.pair.token0.id);
   const token1 = useGetTokenInfo(position?.pair.token1.id);
@@ -75,6 +82,7 @@ export default function DashboardLiquidityDialog() {
             <SubmitButton
               onClick={onSubmit}
               isValid={isValid}
+              validationError={errorMessage}
               state={ButtonState.Default}
             >
               {getActionTypeString(state.actionType)}
