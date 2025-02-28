@@ -5,8 +5,10 @@ import { useAccount, useBalance, useReadContract } from "wagmi";
 
 export function useGetBalance({
   tokenAddress,
+  enabled,
 }: {
-  tokenAddress: `0x${string}`;
+  tokenAddress: `0x${string}` | undefined;
+  enabled?: boolean;
 }) {
   const { address } = useAccount();
   const { data: etherData = { value: BigInt(0) } } = useBalance({ address });
@@ -15,10 +17,11 @@ export function useGetBalance({
     abi: erc20Abi,
     functionName: "balanceOf",
     args: [address ?? zeroAddress],
+    query: { enabled: !!enabled },
   });
   return useMemo(
     () =>
-      tokenAddress.toLowerCase() === ETHER.toLowerCase() ||
+      tokenAddress?.toLowerCase() === ETHER.toLowerCase() ||
       tokenAddress === zeroAddress
         ? etherData.value
         : erc20Balance,
