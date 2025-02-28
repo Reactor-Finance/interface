@@ -23,8 +23,9 @@ export function useQuoteLiquidity({
       pairInfo.token0.toLowerCase() === token0.toLowerCase()
         ? [pairInfo.reserve0, pairInfo.reserve1]
         : [pairInfo.reserve1, pairInfo.reserve0];
-    if (reserveA === BigInt(0) || reserveB === BigInt(0)) return BigInt(0);
-    return (amountIn * reserveB) / reserveA;
+    return amountIn > 0n && reserveB > 0n && reserveA > 0n
+      ? (amountIn * reserveB) / reserveA
+      : BigInt(0);
   }, [pair, pairExists, pairInfo, token0, amountIn]);
   return amountOut;
 }
