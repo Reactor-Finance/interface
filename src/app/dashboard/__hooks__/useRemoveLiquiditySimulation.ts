@@ -1,5 +1,6 @@
 import { ROUTER } from "@/data/constants";
 import { abi } from "@/lib/abis/Router";
+import { useMemo } from "react";
 import { getAddress } from "viem";
 import { useAccount, useChainId, useSimulateContract } from "wagmi";
 export default function useRemoveLiquiditySimulation({
@@ -19,6 +20,10 @@ export default function useRemoveLiquiditySimulation({
   const chainId = useChainId();
   const t0 = token0 ? getAddress(token0) : undefined;
   const t1 = token1 ? getAddress(token1) : undefined;
+  const deadline = useMemo(() => {
+    const ttl = Math.floor(Date.now() / 1000) + 5 * 60;
+    return BigInt(ttl);
+  }, []);
   const removeLiquiditySimulation = useSimulateContract({
     abi,
     address: ROUTER[chainId],
@@ -31,7 +36,7 @@ export default function useRemoveLiquiditySimulation({
       0n, //amountBMin
       0n, //amountBMin
       address ?? "0x",
-      0n, //deadline
+      deadline, //deadline
     ],
     query: { enabled },
   });
@@ -47,7 +52,7 @@ export default function useRemoveLiquiditySimulation({
       0n, //amountAMin
       0n, //amountETHMin
       address ?? "0x",
-      0n, //deadline
+      deadline, //deadline
       false, //withFeeOnTransferTokens
     ],
     query: { enabled },

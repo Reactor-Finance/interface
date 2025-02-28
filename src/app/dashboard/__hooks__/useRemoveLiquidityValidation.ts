@@ -1,5 +1,6 @@
 import { useGetBalance } from "@/lib/hooks/useGetBalance";
 import { UserLiquidityPosition } from "@/server/queries/user";
+import { useMemo } from "react";
 import { Address } from "viem";
 interface Props {
   amount: bigint;
@@ -15,29 +16,29 @@ export default function useRemoveLiquidityValidation({
   removeLiquidityEthRequest,
   removeLiquidityRequest,
 }: Props) {
-  const bal = useGetBalance({ tokenAddress: position?.id as Address });
-
-  if (bal < amount) {
-    return {
-      isValid: false,
-      message: "Insufficient Balance",
-    };
-  }
-
-  if (isEth) {
-    if (removeLiquidityEthRequest) {
+  const bal = useGetBalance({ tokenAddress: position?.pair.id as Address });
+  return useMemo(() => {
+    if (bal < amount) {
       return {
-        isValid: true,
-        message: null,
+        isValid: false,
+        message: "Insufficient Balance",
       };
     }
-  } else {
-    if (removeLiquidityRequest) {
-      return {
-        isValid: true,
-        message: null,
-      };
+    if (isEth) {
+      if (removeLiquidityEthRequest) {
+        return {
+          isValid: true,
+          message: null,
+        };
+      }
+    } else {
+      if (removeLiquidityRequest) {
+        return {
+          isValid: true,
+          message: null,
+        };
+      }
     }
-  }
-  return { isValid: false, message: null };
+    return { isValid: false, message: null };
+  }, [amount, bal, isEth, removeLiquidityEthRequest, removeLiquidityRequest]);
 }
