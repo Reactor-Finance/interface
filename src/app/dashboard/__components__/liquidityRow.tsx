@@ -1,4 +1,3 @@
-import CurrenciesOverlapIcons from "@/components/shared/currenciesOverlapIcons";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
@@ -10,48 +9,40 @@ import {
   LiquidityActions,
   useDashboardLiquidityProvider,
 } from "../__context__/dashboardLiquidityProvider";
+import { UserLiquidityPosition } from "@/server/queries/user";
+import PoolHeader from "@/components/shared/poolHeader";
+import { TPoolType } from "@/lib/types";
+import { useGetTokenInfo } from "@/utils";
+import { useRouter } from "next/navigation";
 
-export function LiquidityRow({ id }: { id: string }) {
+export function LiquidityRow({ id, pair }: UserLiquidityPosition) {
   const { openModal } = useDashboardLiquidityProvider();
+  const router = useRouter();
   const handleOpenClick = (action: LiquidityActions) => {
     openModal(action, id);
   };
+  // const t0 = params.get("token0");
+  //  const t1 = params.get("token1");
+  //  const version = params.get("version");
+  const handleNavigationAddLiquidity = () => {
+    router.push(
+      `/liquidity/add-liquidity?token0=${pair.token0.id}&token1=${pair.token1.id}&version=${pair.isStable ? "stable" : "volitile"}`
+    );
+  };
+  const token0 = useGetTokenInfo(pair.token0.id ?? "0x");
+  const token1 = useGetTokenInfo(pair.token1.id ?? "0x");
   return (
     <tr className="grid text-center rounded-sm grid-cols-7 items-center bg-neutral-1000 py-2 px-6">
       <td className="bg-neutral-1000 text-left col-span-2">
         <div className="flex items-center justify-start gap-4">
-          <CurrenciesOverlapIcons
-            token0={{
-              address: "0x0",
-              symbol: "",
-              decimals: 1,
-              logoURI: "",
-              name: "",
-              chainId: 1,
-            }}
-            token1={{
-              address: "0x0",
-              symbol: "",
-              decimals: 1,
-              logoURI: "",
-              name: "",
-              chainId: 1,
-            }}
-          />
-          <div className="flex flex-col">
-            <span className="text-sm tracking-tight">vAMM-ETH/USDC</span>
-            <div className="flex items-center justify-start gap-1.5">
-              <Badge className="py-1" border="none" colors="yellow" size="sm">
-                Volatile
-              </Badge>
-              <div className="inline-flex items-baseline rounded-md  px-1 py-1 text-xs  transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 font-light border border-neutral-800">
-                0.3%
-              </div>
-            </div>
-          </div>
+          <PoolHeader
+            token0={token0}
+            token1={token1}
+            poolType={TPoolType.STABLE}
+          ></PoolHeader>
         </div>
       </td>
-      <td className="flex flex-col justify-center items-center">
+      <td className="flex flex-col gap-y-2 justify-center items-center">
         <Badge
           className="inline-block px-1 py-1 w-full"
           border="none"
@@ -93,20 +84,23 @@ export function LiquidityRow({ id }: { id: string }) {
               </Button>
             </DropdownMenu.Trigger>
             <DropdownMenu.Content className="bg-neutral-950 rounded-sm p-2">
-              <DropdownMenu.Item className="hover:bg-neutral-900 outline-none pl-3 py-2 pr-9 rounded-sm hover:cursor-pointer">
-                Increase
-              </DropdownMenu.Item>
               <DropdownMenu.Item
-                onClick={() => handleOpenClick(LiquidityActions.Withdraw)}
+                onClick={() => handleNavigationAddLiquidity()}
                 className="hover:bg-neutral-900 outline-none pl-3 py-2 pr-9 rounded-sm hover:cursor-pointer"
               >
-                Withdraw
+                Increase
               </DropdownMenu.Item>
               <DropdownMenu.Item
                 onClick={() => handleOpenClick(LiquidityActions.Stake)}
                 className="hover:bg-neutral-900 outline-none pl-3 py-2 pr-9 rounded-sm hover:cursor-pointer"
               >
                 Stake
+              </DropdownMenu.Item>
+              <DropdownMenu.Item
+                onClick={() => handleOpenClick(LiquidityActions.Withdraw)}
+                className="hover:bg-neutral-900 outline-none pl-3 py-2 pr-9 rounded-sm hover:cursor-pointer"
+              >
+                Withdraw
               </DropdownMenu.Item>
               <DropdownMenu.Item
                 onClick={() => handleOpenClick(LiquidityActions.Unstake)}
