@@ -51,7 +51,6 @@ export const DashboardLiquidityProvider = ({ children }: Props) => {
     <LiquidityContext.Provider
       value={{ state, userLiquidityPositions: data, openModal, updateState }}
     >
-      {" "}
       {children}
     </LiquidityContext.Provider>
   );
