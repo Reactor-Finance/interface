@@ -4,7 +4,7 @@ import { Slider } from "@/components/ui/slider";
 import EstimatesHeader from "@/app/lock/estimateHeader";
 import PoolHeader from "@/components/shared/poolHeader";
 import { TPoolType } from "@/lib/types";
-import SubmitButton, { ButtonState } from "@/components/shared/submitBtn";
+import SubmitButton from "@/components/shared/submitBtn";
 import {
   LiquidityActions,
   useDashboardLiquidityProvider,
@@ -37,7 +37,7 @@ export default function DashboardLiquidityDialog() {
   });
   const stake = useStake({ gaugeAddress });
   const unstake = useUnstake({ gaugeAddress });
-  const { isValid, onSubmit, max, errorMessage } = useMemo(() => {
+  const { isValid, onSubmit, errorMessage, buttonProps } = useMemo(() => {
     switch (state.actionType) {
       case LiquidityActions.Stake:
         return stake;
@@ -49,7 +49,6 @@ export default function DashboardLiquidityDialog() {
         return removeLiquidity;
     }
   }, [removeLiquidity, stake, state.actionType, unstake]);
-
   const token0 = useGetTokenInfo(position?.pair.token0.id);
   const token1 = useGetTokenInfo(position?.pair.token1.id);
   useEffect(() => {
@@ -78,7 +77,7 @@ export default function DashboardLiquidityDialog() {
                 updateState({ sliderValue: value[0] });
               }}
               min={0}
-              max={max}
+              max={100}
             />
             <div className="flex justify-between">
               <span>0%</span>
@@ -94,7 +93,7 @@ export default function DashboardLiquidityDialog() {
               onClick={onSubmit}
               isValid={isValid}
               validationError={errorMessage}
-              state={ButtonState.Default}
+              {...buttonProps}
             >
               {getActionTypeString(state.actionType)}
             </SubmitButton>
