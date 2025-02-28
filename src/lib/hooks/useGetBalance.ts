@@ -10,6 +10,7 @@ export function useGetBalance({
   tokenAddress: `0x${string}` | undefined;
   enabled?: boolean;
 }) {
+  if (enabled === undefined) enabled = true;
   const { address } = useAccount();
   const { data: etherData = { value: BigInt(0) } } = useBalance({ address });
   const { data: erc20Balance = BigInt(0) } = useReadContract({
