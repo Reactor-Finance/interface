@@ -8,6 +8,7 @@ import React, { createContext, useContext, useMemo } from "react";
 import { useAccount } from "wagmi";
 
 export enum LiquidityActions {
+  Unselected,
   Stake,
   Unstake,
   Withdraw,

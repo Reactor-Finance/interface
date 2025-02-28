@@ -45,6 +45,11 @@ export default function DashboardLiquidityDialog() {
       removeLiquiditySubmit();
     }
   };
+  useEffect(() => {
+    if (!state.actionType && state.sliderValue !== 0) {
+      updateState({ sliderValue: 0 });
+    }
+  }, [state.actionType, state.sliderValue, updateState]);
   return (
     <Dialog
       open={state.dialogOpen}
