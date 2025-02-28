@@ -1,9 +1,14 @@
 import { useTokenlistContext } from "@/contexts/tokenlistContext";
+import { useMemo } from "react";
 
 export function useGetTokenInfo(address: string | undefined) {
   const { tokenlist } = useTokenlistContext();
-  return tokenlist.find(
-    (token) => token.address.toLowerCase() === address?.toLowerCase()
+  return useMemo(
+    () =>
+      tokenlist.find(
+        (token) => token.address.toLowerCase() === address?.toLowerCase()
+      ),
+    [address, tokenlist]
   );
 }
 
