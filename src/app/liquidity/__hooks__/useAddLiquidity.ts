@@ -100,7 +100,7 @@ export function useAddLiquidity({
 
   useEffect(() => {
     if (addLiquidityETHSimulation.data || addLiquidityETHSimulation.error) {
-      console.error(addLiquidityETHSimulation.error);
+      console.log(addLiquidityETHSimulation.error);
       console.log(addLiquidityETHSimulation.data);
     }
   }, [addLiquidityETHSimulation]);
