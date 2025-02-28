@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import Headers from "@/components/ui/headers";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,6 @@ import DashboardLiquidityTable from "./__components__/dashboardLiquidityTable";
 import { DashboardLiquidityProvider } from "./__context__/dashboardLiquidityProvider";
 
 export default function Dashboard() {
-  const [isPoolTableOpen, setIsPoolTableOpen] = useState(false);
   return (
     <div>
       <PageMarginContainer>
@@ -48,22 +47,6 @@ export default function Dashboard() {
             </div>
             <div className="pt-6"></div>
             <DashboardLiquidityTable />
-            {isPoolTableOpen ? (
-              <></>
-            ) : (
-              <div className="text-start rounded-sm bg-neutral-1000 font-medium text-neutral-400 py-4 px-6">
-                To receive emissions{" "}
-                <span
-                  className="underline decoration-gray-500 font-semibold cursor-pointer text-white"
-                  onClick={() => {
-                    setIsPoolTableOpen(true);
-                  }}
-                >
-                  deposit and stake
-                </span>{" "}
-                your liquidity first.
-              </div>
-            )}
           </div>
         </DashboardLiquidityProvider>
         <div className="pt-16"></div>
