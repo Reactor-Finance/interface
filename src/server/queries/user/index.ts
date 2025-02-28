@@ -12,6 +12,7 @@ const TokenSchema = z.object({
 
 const PairSchema = z.object({
   id: z.string(),
+  isStable: z.boolean(),
   token0: TokenSchema,
   token1: TokenSchema,
 });
@@ -28,10 +29,10 @@ const UserSchemaDetails = z.object({
 });
 
 const UserSchema = z.object({
-  user: UserSchemaDetails,
+  user: UserSchemaDetails.nullable(),
 });
 export type UserLiquidityPositions = z.infer<typeof UserSchema>;
-
+export type UserLiquidityPosition = z.infer<typeof LiquidityPositionSchema>;
 export const userQuery = gql`
   query UserLiquidityPositions($id: ID!) {
     user(id: $id) {
@@ -41,6 +42,7 @@ export const userQuery = gql`
         liquidityTokenBalance
         pair {
           id
+          isStable
           token0 {
             id
             symbol
@@ -64,7 +66,11 @@ export const executeGetUserLiquidityPositions = async ({
 }: {
   id: string;
 }) => {
-  const result = await graphqlClient.request(userQuery, { id });
+  console.log(id, "ID");
+  const result = await graphqlClient.request(userQuery, {
+    id: id.toLowerCase(),
+  });
+  console.log(result, "USER RESULT");
   const safe = UserSchema.safeParse(result);
   if (safe.error) throw Error("Zod parse error.");
   if (safe.success) {
