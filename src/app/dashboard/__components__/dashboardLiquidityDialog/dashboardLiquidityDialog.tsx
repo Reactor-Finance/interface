@@ -4,7 +4,7 @@ import {
   Dialog,
   DialogDescription,
 } from "@/components/ui/dialog";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Slider } from "@/components/ui/slider";
 import EstimatesHeader from "@/app/lock/estimateHeader";
 import PoolHeader from "@/components/shared/poolHeader";
@@ -14,10 +14,11 @@ import {
   LiquidityActions,
   useDashboardLiquidityProvider,
 } from "../../__context__/dashboardLiquidityProvider";
+import { useGetTokenInfo } from "@/utils";
 
 export default function DashboardLiquidityDialog() {
-  const { state, updateState } = useDashboardLiquidityProvider();
-  console.log(state.actionType, "ACTION");
+  const { state, updateState, userLiquidityPositions } =
+    useDashboardLiquidityProvider();
   const header = useMemo(() => {
     switch (state.actionType) {
       case LiquidityActions.Stake:
@@ -28,6 +29,18 @@ export default function DashboardLiquidityDialog() {
         return <WithdrawHeader />;
     }
   }, [state.actionType]);
+  const position = useMemo(() => {
+    return userLiquidityPositions?.user?.liquidityPositions.find(
+      (pos) => pos.id === state.positionId
+    );
+  }, [state.positionId, userLiquidityPositions?.user?.liquidityPositions]);
+  useEffect(() => {
+    if (!position && state.dialogOpen) {
+      updateState({ dialogOpen: false });
+    }
+  }, [position, state.dialogOpen, updateState]);
+  const token0 = useGetTokenInfo(position?.pair.token0.id);
+  const token1 = useGetTokenInfo(position?.pair.token1.id);
   return (
     <Dialog
       open={state.dialogOpen}
@@ -39,22 +52,8 @@ export default function DashboardLiquidityDialog() {
 
           <div className="space-y-6 p-4 border-b border-neutral-800">
             <PoolHeader
-              token0={{
-                address: "0x",
-                symbol: "a",
-                decimals: 1,
-                logoURI: "",
-                chainId: 1,
-                name: "",
-              }}
-              token1={{
-                address: "0x",
-                symbol: "a",
-                decimals: 1,
-                logoURI: "",
-                chainId: 1,
-                name: "",
-              }}
+              token0={token0}
+              token1={token1}
               poolType={TPoolType.STABLE}
             ></PoolHeader>
             <Slider
