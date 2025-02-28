@@ -5,8 +5,8 @@ import { TPoolType, TToken } from "@/lib/types";
 
 interface Props {
   poolType: TPoolType;
-  token0: TToken;
-  token1: TToken;
+  token0: TToken | undefined;
+  token1: TToken | undefined;
   number?: string;
 }
 
@@ -16,6 +16,7 @@ export default function PoolHeader({
   token1,
   number,
 }: Props) {
+  if (!token0 || !token1) return;
   return (
     <div className="flex gap-x-4 items-center">
       {number && <span>{number}</span>}

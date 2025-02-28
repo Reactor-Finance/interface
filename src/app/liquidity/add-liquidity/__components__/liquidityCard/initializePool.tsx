@@ -2,7 +2,6 @@
 
 import React, { useCallback, useMemo, useState } from "react";
 import AssetCard from "./assetCard";
-import { TToken } from "@/lib/types";
 import {
   useChainId,
   useWaitForTransactionReceipt,
@@ -14,12 +13,12 @@ import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStat
 import { formatUnits, isAddress, parseUnits, zeroAddress } from "viem";
 import { z } from "zod";
 import { useSearchParams } from "next/navigation";
-import { useTokenlistContext } from "@/contexts/tokenlistContext";
 import { useCheckPair } from "@/lib/hooks/useCheckPair";
 import useApproveWrite from "@/lib/hooks/useApproveWrite";
 import { ROUTER } from "@/data/constants";
 import { useQuoteLiquidity } from "@/app/liquidity/__hooks__/useQuoteLiquidity";
 import { BaseError } from "@wagmi/core";
+import { useGetTokenInfo } from "@/utils";
 
 const searchParamsSchema = z.object({
   token0: z.string().refine((arg) => isAddress(arg)),
@@ -31,7 +30,6 @@ export default function InitializePool() {
   // Wagmi parameters
   const chainId = useChainId();
   // Token list
-  const { tokenlist } = useTokenlistContext();
   // Search params
   const params = useSearchParams();
   const [t0, t1, version] = useMemo(() => {
@@ -57,11 +55,8 @@ export default function InitializePool() {
   }, [params]);
 
   // Tokens
-  const [token0, token1] = useMemo(() => {
-    const token0 = tokenlist.find((token) => token.address === t0);
-    const token1 = tokenlist.find((token) => token.address === t1);
-    return [token0, token1] as [TToken | undefined, TToken | undefined];
-  }, [t0, t1, tokenlist]);
+  const token0 = useGetTokenInfo(t0 ?? "0x");
+  const token1 = useGetTokenInfo(t1 ?? "0x");
 
   // Amounts
   const [amount0, setAmount0] = useState(0);
@@ -136,31 +131,25 @@ export default function InitializePool() {
     writeContract,
     isPending,
     data: hash,
-    reset,
     error: writeContractError,
   } = useWriteContract(); // We'll also call reset when transaction toast is closed
   const { isLoading } = useWaitForTransactionReceipt({ hash });
-
+  console.log("isAddLiqEth", isAddLiquidityETH);
   const onSubmit = useCallback(() => {
     if (token0NeedsApproval && token0ApprovalWriteRequest) {
-      reset(); // Call reset first to clear internal state
       writeContract(token0ApprovalWriteRequest);
       return;
     }
-
     if (token1NeedsApproval && token1ApprovalWriteRequest) {
-      reset(); // Call reset first to clear internal state
       writeContract(token1ApprovalWriteRequest);
       return;
     }
     if (isAddLiquidityETH) {
       if (addLiquidityETHSimulation.data?.request) {
-        reset();
         writeContract(addLiquidityETHSimulation.data.request);
       }
     } else {
       if (addLiquiditySimulation.data?.request) {
-        reset();
         writeContract(addLiquiditySimulation.data.request);
       }
     }
@@ -170,7 +159,6 @@ export default function InitializePool() {
     token1NeedsApproval,
     token1ApprovalWriteRequest,
     isAddLiquidityETH,
-    reset,
     writeContract,
     addLiquidityETHSimulation,
     addLiquiditySimulation,

@@ -27,7 +27,7 @@ export default function useApproveWrite({
   const {
     data: allowance = BigInt(0),
     queryKey,
-    isFetching,
+    isLoading,
     refetch,
   } = useGetAllowance({
     tokenAddress,
@@ -52,6 +52,6 @@ export default function useApproveWrite({
       allowance < parseUnits(amount, decimals) &&
       tokenAddress?.toLowerCase() !== ETHER.toLowerCase(),
     allowanceKey: queryKey,
-    isFetching,
+    isFetching: isLoading, // refactor this naming
   };
 }
