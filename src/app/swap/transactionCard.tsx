@@ -1,10 +1,8 @@
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Image from "next/image";
-import { getLogoAsset } from "@/utils";
 import { TabsContent } from "@radix-ui/react-tabs";
 import React from "react";
-import { USDC_ADDRESS } from "@/data/constants";
 
 export default function TransactionCard() {
   return (
@@ -80,23 +78,11 @@ function TransactionTableRow() {
       <td className="text-neutral-300"> $3,400.00</td>
 
       <td className="flex gap-x-1 items-center justify-center">
-        <Image
-          width={20}
-          height={20}
-          className="h-5 w-5"
-          src={getLogoAsset(USDC_ADDRESS)}
-          alt="USDC"
-        />
+        <Image width={20} height={20} className="h-5 w-5" src={""} alt="USDC" />
         0.1
       </td>
       <td className="flex gap-x-1 items-center justify-center">
-        <Image
-          width={20}
-          height={20}
-          className="h-5 w-5"
-          src={getLogoAsset(USDC_ADDRESS)}
-          alt="USDC"
-        />
+        <Image width={20} height={20} className="h-5 w-5" src={""} alt="USDC" />
         134.01
       </td>
       <td>^</td>
