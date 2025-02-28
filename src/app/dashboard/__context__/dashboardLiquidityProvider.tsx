@@ -1,7 +1,10 @@
 "use client";
-import { UserLiquidityPositions } from "@/server/queries/user";
+import {
+  UserLiquidityPosition,
+  UserLiquidityPositions,
+} from "@/server/queries/user";
 import { api } from "@/trpc/react";
-import React, { createContext, useContext } from "react";
+import React, { createContext, useContext, useMemo } from "react";
 import { useAccount } from "wagmi";
 
 export enum LiquidityActions {
@@ -21,6 +24,7 @@ interface ContextType {
   state: StateType;
   openModal: (actionType: LiquidityActions, positionId: string) => void;
   userLiquidityPositions: UserLiquidityPositions | undefined;
+  selectedUserLiquidityPosition: UserLiquidityPosition | undefined;
 }
 const LiquidityContext = createContext<ContextType | undefined>(undefined);
 interface Props {
@@ -47,9 +51,20 @@ export const DashboardLiquidityProvider = ({ children }: Props) => {
     setState({ ...state, actionType, dialogOpen: true, positionId });
   };
 
+  const position = useMemo(() => {
+    return data?.user?.liquidityPositions.find(
+      (pos) => pos.id === state.positionId
+    );
+  }, [data?.user?.liquidityPositions, state.positionId]);
   return (
     <LiquidityContext.Provider
-      value={{ state, userLiquidityPositions: data, openModal, updateState }}
+      value={{
+        state,
+        selectedUserLiquidityPosition: position,
+        userLiquidityPositions: data,
+        openModal,
+        updateState,
+      }}
     >
       {children}
     </LiquidityContext.Provider>

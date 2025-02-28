@@ -1,10 +1,5 @@
-import {
-  DialogContent,
-  DialogTitle,
-  Dialog,
-  DialogDescription,
-} from "@/components/ui/dialog";
-import React, { useEffect, useMemo } from "react";
+import { DialogContent, Dialog } from "@/components/ui/dialog";
+import React, { useEffect } from "react";
 import { Slider } from "@/components/ui/slider";
 import EstimatesHeader from "@/app/lock/estimateHeader";
 import PoolHeader from "@/components/shared/poolHeader";
@@ -15,32 +10,34 @@ import {
   useDashboardLiquidityProvider,
 } from "../../__context__/dashboardLiquidityProvider";
 import { useGetTokenInfo } from "@/utils";
+import { useGetHeader } from "./dialogHeaders";
+import useRemoveLiquidity from "../../__hooks__/useRemoveLiquidity";
 
 export default function DashboardLiquidityDialog() {
-  const { state, updateState, userLiquidityPositions } =
-    useDashboardLiquidityProvider();
-  const header = useMemo(() => {
-    switch (state.actionType) {
-      case LiquidityActions.Stake:
-        return <StakeHeader />;
-      case LiquidityActions.Unstake:
-        return <UnstakeHeader />;
-      case LiquidityActions.Withdraw:
-        return <WithdrawHeader />;
-    }
-  }, [state.actionType]);
-  const position = useMemo(() => {
-    return userLiquidityPositions?.user?.liquidityPositions.find(
-      (pos) => pos.id === state.positionId
-    );
-  }, [state.positionId, userLiquidityPositions?.user?.liquidityPositions]);
+  const {
+    state,
+    updateState,
+    selectedUserLiquidityPosition: position,
+  } = useDashboardLiquidityProvider();
+  const header = useGetHeader();
   useEffect(() => {
     if (!position && state.dialogOpen) {
       updateState({ dialogOpen: false });
     }
   }, [position, state.dialogOpen, updateState]);
+  const { onSubmit: removeLiquiditySubmit, isValid: isRemoveLiqValid } =
+    useRemoveLiquidity({
+      position,
+      enabled: state.actionType === LiquidityActions.Withdraw,
+    });
+  const isValid = isRemoveLiqValid;
   const token0 = useGetTokenInfo(position?.pair.token0.id);
   const token1 = useGetTokenInfo(position?.pair.token1.id);
+  const onSubmit = () => {
+    if (state.actionType === LiquidityActions.Withdraw) {
+      removeLiquiditySubmit();
+    }
+  };
   return (
     <Dialog
       open={state.dialogOpen}
@@ -75,35 +72,17 @@ export default function DashboardLiquidityDialog() {
             <EstimatesHeader />
           </div>
           <div className="p-4">
-            <SubmitButton isValid={false} state={ButtonState.Default}>
+            <SubmitButton
+              onClick={onSubmit}
+              isValid={isValid}
+              state={ButtonState.Default}
+            >
               {getActionTypeString(state.actionType)}
             </SubmitButton>
           </div>
         </div>
       </DialogContent>
     </Dialog>
-  );
-}
-const WithdrawHeader = () => (
-  <DialogHeader title="Withdraw your" desc="Withdraw your staked position" />
-);
-const StakeHeader = () => (
-  <DialogHeader title="Stake your" desc="Stake your position to earn" />
-);
-const UnstakeHeader = () => (
-  <DialogHeader
-    title="Unstake your"
-    desc="Unstake your position to stop earning"
-  />
-);
-function DialogHeader({ title, desc }: { title: string; desc: string }) {
-  return (
-    <div className="py-3 px-4 border-b border-neutral-800">
-      <DialogTitle className="text-lg">
-        {title} <span className="text-primary-400">Position</span>
-      </DialogTitle>
-      <DialogDescription>{desc}</DialogDescription>
-    </div>
   );
 }
 
