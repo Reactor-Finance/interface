@@ -1,5 +1,5 @@
 import { DialogContent, Dialog } from "@/components/ui/dialog";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Slider } from "@/components/ui/slider";
 import EstimatesHeader from "@/app/lock/estimateHeader";
 import PoolHeader from "@/components/shared/poolHeader";
@@ -14,6 +14,8 @@ import { useGetHeader } from "./dialogHeaders";
 import useRemoveLiquidity from "../../__hooks__/useRemoveLiquidity";
 import { useGetGaugeAddress } from "../../__hooks__/useGetGaugeAddress";
 import { Address } from "viem";
+import useStake from "../../__hooks__/useStake";
+import useUnstake from "../../__hooks__/useUnstake";
 
 export default function DashboardLiquidityDialog() {
   const {
@@ -29,22 +31,27 @@ export default function DashboardLiquidityDialog() {
       updateState({ dialogOpen: false });
     }
   }, [position, state.dialogOpen, updateState]);
-  const {
-    onSubmit: removeLiquiditySubmit,
-    isValid: isRemoveLiqValid,
-    errorMessage,
-  } = useRemoveLiquidity({
+  const removeLiquidity = useRemoveLiquidity({
     position,
     enabled: state.actionType === LiquidityActions.Withdraw,
   });
-  const isValid = isRemoveLiqValid;
+  const stake = useStake({ gaugeAddress });
+  const unstake = useUnstake({ gaugeAddress });
+  const { isValid, onSubmit, max, errorMessage } = useMemo(() => {
+    switch (state.actionType) {
+      case LiquidityActions.Stake:
+        return stake;
+      case LiquidityActions.Unstake:
+        return unstake;
+      case LiquidityActions.Withdraw:
+        return removeLiquidity;
+      default:
+        return removeLiquidity;
+    }
+  }, [removeLiquidity, stake, state.actionType, unstake]);
+
   const token0 = useGetTokenInfo(position?.pair.token0.id);
   const token1 = useGetTokenInfo(position?.pair.token1.id);
-  const onSubmit = () => {
-    if (state.actionType === LiquidityActions.Withdraw) {
-      removeLiquiditySubmit();
-    }
-  };
   useEffect(() => {
     if (!state.actionType && state.sliderValue !== 0) {
       updateState({ sliderValue: 0 });
@@ -71,8 +78,7 @@ export default function DashboardLiquidityDialog() {
                 updateState({ sliderValue: value[0] });
               }}
               min={0}
-              max={100}
-              step={1}
+              max={max}
             />
             <div className="flex justify-between">
               <span>0%</span>

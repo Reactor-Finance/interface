@@ -5,12 +5,13 @@ import { useGetBalance } from "@/lib/hooks/useGetBalance";
 import { useMemo } from "react";
 import useWithdrawSimulation from "./useUnstakeSimulation";
 import { useDebounce } from "@/lib/hooks/useDebounce";
+import { FormAction } from "../types";
 
 export default function useUnstake({
   gaugeAddress,
 }: {
   gaugeAddress: Address | undefined;
-}) {
+}): FormAction {
   const { state } = useDashboardLiquidityProvider();
   const { debouncedValue: amount } = useDebounce(
     parseUnits(state.sliderValue.toString(), 18),
@@ -42,5 +43,5 @@ export default function useUnstake({
       writeContract(unstakeSimulation.request);
     }
   };
-  return { onSubmit, errorMessage: message, isValid };
+  return { onSubmit, errorMessage: message, isValid, max: 100 };
 }

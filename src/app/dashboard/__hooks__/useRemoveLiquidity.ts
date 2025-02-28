@@ -1,18 +1,21 @@
 import { UserLiquidityPosition } from "@/server/queries/user";
-import useQuoteRemoveLiquidity from "./useQuoteRemoveLiquidity";
-import { Address, parseUnits } from "viem";
+import { Address, formatUnits, parseUnits } from "viem";
 import { useDashboardLiquidityProvider } from "../__context__/dashboardLiquidityProvider";
 import useRemoveLiquidityValidation from "./useRemoveLiquidityValidation";
 import { useWriteContract } from "wagmi";
 import useRemoveLiquiditySimulation from "./useRemoveLiquiditySimulation";
 import { useGetBalance } from "@/lib/hooks/useGetBalance";
 import { useDebounce } from "@/lib/hooks/useDebounce";
+import { FormAction } from "../types";
 
 interface Props {
   position: UserLiquidityPosition | undefined;
   enabled: boolean;
 }
-export default function useRemoveLiquidity({ position, enabled }: Props) {
+export default function useRemoveLiquidity({
+  position,
+  enabled,
+}: Props): FormAction {
   const { state } = useDashboardLiquidityProvider();
   const { debouncedValue: amount } = useDebounce(
     parseUnits(state.sliderValue.toString(), 18),
@@ -21,13 +24,6 @@ export default function useRemoveLiquidity({ position, enabled }: Props) {
   const token0 = position?.pair.token0.id;
   const token1 = position?.pair.token1.id;
   const isEth = false;
-  const { data: removeLiqQuote } = useQuoteRemoveLiquidity({
-    token0,
-    token1,
-    isStable: position?.pair.isStable,
-    amount,
-    enabled,
-  });
   const { removeLiquidityEthSimulation, removeLiquiditySimulation } =
     useRemoveLiquiditySimulation({
       amount,
@@ -60,5 +56,10 @@ export default function useRemoveLiquidity({ position, enabled }: Props) {
     tokenAddress: position?.pair.id as Address,
     enabled,
   });
-  return { onSubmit, removeLiqQuote, isValid, errorMessage: message, max: bal };
+  return {
+    onSubmit,
+    isValid,
+    errorMessage: message,
+    max: parseFloat(formatUnits(bal, 0)),
+  };
 }
