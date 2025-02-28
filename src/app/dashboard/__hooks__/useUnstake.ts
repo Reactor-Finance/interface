@@ -43,5 +43,5 @@ export default function useUnstake({
       writeContract(unstakeSimulation.request);
     }
   };
-  return { onSubmit, errorMessage: message, isValid, max: 100 };
+  return { onSubmit, errorMessage: message, isValid };
 }
