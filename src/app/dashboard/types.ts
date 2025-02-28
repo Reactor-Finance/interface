@@ -1,6 +1,11 @@
+import { ButtonState } from "@/components/shared/submitBtn";
+
 export type FormAction = {
   onSubmit: () => void;
   errorMessage: string | null;
   isValid: boolean;
-  max: number;
+  buttonProps: {
+    state: ButtonState;
+    approveTokenSymbol?: string;
+  };
 };
