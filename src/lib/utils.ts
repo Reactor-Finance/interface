@@ -101,3 +101,5 @@ export function roundDown(float: number, decimals: number) {
   const roundedDown = Math.floor(float * factor) / factor;
   return roundedDown;
 }
+
+export function calculateVotingPower(deposit: number) {}

@@ -1,18 +1,47 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import React from "react";
+import React, { useMemo } from "react";
 import { TLockToken } from "../types";
 import logo from "@/assets/reactor-symbol.svg";
 import { useLockProvider } from "../lockProvider";
 import { formatUnits } from "viem";
 import { formatNumber } from "@/lib/utils";
+import { RCT_DECIMALS } from "@/data/constants";
+import { useAtomicDate } from "@/lib/hooks/useAtomicDate";
+
+enum TokenStatus {
+  ACTIVE = "Active",
+  INACTIVE = "Not Active",
+  EXPIRED = "Expired",
+}
+
 interface Props {
   setOpenModal: (open: boolean) => void;
   token: TLockToken;
+  onLockActionMenuClicked: (lockToken: TLockToken) => void;
 }
-export default function LockRow({ setOpenModal, token }: Props) {
+
+export default function LockRow({
+  setOpenModal,
+  token,
+  onLockActionMenuClicked,
+}: Props) {
   const { setSelectedTokenId } = useLockProvider();
+  const unlockDate = useMemo(
+    () => new Date(Number(token.lockEnd) * 1000),
+    [token]
+  );
+  const currentDate = useAtomicDate();
+  const status = useMemo(() => {
+    const lockEnd = new Date(Number(token.lockEnd) * 1000);
+    return lockEnd <= currentDate
+      ? TokenStatus.EXPIRED
+      : token.voted
+        ? TokenStatus.ACTIVE
+        : TokenStatus.INACTIVE;
+  }, [token, currentDate]);
+
   return (
     <tr className="grid text-center rounded-sm grid-cols-8 items-center bg-neutral-1000 py-2 px-6">
       <td className="bg-neutral-1000 flex gap-x-2 items-center text-left col-span-2">
@@ -31,11 +60,22 @@ export default function LockRow({ setOpenModal, token }: Props) {
         </span>
       </td>
       <td className="">11.22</td>
-      <td className="">0 RCT</td>
-      <td className="">5 June 2025</td>
       <td className="">
-        <Badge border="one" colors="success">
-          Success
+        {formatNumber(formatUnits(token.rebase_amount, RCT_DECIMALS))}
+      </td>
+      <td className="">{unlockDate.toDateString()}</td>
+      <td className="">
+        <Badge
+          border="one"
+          colors={
+            status === TokenStatus.EXPIRED
+              ? "yellow"
+              : status === TokenStatus.ACTIVE
+                ? "success"
+                : "error"
+          }
+        >
+          {status}
         </Badge>
       </td>
       <td>
@@ -45,7 +85,7 @@ export default function LockRow({ setOpenModal, token }: Props) {
           </Button>
           <Button
             onClick={() => {
-              setSelectedTokenId(token.id.toString());
+              onLockActionMenuClicked(token);
               setOpenModal(true);
             }}
             variant={"outline"}
