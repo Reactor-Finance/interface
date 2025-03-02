@@ -17,6 +17,7 @@ import { TokenlistContextProvider } from "@/contexts/tokenlistContext";
 import { PersistGate } from "redux-persist/integration/react";
 import { Provider as ReduxProvider } from "react-redux";
 import { persistor, store } from "@/store";
+import { TransactionToastProvider } from "@/contexts/transactionToastProvider";
 
 export const wagmiConfig = getDefaultConfig({
   appName: "Reactor Finance",
@@ -49,11 +50,13 @@ export const Providers: FC<PropsWithChildren> = ({ children }) => {
             <RainbowKitProvider theme={darkTheme()}>
               <TRPCReactProvider>
                 <TokenlistContextProvider>
-                  <HeroUIProvider className="flex min-h-svh flex-col ">
-                    {/* Header goes here */}
-                    {children}
-                    {/* Footer goes here */}
-                  </HeroUIProvider>
+                  <TransactionToastProvider>
+                    <HeroUIProvider className="flex min-h-svh flex-col ">
+                      {/* Header goes here */}
+                      {children}
+                      {/* Footer goes here */}
+                    </HeroUIProvider>
+                  </TransactionToastProvider>
                 </TokenlistContextProvider>
               </TRPCReactProvider>
             </RainbowKitProvider>
