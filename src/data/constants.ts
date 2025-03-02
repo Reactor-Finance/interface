@@ -11,7 +11,7 @@ export enum ChainId {
 }
 
 export const VOTER: { [key: number]: `0x${string}` } = {
-  [ChainId.MONAD_TESTNET]: "0xEeeC1d828520fC26541624c4e2E34376220CB93a",
+  [ChainId.MONAD_TESTNET]: "0xf8f04e8e8152B182A904102359C66215F30c413D",
 };
 export const TRADE_HELPER: { [key: number]: `0x${string}` } = {
   [ChainId.MONAD_TESTNET]: "0xD59B88727680a026C572fEeD94fB81579c1c1394",
