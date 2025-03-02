@@ -16,6 +16,7 @@ import { useGetGaugeAddress } from "../../__hooks__/useGetGaugeAddress";
 import { Address } from "viem";
 import useStake from "../../__hooks__/useStake";
 import useUnstake from "../../__hooks__/useUnstake";
+import useCreateGauge from "../../__hooks__/useCreateGauge";
 
 export default function DashboardLiquidityDialog() {
   const {
@@ -24,7 +25,6 @@ export default function DashboardLiquidityDialog() {
     selectedUserLiquidityPosition: position,
   } = useDashboardLiquidityProvider();
   const gaugeAddress = useGetGaugeAddress({ poolId: position?.id as Address });
-  console.log(gaugeAddress);
   const header = useGetHeader();
   useEffect(() => {
     if (!position && state.dialogOpen) {
@@ -37,7 +37,14 @@ export default function DashboardLiquidityDialog() {
   });
   const stake = useStake({ gaugeAddress });
   const unstake = useUnstake({ gaugeAddress });
+  const createGauage = useCreateGauge();
   const { isValid, onSubmit, errorMessage, buttonProps } = useMemo(() => {
+    if (
+      gaugeAddress === undefined &&
+      state.actionType !== LiquidityActions.Withdraw
+    ) {
+      return createGauage;
+    }
     switch (state.actionType) {
       case LiquidityActions.Stake:
         return stake;
@@ -48,7 +55,14 @@ export default function DashboardLiquidityDialog() {
       default:
         return removeLiquidity;
     }
-  }, [removeLiquidity, stake, state.actionType, unstake]);
+  }, [
+    createGauage,
+    gaugeAddress,
+    removeLiquidity,
+    stake,
+    state.actionType,
+    unstake,
+  ]);
   const token0 = useGetTokenInfo(position?.pair.token0.id);
   const token1 = useGetTokenInfo(position?.pair.token1.id);
   useEffect(() => {
