@@ -1,12 +1,8 @@
 "use client";
 
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import AssetCard from "./assetCard";
-import {
-  useChainId,
-  useWaitForTransactionReceipt,
-  useWriteContract,
-} from "wagmi";
+import { useChainId, useWriteContract } from "wagmi";
 import { useAddLiquidity } from "../../../__hooks__/useAddLiquidity";
 import SubmitButton from "@/components/shared/submitBtn";
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
@@ -19,6 +15,7 @@ import { ROUTER } from "@/data/constants";
 import { useQuoteLiquidity } from "@/app/liquidity/__hooks__/useQuoteLiquidity";
 import { BaseError } from "@wagmi/core";
 import { useGetTokenInfo } from "@/utils";
+import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
 
 const searchParamsSchema = z.object({
   token0: z.string().refine((arg) => isAddress(arg)),
@@ -133,7 +130,19 @@ export default function InitializePool() {
     data: hash,
     error: writeContractError,
   } = useWriteContract(); // We'll also call reset when transaction toast is closed
-  const { isLoading } = useWaitForTransactionReceipt({ hash });
+  const { txReceipt, updateState } = useTransactionToastProvider();
+  useEffect(() => {
+    if (hash) {
+      updateState({
+        hash,
+        actionTitle:
+          token0NeedsApproval || token1NeedsApproval
+            ? "Approve"
+            : "Add Liquidity",
+      });
+    }
+  }, [hash, token0NeedsApproval, token1NeedsApproval, updateState]);
+  const { isLoading } = txReceipt;
   console.log("isAddLiqEth", isAddLiquidityETH);
   const onSubmit = useCallback(() => {
     if (token0NeedsApproval && token0ApprovalWriteRequest) {
