@@ -29,8 +29,9 @@ export default function TransactionToast() {
           </button>
         </div>
         <div>
-          <span>TransactionToast</span>
+          <span>{state.actionTitle ?? "Transaction Successful"}</span>
         </div>
+        <div></div>
       </div>
     </div>
   );
