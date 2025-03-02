@@ -1,4 +1,3 @@
-import CurrenciesOverlapIcons from "@/components/shared/currenciesOverlapIcons";
 import { Card } from "@/components/ui/card";
 import React from "react";
 
@@ -6,16 +5,16 @@ export default function StatCard() {
   return (
     <Card className="p-4 items-center gap-x-4 flex">
       <div className="flex items-center gap-x-2 pr-6">
-        <CurrenciesOverlapIcons
-          tokenOne={{
-            alt: "",
-            address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-          }}
-          tokenTwo={{
-            alt: "",
-            address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-          }}
-        />
+        {/* <CurrenciesOverlapIcons */}
+        {/*   tokenOne={{ */}
+        {/*     alt: "", */}
+        {/*     address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", */}
+        {/*   }} */}
+        {/*   tokenTwo={{ */}
+        {/*     alt: "", */}
+        {/*     address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", */}
+        {/*   }} */}
+        {/* /> */}
         <h2 className="text-neutral-100">ETH/USDC</h2>
       </div>
       <div className="h-10 w-[2px] bg-neutral-700"></div>

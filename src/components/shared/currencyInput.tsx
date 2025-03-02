@@ -3,8 +3,9 @@ import { Input } from "../ui/input";
 import { ControllerRenderProps, FieldValues } from "react-hook-form";
 import { ChevronDown } from "lucide-react";
 import ImageWithFallback from "./imageWithFallback";
-import { getLogoAsset, inputPatternNumberMatch } from "@/utils";
-import { TAddress, TToken } from "@/lib/types";
+import { inputPatternNumberMatch } from "@/utils";
+import { TToken } from "@/lib/types";
+
 /**
  * Must Wrap in Form Field
  */
@@ -12,11 +13,13 @@ function NumberInput<T extends FieldValues>({
   disabled,
   onChangeValue,
   decimals,
+  value,
 }: {
   disabled: boolean;
   decimals: number;
-  onChangeValue: (value: string) => void;
+  onChangeValue?: (value: string) => void;
   field?: ControllerRenderProps<T>;
+  value?: string | number;
 }) {
   return (
     <Input
@@ -29,8 +32,12 @@ function NumberInput<T extends FieldValues>({
       placeholder="0"
       minLength={1}
       step="any"
+      value={value}
       onChange={(e) => {
-        if (inputPatternNumberMatch(e.target.value, decimals)) {
+        if (
+          inputPatternNumberMatch(e.target.value, decimals) &&
+          onChangeValue
+        ) {
           return onChangeValue(e.target.value);
         }
       }}
@@ -71,7 +78,7 @@ function CurrencySelect({
         {token !== null && (
           <>
             <ImageWithFallback
-              src={getLogoAsset(token?.address as TAddress)}
+              src={token.logoURI}
               width={25}
               height={25}
               className="h-6 w-6 rounded-full"
@@ -88,6 +95,7 @@ function CurrencySelect({
     </button>
   );
 }
+
 const CurrencyInput = {
   Root,
   CurrencySelect,

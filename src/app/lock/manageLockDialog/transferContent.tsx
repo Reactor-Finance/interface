@@ -1,50 +1,50 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { Alert } from "@/components/ui/alert";
 import {
   useAccount,
+  useChainId,
   useSimulateContract,
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
-import { Contracts } from "@/lib/contracts";
-import { Address } from "viem";
-import { useLockProvider } from "../lockProvider";
-import useGetButtonStatuses from "@/components/shared/hooks/useGetButtonStatuses";
+import { Address, isAddress, zeroAddress } from "viem";
 import SubmitButton from "@/components/shared/submitBtn";
-import { useQueryClient } from "@tanstack/react-query";
+import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
+import * as Ve from "@/lib/abis/Ve";
+import { VE } from "@/data/constants";
+import { TLockToken } from "../types";
 
-export default function TransferContent() {
-  const [toAddress, setAddress] = React.useState("");
-  const { selectedLockToken } = useLockProvider();
-  const { address } = useAccount();
-  const { data: transferSimulation, queryKey } = useSimulateContract({
-    ...Contracts.VotingEscrow,
+export default function TransferContent({
+  selectedLockToken,
+}: {
+  selectedLockToken: TLockToken;
+}) {
+  const [toAddress, setToAddress] = React.useState<string>(zeroAddress);
+  const { address = zeroAddress } = useAccount();
+  const chainId = useChainId();
+  const ve = useMemo(() => VE[chainId], [chainId]);
+  const { data: transferSimulation } = useSimulateContract({
+    ...Ve,
+    address: ve,
     functionName: "safeTransferFrom",
-    args: [
-      address as Address,
-      toAddress as Address,
-      selectedLockToken?.id ?? 0n,
-    ],
+    args: [address, toAddress as Address, selectedLockToken.id],
     query: {
-      enabled: Boolean(address) && Boolean(selectedLockToken),
+      enabled:
+        address !== zeroAddress &&
+        Boolean(selectedLockToken) &&
+        isAddress(toAddress),
     },
   });
   const { writeContract, data: hash, reset, isPending } = useWriteContract();
-  const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash });
-  const onSubmit = () => {
+  const { isLoading } = useWaitForTransactionReceipt({ hash });
+  const onSubmit = useCallback(() => {
     if (transferSimulation) {
+      reset();
       writeContract(transferSimulation.request);
     }
-  };
-  const queryClient = useQueryClient();
-  useEffect(() => {
-    if (isSuccess) {
-      queryClient.invalidateQueries({ queryKey });
-      reset();
-      setAddress("");
-    }
-  }, [isSuccess, queryClient, queryKey, reset]);
+  }, [transferSimulation, reset, writeContract]);
+
   const { state } = useGetButtonStatuses({ isLoading, isPending });
   return (
     <div className="space-y-4 pt-4">
@@ -53,7 +53,7 @@ export default function TransferContent() {
         <div className="pt-1"></div>
         <Input
           placeholder="0x..."
-          onChange={(e) => setAddress(e.target.value)}
+          onChange={(e) => setToAddress(e.target.value)}
           value={toAddress}
           className="bg-neutral-1000"
         />

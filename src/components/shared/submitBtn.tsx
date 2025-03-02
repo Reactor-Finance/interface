@@ -4,6 +4,7 @@ import { useAccount } from "wagmi";
 import { Button, ButtonProps } from "../ui/button";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import Spinner from "../ui/spinner";
+
 export enum ButtonState {
   Signing = "SIGNING",
   Fetching = "FETCHING",
@@ -17,6 +18,7 @@ interface Props extends ButtonProps {
   approveTokenSymbol?: string;
   validationError?: string | null;
 }
+
 export default function SubmitButton({
   state,
   isValid,
@@ -40,20 +42,17 @@ export default function SubmitButton({
         return props.children;
     }
   }, [approveTokenSymbol, props.children, state]);
-  const isLoading =
-    state === ButtonState.Loading || state === ButtonState.Signing;
-  if (!isConnected) {
-    return (
-      <Button
-        onClick={() => openConnectModal?.()}
-        variant="primary"
-        size="submit"
-      >
-        Connect Wallet
-      </Button>
-    );
-  }
-  return (
+
+  const isLoading = useMemo(
+    () => state === ButtonState.Loading || state === ButtonState.Signing,
+    [state]
+  );
+
+  return !isConnected ? (
+    <Button onClick={openConnectModal} variant="primary" size="submit">
+      Connect Wallet
+    </Button>
+  ) : (
     <Button
       {...props}
       data-pending={isLoading ? "true" : "false"}

@@ -5,18 +5,21 @@ import reactor from "@/assets/reactor.svg";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { CustomConnectButton } from "./customConnectButton";
+
 export default function Header() {
   return (
-    <div className="h-[88px] px-8 items-center grid grid-cols-3">
+    <div className="h-[88px] px-8 items-center grid grid-cols-4">
       <div>
         <Image src={reactor} alt="" />
       </div>
-      <div>
-        <ul className="grid justify-center grid-cols-4 place-items-center text-[14px]">
+      <div className="col-span-2">
+        <ul className="grid justify-center  grid-cols-6 place-items-center text-[13px]">
           <NavLink href="/swap">Swap</NavLink>
           <NavLink href="/lock">Lock</NavLink>
           <NavLink href="/dashboard">Dashboard</NavLink>
           <NavLink href="/liquidity">Liquidity</NavLink>
+          <NavLink href="/voting">Voting</NavLink>
+          <NavLink href="/uniswap">Faucet</NavLink>
         </ul>
       </div>
       <div className="flex justify-end">

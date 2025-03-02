@@ -1,7 +1,6 @@
 import React from "react";
 import ImageWithFallback from "./imageWithFallback";
-import { getLogoAsset } from "@/utils";
-import { TAddress } from "@/lib/types";
+import { TToken } from "@/lib/types";
 import { cva, VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
@@ -14,20 +13,15 @@ const variants = cva("rounded-full", {
   },
   defaultVariants: { size: "md" },
 });
+
 interface Props extends VariantProps<typeof variants> {
-  tokenOne: {
-    address: TAddress;
-    alt: string;
-  };
-  tokenTwo: {
-    address: TAddress;
-    alt: string;
-  };
+  token0: TToken;
+  token1: TToken;
 }
 
 export default function CurrenciesOverlapIcons({
-  tokenOne,
-  tokenTwo,
+  token0,
+  token1,
   size,
 }: Props) {
   return (
@@ -36,16 +30,16 @@ export default function CurrenciesOverlapIcons({
         className={cn(variants({ size }))}
         width={35}
         height={35}
-        src={getLogoAsset(tokenOne.address)}
-        alt={tokenOne.alt}
+        src={token0.logoURI}
+        alt={token0.symbol}
       />
       <ImageWithFallback
         data-a="a"
         className={cn(variants({ size, className: "z-10" }))}
         width={35}
         height={35}
-        src={getLogoAsset(tokenTwo.address)}
-        alt={tokenTwo.alt}
+        src={token1.logoURI}
+        alt={token1.symbol}
       />
     </div>
   );

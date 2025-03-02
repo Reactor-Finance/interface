@@ -1,40 +1,57 @@
-import { ContractsAbi } from "./contractsAbi";
-export const Contracts = {
-  WETH: {
-    abi: [...ContractsAbi.WETH.abi] as const,
-    address: ContractsAbi.WETH.contractAddress as `0x${string}`,
-  },
+import { ContractsAbi } from "./abis/contractsAbi";
+import { env } from "@/env";
+import { monadTestnet } from "./abis/monadTestnet";
 
+const ABIs = {
+  PRIVATE_NET: ContractsAbi,
+  TESTNET: monadTestnet,
+  PROD: ContractsAbi,
+};
+
+const getContracts = () => {
+  if (env.NEXT_PUBLIC_CONTRACTS === "PRIVATE_NET") {
+    return ABIs.PRIVATE_NET;
+  }
+  if (env.NEXT_PUBLIC_CONTRACTS === "TESTNET") {
+    return ABIs.TESTNET;
+  }
+  if (env.NEXT_PUBLIC_CONTRACTS === "PROD") {
+    return ABIs.PROD;
+  }
+  return ABIs.PRIVATE_NET;
+};
+const EnvContracts = getContracts();
+export const Contracts = {
   Reactor: {
-    abi: [...ContractsAbi.Reactor.abi] as const,
-    address: ContractsAbi.Reactor.contractAddress as `0x${string}`,
+    abi: [...EnvContracts.Reactor.abi] as const,
+    address: EnvContracts.Reactor.contractAddress as `0x${string}`,
   },
   Voter: {
-    abi: [...ContractsAbi.Voter.abi] as const,
-    address: ContractsAbi.Voter.contractAddress as `0x${string}`,
+    abi: [...EnvContracts.Voter.abi] as const,
+    address: EnvContracts.Voter.contractAddress as `0x${string}`,
   },
   VotingEscrow: {
-    abi: [...ContractsAbi.VotingEscrow.abi] as const,
-    address: ContractsAbi.VotingEscrow.contractAddress as `0x${string}`,
+    abi: [...EnvContracts.VotingEscrow.abi] as const,
+    address: EnvContracts.VotingEscrow.contractAddress as `0x${string}`,
   },
   Router: {
-    abi: [...ContractsAbi.Router.abi] as const,
-    address: ContractsAbi.Router.contractAddress as `0x${string}`,
+    abi: [...EnvContracts.Router.abi] as const,
+    address: EnvContracts.Router.contractAddress as `0x${string}`,
   },
   PairFactory: {
-    abi: [...ContractsAbi.PairFactory.abi] as const,
-    address: ContractsAbi.PairFactory.contractAddress as `0x${string}`,
+    abi: [...EnvContracts.PairFactory.abi] as const,
+    address: EnvContracts.PairFactory.contractAddress as `0x${string}`,
   },
   TradeHelper: {
-    abi: [...ContractsAbi.TradeHelper.abi] as const,
-    address: ContractsAbi.TradeHelper.contractAddress as `0x${string}`,
+    abi: [...EnvContracts.TradeHelper.abi] as const,
+    address: EnvContracts.TradeHelper.contractAddress as `0x${string}`,
   },
   veNFTHelper: {
-    abi: [...ContractsAbi.veNFTHelper.abi] as const,
-    address: ContractsAbi.veNFTHelper.contractAddress as `0x${string}`,
+    abi: [...EnvContracts.veNFTHelper.abi] as const,
+    address: EnvContracts.veNFTHelper.contractAddress as `0x${string}`,
   },
   RewardsDistributor: {
-    abi: [...ContractsAbi.RewardsDistributor.abi] as const,
-    address: ContractsAbi.RewardsDistributor.contractAddress as `0x${string}`,
+    abi: [...EnvContracts.RewardsDistributor.abi] as const,
+    address: EnvContracts.RewardsDistributor.contractAddress as `0x${string}`,
   },
 };

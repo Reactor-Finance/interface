@@ -11,6 +11,8 @@ import { TAddress } from "@/lib/types";
 import { useWethDeposit } from "./useWeth";
 import { parseUnits } from "viem";
 import { Contracts } from "@/lib/contracts";
+import { TarpAbi } from "@/lib/abis/Tarp";
+import { Button } from "@/components/ui/button";
 
 export default function Page() {
   const [formData, setFormData] = useState({ token: "", deposit: "" });
@@ -37,12 +39,30 @@ export default function Page() {
     functionName: "mintRct",
     args: [address ?? "0x", parseUnits("1000", 18)],
   });
+  const { data: mintTarp } = useSimulateContract({
+    abi: TarpAbi,
+    address: "0xf08ae37182DA7a094087f3255Fa1915fa4490483",
+    functionName: "mint",
+    args: [address ?? "0x", parseUnits("1000", 18)],
+  });
+  const { data: mintVoot } = useSimulateContract({
+    abi: TarpAbi,
+    address: "0x1EF97B4c3Fa0b5aFB1727D9598027257944390F7",
+    functionName: "mint",
+    args: [address ?? "0x", parseUnits("1000", 18)],
+  });
   const { data: getWeth } = useWethDeposit({ amount: parseUnits("1", 18) });
   const onSubmit2 = () => {
     if (getWeth?.request) writeContract(getWeth?.request);
   };
   const onSubmit3 = () => {
     if (mintRct?.request) writeContract(mintRct?.request);
+  };
+  const onSubmit4 = () => {
+    if (mintTarp?.request) writeContract(mintTarp?.request);
+  };
+  const onSubmit5 = () => {
+    if (mintVoot?.request) writeContract(mintVoot?.request);
   };
   return (
     <div className="flex justify-center">
@@ -83,8 +103,12 @@ export default function Page() {
         >
           Submit
         </button>
-        <button onClick={onSubmit2}>Get WETH</button>
-        <button onClick={onSubmit3}>Get RCT</button>
+        <div className="grid grid-cols-2 gap-4">
+          <Button onClick={onSubmit2}>Get WETH</Button>
+          <Button onClick={onSubmit3}>Get RCT</Button>
+          <Button onClick={onSubmit4}>Mint Tarp</Button>
+          <Button onClick={onSubmit5}>Mint Voot</Button>
+        </div>
       </div>
     </div>
   );

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import type { StaticImageData } from "next/image";
 import unknownImg from "@/assets/question-mark.svg";
+
 // Todo
 // Extend image props
 interface Props {
@@ -25,6 +26,7 @@ interface Props {
   className?: string | undefined;
   fallbackImageUrl?: string | StaticImageData;
 }
+
 const ImageWithFallback = (props: Props) => {
   let { fallbackImageUrl } = props;
   const { src, ...rest } = props;
