@@ -68,6 +68,7 @@ export const TransactionToastProvider = ({ children }: Props) => {
   function testToast() {
     updateState({ open: !state.open });
   }
+  console.log({ state }, "----====----");
   return (
     <TransactionToastContext.Provider
       value={{ updateState, testToast, state, resetState, txReceipt }}
