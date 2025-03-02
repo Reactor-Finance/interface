@@ -107,9 +107,7 @@ export default function CreateLockDialog() {
         </DialogTitle>
         <div>
           <div className="flex justify-between">
-            <label className="" htmlFor="">
-              Amount to Lock
-            </label>
+            <label htmlFor="">Amount to Lock</label>
             <span className="text-sm">
               <span className="text-neutral-200">Available:</span>{" "}
               {formatNumber(formatUnits(rctBalance, RCT_DECIMALS))} RCT
