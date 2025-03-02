@@ -14,9 +14,16 @@ import {
 interface State {
   hash: Address | undefined;
   open: boolean;
+  actionTitle: string | undefined;
+  actionDescription: string | undefined;
 }
 
-const initialState: State = { open: true, hash: undefined };
+const initialState: State = {
+  open: true,
+  hash: undefined,
+  actionTitle: undefined,
+  actionDescription: undefined,
+};
 interface ContextType {
   state: State;
   testToast: () => void;
@@ -46,6 +53,14 @@ export const TransactionToastProvider = ({ children }: Props) => {
       updateState({ open: true });
     }
   }, [txReceipt.isSuccess, updateState]);
+  useEffect(() => {
+    if (state.open) {
+      const timeout = setTimeout(() => {
+        updateState({ open: false });
+      }, 4000);
+      return () => clearTimeout(timeout);
+    }
+  }, [state.open, updateState]);
   const resetState = useCallback(() => {
     setState(initialState);
   }, [setState]);

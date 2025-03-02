@@ -1,5 +1,5 @@
 "use client";
-import { useTransactionToastProvider } from "@/providers/TransactionToastProvider";
+import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
 import { X } from "lucide-react";
 import React, { useEffect } from "react";
 
