@@ -8,11 +8,11 @@ import { CustomConnectButton } from "./customConnectButton";
 
 export default function Header() {
   return (
-    <div className="h-[88px] px-8 items-center grid grid-cols-3">
+    <div className="h-[88px] px-8 items-center grid grid-cols-4">
       <div>
         <Image src={reactor} alt="" />
       </div>
-      <div>
+      <div className="col-span-2">
         <ul className="grid justify-center  grid-cols-6 place-items-center text-[13px]">
           <NavLink href="/swap">Swap</NavLink>
           <NavLink href="/lock">Lock</NavLink>
