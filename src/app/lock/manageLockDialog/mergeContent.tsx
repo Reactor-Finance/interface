@@ -1,36 +1,46 @@
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { Alert } from "@/components/ui/alert";
-import { Contracts } from "@/lib/contracts";
 import {
+  useChainId,
   useSimulateContract,
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
 import LockDropdown from "../lockDropdown";
-import { useLockProvider } from "../lockProvider";
 import SubmitButton from "@/components/shared/submitBtn";
 import usePadLoading from "@/lib/hooks/usePadLoading";
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
+import { useCheckUserVeNFTs } from "@/lib/hooks/useCheckUserVeNFTs";
+import { TLockToken } from "../types";
+import * as Ve from "@/lib/abis/Ve";
+import { VE } from "@/data/constants";
 
-export default function MergeContent() {
-  const [mergeToken, setMergeToken] = React.useState("");
-  const { lockTokens, selectedLockToken } = useLockProvider();
-  const tokenId1 = useMemo(() => {
-    return lockTokens.find((token) => token.id.toString() === mergeToken);
-  }, [lockTokens, mergeToken]);
+export default function MergeContent({
+  selectedLockToken,
+}: {
+  selectedLockToken: TLockToken;
+}) {
+  const lockTokens = useCheckUserVeNFTs();
+  const [selectedLockToken0, setSelectedLockToken0] = useState<TLockToken>();
+  const chainId = useChainId();
+  const ve = useMemo(() => VE[chainId], [chainId]);
   const { data: mergeSimulation, isFetching } = useSimulateContract({
-    ...Contracts.VotingEscrow,
+    ...Ve,
+    address: ve,
     functionName: "merge",
-    args: [selectedLockToken?.id ?? 0n, tokenId1?.id ?? 0n],
-    query: { enabled: Boolean(selectedLockToken) && Boolean(tokenId1) },
+    args: [selectedLockToken?.id ?? 0n, selectedLockToken0?.id ?? 0n],
+    query: {
+      enabled: Boolean(selectedLockToken) && Boolean(selectedLockToken0),
+    },
   });
   const { writeContract, isPending, data: hash } = useWriteContract();
   const { isLoading } = useWaitForTransactionReceipt({ hash });
-  const onSubmit = () => {
+  const onSubmit = useCallback(() => {
     if (mergeSimulation?.request) {
       writeContract(mergeSimulation.request);
     }
-  };
+  }, [mergeSimulation, writeContract]);
+
   const paddedIsFetching = usePadLoading({
     value: isFetching,
     duration: 300,
@@ -45,13 +55,23 @@ export default function MergeContent() {
     <div className="space-y-4 pt-4">
       <h2>Merge with</h2>
       <LockDropdown.Root
-        value={mergeToken}
-        onValueChange={(value) => setMergeToken(value)}
+        value={selectedLockToken0?.id.toString()}
+        onValueChange={(value) =>
+          setSelectedLockToken0(
+            lockTokens.find((lock) => lock.id === BigInt(value))
+          )
+        }
       >
-        <LockDropdown.Trigger></LockDropdown.Trigger>
+        <LockDropdown.Trigger>
+          Lock #{selectedLockToken0?.id.toString()}
+        </LockDropdown.Trigger>
         <LockDropdown.SelectList>
           {lockTokens
-            .filter((token) => token.id !== selectedLockToken?.id)
+            .filter(
+              (token) =>
+                token.id !== selectedLockToken0?.id &&
+                token.id !== selectedLockToken.id
+            )
             .map((lockToken) => (
               <LockDropdown.Item
                 value={lockToken.id.toString()}

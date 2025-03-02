@@ -1,10 +1,10 @@
 import { DialogContent, Dialog } from "@/components/ui/dialog";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Slider } from "@/components/ui/slider";
 import EstimatesHeader from "@/app/lock/estimateHeader";
 import PoolHeader from "@/components/shared/poolHeader";
 import { TPoolType } from "@/lib/types";
-import SubmitButton, { ButtonState } from "@/components/shared/submitBtn";
+import SubmitButton from "@/components/shared/submitBtn";
 import {
   LiquidityActions,
   useDashboardLiquidityProvider,
@@ -14,6 +14,9 @@ import { useGetHeader } from "./dialogHeaders";
 import useRemoveLiquidity from "../../__hooks__/useRemoveLiquidity";
 import { useGetGaugeAddress } from "../../__hooks__/useGetGaugeAddress";
 import { Address } from "viem";
+import useStake from "../../__hooks__/useStake";
+import useUnstake from "../../__hooks__/useUnstake";
+import useCreateGauge from "../../__hooks__/useCreateGauge";
 
 export default function DashboardLiquidityDialog() {
   const {
@@ -22,29 +25,46 @@ export default function DashboardLiquidityDialog() {
     selectedUserLiquidityPosition: position,
   } = useDashboardLiquidityProvider();
   const gaugeAddress = useGetGaugeAddress({ poolId: position?.id as Address });
-  console.log(gaugeAddress);
   const header = useGetHeader();
   useEffect(() => {
     if (!position && state.dialogOpen) {
       updateState({ dialogOpen: false });
     }
   }, [position, state.dialogOpen, updateState]);
-  const {
-    onSubmit: removeLiquiditySubmit,
-    isValid: isRemoveLiqValid,
-    errorMessage,
-  } = useRemoveLiquidity({
+  const removeLiquidity = useRemoveLiquidity({
     position,
     enabled: state.actionType === LiquidityActions.Withdraw,
   });
-  const isValid = isRemoveLiqValid;
+  const stake = useStake({ gaugeAddress });
+  const unstake = useUnstake({ gaugeAddress });
+  const createGauage = useCreateGauge();
+  const { isValid, onSubmit, errorMessage, buttonProps } = useMemo(() => {
+    if (
+      gaugeAddress === undefined &&
+      state.actionType !== LiquidityActions.Withdraw
+    ) {
+      return createGauage;
+    }
+    switch (state.actionType) {
+      case LiquidityActions.Stake:
+        return stake;
+      case LiquidityActions.Unstake:
+        return unstake;
+      case LiquidityActions.Withdraw:
+        return removeLiquidity;
+      default:
+        return removeLiquidity;
+    }
+  }, [
+    createGauage,
+    gaugeAddress,
+    removeLiquidity,
+    stake,
+    state.actionType,
+    unstake,
+  ]);
   const token0 = useGetTokenInfo(position?.pair.token0.id);
   const token1 = useGetTokenInfo(position?.pair.token1.id);
-  const onSubmit = () => {
-    if (state.actionType === LiquidityActions.Withdraw) {
-      removeLiquiditySubmit();
-    }
-  };
   useEffect(() => {
     if (!state.actionType && state.sliderValue !== 0) {
       updateState({ sliderValue: 0 });
@@ -72,7 +92,6 @@ export default function DashboardLiquidityDialog() {
               }}
               min={0}
               max={100}
-              step={1}
             />
             <div className="flex justify-between">
               <span>0%</span>
@@ -88,7 +107,7 @@ export default function DashboardLiquidityDialog() {
               onClick={onSubmit}
               isValid={isValid}
               validationError={errorMessage}
-              state={ButtonState.Default}
+              {...buttonProps}
             >
               {getActionTypeString(state.actionType)}
             </SubmitButton>

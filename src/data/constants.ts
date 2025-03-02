@@ -11,13 +11,16 @@ export enum ChainId {
 }
 
 export const VOTER: { [key: number]: `0x${string}` } = {
-  [ChainId.MONAD_TESTNET]: "0xEeeC1d828520fC26541624c4e2E34376220CB93a",
+  [ChainId.MONAD_TESTNET]: "0xf8f04e8e8152B182A904102359C66215F30c413D",
 };
 export const TRADE_HELPER: { [key: number]: `0x${string}` } = {
   [ChainId.MONAD_TESTNET]: "0xD59B88727680a026C572fEeD94fB81579c1c1394",
 };
 export const PAIR_HELPER: { [key: number]: `0x${string}` } = {
   [ChainId.MONAD_TESTNET]: "0xcD6de9d7f6d2e105cDc4807D83839Bd1442498EB",
+};
+export const VE_NFT_HELPER: { [key: number]: `0x${string}` } = {
+  [ChainId.MONAD_TESTNET]: "0x6485ECf484640395Eb91Fe8DF50e1110D0d4D930",
 };
 export const ROUTER: { [key: number]: `0x${string}` } = {
   [ChainId.MONAD_TESTNET]: "0x0067e92EAa46701c75D77dEb970c568307B086c5",
@@ -27,5 +30,11 @@ export const WETH: { [key: number]: `0x${string}` } = {
 };
 export const ORACLE: { [key: number]: `0x${string}` } = {
   [ChainId.MONAD_TESTNET]: "0x27b14220DD749343979da9ea1434d086f99f2ABB",
+};
+export const VE: { [key: number]: `0x${string}` } = {
+  [ChainId.MONAD_TESTNET]: "0x2203cEf33764a133138528095bd88dacF669F196",
+};
+export const RCT: { [key: number]: `0x${string}` } = {
+  [ChainId.MONAD_TESTNET]: "0xE125F57EAF50C4e93B8c24c5c49D405e51D7122D",
 };
 export const ETHER = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
