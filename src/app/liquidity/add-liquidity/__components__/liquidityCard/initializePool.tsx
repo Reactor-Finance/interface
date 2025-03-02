@@ -138,7 +138,7 @@ export default function InitializePool() {
         actionTitle:
           token0NeedsApproval || token1NeedsApproval
             ? "Approve"
-            : "Add Liquidity",
+            : "Added Liquidity",
       });
     }
   }, [hash, token0NeedsApproval, token1NeedsApproval, updateState]);
