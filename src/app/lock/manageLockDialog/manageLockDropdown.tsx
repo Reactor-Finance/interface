@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback } from "react";
 import LockDropdown from "../lockDropdown";
 import { formatUnits } from "viem";
 import { formatNumber } from "@/lib/utils";
