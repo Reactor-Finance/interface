@@ -4,7 +4,6 @@ import Image from "next/image";
 import React, { useMemo } from "react";
 import { TLockToken } from "../types";
 import logo from "@/assets/reactor-symbol.svg";
-import { useLockProvider } from "../lockProvider";
 import { formatUnits } from "viem";
 import { formatNumber } from "@/lib/utils";
 import { RCT_DECIMALS } from "@/data/constants";
@@ -27,7 +26,6 @@ export default function LockRow({
   token,
   onLockActionMenuClicked,
 }: Props) {
-  const { setSelectedTokenId } = useLockProvider();
   const unlockDate = useMemo(
     () => new Date(Number(token.lockEnd) * 1000),
     [token]
@@ -59,7 +57,6 @@ export default function LockRow({
           {formatNumber(formatUnits(token.amount, Number(token.decimals)))} RCT
         </span>
       </td>
-      <td className="">11.22</td>
       <td className="">
         {formatNumber(formatUnits(token.rebase_amount, RCT_DECIMALS))}
       </td>

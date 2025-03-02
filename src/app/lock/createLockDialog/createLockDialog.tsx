@@ -19,6 +19,7 @@ import useApproveWrite from "@/lib/hooks/useApproveWrite";
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
 import { useGetBalance } from "@/lib/hooks/useGetBalance";
 import { formatNumber } from "@/lib/utils";
+import { useAtomicDate } from "@/lib/hooks/useAtomicDate";
 
 // Local constants
 const YEARS_2 = 62208000;
@@ -26,6 +27,7 @@ const DAYS_14 = 1209600;
 
 export default function CreateLockDialog() {
   const chainId = useChainId();
+  const now = useAtomicDate();
   const rct = useMemo(() => RCT[chainId], [chainId]); // RCT
   const ve = useMemo(() => VE[chainId], [chainId]); // Escrow
   const [amount, setAmount] = useState(0);
@@ -75,6 +77,12 @@ export default function CreateLockDialog() {
     needsApproval,
     isFetching,
   });
+
+  const dateString = useMemo(() => {
+    const newTimestamp = now.getTime() + duration * 1000;
+    const date = new Date(newTimestamp);
+    return date.toLocaleDateString();
+  }, [duration, now]);
 
   const isValid = useMemo(
     () =>
@@ -136,7 +144,7 @@ export default function CreateLockDialog() {
           <div className="pt-2"></div>
           <EstimateRow title="Deposit" value={`${amount} RCT`} />
           <EstimateRow title="Voting Power" value="0.00 RCT" />
-          <EstimateRow title="Unlock Date" value="-" />
+          <EstimateRow title="Unlock Date" value={dateString} />
         </div>
         <div className="border-t border-neutral-800 my-2"></div>
         <Alert colors="muted">

@@ -12,6 +12,7 @@ import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStat
 import { TLockToken } from "../types";
 import * as Ve from "@/lib/abis/Ve";
 import { VE } from "@/data/constants";
+import { useAtomicDate } from "@/lib/hooks/useAtomicDate";
 
 // Local constants
 const YEARS_2 = 62208000;
@@ -23,6 +24,7 @@ export default function ExtendContent({
   selectedLockToken: TLockToken;
 }) {
   const chainId = useChainId();
+  const now = useAtomicDate();
   const ve = useMemo(() => VE[chainId], [chainId]); // Escrow
   const [duration, setDuration] = useState(DAYS_14);
   const { writeContract, isPending, data: hash } = useWriteContract();
@@ -50,12 +52,12 @@ export default function ExtendContent({
   });
 
   const { newDate, days } = useMemo(() => {
-    const newTimestamp = Date.now() + duration * 1000;
+    const newTimestamp = now.getTime() + duration * 1000;
     const date = new Date(newTimestamp);
     const newDate = date.toLocaleDateString();
     const days = secondsToDays(duration);
     return { newDate, days };
-  }, [duration]);
+  }, [duration, now]);
 
   return (
     <div className="space-y-4 pt-4">
@@ -82,10 +84,6 @@ export default function ExtendContent({
         <div className="flex justify-between text-sm">
           <h5 className="text-sm text-neutral-200">New lock time</h5>
           <h5 className="">{newDate}</h5>
-        </div>
-        <div className="flex justify-between text-sm">
-          <h5 className="text-sm text-neutral-100">New est.voting power</h5>
-          <h5 className="">24.42 veRCT</h5>
         </div>
       </div>
 

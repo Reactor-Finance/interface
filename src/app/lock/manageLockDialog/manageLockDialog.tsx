@@ -3,7 +3,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { TabsContent } from "@radix-ui/react-tabs";
 import React from "react";
-import { IncreaseContent } from "./increaseContent";
+import IncreaseContent from "./increaseContent";
 import ExtendContent from "./extendContent";
 import TransferContent from "./transferContent";
 import MergeContent from "./mergeContent";
@@ -16,6 +16,7 @@ interface Props {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   selectedToken?: TLockToken;
   reset?: () => void;
+  onDropdownChange: (token?: TLockToken) => void;
 }
 
 export default function ManageLockDialog({
@@ -23,6 +24,7 @@ export default function ManageLockDialog({
   setOpen,
   selectedToken,
   reset,
+  onDropdownChange,
 }: Props) {
   return (
     <div>
@@ -30,7 +32,7 @@ export default function ManageLockDialog({
         open={open}
         onOpenChange={(isOpen) => {
           setOpen(isOpen);
-          if (reset) reset();
+          if (!isOpen && reset) reset();
         }}
       >
         <DialogContent position="static">
@@ -83,22 +85,25 @@ export default function ManageLockDialog({
                 </TabsTrigger>
               </TabsList>
               <div className="py-4">
-                <ManageLockDropdown />
+                <ManageLockDropdown
+                  selectedLockToken={selectedToken}
+                  onTokenSelected={onDropdownChange}
+                />
               </div>
               <TabsContent value="increase">
-                <IncreaseContent />
+                <IncreaseContent selectedLockToken={selectedToken} />
               </TabsContent>
               <TabsContent value="extend">
                 <ExtendContent selectedLockToken={selectedToken} />
               </TabsContent>
               <TabsContent value="transfer">
-                <TransferContent />
+                <TransferContent selectedLockToken={selectedToken} />
               </TabsContent>
               <TabsContent value="merge">
-                <MergeContent />
+                <MergeContent selectedLockToken={selectedToken} />
               </TabsContent>
               <TabsContent value="withdraw">
-                <WithdrawContent />
+                <WithdrawContent selectedLockToken={selectedToken} />
               </TabsContent>
             </Tabs>
           )}

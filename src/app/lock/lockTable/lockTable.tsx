@@ -15,6 +15,8 @@ export default function LockTable() {
         open={manageDialogOpen}
         setOpen={setManageDialogOpen}
         selectedToken={selectedLockToken}
+        reset={() => setSelectedLockToken(undefined)}
+        onDropdownChange={setSelectedLockToken}
       />
       <table className="w-full pt-6">
         <caption className="h-0 opacity-0">Locks Table</caption>
@@ -23,7 +25,6 @@ export default function LockTable() {
             <tr className="grid grid-cols-8 px-6 py-2 font-medium">
               <th className="col-span-2 text-left">Lock ID</th>
               <th>Voting Power</th>
-              <th>APR</th>
               <th>Rewards</th>
               <th>Unlock Date</th>
               <th>Status</th>

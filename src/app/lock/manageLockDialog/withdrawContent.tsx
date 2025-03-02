@@ -1,72 +1,53 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useMemo } from "react";
 import { Alert } from "@/components/ui/alert";
 import {
+  useChainId,
   useSimulateContract,
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
-import { Contracts } from "@/lib/contracts";
-import useApproveVeRct from "./hooks/useApproveVeRct";
-import useGetLockApproval from "./hooks/useGetLockApproval";
-import { useQueryClient } from "@tanstack/react-query";
-import { useLockProvider } from "../lockProvider";
 import SubmitButton from "@/components/shared/submitBtn";
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
+import { TLockToken } from "../types";
+import * as Ve from "@/lib/abis/Ve";
+import { VE } from "@/data/constants";
 
-export default function WithdrawContent() {
-  const { selectedLockToken } = useLockProvider();
-  const { data: withdrawSimulation, queryKey: withdrawKey } =
-    useSimulateContract({
-      ...Contracts.VotingEscrow,
-      functionName: "withdraw",
-      args: [selectedLockToken?.id ?? 0n],
-    });
-  const { data: approved, queryKey: getLockKey } = useGetLockApproval();
-  const { data: approveSimulation } = useApproveVeRct();
+export default function WithdrawContent({
+  selectedLockToken,
+}: {
+  selectedLockToken: TLockToken;
+}) {
+  const chainId = useChainId();
+  const ve = useMemo(() => VE[chainId], [chainId]);
+  const { data: withdrawSimulation } = useSimulateContract({
+    ...Ve,
+    address: ve,
+    functionName: "withdraw",
+    args: [selectedLockToken.id],
+  });
   const { writeContract, reset, isPending, data: hash } = useWriteContract();
-  const { isSuccess, isError, isLoading } = useWaitForTransactionReceipt({
+  const { isLoading } = useWaitForTransactionReceipt({
     hash,
   });
-  const queryClient = useQueryClient();
-  useEffect(() => {
-    if (isSuccess) {
-      if (!approved) {
-        queryClient.invalidateQueries({ queryKey: getLockKey });
-        queryClient.invalidateQueries({ queryKey: withdrawKey });
-      }
-      reset();
-    }
-  }, [
-    isSuccess,
-    isError,
-    reset,
-    approved,
-    queryClient,
-    getLockKey,
-    withdrawKey,
-  ]);
-  const onSubmit = () => {
-    if (!approved && approveSimulation) {
-      writeContract(approveSimulation.request);
-      return;
-    }
+
+  const onSubmit = useCallback(() => {
     if (withdrawSimulation) {
+      reset();
       writeContract(withdrawSimulation.request);
     }
-  };
+  }, [withdrawSimulation, reset, writeContract]);
   const { state } = useGetButtonStatuses({
     isPending,
     isLoading,
-    needsApproval: !Boolean(approved),
+    needsApproval: false,
   });
   return (
     <div className="space-y-4 pt-4">
-      <Alert colors="muted">Withdraw veRCT from your expired locks.</Alert>
+      <Alert colors="muted">Withdraw RCT from your expired locks.</Alert>
       <SubmitButton
         onClick={onSubmit}
         state={state}
         isValid={Boolean(withdrawSimulation)}
-        approveTokenSymbol="veRCT"
       >
         Withdraw
       </SubmitButton>

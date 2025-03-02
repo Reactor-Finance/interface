@@ -2,99 +2,105 @@ import * as React from "react";
 import { Alert } from "@/components/ui/alert";
 import RctInput from "../rctInput";
 import {
+  useChainId,
   useSimulateContract,
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
-import { Contracts } from "@/lib/contracts";
 import { formatUnits, parseUnits } from "viem";
-import { RCT_DECIMALS } from "@/data/constants";
-import useGetLockApproval from "./hooks/useGetLockApproval";
-import { inputPatternMatch } from "@/lib/utils";
-import { useLockProvider } from "../lockProvider";
+import { RCT, RCT_DECIMALS, VE } from "@/data/constants";
+import { formatNumber } from "@/lib/utils";
 import SubmitButton from "@/components/shared/submitBtn";
-import { useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
-import { useIncreaseLockValidation } from "./hooks/useIncreaseLockValidation";
-import useGetRctBalance from "@/lib/hooks/useGetRctBalance";
 import useApproveWrite from "@/lib/hooks/useApproveWrite";
 import usePadLoading from "@/lib/hooks/usePadLoading";
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
-export function IncreaseContent() {
-  const [amount, setAmount] = React.useState("");
-  const [isApproving, setIsApproving] = React.useState(false);
-  const { selectedLockToken } = useLockProvider();
-  const tokenId = selectedLockToken?.id.toString() ?? "";
-  const { rctBalance, rctQueryKey } = useGetRctBalance();
-  const { data: increaseAmountSimulation } = useSimulateContract({
-    ...Contracts.VotingEscrow,
-    functionName: "increase_amount",
-    args: [parseUnits(tokenId, 0), parseUnits(amount, RCT_DECIMALS)],
-  });
-  const { data: approveSimulation } = useSimulateContract({
-    ...Contracts.VotingEscrow,
-    functionName: "approve",
-    args: [Contracts.VotingEscrow.address, parseUnits(tokenId, 0)],
-  });
-  const { approveWriteRequest, needsApproval, isFetching, allowanceKey } =
-    useApproveWrite({
-      tokenAddress: Contracts.Reactor.address,
-      spender: Contracts.VotingEscrow.address,
-      amount,
-    });
-  const isLockApproved = useGetLockApproval();
-  const { writeContract, reset, isPending, data: hash } = useWriteContract();
-  const { isLoading, isSuccess } = useWaitForTransactionReceipt({
+import { useGetBalance } from "@/lib/hooks/useGetBalance";
+import * as Ve from "@/lib/abis/Ve";
+import { TLockToken } from "../types";
+
+// Local constants
+
+export default function IncreaseContent({
+  selectedLockToken,
+}: {
+  selectedLockToken: TLockToken;
+}) {
+  const chainId = useChainId();
+  const rct = React.useMemo(() => RCT[chainId], [chainId]); // RCT
+  const ve = React.useMemo(() => VE[chainId], [chainId]); // Escrow
+  const [amount, setAmount] = React.useState(0);
+  const rctBalance = useGetBalance({ tokenAddress: rct });
+  const { writeContract, reset, data: hash, isPending } = useWriteContract();
+  const { isLoading } = useWaitForTransactionReceipt({
     hash,
   });
-  const { isValid, validationError } = useIncreaseLockValidation({
-    needsApproval,
-    isLockApproved: Boolean(isLockApproved),
-    rctBalance,
-    increaseAmountSimulation: Boolean(increaseAmountSimulation?.request),
-    amount,
-    approveSimulation: Boolean(approveSimulation?.request),
-    approveWriteRequest: Boolean(approveWriteRequest),
+
+  const handleInputChange = React.useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const parsedNumber = Number(e.target.value);
+      const changeValue = isNaN(parsedNumber) ? amount : parsedNumber;
+      setAmount(changeValue);
+    },
+    [amount, setAmount]
+  );
+
+  const { approveWriteRequest, needsApproval, isFetching } = useApproveWrite({
+    spender: ve,
+    tokenAddress: rct, //rct address
+    amount: String(amount),
+    decimals: RCT_DECIMALS,
   });
-  const queryClient = useQueryClient();
-  useEffect(() => {
-    if (isSuccess) {
-      if (isApproving) {
-        queryClient.invalidateQueries({ queryKey: allowanceKey });
-        setIsApproving(false);
-      } else {
-        queryClient.invalidateQueries({ queryKey: rctQueryKey });
-        setAmount("");
-      }
+
+  const { data: increaseAmountSimulation, error: increaseAmountError } =
+    useSimulateContract({
+      ...Ve,
+      address: ve,
+      functionName: "increase_amount",
+      args: [selectedLockToken.id, parseUnits(String(amount), RCT_DECIMALS)],
+    });
+
+  const onSubmit = React.useCallback(() => {
+    if (needsApproval && approveWriteRequest) {
       reset();
-    }
-  }, [allowanceKey, isApproving, isSuccess, queryClient, rctQueryKey, reset]);
-  const onSubmit = () => {
-    if (approveWriteRequest) {
       writeContract(approveWriteRequest);
-      setIsApproving(true);
-      return;
-    }
-    if (!isLockApproved && approveSimulation) {
-      writeContract(approveSimulation.request);
-      setIsApproving(true);
       return;
     }
     if (increaseAmountSimulation) {
+      reset();
       writeContract(increaseAmountSimulation.request);
       return;
     }
-  };
+  }, [
+    reset,
+    needsApproval,
+    approveWriteRequest,
+    increaseAmountSimulation,
+    writeContract,
+  ]);
+
   const paddedIsFetching = usePadLoading({
     value: isFetching,
     duration: 300,
   });
+
   const { state } = useGetButtonStatuses({
     isLoading,
     isPending,
     needsApproval,
     isFetching: paddedIsFetching,
   });
+
+  const isValid = React.useMemo(() => {
+    return needsApproval
+      ? Boolean(approveWriteRequest)
+      : Boolean(increaseAmountSimulation) && !Boolean(increaseAmountError);
+  }, [
+    needsApproval,
+    approveWriteRequest,
+    increaseAmountSimulation,
+    increaseAmountError,
+  ]);
+
   return (
     <div className="space-y-4 pt-4">
       <div className="flex justify-between">
@@ -102,40 +108,24 @@ export function IncreaseContent() {
         <h5 className="text-neutral-300 text-[13px]">
           Available:{" "}
           <span className="text-white">
-            {formatUnits(rctBalance ?? 0n, RCT_DECIMALS)} RCT
+            {formatNumber(formatUnits(rctBalance, RCT_DECIMALS))} RCT
           </span>
         </h5>
       </div>
 
-      <RctInput
-        value={amount}
-        onChange={(e) => {
-          if (inputPatternMatch(e.target.value, RCT_DECIMALS)) {
-            setAmount(e.target.value);
-          }
-        }}
-      />
+      <RctInput value={amount} onChange={handleInputChange} />
       <h3 className="text-lg">Estimates</h3>
       <div className="space-y-1">
         <div className="flex justify-between">
           <h5 className="text-sm text-neutral-200">Deposit</h5>
-          <h5 className="text-neutral-100">0.00 RCT</h5>
-        </div>
-        <div className="flex justify-between">
-          <h5 className="text-sm text-neutral-200">Deposit</h5>
-          <h5 className="text-neutral-100">0.00 RCT</h5>
+          <h5 className="text-neutral-100">{formatNumber(amount)} RCT</h5>
         </div>
       </div>
       <Alert colors={"muted"}>
         Depositing into the lock will increase your voting power and rewards.
         You can also extend the lock duration.
       </Alert>
-      <SubmitButton
-        validationError={validationError}
-        state={state}
-        onClick={onSubmit}
-        isValid={isValid}
-      >
+      <SubmitButton state={state} onClick={onSubmit} isValid={isValid}>
         Increase Lock
       </SubmitButton>
     </div>
