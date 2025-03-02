@@ -1,88 +1,96 @@
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import RctInput from "../rctInput";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Alert } from "@/components/ui/alert";
 import EstimatesHeader from "../estimateHeader";
 import EstimateRow from "../estimateRow";
-import useSimulateCreateLock from "./hooks/useSimulateCreateLock";
-import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
-import { Contracts } from "@/lib/contracts";
-import { formatUnits } from "viem";
-import { DAYS_14, RCT_DECIMALS, TWO_YEARS } from "@/data/constants";
-import useCreateLockValidation from "./hooks/useCreateLockValidation";
-import { useLockProvider } from "../lockProvider";
-import { useQueryClient } from "@tanstack/react-query";
+import useSimulateCreateLock from "../__hooks__/useSimulateCreateLock";
+import {
+  useChainId,
+  useWaitForTransactionReceipt,
+  useWriteContract,
+} from "wagmi";
+import { formatUnits, parseUnits } from "viem";
+import { RCT, RCT_DECIMALS, VE } from "@/data/constants";
 import SubmitButton from "@/components/shared/submitBtn";
-import useGetRctBalance from "@/lib/hooks/useGetRctBalance";
 import useApproveWrite from "@/lib/hooks/useApproveWrite";
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
+import { useGetBalance } from "@/lib/hooks/useGetBalance";
+import { formatNumber } from "@/lib/utils";
+import { useAtomicDate } from "@/lib/hooks/useAtomicDate";
+
+// Local constants
+const YEARS_2 = 62208000;
+const DAYS_14 = 1209600;
+
 export default function CreateLockDialog() {
+  const chainId = useChainId();
+  const now = useAtomicDate();
+  const rct = useMemo(() => RCT[chainId], [chainId]); // RCT
+  const ve = useMemo(() => VE[chainId], [chainId]); // Escrow
+  const [amount, setAmount] = useState(0);
+  const [duration, setDuration] = useState(DAYS_14);
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ amount: "", duration: [DAYS_14] });
-  const [isApproving, setIsApproving] = useState(false);
-  const { queryKey } = useLockProvider();
-  const queryClient = useQueryClient();
-  const { rctBalance, rctQueryKey } = useGetRctBalance();
+  const rctBalance = useGetBalance({ tokenAddress: rct });
   const { writeContract, reset, data: hash, isPending } = useWriteContract();
-  const { isSuccess, isLoading, isError } = useWaitForTransactionReceipt({
+  const { isLoading } = useWaitForTransactionReceipt({
     hash,
   });
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setForm((prevForm) => ({ ...prevForm, [name]: value }));
-  };
-  const { error: validationError, isValid } = useCreateLockValidation({ form });
-  const { approveWriteRequest, needsApproval, allowanceKey, isFetching } =
-    useApproveWrite({
-      spender: Contracts.VotingEscrow.address,
-      tokenAddress: Contracts.Reactor.address, //rct address
-      amount: form.amount,
-    });
-  const { data: createLockSimulation } = useSimulateCreateLock({
-    form,
-    needsApproval,
+
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const parsedNumber = Number(e.target.value);
+      const changeValue = isNaN(parsedNumber) ? amount : parsedNumber;
+      setAmount(changeValue);
+    },
+    [amount, setAmount]
+  );
+
+  const { approveWriteRequest, needsApproval, isFetching } = useApproveWrite({
+    spender: ve,
+    tokenAddress: rct, //rct address
+    amount: String(amount),
+    decimals: RCT_DECIMALS,
   });
-  const onSubmit = () => {
+
+  const { data: createLockSimulation } = useSimulateCreateLock({
+    value: parseUnits(String(amount), RCT_DECIMALS),
+    duration: BigInt(duration),
+  });
+
+  const onSubmit = useCallback(() => {
     if (approveWriteRequest) {
+      reset(); // Reset state first
       writeContract(approveWriteRequest);
-      setIsApproving(true);
       return;
     }
     if (createLockSimulation) {
       writeContract(createLockSimulation.request);
     }
-  };
-  useEffect(() => {
-    if (isSuccess || isError) {
-      if (isApproving) {
-        queryClient.invalidateQueries({ queryKey: allowanceKey });
-        reset();
-        setIsApproving(false);
-      } else {
-        queryClient.invalidateQueries({ queryKey });
-        queryClient.invalidateQueries({ queryKey: rctQueryKey });
-        setForm({ amount: "", duration: [DAYS_14] });
-        reset();
-      }
-    }
-  }, [
-    allowanceKey,
-    isApproving,
-    isError,
-    isSuccess,
-    queryClient,
-    queryKey,
-    rctQueryKey,
-    reset,
-  ]);
+  }, [approveWriteRequest, reset, writeContract, createLockSimulation]);
+
   const { state } = useGetButtonStatuses({
     isLoading,
     isPending,
     needsApproval,
     isFetching,
   });
+
+  const dateString = useMemo(() => {
+    const newTimestamp = now.getTime() + duration * 1000;
+    const date = new Date(newTimestamp);
+    return date.toLocaleDateString();
+  }, [duration, now]);
+
+  const isValid = useMemo(
+    () =>
+      amount > 0 &&
+      (Boolean(createLockSimulation) || Boolean(approveWriteRequest)),
+    [amount, createLockSimulation, approveWriteRequest]
+  );
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <Button
@@ -102,44 +110,41 @@ export default function CreateLockDialog() {
             <label htmlFor="">Amount to Lock</label>
             <span className="text-sm">
               <span className="text-neutral-200">Available:</span>{" "}
-              {formatUnits(rctBalance ?? 0n, RCT_DECIMALS)} RCT
+              {formatNumber(formatUnits(rctBalance, RCT_DECIMALS))} RCT
             </span>
           </div>
           <div className="pt-2"></div>
           <RctInput
-            value={form.amount}
+            value={String(amount)}
             name="amount"
             onChange={handleInputChange}
           />
         </div>
         <div className="border-t border-neutral-800 my-2"></div>
         <div className="space-y-3">
-          <h2 className="font-medium">Locking For</h2>
+          <h2 className="font-medium">
+            Locking For {secondsToDays(duration)} Days
+          </h2>
           <Slider
-            onValueChange={(value) =>
-              setForm((prevForm) => ({
-                ...prevForm,
-                duration: value,
-              }))
-            }
-            defaultValue={[0]}
+            onValueChange={([value]) => setDuration(value)}
+            defaultValue={[duration]}
             min={DAYS_14}
-            max={TWO_YEARS}
-            step={1000}
+            max={YEARS_2}
+            step={86400}
           />
           <div className="flex justify-between text-sm text-neutral-200 ">
-            <span>14 days</span>
-            <span>3 month</span>
-            <span>1 years</span>
-            <span>2 years</span>
+            <span>Min</span>
+            <span>.</span>
+            <span>.</span>
+            <span>Max</span>
           </div>
         </div>
         <div className="space-y-2">
           <EstimatesHeader />
           <div className="pt-2"></div>
-          <EstimateRow title="Deposit" value="0.00 RCT" />
+          <EstimateRow title="Deposit" value={`${amount} RCT`} />
           <EstimateRow title="Voting Power" value="0.00 RCT" />
-          <EstimateRow title="Unlock Date" value="-" />
+          <EstimateRow title="Unlock Date" value={dateString} />
         </div>
         <div className="border-t border-neutral-800 my-2"></div>
         <Alert colors="muted">
@@ -152,7 +157,6 @@ export default function CreateLockDialog() {
             onClick={onSubmit}
             isValid={isValid}
             approveTokenSymbol="RCT"
-            validationError={validationError}
           >
             Create Lock
           </SubmitButton>
@@ -160,4 +164,8 @@ export default function CreateLockDialog() {
       </DialogContent>
     </Dialog>
   );
+}
+
+function secondsToDays(seconds: number): number {
+  return Math.floor(seconds / (60 * 60 * 24));
 }

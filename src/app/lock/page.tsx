@@ -7,6 +7,7 @@ import HiveTable from "./hiveTable/hiveTable";
 import LockTable from "./lockTable/lockTable";
 import ClaimAllLocks from "./claimAllLocks";
 import { LockProvider } from "./lockProvider";
+
 export default function Lock() {
   return (
     <LockProvider>
