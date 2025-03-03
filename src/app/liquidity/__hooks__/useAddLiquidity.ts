@@ -107,7 +107,7 @@ export function useAddLiquidity({
 
   useEffect(() => {
     if (addLiquiditySimulation.data || addLiquiditySimulation.error) {
-      console.error(addLiquiditySimulation.error);
+      console.log(addLiquiditySimulation.error);
       console.log(addLiquiditySimulation.data);
     }
   }, [addLiquiditySimulation]);

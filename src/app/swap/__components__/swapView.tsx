@@ -150,11 +150,11 @@ export default function SwapView() {
 
   useEffect(() => {
     if (writeError) {
-      console.error(writeError);
+      console.log(writeError);
     }
 
     if (swapSimulationError) {
-      console.error(swapSimulationError);
+      console.log(swapSimulationError);
     }
   }, [writeError, swapSimulationError]);
 
