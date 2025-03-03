@@ -132,18 +132,26 @@ export default function InitializePool() {
   } = useWriteContract(); // We'll also call reset when transaction toast is closed
   const { txReceipt, updateState } = useTransactionToastProvider();
   useEffect(() => {
-    if (hash) {
-      updateState({
-        hash,
-        actionTitle:
-          token0NeedsApproval || token1NeedsApproval
-            ? "Approve"
-            : "Added Liquidity",
-      });
-    }
+    updateState({
+      hash,
+    });
   }, [hash, token0NeedsApproval, token1NeedsApproval, updateState]);
+  useEffect(() => {
+    updateState({
+      actionTitle:
+        token0NeedsApproval || token1NeedsApproval
+          ? `Approved ${token0NeedsApproval ? token0?.symbol : token1?.symbol}`
+          : "Added Liquidity",
+    });
+  }, [
+    token0?.symbol,
+    token0NeedsApproval,
+    token1?.symbol,
+    token1NeedsApproval,
+    updateState,
+  ]);
+  console.log({ token0NeedsApproval, token1NeedsApproval });
   const { isLoading } = txReceipt;
-  console.log("isAddLiqEth", isAddLiquidityETH);
   const onSubmit = useCallback(() => {
     if (token0NeedsApproval && token0ApprovalWriteRequest) {
       writeContract(token0ApprovalWriteRequest);
