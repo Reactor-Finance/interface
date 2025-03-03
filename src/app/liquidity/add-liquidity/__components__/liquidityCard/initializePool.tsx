@@ -120,6 +120,7 @@ export default function InitializePool() {
     addLiquiditySimulation,
     isAddLiquidityETH,
   } = useAddLiquidity({
+    disabled: token1NeedsApproval || token1NeedsApproval,
     token0: token0?.address ?? zeroAddress,
     token1: token1?.address ?? zeroAddress,
     amountADesired,
@@ -174,7 +175,6 @@ export default function InitializePool() {
     token1NeedsApproval,
     updateState,
   ]);
-  console.log({ token0NeedsApproval, token1NeedsApproval });
   const { isLoading } = txReceipt;
   const onSubmit = useCallback(() => {
     if (token0NeedsApproval && token0ApprovalWriteRequest) {
@@ -275,7 +275,6 @@ export default function InitializePool() {
             value={amount1}
             disableInput={pairExists && quoteLiquidity > 0n}
           />
-          o{" "}
         </div>
       )}
       <div className="">
