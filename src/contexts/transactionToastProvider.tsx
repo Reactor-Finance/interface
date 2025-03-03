@@ -13,13 +13,11 @@ import {
 } from "wagmi";
 interface State {
   hash: Address | undefined;
-  open: boolean;
   actionTitle: string | undefined;
   actionDescription: string | undefined;
 }
 
 const initialState: State = {
-  open: true,
   hash: undefined,
   actionTitle: undefined,
   actionDescription: undefined,
@@ -31,6 +29,21 @@ interface ContextType {
   resetState: () => void;
   txReceipt: UseWaitForTransactionReceiptReturnType;
   parsedInputAmount?: string;
+  setToastState: React.Dispatch<
+    React.SetStateAction<
+      | {
+          actionTitle: string | undefined;
+          actionDescription: string | undefined;
+        }
+      | undefined
+    >
+  >;
+  toastState:
+    | undefined
+    | {
+        actionTitle: string | undefined;
+        actionDescription: string | undefined;
+      };
 }
 const TransactionToastContext = createContext<ContextType | undefined>(
   undefined
@@ -41,6 +54,10 @@ interface Props {
 
 export const TransactionToastProvider = ({ children }: Props) => {
   const [state, setState] = useState(initialState);
+  const [toastState, setToastState] = useState<
+    | undefined
+    | { actionTitle: string | undefined; actionDescription: string | undefined }
+  >();
   const txReceipt = useWaitForTransactionReceipt({ hash: state.hash });
   const updateState = useCallback(
     (payload: Partial<State>) => {
@@ -50,28 +67,39 @@ export const TransactionToastProvider = ({ children }: Props) => {
   );
   useEffect(() => {
     if (txReceipt.isSuccess) {
-      updateState({ open: true });
+      setToastState({
+        actionTitle: state.actionTitle,
+        actionDescription: state.actionDescription,
+      });
     }
-  }, [txReceipt.isSuccess, updateState]);
+  }, [state.actionDescription, state.actionTitle, txReceipt.isSuccess]);
   useEffect(() => {
-    if (state.open) {
+    if (toastState) {
       const timeout = setTimeout(() => {
-        updateState({ open: false });
+        setToastState(undefined);
       }, 4000);
       return () => clearTimeout(timeout);
     }
-  }, [state.open, updateState]);
+  }, [, toastState, updateState]);
   const resetState = useCallback(() => {
     setState(initialState);
   }, [setState]);
 
   function testToast() {
-    updateState({ open: !state.open });
+    setToastState({ actionTitle: "Test", actionDescription: undefined });
   }
   console.log({ state }, "----====----");
   return (
     <TransactionToastContext.Provider
-      value={{ updateState, testToast, state, resetState, txReceipt }}
+      value={{
+        updateState,
+        toastState,
+        setToastState,
+        testToast,
+        state,
+        resetState,
+        txReceipt,
+      }}
     >
       {children}
     </TransactionToastContext.Provider>
