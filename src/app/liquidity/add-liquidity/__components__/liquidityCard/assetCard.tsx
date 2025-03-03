@@ -12,6 +12,7 @@ interface Props {
   onValueChange: (value: string) => void;
   value: string;
   disableInput?: boolean;
+  onFocus: () => void;
 }
 
 export default function AssetCard({
@@ -19,6 +20,7 @@ export default function AssetCard({
   onValueChange,
   value,
   disableInput,
+  onFocus,
 }: Props) {
   const balance = useGetBalance({ tokenAddress: token.address });
   const formattedBalance = useMemo(
@@ -30,6 +32,7 @@ export default function AssetCard({
       <div className="flex justify-between">
         <div className="flex items-center">
           <Input
+            onFocus={onFocus}
             aria-label="amount"
             className="w-[200px] md:text-lg px-1 py-1 bg-transparent border-none"
             placeholder="0"
