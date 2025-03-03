@@ -19,6 +19,7 @@ import { useTransactionToastProvider } from "@/contexts/transactionToastProvider
 import { useQueryClient } from "@tanstack/react-query";
 import { api } from "@/trpc/react";
 import { useGetBalance } from "@/lib/hooks/useGetBalance";
+import AddLiquidityInfo from "./addLiquidityInfo";
 
 const searchParamsSchema = z.object({
   token0: z.string().refine((arg) => isAddress(arg)),
@@ -292,30 +293,7 @@ export default function InitializePool() {
           />
         </div>
       )}
-      {!pair && (
-        <div className="">
-          <h5>Starting Liquidity Info</h5>
-          <div className="pt-1"></div>
-          <div className="space-y-1">
-            <div className="flex text-neutral-300 text-sm justify-between">
-              <span>USDC per USDT</span>
-              <span>
-                {!isNaN(Number(amount0)) && !isNaN(Number(amount1))
-                  ? Number(amount0) / Number(amount1)
-                  : 0}
-              </span>
-            </div>
-            <div className="flex text-neutral-300 text-sm justify-between">
-              <span>USDC per USDT</span>
-              <span>
-                {!isNaN(Number(amount0)) && !isNaN(Number(amount1))
-                  ? Number(amount1) / Number(amount0)
-                  : 0}
-              </span>
-            </div>
-          </div>
-        </div>
-      )}
+      {!pair && <AddLiquidityInfo amount0={amount0} amount1={amount1} />}
       {pair && (
         <>
           <div className="">
