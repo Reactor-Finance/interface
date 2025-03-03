@@ -12,6 +12,7 @@ interface Props {
   stable: boolean;
   amountADesired: bigint;
   amountBDesired: bigint;
+  disabled: boolean;
 }
 
 export function useAddLiquidity({
@@ -20,6 +21,7 @@ export function useAddLiquidity({
   stable,
   amountADesired,
   amountBDesired,
+  disabled,
 }: Props) {
   const chainId = useChainId();
   const { address = zeroAddress } = useAccount();
@@ -51,7 +53,12 @@ export function useAddLiquidity({
       Math.floor(Date.now() / 1000) + transactionDeadlineInMinutes * 60;
     return () => BigInt(ttl);
   }, [transactionDeadlineInMinutes]);
-
+  const isAddLiquidityETH = useMemo(
+    () =>
+      token0.toLowerCase() === ETHER.toLowerCase() ||
+      token1.toLowerCase() === ETHER.toLowerCase(),
+    [token0, token1]
+  );
   const addLiquidityETHSimulation = useSimulateContract({
     ...Router,
     address: router,
@@ -67,7 +74,7 @@ export function useAddLiquidity({
     ],
     value: msgValueLiquidityETH,
     query: {
-      enabled: address !== zeroAddress,
+      enabled: address !== zeroAddress && isAddLiquidityETH && !disabled,
     },
   });
 
@@ -87,16 +94,9 @@ export function useAddLiquidity({
       deadline(),
     ],
     query: {
-      enabled: address !== zeroAddress,
+      enabled: address !== zeroAddress && !isAddLiquidityETH && !disabled,
     },
   });
-
-  const isAddLiquidityETH = useMemo(
-    () =>
-      token0.toLowerCase() === ETHER.toLowerCase() ||
-      token1.toLowerCase() === ETHER.toLowerCase(),
-    [token0, token1]
-  );
 
   useEffect(() => {
     if (addLiquidityETHSimulation.data || addLiquidityETHSimulation.error) {
