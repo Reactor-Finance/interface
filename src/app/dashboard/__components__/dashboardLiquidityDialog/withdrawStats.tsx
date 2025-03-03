@@ -2,15 +2,10 @@ import React from "react";
 import { useChainId, useReadContract } from "wagmi";
 import { abi } from "@/lib/abis/Router";
 import { ROUTER } from "@/data/constants";
-import { Address, formatUnits } from "viem";
+import { Address, formatUnits, zeroAddress } from "viem";
 import { useDashboardLiquidityProvider } from "../../__context__/dashboardLiquidityProvider";
 import { useGetBalance } from "@/lib/hooks/useGetBalance";
-interface Props {
-  token0: Address;
-  token1: Address;
-  isStable: boolean;
-}
-export default function WithdrawStats({ token0, token1 }: Props) {
+export default function WithdrawStats() {
   const { selectedUserLiquidityPosition, state } =
     useDashboardLiquidityProvider();
   const amountPercent = state.sliderValue;
@@ -19,13 +14,19 @@ export default function WithdrawStats({ token0, token1 }: Props) {
   });
   const amount = (a * BigInt(amountPercent)) / 100n;
   const chainId = useChainId();
+  const token0Addr = selectedUserLiquidityPosition?.pair.token0.id as
+    | Address
+    | undefined;
+  const token1Addr = selectedUserLiquidityPosition?.pair.token1.id as
+    | Address
+    | undefined;
   const { data } = useReadContract({
     abi,
     address: ROUTER[chainId],
     functionName: "quoteRemoveLiquidity",
     args: [
-      token0,
-      token1,
+      token0Addr ?? zeroAddress,
+      token1Addr ?? zeroAddress,
       !!selectedUserLiquidityPosition?.pair.isStable,
       amount,
     ],
