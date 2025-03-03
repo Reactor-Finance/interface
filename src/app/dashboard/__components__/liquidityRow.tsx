@@ -14,8 +14,15 @@ import PoolHeader from "@/components/shared/poolHeader";
 import { TPoolType } from "@/lib/types";
 import { useGetTokenInfo } from "@/utils";
 import { useRouter } from "next/navigation";
+import { useGetPairs } from "@/lib/hooks/useGetPairs";
 
-export function LiquidityRow({ id, pair }: UserLiquidityPosition) {
+type ElementType<T extends readonly any[]> = T[number];
+
+export function LiquidityRow({
+  token0: token0Id,
+  token1: token1Id,
+  stable,
+}: ElementType<ReturnType<typeof useGetPairs>>) {
   const { openModal } = useDashboardLiquidityProvider();
   const router = useRouter();
   const handleOpenClick = (action: LiquidityActions) => {
@@ -26,11 +33,11 @@ export function LiquidityRow({ id, pair }: UserLiquidityPosition) {
   //  const version = params.get("version");
   const handleNavigationAddLiquidity = () => {
     router.push(
-      `/liquidity/add-liquidity?token0=${pair.token0.id}&token1=${pair.token1.id}&version=${pair.isStable ? "stable" : "volitile"}`
+      `/liquidity/add-liquidity?token0=${token0Id}&token1=${token1Id}&version=${stable ? "stable" : "volatile"}`
     );
   };
-  const token0 = useGetTokenInfo(pair.token0.id ?? "0x");
-  const token1 = useGetTokenInfo(pair.token1.id ?? "0x");
+  const token0 = useGetTokenInfo(token0Id);
+  const token1 = useGetTokenInfo(token1Id);
   return (
     <tr className="grid text-center rounded-sm grid-cols-7 items-center bg-neutral-1000 py-2 px-6">
       <td className="bg-neutral-1000 text-left col-span-2">
