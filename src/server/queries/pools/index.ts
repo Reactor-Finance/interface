@@ -9,12 +9,12 @@ export const PoolSchema = z.object({
     id: z.string(),
     symbol: z.string(),
     decimals: z.string(),
-    totalSupply: z.string(),
+    totalSupply: z.string().optional(),
   }),
   token1: z.object({
     id: z.string(),
     decimals: z.string(),
-    totalSupply: z.string(),
+    totalSupply: z.string().optional(),
     symbol: z.string(),
   }),
 });
