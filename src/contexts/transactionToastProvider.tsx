@@ -49,6 +49,11 @@ export const TransactionToastProvider = ({ children }: Props) => {
     [setState]
   );
   useEffect(() => {
+    if (txReceipt.isLoading) {
+      updateState({ open: false });
+    }
+  }, [txReceipt.isLoading, updateState]);
+  useEffect(() => {
     if (txReceipt.isSuccess) {
       updateState({ open: true });
     }
