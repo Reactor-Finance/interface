@@ -11,9 +11,11 @@ export default function TransactionToast() {
         desc: string | undefined;
       }
     | undefined
-  >();
+  >(undefined);
+  console.log({ content });
   useEffect(() => {
-    if (!content) {
+    console.log(state.actionTitle, "CONTENT", content);
+    if (!content && state.actionTitle) {
       setContent({
         title: state.actionTitle,
         desc: state.actionDescription,
