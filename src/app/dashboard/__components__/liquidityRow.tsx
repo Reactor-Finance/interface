@@ -90,24 +90,24 @@ export function LiquidityRow({ id, pair }: UserLiquidityPosition) {
               >
                 Increase
               </DropdownMenu.Item>
-              <DropdownMenu.Item
-                onClick={() => handleOpenClick(LiquidityActions.Stake)}
-                className="hover:bg-neutral-900 outline-none pl-3 py-2 pr-9 rounded-sm hover:cursor-pointer"
-              >
-                Stake
-              </DropdownMenu.Item>
+              {/* <DropdownMenu.Item */}
+              {/*   onClick={() => handleOpenClick(LiquidityActions.Stake)} */}
+              {/*   className="hover:bg-neutral-900 outline-none pl-3 py-2 pr-9 rounded-sm hover:cursor-pointer" */}
+              {/* > */}
+              {/*   Stake */}
+              {/* </DropdownMenu.Item> */}
               <DropdownMenu.Item
                 onClick={() => handleOpenClick(LiquidityActions.Withdraw)}
                 className="hover:bg-neutral-900 outline-none pl-3 py-2 pr-9 rounded-sm hover:cursor-pointer"
               >
                 Withdraw
               </DropdownMenu.Item>
-              <DropdownMenu.Item
-                onClick={() => handleOpenClick(LiquidityActions.Unstake)}
-                className="hover:bg-neutral-900 outline-none pl-3 py-2 pr-9 rounded-sm hover:cursor-pointer"
-              >
-                Unstake
-              </DropdownMenu.Item>
+              {/* <DropdownMenu.Item */}
+              {/*   onClick={() => handleOpenClick(LiquidityActions.Unstake)} */}
+              {/*   className="hover:bg-neutral-900 outline-none pl-3 py-2 pr-9 rounded-sm hover:cursor-pointer" */}
+              {/* > */}
+              {/*   Unstake */}
+              {/* </DropdownMenu.Item> */}
             </DropdownMenu.Content>
           </DropdownMenu.Root>
         </div>
