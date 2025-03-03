@@ -35,12 +35,12 @@ export default function useRemoveLiquidity({
   const isEth = false;
   const { writeContract, reset, data: hash, isPending } = useWriteContract();
   const { isSuccess, isLoading } = useWaitForTransactionReceipt({ hash });
-  const bal = useGetBalance({
+  const { balance } = useGetBalance({
     tokenAddress: position?.pair.id as Address,
     enabled,
   });
   const chainId = useChainId();
-  const amount = (bal * percentAmount) / 100n;
+  const amount = (balance * percentAmount) / 100n;
   const { needsApproval, approveWriteRequest, allowanceKey, isFetching } =
     useApproveWrite({
       tokenAddress: position?.pair.id as Address,

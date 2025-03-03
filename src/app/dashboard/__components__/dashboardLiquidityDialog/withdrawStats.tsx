@@ -9,10 +9,10 @@ export default function WithdrawStats() {
   const { selectedUserLiquidityPosition, state } =
     useDashboardLiquidityProvider();
   const amountPercent = state.sliderValue;
-  const a = useGetBalance({
+  const { balance } = useGetBalance({
     tokenAddress: selectedUserLiquidityPosition?.pair.id as Address,
   });
-  const amount = (a * BigInt(amountPercent)) / 100n;
+  const amount = (balance * BigInt(amountPercent)) / 100n;
   const chainId = useChainId();
   const token0Addr = selectedUserLiquidityPosition?.pair.token0.id as
     | Address

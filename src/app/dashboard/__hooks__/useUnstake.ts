@@ -22,7 +22,7 @@ export default function useUnstake({
     amount,
     address: gaugeAddress,
   });
-  const bal = useGetBalance({ tokenAddress: gaugeAddress });
+  const { balance: bal } = useGetBalance({ tokenAddress: gaugeAddress });
   const { isValid, message } = useMemo(() => {
     if (bal < amount) {
       return {

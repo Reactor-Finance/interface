@@ -110,7 +110,7 @@ export default function CreateLockDialog() {
             <label htmlFor="">Amount to Lock</label>
             <span className="text-sm">
               <span className="text-neutral-200">Available:</span>{" "}
-              {formatNumber(formatUnits(rctBalance, RCT_DECIMALS))} RCT
+              {formatNumber(formatUnits(rctBalance.balance, RCT_DECIMALS))} RCT
             </span>
           </div>
           <div className="pt-2"></div>

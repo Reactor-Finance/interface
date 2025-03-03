@@ -16,9 +16,11 @@ export default function useRemoveLiquidityValidation({
   removeLiquidityEthRequest,
   removeLiquidityRequest,
 }: Props) {
-  const bal = useGetBalance({ tokenAddress: position?.pair.id as Address });
+  const { balance } = useGetBalance({
+    tokenAddress: position?.pair.id as Address,
+  });
   return useMemo(() => {
-    if (bal < amount) {
+    if (balance < amount) {
       return {
         isValid: false,
         message: "Insufficient Balance",
@@ -40,5 +42,11 @@ export default function useRemoveLiquidityValidation({
       }
     }
     return { isValid: false, message: null };
-  }, [amount, bal, isEth, removeLiquidityEthRequest, removeLiquidityRequest]);
+  }, [
+    amount,
+    balance,
+    isEth,
+    removeLiquidityEthRequest,
+    removeLiquidityRequest,
+  ]);
 }

@@ -29,7 +29,7 @@ export default function IncreaseContent({
   const rct = React.useMemo(() => RCT[chainId], [chainId]); // RCT
   const ve = React.useMemo(() => VE[chainId], [chainId]); // Escrow
   const [amount, setAmount] = React.useState(0);
-  const rctBalance = useGetBalance({ tokenAddress: rct });
+  const { balance: rctBalance } = useGetBalance({ tokenAddress: rct });
   const { writeContract, reset, data: hash, isPending } = useWriteContract();
   const { isLoading } = useWaitForTransactionReceipt({
     hash,

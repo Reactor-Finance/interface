@@ -19,8 +19,10 @@ export default function useStake({
     parseUnits(state.sliderValue.toString(), 0),
     400
   );
-  const stakeBalance = useGetBalance({ tokenAddress: gaugeAddress });
-  const lpBalance = useGetBalance({
+  const { balance: stakeBalance } = useGetBalance({
+    tokenAddress: gaugeAddress,
+  });
+  const { balance: lpBalance } = useGetBalance({
     tokenAddress: selectedUserLiquidityPosition?.pair.id as Address,
   });
   const availableToStakeBalance = lpBalance - stakeBalance;
@@ -34,7 +36,7 @@ export default function useStake({
   console.log({ error });
   const bal = useGetBalance({ tokenAddress: gaugeAddress });
   const { isValid, message } = useMemo(() => {
-    if (bal < amount) {
+    if (bal.balance < amount) {
       return {
         isValid: false,
         message: "Insufficient Balance",

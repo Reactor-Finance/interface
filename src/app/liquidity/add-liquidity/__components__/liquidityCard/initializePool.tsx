@@ -265,7 +265,7 @@ export default function InitializePool() {
       amountBDesired,
     ]
   );
-  const d = useGetBalance({
+  const { balance } = useGetBalance({
     tokenAddress: (pair?.id as Address) ?? zeroAddress,
   });
   const { state: buttonState } = useGetButtonStatuses({
@@ -364,7 +364,7 @@ export default function InitializePool() {
 
             <div className="flex pt-1 text-neutral-300 text-sm justify-between">
               <span>Amount</span>
-              <span>{formatUnits(d, 18)} lp</span>
+              <span>{formatUnits(balance, 18)} lp</span>
             </div>
           </div>
         </>

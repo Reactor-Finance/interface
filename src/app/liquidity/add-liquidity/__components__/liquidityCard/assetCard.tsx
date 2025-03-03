@@ -5,7 +5,7 @@ import { formatUnits } from "viem";
 import { TToken } from "@/lib/types";
 import Input from "@/components/ui/input";
 
-import { formatNumber } from "@/lib/utils";
+import { formatNumber, inputPatternMatch } from "@/lib/utils";
 
 interface Props {
   token: TToken;
@@ -13,6 +13,7 @@ interface Props {
   value: string;
   disableInput?: boolean;
   balance: bigint;
+  onFocus?: () => void;
 }
 
 export default function AssetCard({
@@ -21,6 +22,7 @@ export default function AssetCard({
   value,
   disableInput,
   balance,
+  onFocus,
 }: Props) {
   const formattedBalance = useMemo(
     () => formatNumber(formatUnits(balance, token.decimals)),
