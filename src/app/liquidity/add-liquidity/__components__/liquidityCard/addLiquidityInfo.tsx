@@ -17,7 +17,7 @@ export default function AddLiquidityInfo({
       return { result0: 0, result1: 0 };
     }
     let result0 = Number(amount0) / Number(amount1);
-    let result1 = Number(amount0) / Number(amount1);
+    let result1 = Number(amount1) / Number(amount0);
     if (isNaN(result0) || !isFinite(result0)) {
       result0 = 0;
     }
