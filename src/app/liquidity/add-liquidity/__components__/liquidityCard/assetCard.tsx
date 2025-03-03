@@ -4,7 +4,7 @@ import AssetSymbolAndName from "./assetSymbolAndName";
 import { formatUnits } from "viem";
 import { TToken } from "@/lib/types";
 import Input from "@/components/ui/input";
-import { useGetBalance } from "@/lib/hooks/useGetBalance";
+
 import { formatNumber } from "@/lib/utils";
 
 interface Props {
@@ -12,6 +12,7 @@ interface Props {
   onValueChange: (value: number) => void;
   value: number;
   disableInput?: boolean;
+  balance: bigint;
 }
 
 export default function AssetCard({
@@ -19,8 +20,8 @@ export default function AssetCard({
   onValueChange,
   value,
   disableInput,
+  balance,
 }: Props) {
-  const balance = useGetBalance({ tokenAddress: token.address });
   const formattedBalance = useMemo(
     () => formatNumber(formatUnits(balance, token.decimals)),
     [balance, token.decimals]

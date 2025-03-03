@@ -17,6 +17,7 @@ import { BaseError } from "@wagmi/core";
 import { useGetTokenInfo } from "@/utils";
 import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
 import { useQueryClient } from "@tanstack/react-query";
+import { useGetBalance } from "@/lib/hooks/useGetBalance";
 
 const searchParamsSchema = z.object({
   token0: z.string().refine((arg) => isAddress(arg)),
@@ -136,6 +137,13 @@ export default function InitializePool() {
     error: writeContractError,
   } = useWriteContract(); // We'll also call reset when transaction toast is closed
   const { txReceipt, updateState } = useTransactionToastProvider();
+
+  const { balance: balance0, queryKey: bal0Key } = useGetBalance({
+    tokenAddress: token0?.address ?? zeroAddress,
+  });
+  const { balance: balance1, queryKey: bal1Key } = useGetBalance({
+    tokenAddress: token1?.address ?? zeroAddress,
+  });
   const queryClient = useQueryClient();
   useEffect(() => {
     if (txReceipt.isSuccess) {
@@ -145,9 +153,15 @@ export default function InitializePool() {
       if (token1NeedsApproval) {
         queryClient.invalidateQueries({ queryKey: token1AllowanceKey });
       }
+      if (!token0NeedsApproval || !token1NeedsApproval) {
+        queryClient.invalidateQueries({ queryKey: bal0Key });
+        queryClient.invalidateQueries({ queryKey: bal1Key });
+      }
       reset();
     }
   }, [
+    bal0Key,
+    bal1Key,
     queryClient,
     reset,
     token0AllowanceKey,
@@ -260,6 +274,7 @@ export default function InitializePool() {
           <AssetCard
             onValueChange={setAmount0}
             token={token0}
+            balance={balance0}
             value={amount0}
           />
         </div>
@@ -271,6 +286,7 @@ export default function InitializePool() {
           </div>
           <AssetCard
             onValueChange={setAmount1}
+            balance={balance1}
             token={token1}
             value={amount1}
             disableInput={pairExists && quoteLiquidity > 0n}
