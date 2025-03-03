@@ -16,6 +16,7 @@ import { useQuoteLiquidity } from "@/app/liquidity/__hooks__/useQuoteLiquidity";
 import { BaseError } from "@wagmi/core";
 import { useGetTokenInfo } from "@/utils";
 import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
+import { useQueryClient } from "@tanstack/react-query";
 
 const searchParamsSchema = z.object({
   token0: z.string().refine((arg) => isAddress(arg)),
@@ -82,6 +83,7 @@ export default function InitializePool() {
     approveWriteRequest: token0ApprovalWriteRequest,
     needsApproval: token0NeedsApproval,
     isFetching: token0ApprovalFetching,
+    allowanceKey: token0AllowanceKey,
   } = useApproveWrite({
     spender: router,
     tokenAddress: token0?.address ?? zeroAddress,
@@ -93,6 +95,7 @@ export default function InitializePool() {
     approveWriteRequest: token1ApprovalWriteRequest,
     needsApproval: token1NeedsApproval,
     isFetching: token1ApprovalFetching,
+    allowanceKey: token1AllowanceKey,
   } = useApproveWrite({
     spender: router,
     tokenAddress: token1?.address ?? zeroAddress,
@@ -126,11 +129,32 @@ export default function InitializePool() {
 
   const {
     writeContract,
+    reset,
     isPending,
     data: hash,
     error: writeContractError,
   } = useWriteContract(); // We'll also call reset when transaction toast is closed
   const { txReceipt, updateState } = useTransactionToastProvider();
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    if (txReceipt.isSuccess) {
+      if (token0NeedsApproval) {
+        queryClient.invalidateQueries({ queryKey: token0AllowanceKey });
+      }
+      if (token1NeedsApproval) {
+        queryClient.invalidateQueries({ queryKey: token1AllowanceKey });
+      }
+      reset();
+    }
+  }, [
+    queryClient,
+    reset,
+    token0AllowanceKey,
+    token0NeedsApproval,
+    token1AllowanceKey,
+    token1NeedsApproval,
+    txReceipt.isSuccess,
+  ]);
   useEffect(() => {
     updateState({
       hash,
@@ -141,7 +165,7 @@ export default function InitializePool() {
       actionTitle:
         token0NeedsApproval || token1NeedsApproval
           ? `Approved ${token0NeedsApproval ? token0?.symbol : token1?.symbol}`
-          : "Added Liquidity",
+          : "Added Liquidity.",
     });
   }, [
     token0?.symbol,
