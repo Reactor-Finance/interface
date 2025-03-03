@@ -210,7 +210,11 @@ export default function InitializePool() {
     isFetching: token0ApprovalFetching || token1ApprovalFetching,
     needsApproval: token0NeedsApproval || token1NeedsApproval,
   });
-
+  useEffect(() => {
+    if (quoteLiquidity && pairExists) {
+      setAmount1(Number(formatUnits(quoteLiquidity, token1?.decimals ?? 18)));
+    }
+  }, [pairExists, quoteLiquidity, token1?.decimals]);
   return (
     <>
       <h2 className="text-xl">
@@ -236,11 +240,7 @@ export default function InitializePool() {
           <AssetCard
             onValueChange={setAmount1}
             token={token1}
-            value={
-              pairExists && quoteLiquidity > 0n
-                ? Number(formatUnits(quoteLiquidity, token1.decimals))
-                : amount1
-            }
+            value={amount1}
             disableInput={pairExists && quoteLiquidity > 0n}
           />
           o{" "}
