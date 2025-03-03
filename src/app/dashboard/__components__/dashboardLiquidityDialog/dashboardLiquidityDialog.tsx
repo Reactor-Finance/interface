@@ -17,6 +17,7 @@ import { Address } from "viem";
 import useStake from "../../__hooks__/useStake";
 import useUnstake from "../../__hooks__/useUnstake";
 import useCreateGauge from "../../__hooks__/useCreateGauge";
+import WithdrawStats from "./withdrawStats";
 
 export default function DashboardLiquidityDialog() {
   const {
@@ -101,6 +102,9 @@ export default function DashboardLiquidityDialog() {
               <span>100%</span>
             </div>
             <EstimatesHeader />
+            {state.actionType === LiquidityActions.Withdraw && (
+              <WithdrawStats />
+            )}
           </div>
           <div className="p-4">
             <SubmitButton

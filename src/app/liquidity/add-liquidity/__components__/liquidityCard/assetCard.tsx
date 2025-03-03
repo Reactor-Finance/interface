@@ -9,8 +9,8 @@ import { formatNumber } from "@/lib/utils";
 
 interface Props {
   token: TToken;
-  onValueChange: (value: number) => void;
-  value: number;
+  onValueChange: (value: string) => void;
+  value: string;
   disableInput?: boolean;
   balance: bigint;
 }
@@ -31,6 +31,7 @@ export default function AssetCard({
       <div className="flex justify-between">
         <div className="flex items-center">
           <Input
+            onFocus={onFocus}
             aria-label="amount"
             className="w-[200px] md:text-lg px-1 py-1 bg-transparent border-none"
             placeholder="0"
@@ -38,9 +39,9 @@ export default function AssetCard({
             disabled={disableInput}
             onChange={(s) => {
               // Add this check to prevent NaN errors
-              const parsedNumber = Number(s.target.value ?? "0");
-              const validNumber = isNaN(parsedNumber) ? value : parsedNumber;
-              onValueChange(validNumber);
+              if (inputPatternMatch(s.target.value)) {
+                onValueChange(s.target.value);
+              }
             }}
           />
         </div>
@@ -51,9 +52,7 @@ export default function AssetCard({
         <div className="flex gap-x-1">
           <div>{formattedBalance} </div>
           <button
-            onClick={() =>
-              onValueChange(Number(formatUnits(balance, token.decimals)))
-            }
+            onClick={() => onValueChange(formatUnits(balance, token.decimals))}
             aria-label="Set Max Balance"
             className="text-primary-400"
           >
