@@ -18,6 +18,7 @@ import { useGetTokenInfo } from "@/utils";
 import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
 import { useQueryClient } from "@tanstack/react-query";
 import { api } from "@/trpc/react";
+import { useGetBalance } from "@/lib/hooks/useGetBalance";
 
 const searchParamsSchema = z.object({
   token0: z.string().refine((arg) => isAddress(arg)),
@@ -247,7 +248,7 @@ export default function InitializePool() {
       amountBDesired,
     ]
   );
-
+  const d = useGetBalance({ tokenAddress: pair?.id ?? zeroAddress });
   const { state: buttonState } = useGetButtonStatuses({
     isLoading,
     isPending,
@@ -306,30 +307,40 @@ export default function InitializePool() {
         </div>
       )}
       {pair && (
-        <div className="">
-          <h5>Reserve Info</h5>
-          <div className="pt-1"></div>
-          <div className="space-y-1">
-            <div className="flex text-neutral-300 text-sm justify-between">
-              <span>{token0?.symbol} Amount</span>
-              <span>
-                {formatUnits(
-                  parseUnits(pair.token0.totalSupply, 0),
-                  Number(pair.token0.decimals)
-                )}
-              </span>
-            </div>
-            <div className="flex text-neutral-300 text-sm justify-between">
-              <span>{token1?.symbol} Amount</span>
-              <span>
-                {formatUnits(
-                  parseUnits(pair.token0.totalSupply, 0),
-                  Number(pair.token1.decimals)
-                )}
-              </span>
+        <>
+          <div className="">
+            <h5>Reserve Info</h5>
+            <div className="pt-1"></div>
+            <div className="space-y-1">
+              <div className="flex text-neutral-300 text-sm justify-between">
+                <span>{token0?.symbol} Amount</span>
+                <span>
+                  {formatUnits(
+                    parseUnits(pair.token0.totalSupply, 0),
+                    Number(pair.token0.decimals)
+                  )}
+                </span>
+              </div>
+              <div className="flex text-neutral-300 text-sm justify-between">
+                <span>{token1?.symbol} Amount</span>
+                <span>
+                  {formatUnits(
+                    parseUnits(pair.token0.totalSupply, 0),
+                    Number(pair.token1.decimals)
+                  )}
+                </span>
+              </div>
             </div>
           </div>
-        </div>
+          <div>
+            <h5>My Info</h5>
+
+            <div className="flex pt-1 text-neutral-300 text-sm justify-between">
+              <span>{token1?.symbol} Amount</span>
+              <span>{formatUnits(d, 18)} lp</span>
+            </div>
+          </div>
+        </>
       )}
       <SubmitButton
         state={buttonState}
