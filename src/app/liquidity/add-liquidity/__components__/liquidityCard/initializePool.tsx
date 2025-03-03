@@ -192,16 +192,35 @@ export default function InitializePool() {
     });
   }, [hash, token0NeedsApproval, token1NeedsApproval, updateState]);
   useEffect(() => {
-    updateState({
-      actionTitle:
-        token0NeedsApproval || token1NeedsApproval
-          ? `Approved ${token0NeedsApproval ? token0?.symbol : token1?.symbol}`
-          : "Added Liquidity.",
-    });
+    if (amount0 && amount1) {
+      console.log({
+        actionTitle:
+          token0NeedsApproval || token1NeedsApproval
+            ? `Approved ${token0NeedsApproval ? token0?.symbol : token1?.symbol}`
+            : "Added Liquidity.",
+      });
+    }
+    if (
+      amount0 &&
+      amount1 &&
+      !token0ApprovalFetching &&
+      !token1ApprovalFetching
+    ) {
+      updateState({
+        actionTitle:
+          token0NeedsApproval || token1NeedsApproval
+            ? `Approved ${token0NeedsApproval ? token0?.symbol : token1?.symbol}`
+            : "Added Liquidity.",
+      });
+    }
   }, [
+    amount0,
+    amount1,
     token0?.symbol,
+    token0ApprovalFetching,
     token0NeedsApproval,
     token1?.symbol,
+    token1ApprovalFetching,
     token1NeedsApproval,
     updateState,
   ]);
