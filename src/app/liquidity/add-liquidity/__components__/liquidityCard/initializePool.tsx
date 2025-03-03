@@ -6,7 +6,7 @@ import { useChainId, useWriteContract } from "wagmi";
 import { useAddLiquidity } from "../../../__hooks__/useAddLiquidity";
 import SubmitButton from "@/components/shared/submitBtn";
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
-import { formatUnits, isAddress, parseUnits, zeroAddress } from "viem";
+import { Address, formatUnits, isAddress, parseUnits, zeroAddress } from "viem";
 import { z } from "zod";
 import { useSearchParams } from "next/navigation";
 import { useCheckPair } from "@/lib/hooks/useCheckPair";
@@ -248,7 +248,9 @@ export default function InitializePool() {
       amountBDesired,
     ]
   );
-  const d = useGetBalance({ tokenAddress: pair?.id ?? zeroAddress });
+  const d = useGetBalance({
+    tokenAddress: (pair?.id as Address) ?? zeroAddress,
+  });
   const { state: buttonState } = useGetButtonStatuses({
     isLoading,
     isPending,
@@ -297,11 +299,19 @@ export default function InitializePool() {
           <div className="space-y-1">
             <div className="flex text-neutral-300 text-sm justify-between">
               <span>USDC per USDT</span>
-              <span>-</span>
+              <span>
+                {!isNaN(Number(amount0)) && !isNaN(Number(amount1))
+                  ? Number(amount0) / Number(amount1)
+                  : 0}
+              </span>
             </div>
             <div className="flex text-neutral-300 text-sm justify-between">
               <span>USDC per USDT</span>
-              <span>-</span>
+              <span>
+                {!isNaN(Number(amount0)) && !isNaN(Number(amount1))
+                  ? Number(amount1) / Number(amount0)
+                  : 0}
+              </span>
             </div>
           </div>
         </div>
@@ -336,7 +346,7 @@ export default function InitializePool() {
             <h5>My Info</h5>
 
             <div className="flex pt-1 text-neutral-300 text-sm justify-between">
-              <span>{token1?.symbol} Amount</span>
+              <span>Amount</span>
               <span>{formatUnits(d, 18)} lp</span>
             </div>
           </div>
