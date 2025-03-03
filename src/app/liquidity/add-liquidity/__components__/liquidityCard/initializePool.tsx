@@ -328,7 +328,7 @@ export default function InitializePool() {
                 <span>{token0?.symbol} Amount</span>
                 <span>
                   {formatUnits(
-                    parseUnits(pair.token0.totalSupply, 0),
+                    parseUnits(pair.token0.totalSupply ?? "0", 0),
                     Number(pair.token0.decimals)
                   )}
                 </span>
@@ -337,7 +337,7 @@ export default function InitializePool() {
                 <span>{token1?.symbol} Amount</span>
                 <span>
                   {formatUnits(
-                    parseUnits(pair.token0.totalSupply, 0),
+                    parseUnits(pair.token0.totalSupply ?? "0", 0),
                     Number(pair.token1.decimals)
                   )}
                 </span>
