@@ -29,9 +29,10 @@ export default function TransactionToast() {
   }, [state.open]);
   useEffect(() => {
     if (state.open) {
-      setTimeout(() => {
+      const clear = setTimeout(() => {
         updateState({ open: false });
       }, 5000);
+      return () => clearTimeout(clear);
     }
   }, [state.open, updateState]);
   return (
