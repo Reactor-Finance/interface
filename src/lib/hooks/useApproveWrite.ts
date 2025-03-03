@@ -46,6 +46,12 @@ export default function useApproveWrite({
     },
   });
 
+  console.log(
+    allowance,
+    parseUnits(amount, decimals),
+    tokenAddress?.toLowerCase() !== ETHER.toLowerCase(),
+    "Allowance"
+  );
   return {
     approveWriteRequest: data?.request,
     needsApproval:
