@@ -28,11 +28,13 @@ const findPoolQuery = ({ isStable }: { isStable?: boolean }) => {
           id
           symbol
           decimals
+          totalSupply
         }
         token1 {
           id
           symbol
           decimals
+          totalSupply
         }
       }
     }

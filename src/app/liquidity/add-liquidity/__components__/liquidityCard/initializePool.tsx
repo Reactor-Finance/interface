@@ -6,7 +6,7 @@ import { useChainId, useWriteContract } from "wagmi";
 import { useAddLiquidity } from "../../../__hooks__/useAddLiquidity";
 import SubmitButton from "@/components/shared/submitBtn";
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
-import { formatUnits, isAddress, parseUnits, zeroAddress } from "viem";
+import { Address, formatUnits, isAddress, parseUnits, zeroAddress } from "viem";
 import { z } from "zod";
 import { useSearchParams } from "next/navigation";
 import { useCheckPair } from "@/lib/hooks/useCheckPair";
@@ -16,6 +16,10 @@ import { useQuoteLiquidity } from "@/app/liquidity/__hooks__/useQuoteLiquidity";
 import { BaseError } from "@wagmi/core";
 import { useGetTokenInfo } from "@/utils";
 import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
+import { useQueryClient } from "@tanstack/react-query";
+import { api } from "@/trpc/react";
+import { useGetBalance } from "@/lib/hooks/useGetBalance";
+import AddLiquidityInfo from "./addLiquidityInfo";
 
 const searchParamsSchema = z.object({
   token0: z.string().refine((arg) => isAddress(arg)),
@@ -26,6 +30,7 @@ const searchParamsSchema = z.object({
 export default function InitializePool() {
   // Wagmi parameters
   const chainId = useChainId();
+  const [selectedInput, setSelectedInput] = useState<"0" | "1">("0");
   // Token list
   // Search params
   const params = useSearchParams();
@@ -55,9 +60,19 @@ export default function InitializePool() {
   const token0 = useGetTokenInfo(t0 ?? "0x");
   const token1 = useGetTokenInfo(t1 ?? "0x");
 
+  const { data: pools } = api.pool.findPool.useQuery(
+    {
+      tokenOneAddress: token0?.address ?? "0x",
+      tokenTwoAddress: token1?.address ?? "0x",
+      isStable: version === "stable",
+    },
+    { enabled: Boolean(token0) && Boolean(token1) }
+  );
+
+  const pair = pools?.pairs[0];
   // Amounts
-  const [amount0, setAmount0] = useState(0);
-  const [amount1, setAmount1] = useState(0);
+  const [amount0, setAmount0] = useState("");
+  const [amount1, setAmount1] = useState("");
 
   // Router
   const router = useMemo(() => ROUTER[chainId], [chainId]);
@@ -71,10 +86,13 @@ export default function InitializePool() {
 
   // Quote liquidity
   const quoteLiquidity = useQuoteLiquidity({
-    token0: t0 ?? zeroAddress,
-    token1: t1 ?? zeroAddress,
+    token0: (selectedInput === "0" ? t0 : t1) ?? zeroAddress,
+    token1: (selectedInput === "0" ? t1 : t0) ?? zeroAddress,
     stable: version === "stable",
-    amountIn: parseUnits(String(amount0), token0?.decimals ?? 18),
+    amountIn: parseUnits(
+      selectedInput === "0" ? amount0 : amount1,
+      token0?.decimals ?? 18
+    ),
   });
 
   // Check approval required
@@ -82,6 +100,7 @@ export default function InitializePool() {
     approveWriteRequest: token0ApprovalWriteRequest,
     needsApproval: token0NeedsApproval,
     isFetching: token0ApprovalFetching,
+    allowanceKey: token0AllowanceKey,
   } = useApproveWrite({
     spender: router,
     tokenAddress: token0?.address ?? zeroAddress,
@@ -93,6 +112,7 @@ export default function InitializePool() {
     approveWriteRequest: token1ApprovalWriteRequest,
     needsApproval: token1NeedsApproval,
     isFetching: token1ApprovalFetching,
+    allowanceKey: token1AllowanceKey,
   } = useApproveWrite({
     spender: router,
     tokenAddress: token1?.address ?? zeroAddress,
@@ -117,6 +137,7 @@ export default function InitializePool() {
     addLiquiditySimulation,
     isAddLiquidityETH,
   } = useAddLiquidity({
+    disabled: token1NeedsApproval || token1NeedsApproval,
     token0: token0?.address ?? zeroAddress,
     token1: token1?.address ?? zeroAddress,
     amountADesired,
@@ -126,24 +147,84 @@ export default function InitializePool() {
 
   const {
     writeContract,
+    reset,
     isPending,
     data: hash,
     error: writeContractError,
   } = useWriteContract(); // We'll also call reset when transaction toast is closed
   const { txReceipt, updateState } = useTransactionToastProvider();
+
+  const { balance: balance0, queryKey: bal0Key } = useGetBalance({
+    tokenAddress: token0?.address ?? zeroAddress,
+  });
+  const { balance: balance1, queryKey: bal1Key } = useGetBalance({
+    tokenAddress: token1?.address ?? zeroAddress,
+  });
+  const queryClient = useQueryClient();
   useEffect(() => {
-    if (hash) {
-      updateState({
-        hash,
+    if (txReceipt.isSuccess) {
+      if (token0NeedsApproval) {
+        queryClient.invalidateQueries({ queryKey: token0AllowanceKey });
+      }
+      if (token1NeedsApproval) {
+        queryClient.invalidateQueries({ queryKey: token1AllowanceKey });
+      }
+      if (!token0NeedsApproval || !token1NeedsApproval) {
+        queryClient.invalidateQueries({ queryKey: bal0Key });
+        queryClient.invalidateQueries({ queryKey: bal1Key });
+      }
+      reset();
+    }
+  }, [
+    bal0Key,
+    bal1Key,
+    queryClient,
+    reset,
+    token0AllowanceKey,
+    token0NeedsApproval,
+    token1AllowanceKey,
+    token1NeedsApproval,
+    txReceipt.isSuccess,
+  ]);
+  useEffect(() => {
+    updateState({
+      hash,
+    });
+  }, [hash, token0NeedsApproval, token1NeedsApproval, updateState]);
+  useEffect(() => {
+    if (amount0 && amount1) {
+      console.log({
         actionTitle:
           token0NeedsApproval || token1NeedsApproval
-            ? "Approve"
-            : "Added Liquidity",
+            ? `Approved ${token0NeedsApproval ? token0?.symbol : token1?.symbol}`
+            : "Added Liquidity.",
       });
     }
-  }, [hash, token0NeedsApproval, token1NeedsApproval, updateState]);
+    if (
+      amount0 &&
+      amount1 &&
+      !token0ApprovalFetching &&
+      !token1ApprovalFetching
+    ) {
+      updateState({
+        actionTitle:
+          token0NeedsApproval || token1NeedsApproval
+            ? `Approved ${token0NeedsApproval ? token0?.symbol : token1?.symbol}`
+            : "Added Liquidity.",
+      });
+    }
+  }, [
+    amount0,
+    amount1,
+    token0?.symbol,
+    token0ApprovalFetching,
+    token0NeedsApproval,
+    token1?.symbol,
+    token1ApprovalFetching,
+    token1NeedsApproval,
+    updateState,
+  ]);
   const { isLoading } = txReceipt;
-  console.log("isAddLiqEth", isAddLiquidityETH);
   const onSubmit = useCallback(() => {
     if (token0NeedsApproval && token0ApprovalWriteRequest) {
       writeContract(token0ApprovalWriteRequest);
@@ -203,14 +284,40 @@ export default function InitializePool() {
       amountBDesired,
     ]
   );
-
+  const { balance } = useGetBalance({
+    tokenAddress: (pair?.id as Address) ?? zeroAddress,
+  });
   const { state: buttonState } = useGetButtonStatuses({
     isLoading,
     isPending,
     isFetching: token0ApprovalFetching || token1ApprovalFetching,
     needsApproval: token0NeedsApproval || token1NeedsApproval,
   });
-
+  useEffect(() => {
+    if (selectedInput === "0") {
+      if (quoteLiquidity && pairExists) {
+        setAmount1(formatUnits(quoteLiquidity, token1?.decimals ?? 18));
+      }
+      if (amount0 === "") {
+        setAmount1("");
+      }
+    } else {
+      if (quoteLiquidity && pairExists) {
+        setAmount0(formatUnits(quoteLiquidity, token0?.decimals ?? 18));
+      }
+      if (amount1 === "") {
+        setAmount0("");
+      }
+    }
+  }, [
+    amount0,
+    amount1,
+    pairExists,
+    quoteLiquidity,
+    selectedInput,
+    token0?.decimals,
+    token1?.decimals,
+  ]);
   return (
     <>
       <h2 className="text-xl">
@@ -224,7 +331,9 @@ export default function InitializePool() {
           <AssetCard
             onValueChange={setAmount0}
             token={token0}
+            balance={balance0}
             value={amount0}
+            onFocus={() => setSelectedInput("0")}
           />
         </div>
       )}
@@ -235,31 +344,50 @@ export default function InitializePool() {
           </div>
           <AssetCard
             onValueChange={setAmount1}
+            balance={balance1}
             token={token1}
-            value={
-              pairExists && quoteLiquidity > 0n
-                ? Number(formatUnits(quoteLiquidity, token1.decimals))
-                : amount1
-            }
-            disableInput={pairExists && quoteLiquidity > 0n}
+            value={amount1}
+            onFocus={() => setSelectedInput("1")}
           />
-          o{" "}
         </div>
       )}
-      <div className="">
-        <h5>Starting Liquidity Info</h5>
-        <div className="pt-1"></div>
-        <div className="space-y-1">
-          <div className="flex text-neutral-300 text-sm justify-between">
-            <span>USDC per USDT</span>
-            <span>-</span>
+      {!pair && <AddLiquidityInfo amount0={amount0} amount1={amount1} />}
+      {pair && (
+        <>
+          <div className="">
+            <h5>Reserve Info</h5>
+            <div className="pt-1"></div>
+            <div className="space-y-1">
+              <div className="flex text-neutral-300 text-sm justify-between">
+                <span>{token0?.symbol} Amount</span>
+                <span>
+                  {formatUnits(
+                    parseUnits(pair.token0.totalSupply ?? "0", 0),
+                    Number(pair.token0.decimals)
+                  )}
+                </span>
+              </div>
+              <div className="flex text-neutral-300 text-sm justify-between">
+                <span>{token1?.symbol} Amount</span>
+                <span>
+                  {formatUnits(
+                    parseUnits(pair.token0.totalSupply ?? "0", 0),
+                    Number(pair.token1.decimals)
+                  )}
+                </span>
+              </div>
+            </div>
           </div>
-          <div className="flex text-neutral-300 text-sm justify-between">
-            <span>USDC per USDT</span>
-            <span>-</span>
+          <div>
+            <h5>My Info</h5>
+
+            <div className="flex pt-1 text-neutral-300 text-sm justify-between">
+              <span>Amount</span>
+              <span>{formatUnits(balance, 18)} lp</span>
+            </div>
           </div>
-        </div>
-      </div>
+        </>
+      )}
       <SubmitButton
         state={buttonState}
         isValid={stateValid}

@@ -150,11 +150,11 @@ export default function SwapView() {
 
   useEffect(() => {
     if (writeError) {
-      console.error(writeError);
+      console.log(writeError);
     }
 
     if (swapSimulationError) {
-      console.error(swapSimulationError);
+      console.log(swapSimulationError);
     }
   }, [writeError, swapSimulationError]);
 
@@ -182,7 +182,7 @@ export default function SwapView() {
         <CurrencyInput.Root
           title="Sell"
           estimate={formatNumber(
-            formatUnits(token0Balance, token0?.decimals ?? 18)
+            formatUnits(token0Balance.balance, token0?.decimals ?? 18)
           )}
         >
           <CurrencyInput.CurrencySelect
@@ -201,7 +201,7 @@ export default function SwapView() {
         <CurrencyInput.Root
           title="Buy"
           estimate={formatNumber(
-            formatUnits(token1Balance, token1?.decimals ?? 18)
+            formatUnits(token1Balance.balance, token1?.decimals ?? 18)
           )}
         >
           <CurrencyInput.CurrencySelect

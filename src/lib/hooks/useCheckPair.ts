@@ -26,7 +26,7 @@ export function useCheckPair({
     functionName: "pairFor",
     args: [token0, token1, stable],
   });
-
+  // why do we need to refetch here?
   useWatchBlocks({
     onBlock: () => {
       void refetch();

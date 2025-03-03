@@ -92,7 +92,9 @@ export const executeGetPools = async (filter: Filter) => {
   console.log("made it here");
   try {
     const result = await graphqlClient.request(getPools(filter), { ...filter });
+    console.log(result, "result");
     const safe = PoolsSchema.safeParse(result);
+    console.log(safe.error);
     return safe.data;
   } catch (e) {
     console.log(e);
