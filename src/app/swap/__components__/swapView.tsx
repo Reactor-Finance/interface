@@ -146,21 +146,25 @@ export default function SwapView() {
     isLoading,
     needsApproval: needsApproval && !isIntrinsicWETHProcess,
   });
-  const stateValid = useMemo(
+  let stateValid = useMemo(
     () =>
       Boolean(swapSimulation?.request) ||
       Boolean(WETHProcessSimulation.depositSimulation.data) ||
       Boolean(WETHProcessSimulation.withdrawalSimulation.data) ||
-      Boolean(approveWriteRequest && needsApproval),
+      Boolean(approveWriteRequest && needsApproval) ||
+      !!amountIn,
     [
       swapSimulation?.request,
       WETHProcessSimulation.depositSimulation.data,
       WETHProcessSimulation.withdrawalSimulation.data,
       approveWriteRequest,
       needsApproval,
+      amountIn,
     ]
   );
-
+  if (!token0 || !token1) {
+    stateValid = false;
+  }
   useEffect(() => {
     if (writeError) {
       console.log(writeError);
