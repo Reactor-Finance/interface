@@ -298,14 +298,14 @@ export default function InitializePool() {
       if (quoteLiquidity && pairExists) {
         setAmount1(formatUnits(quoteLiquidity, token1?.decimals ?? 18));
       }
-      if (amount0 === "") {
+      if (amount0 === "" && pairExists) {
         setAmount1("");
       }
     } else {
       if (quoteLiquidity && pairExists) {
         setAmount0(formatUnits(quoteLiquidity, token0?.decimals ?? 18));
       }
-      if (amount1 === "") {
+      if (amount1 === "" && pairExists) {
         setAmount0("");
       }
     }
@@ -351,7 +351,14 @@ export default function InitializePool() {
           />
         </div>
       )}
-      {!pair && <AddLiquidityInfo amount0={amount0} amount1={amount1} />}
+      {!pair && (
+        <AddLiquidityInfo
+          amount0={amount0}
+          amount1={amount1}
+          token0Symbol={token0?.symbol}
+          token1Symbol={token1?.symbol}
+        />
+      )}
       {pair && (
         <>
           <div className="">
