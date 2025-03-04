@@ -15,7 +15,7 @@ import { useGetMarketQuote } from "@/lib/hooks/useGetMarketQuote";
 import { formatNumber } from "@/lib/utils";
 import { formatEther, formatUnits } from "viem";
 
-type ElementType<T extends readonly any[]> = T[number];
+type ElementType<T extends readonly object[]> = T[number];
 
 export function LiquidityRow({
   pairInfo: {

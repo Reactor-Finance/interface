@@ -23,7 +23,7 @@ import useApproveWrite from "@/lib/hooks/useApproveWrite";
 import { ROUTER } from "@/data/constants";
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
 
-type ElementType<T extends readonly any[]> = T[number];
+type ElementType<T extends readonly object[]> = T[number];
 
 interface Props {
   state: StateType;
