@@ -1,8 +1,8 @@
 "use client";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import SwapIconBorder from "@/components/shared/swapIconBorder";
-import CurrencyInput from "@/components/shared/currencyInput";
 import TokensDialog from "@/components/shared/tokensDialog";
+import CurrencyInput from "@/components/shared/currencyInput";
 import useApproveWrite from "@/lib/hooks/useApproveWrite";
 import {
   useChainId,
@@ -19,13 +19,15 @@ import { formatUnits, parseUnits, zeroAddress } from "viem";
 import { useWETHExecutions } from "../__hooks__/useWETHExecutions";
 import { useGetBalance } from "@/lib/hooks/useGetBalance";
 import { formatNumber } from "@/lib/utils";
+import { useQueryClient } from "@tanstack/react-query";
+import useSwapValidation from "../__hooks__/useSwapValidation";
 
 export default function SwapView() {
   // Wagmi parameters
   const chainId = useChainId();
 
   // Amount in
-  const [amountIn, setAmountIn] = useState(0);
+  const [amountIn, setAmountIn] = useState("");
   // Selected tokens
   const [token0, setToken0] = useState<TToken | null>(null);
   const [token1, setToken1] = useState<TToken | null>(null);
@@ -54,9 +56,9 @@ export default function SwapView() {
 
   // Router by chain ID
   const router = useMemo(() => ROUTER[chainId], [chainId]);
-
+  console.log(token0?.address, "token address");
   // checks allowance
-  const { approveWriteRequest, needsApproval } = useApproveWrite({
+  const { approveWriteRequest, needsApproval, allowanceKey } = useApproveWrite({
     tokenAddress: token0?.address,
     spender: router,
     amount: String(amountIn),
@@ -69,10 +71,7 @@ export default function SwapView() {
       amount: amountIn,
       token0,
       token1,
-      minAmountOut: parseUnits(
-        String(amountOut.toFixed(4)),
-        token1?.decimals ?? 18
-      ),
+      minAmountOut: parseUnits(String(amountOut), token1?.decimals ?? 18),
     });
 
   // Simulate WETH process
@@ -89,8 +88,15 @@ export default function SwapView() {
     data: hash,
     error: writeError,
   } = useWriteContract();
-  const { isLoading } = useWaitForTransactionReceipt({ hash });
-
+  const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash });
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    if (isSuccess) {
+      if (needsApproval) {
+        queryClient.invalidateQueries({ queryKey: allowanceKey });
+      }
+    }
+  }, [allowanceKey, isSuccess, needsApproval, queryClient]);
   const switchTokens = useCallback(() => {
     const t0 = token0;
     const t1 = token1;
@@ -98,7 +104,12 @@ export default function SwapView() {
     setToken0(t1);
     setToken1(t0);
   }, [token0, token1]);
-
+  const { isValid, message: errorMessage } = useSwapValidation({
+    amountIn,
+    token0,
+    token1,
+    token0Balance: token0Balance.balance,
+  });
   const onSubmit = useCallback(() => {
     if (isIntrinsicWETHProcess) {
       if (isWETHToEther) {
@@ -138,23 +149,31 @@ export default function SwapView() {
     isLoading,
     needsApproval: needsApproval && !isIntrinsicWETHProcess,
   });
-
-  const stateValid = useMemo(
+  let stateValid = useMemo(
     () =>
       Boolean(swapSimulation?.request) ||
       Boolean(WETHProcessSimulation.depositSimulation.data) ||
       Boolean(WETHProcessSimulation.withdrawalSimulation.data) ||
+      Boolean(approveWriteRequest && needsApproval),
+    [
+      swapSimulation?.request,
+      WETHProcessSimulation.depositSimulation.data,
+      WETHProcessSimulation.withdrawalSimulation.data,
+      approveWriteRequest,
       needsApproval,
-    [swapSimulation, WETHProcessSimulation, needsApproval]
+    ]
   );
 
+  if (!token0 || !token1 || !amountIn || !isValid) {
+    stateValid = false;
+  }
   useEffect(() => {
     if (writeError) {
-      console.error(writeError);
+      console.log(writeError);
     }
 
     if (swapSimulationError) {
-      console.error(swapSimulationError);
+      console.log(swapSimulationError);
     }
   }, [writeError, swapSimulationError]);
 
@@ -182,7 +201,7 @@ export default function SwapView() {
         <CurrencyInput.Root
           title="Sell"
           estimate={formatNumber(
-            formatUnits(token0Balance, token0?.decimals ?? 18)
+            formatUnits(token0Balance.balance, token0?.decimals ?? 18)
           )}
         >
           <CurrencyInput.CurrencySelect
@@ -190,7 +209,7 @@ export default function SwapView() {
             token={token0}
           />
           <CurrencyInput.NumberInput
-            onChangeValue={(value: string) => setAmountIn(Number(value))}
+            onChangeValue={(value: string) => setAmountIn(value)}
             disabled={false}
             decimals={10}
           />
@@ -201,7 +220,7 @@ export default function SwapView() {
         <CurrencyInput.Root
           title="Buy"
           estimate={formatNumber(
-            formatUnits(token1Balance, token1?.decimals ?? 18)
+            formatUnits(token1Balance.balance, token1?.decimals ?? 18)
           )}
         >
           <CurrencyInput.CurrencySelect
@@ -219,7 +238,9 @@ export default function SwapView() {
       <div className="pt-2">
         <SubmitButton
           state={buttonState}
-          isValid={stateValid}
+          isValid={!!stateValid}
+          validationError={errorMessage}
+          disabled={!stateValid}
           approveTokenSymbol={token0?.symbol}
           onClick={onSubmit}
         >

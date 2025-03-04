@@ -13,16 +13,16 @@ import {
 } from "wagmi";
 interface State {
   hash: Address | undefined;
-  open: boolean;
   actionTitle: string | undefined;
   actionDescription: string | undefined;
+  open: boolean;
 }
 
 const initialState: State = {
-  open: true,
   hash: undefined,
   actionTitle: undefined,
   actionDescription: undefined,
+  open: false,
 };
 interface ContextType {
   state: State;
@@ -49,29 +49,29 @@ export const TransactionToastProvider = ({ children }: Props) => {
     [setState]
   );
   useEffect(() => {
+    if (txReceipt.isLoading) {
+      updateState({ open: false });
+    }
+  }, [txReceipt.isLoading, updateState]);
+  useEffect(() => {
     if (txReceipt.isSuccess) {
       updateState({ open: true });
     }
   }, [txReceipt.isSuccess, updateState]);
-  useEffect(() => {
-    if (state.open) {
-      const timeout = setTimeout(() => {
-        updateState({ open: false });
-      }, 4000);
-      return () => clearTimeout(timeout);
-    }
-  }, [state.open, updateState]);
   const resetState = useCallback(() => {
     setState(initialState);
   }, [setState]);
 
-  function testToast() {
-    updateState({ open: !state.open });
-  }
-  console.log({ state }, "----====----");
+  function testToast() {}
   return (
     <TransactionToastContext.Provider
-      value={{ updateState, testToast, state, resetState, txReceipt }}
+      value={{
+        updateState,
+        testToast,
+        state,
+        resetState,
+        txReceipt,
+      }}
     >
       {children}
     </TransactionToastContext.Provider>

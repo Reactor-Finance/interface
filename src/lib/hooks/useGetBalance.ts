@@ -13,7 +13,7 @@ export function useGetBalance({
   if (enabled === undefined) enabled = true;
   const { address } = useAccount();
   const { data: etherData = { value: BigInt(0) } } = useBalance({ address });
-  const { data: erc20Balance = BigInt(0) } = useReadContract({
+  const { data: erc20Balance = BigInt(0), queryKey } = useReadContract({
     address: tokenAddress,
     abi: erc20Abi,
     functionName: "balanceOf",
@@ -21,11 +21,13 @@ export function useGetBalance({
     query: { enabled: !!enabled },
   });
   return useMemo(
-    () =>
-      tokenAddress?.toLowerCase() === ETHER.toLowerCase() ||
-      tokenAddress === zeroAddress
-        ? etherData.value
-        : erc20Balance,
-    [etherData.value, tokenAddress, erc20Balance]
+    () => ({
+      balance:
+        tokenAddress?.toLowerCase() === ETHER.toLowerCase()
+          ? etherData.value
+          : erc20Balance,
+      queryKey,
+    }),
+    [erc20Balance, etherData.value, queryKey, tokenAddress]
   );
 }

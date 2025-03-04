@@ -1,15 +1,40 @@
 "use client";
 import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
 import { X } from "lucide-react";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 export default function TransactionToast() {
   const { state, updateState } = useTransactionToastProvider();
+  const [content, setContent] = useState<
+    | {
+        title: string | undefined;
+        desc: string | undefined;
+      }
+    | undefined
+  >(undefined);
+  console.log({ content });
+  useEffect(() => {
+    console.log(state.actionTitle, "CONTENT", content);
+    if (!content && state.actionTitle) {
+      setContent({
+        title: state.actionTitle,
+        desc: state.actionDescription,
+      });
+    }
+  }, [content, state.actionDescription, state.actionTitle]);
+  useEffect(() => {
+    if (!state.open) {
+      setTimeout(() => {
+        setContent(undefined);
+      }, 500);
+    }
+  }, [state.open]);
   useEffect(() => {
     if (state.open) {
-      setTimeout(() => {
+      const clear = setTimeout(() => {
         updateState({ open: false });
-      }, 4000);
+      }, 5000);
+      return () => clearTimeout(clear);
     }
   }, [state.open, updateState]);
   return (
@@ -17,7 +42,7 @@ export default function TransactionToast() {
       data-state={state.open ? "open" : "closed"}
       className="absolute transition-all  z-50 top-[74px] data-[state=closed]:translate-x-[120%] data-[state=open]:right-[34px] right-0"
     >
-      <div className="bg-neutral-950 relative py-6 px-4 border-b-success-400 border-b-2 rounded-lg">
+      <div className="bg-neutral-950 relative py-6 pl-4 pr-8 border-b-success-400 border-b-2 rounded-lg">
         <div className="absolute right-1 top-1">
           <button className="text-neutral-400">
             <X
@@ -29,7 +54,7 @@ export default function TransactionToast() {
           </button>
         </div>
         <div>
-          <span>{state.actionTitle ?? "Transaction Successful"}</span>
+          <span>{content?.title ?? "Transaction Successful"}</span>
         </div>
         <div></div>
       </div>

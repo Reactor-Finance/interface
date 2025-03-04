@@ -243,6 +243,9 @@ export default function DashboardLiquidityDialog({
               <span>Max</span>
             </div>
             <EstimatesHeader />
+            {/* {state.actionType === LiquidityActions.Withdraw && (
+              <WithdrawStats />
+            )} */}
           </div>
           <div className="p-4">
             <SubmitButton
