@@ -1,8 +1,8 @@
 "use client";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import SwapIconBorder from "@/components/shared/swapIconBorder";
-import CurrencyInput from "@/components/shared/currencyInput";
 import TokensDialog from "@/components/shared/tokensDialog";
+import CurrencyInput from "@/components/shared/currencyInput";
 import useApproveWrite from "@/lib/hooks/useApproveWrite";
 import {
   useChainId,
@@ -19,6 +19,7 @@ import { formatUnits, parseUnits, zeroAddress } from "viem";
 import { useWETHExecutions } from "../__hooks__/useWETHExecutions";
 import { useGetBalance } from "@/lib/hooks/useGetBalance";
 import { formatNumber } from "@/lib/utils";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function SwapView() {
   // Wagmi parameters
@@ -54,9 +55,9 @@ export default function SwapView() {
 
   // Router by chain ID
   const router = useMemo(() => ROUTER[chainId], [chainId]);
-
+  console.log(token0?.address, "token address");
   // checks allowance
-  const { approveWriteRequest, needsApproval } = useApproveWrite({
+  const { approveWriteRequest, needsApproval, allowanceKey } = useApproveWrite({
     tokenAddress: token0?.address,
     spender: router,
     amount: String(amountIn),
@@ -89,8 +90,15 @@ export default function SwapView() {
     data: hash,
     error: writeError,
   } = useWriteContract();
-  const { isLoading } = useWaitForTransactionReceipt({ hash });
-
+  const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash });
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    if (isSuccess) {
+      if (needsApproval) {
+        queryClient.invalidateQueries({ queryKey: allowanceKey });
+      }
+    }
+  }, [allowanceKey, isSuccess, needsApproval, queryClient]);
   const switchTokens = useCallback(() => {
     const t0 = token0;
     const t1 = token1;
@@ -138,14 +146,19 @@ export default function SwapView() {
     isLoading,
     needsApproval: needsApproval && !isIntrinsicWETHProcess,
   });
-
   const stateValid = useMemo(
     () =>
       Boolean(swapSimulation?.request) ||
       Boolean(WETHProcessSimulation.depositSimulation.data) ||
       Boolean(WETHProcessSimulation.withdrawalSimulation.data) ||
+      Boolean(approveWriteRequest && needsApproval),
+    [
+      swapSimulation?.request,
+      WETHProcessSimulation.depositSimulation.data,
+      WETHProcessSimulation.withdrawalSimulation.data,
+      approveWriteRequest,
       needsApproval,
-    [swapSimulation, WETHProcessSimulation, needsApproval]
+    ]
   );
 
   useEffect(() => {
@@ -219,7 +232,8 @@ export default function SwapView() {
       <div className="pt-2">
         <SubmitButton
           state={buttonState}
-          isValid={stateValid}
+          isValid={!!stateValid}
+          disabled={!stateValid}
           approveTokenSymbol={token0?.symbol}
           onClick={onSubmit}
         >
