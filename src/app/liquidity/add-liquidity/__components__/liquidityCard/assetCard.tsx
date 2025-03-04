@@ -4,16 +4,14 @@ import AssetSymbolAndName from "./assetSymbolAndName";
 import { formatUnits } from "viem";
 import { TToken } from "@/lib/types";
 import Input from "@/components/ui/input";
-
-import { formatNumber, inputPatternMatch } from "@/lib/utils";
+import { useGetBalance } from "@/lib/hooks/useGetBalance";
+import { formatNumber } from "@/lib/utils";
 
 interface Props {
   token: TToken;
-  onValueChange: (value: string) => void;
-  value: string;
+  onValueChange: (value: number) => void;
+  value: number;
   disableInput?: boolean;
-  balance: bigint;
-  onFocus?: () => void;
 }
 
 export default function AssetCard({
@@ -21,9 +19,8 @@ export default function AssetCard({
   onValueChange,
   value,
   disableInput,
-  balance,
-  onFocus,
 }: Props) {
+  const balance = useGetBalance({ tokenAddress: token.address });
   const formattedBalance = useMemo(
     () => formatNumber(formatUnits(balance, token.decimals)),
     [balance, token.decimals]
@@ -33,7 +30,6 @@ export default function AssetCard({
       <div className="flex justify-between">
         <div className="flex items-center">
           <Input
-            onFocus={onFocus}
             aria-label="amount"
             className="w-[200px] md:text-lg px-1 py-1 bg-transparent border-none"
             placeholder="0"
@@ -41,9 +37,9 @@ export default function AssetCard({
             disabled={disableInput}
             onChange={(s) => {
               // Add this check to prevent NaN errors
-              if (inputPatternMatch(s.target.value)) {
-                onValueChange(s.target.value);
-              }
+              const parsedNumber = Number(s.target.value ?? "0");
+              const validNumber = isNaN(parsedNumber) ? value : parsedNumber;
+              onValueChange(validNumber);
             }}
           />
         </div>
@@ -54,7 +50,9 @@ export default function AssetCard({
         <div className="flex gap-x-1">
           <div>{formattedBalance} </div>
           <button
-            onClick={() => onValueChange(formatUnits(balance, token.decimals))}
+            onClick={() =>
+              onValueChange(Number(formatUnits(balance, token.decimals)))
+            }
             aria-label="Set Max Balance"
             className="text-primary-400"
           >

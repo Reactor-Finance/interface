@@ -1,29 +1,22 @@
+import { TToken } from "@/lib/types";
 import { useMemo } from "react";
 
 interface Props {
-  amount0: string;
-  amount1: string;
-  token0Symbol: string | undefined;
-  token1Symbol: string | undefined;
+  amount0: number;
+  amount1: number;
+  token0: TToken | undefined;
+  token1: TToken | undefined;
 }
+
 export default function AddLiquidityInfo({
   amount0,
   amount1,
-  token0Symbol,
-  token1Symbol,
+  token0,
+  token1,
 }: Props) {
   const { result0, result1 } = useMemo(() => {
-    if (isNaN(Number(amount0)) || isNaN(Number(amount1))) {
-      return { result0: 0, result1: 0 };
-    }
-    let result0 = Number(amount0) / Number(amount1);
-    let result1 = Number(amount1) / Number(amount0);
-    if (isNaN(result0) || !isFinite(result0)) {
-      result0 = 0;
-    }
-    if (isNaN(result1) || !isFinite(result1)) {
-      result1 = 0;
-    }
+    const result0 = amount1 > 0 ? amount0 / amount1 : amount0 / 1;
+    const result1 = amount0 > 0 ? amount1 / amount0 : amount1 / 1;
     return { result0, result1 };
   }, [amount0, amount1]);
   return (
@@ -33,13 +26,13 @@ export default function AddLiquidityInfo({
       <div className="space-y-1">
         <div className="flex text-neutral-300 text-sm justify-between">
           <span>
-            {token0Symbol} per {token1Symbol}
+            {token0?.symbol} per {token1?.symbol}
           </span>
           <span>{result0}</span>
         </div>
         <div className="flex text-neutral-300 text-sm justify-between">
           <span>
-            {token1Symbol} per {token0Symbol}
+            {token1?.symbol} per {token0?.symbol}
           </span>
           <span>{result1}</span>
         </div>
