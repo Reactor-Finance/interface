@@ -2,35 +2,73 @@ import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import symbol from "@/assets/reactor-symbol.svg";
-import greenDot from "@/assets/green-dot.svg";
 import { Button } from "@/components/ui/button";
-import { EllipsisIcon } from "lucide-react";
-import {
-  LiquidityActions,
-  useDashboardLiquidityProvider,
-} from "../__context__/dashboardLiquidityProvider";
-import { UserLiquidityPosition } from "@/server/queries/user";
+import { EllipsisIcon, Dot } from "lucide-react";
 import PoolHeader from "@/components/shared/poolHeader";
 import { TPoolType } from "@/lib/types";
 import { useGetTokenInfo } from "@/utils";
 import { useRouter } from "next/navigation";
+import { useGetPairs } from "@/lib/hooks/useGetPairs";
+import { LiquidityActions } from "../types";
+import { useCallback, useMemo } from "react";
+import { useGetMarketQuote } from "@/lib/hooks/useGetMarketQuote";
+import { formatNumber } from "@/lib/utils";
+import { formatEther, formatUnits } from "viem";
 
-export function LiquidityRow({ id, pair }: UserLiquidityPosition) {
-  const { openModal } = useDashboardLiquidityProvider();
+type ElementType<T extends readonly any[]> = T[number];
+
+export function LiquidityRow({
+  pairInfo: {
+    token0: token0Id,
+    token1: token1Id,
+    reserve0,
+    reserve1,
+    stable,
+    emissions,
+    account_gauge_earned,
+    emissions_token,
+  },
+  onItemClick,
+}: {
+  pairInfo: ElementType<ReturnType<typeof useGetPairs>>;
+  onItemClick: (action: LiquidityActions) => void;
+}) {
   const router = useRouter();
-  const handleOpenClick = (action: LiquidityActions) => {
-    openModal(action, id);
-  };
   // const t0 = params.get("token0");
   //  const t1 = params.get("token1");
   //  const version = params.get("version");
-  const handleNavigationAddLiquidity = () => {
+  const handleNavigationAddLiquidity = useCallback(() => {
     router.push(
-      `/liquidity/add-liquidity?token0=${pair.token0.id}&token1=${pair.token1.id}&version=${pair.isStable ? "stable" : "volitile"}`
+      `/liquidity/add-liquidity?token0=${token0Id}&token1=${token1Id}&version=${stable ? "stable" : "volatile"}`
     );
-  };
-  const token0 = useGetTokenInfo(pair.token0.id ?? "0x");
-  const token1 = useGetTokenInfo(pair.token1.id ?? "0x");
+  }, [router, token0Id, token1Id, stable]);
+
+  const token0 = useGetTokenInfo(token0Id);
+  const token1 = useGetTokenInfo(token1Id);
+
+  const { quote: quote0 } = useGetMarketQuote({
+    tokenAddress: token0Id,
+    value: reserve0,
+  });
+  const { quote: quote1 } = useGetMarketQuote({
+    tokenAddress: token1Id,
+    value: reserve1,
+  });
+  const totalMarketQuote = useMemo(() => {
+    const total = quote0[0] + quote1[0];
+    return formatNumber(formatUnits(total, 18));
+  }, [quote0, quote1]);
+
+  // Rewards market quote
+  const { quote: rewardsQuote } = useGetMarketQuote({
+    tokenAddress: emissions_token,
+    value: account_gauge_earned,
+  });
+  const isInRange = useMemo(
+    () => account_gauge_earned > 0n,
+    [account_gauge_earned]
+  );
+
   return (
     <tr className="grid text-center rounded-sm grid-cols-7 items-center bg-neutral-1000 py-2 px-6">
       <td className="bg-neutral-1000 text-left col-span-2">
@@ -38,26 +76,28 @@ export function LiquidityRow({ id, pair }: UserLiquidityPosition) {
           <PoolHeader
             token0={token0}
             token1={token1}
-            poolType={TPoolType.STABLE}
-          ></PoolHeader>
+            poolType={stable ? TPoolType.STABLE : TPoolType.VOLATILE}
+          />
         </div>
       </td>
       <td className="flex flex-col gap-y-2 justify-center items-center">
         <Badge
           className="inline-block px-1 py-1 w-full"
           border="none"
-          colors="success"
+          colors={isInRange ? "success" : "error"}
           size="sm"
         >
-          In Range
+          {isInRange ? "In Range" : "Out Of Range"}
         </Badge>
         <div className="flex items-center gap-1">
-          <Image src={greenDot} alt="green dot" width={8} height={8} />
-          <span className="text-[10px] leading-[16px]">Earning emissions</span>
+          <Dot color={isInRange ? "#4ade80" : "#f87171"} width={8} height={8} />
+          <span className="text-[10px] leading-[16px]">
+            {isInRange ? "Earning emissions" : "Not earning emissions"}
+          </span>
         </div>
       </td>
-      <td className="text-sm">$6,950.5</td>
-      <td className="text-blue-light text-sm">100.92%</td>
+      <td className="text-sm">${totalMarketQuote}</td>
+      <td className="text-blue-light text-sm">{formatEther(emissions)}%</td>
       <td className="flex flex-col items-center justify-center">
         <div className="flex items-center gap-[9px]">
           <Image
@@ -67,9 +107,13 @@ export function LiquidityRow({ id, pair }: UserLiquidityPosition) {
             height={20}
             alt="Reactor Ticker"
           />
-          <span className="text-sm">123,000.23</span>
+          <span className="text-sm">
+            {formatNumber(formatEther(account_gauge_earned))}
+          </span>
         </div>
-        <span className="text-sm text-neutral-400">$6,950.5</span>
+        <span className="text-sm text-neutral-400">
+          ${formatNumber(formatEther(rewardsQuote[0]))}
+        </span>
       </td>
       <td>
         <div className="flex gap-x-2 justify-end">
@@ -85,29 +129,29 @@ export function LiquidityRow({ id, pair }: UserLiquidityPosition) {
             </DropdownMenu.Trigger>
             <DropdownMenu.Content className="bg-neutral-950 rounded-sm p-2">
               <DropdownMenu.Item
-                onClick={() => handleNavigationAddLiquidity()}
+                onClick={handleNavigationAddLiquidity}
                 className="hover:bg-neutral-900 outline-none pl-3 py-2 pr-9 rounded-sm hover:cursor-pointer"
               >
                 Increase
               </DropdownMenu.Item>
-              {/* <DropdownMenu.Item */}
-              {/*   onClick={() => handleOpenClick(LiquidityActions.Stake)} */}
-              {/*   className="hover:bg-neutral-900 outline-none pl-3 py-2 pr-9 rounded-sm hover:cursor-pointer" */}
-              {/* > */}
-              {/*   Stake */}
-              {/* </DropdownMenu.Item> */}
               <DropdownMenu.Item
-                onClick={() => handleOpenClick(LiquidityActions.Withdraw)}
+                onClick={() => onItemClick(LiquidityActions.Stake)}
+                className="hover:bg-neutral-900 outline-none pl-3 py-2 pr-9 rounded-sm hover:cursor-pointer"
+              >
+                Stake
+              </DropdownMenu.Item>
+              <DropdownMenu.Item
+                onClick={() => onItemClick(LiquidityActions.Withdraw)}
                 className="hover:bg-neutral-900 outline-none pl-3 py-2 pr-9 rounded-sm hover:cursor-pointer"
               >
                 Withdraw
               </DropdownMenu.Item>
-              {/* <DropdownMenu.Item */}
-              {/*   onClick={() => handleOpenClick(LiquidityActions.Unstake)} */}
-              {/*   className="hover:bg-neutral-900 outline-none pl-3 py-2 pr-9 rounded-sm hover:cursor-pointer" */}
-              {/* > */}
-              {/*   Unstake */}
-              {/* </DropdownMenu.Item> */}
+              <DropdownMenu.Item
+                onClick={() => onItemClick(LiquidityActions.Unstake)}
+                className="hover:bg-neutral-900 outline-none pl-3 py-2 pr-9 rounded-sm hover:cursor-pointer"
+              >
+                Unstake
+              </DropdownMenu.Item>
             </DropdownMenu.Content>
           </DropdownMenu.Root>
         </div>

@@ -1,13 +1,32 @@
 "use client";
-import { useDashboardLiquidityProvider } from "../__context__/dashboardLiquidityProvider";
+import { useGetPairs } from "@/lib/hooks/useGetPairs";
 import DashboardLiquidityDialog from "./dashboardLiquidityDialog/dashboardLiquidityDialog";
 import { LiquidityRow } from "./liquidityRow";
+import { useMemo, useState } from "react";
+import { LiquidityActions, StateType } from "../types";
 
 export default function DashboardLiquidityTable() {
-  const { userLiquidityPositions } = useDashboardLiquidityProvider();
+  const pairs = useGetPairs({});
+  const activePairs = useMemo(
+    () => pairs.filter((pair) => pair.account_lp_balance > 0n),
+    [pairs]
+  );
+  const [selectedPair, setSelectedPair] = useState(activePairs[0]);
+  const [stateType, setStateType] = useState<StateType>({
+    dialogOpen: false,
+    actionType: LiquidityActions.Stake,
+  });
   return (
     <>
-      <DashboardLiquidityDialog />
+      {stateType && selectedPair && (
+        <DashboardLiquidityDialog
+          state={stateType}
+          pairInfo={selectedPair}
+          onOpenChange={(isOpen) =>
+            setStateType((s) => ({ ...s, dialogOpen: isOpen }))
+          }
+        />
+      )}
       <table className="w-full pt-6 mx-auto">
         <caption className="h-0 opacity-0">Pools Table</caption>
         <thead className="text-neutral-400 text-sm">
@@ -21,13 +40,20 @@ export default function DashboardLiquidityTable() {
           </tr>
         </thead>
         <tbody>
-          {userLiquidityPositions?.user?.liquidityPositions.map((position) => (
-            <LiquidityRow key={position.id} {...position}></LiquidityRow>
+          {activePairs.map((pair) => (
+            <LiquidityRow
+              key={pair.pair_address}
+              pairInfo={pair}
+              onItemClick={(actionType) => {
+                setSelectedPair(pair);
+                setStateType({ actionType, dialogOpen: true });
+              }}
+            />
           ))}
         </tbody>
       </table>
 
-      {!userLiquidityPositions?.user?.liquidityPositions.length && (
+      {!activePairs.length && (
         <div className="text-start rounded-sm bg-neutral-1000 font-medium text-neutral-400 py-4 px-6">
           To receive emissions{" "}
           <span className="underline decoration-gray-500 font-semibold cursor-pointer text-white">

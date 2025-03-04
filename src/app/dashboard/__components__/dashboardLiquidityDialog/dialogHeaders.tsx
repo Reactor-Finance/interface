@@ -1,9 +1,6 @@
 import { DialogDescription, DialogTitle } from "@/components/ui/dialog";
-import {
-  LiquidityActions,
-  useDashboardLiquidityProvider,
-} from "../../__context__/dashboardLiquidityProvider";
 import { useMemo } from "react";
+import { LiquidityActions, StateType } from "../../types";
 
 export const WithdrawHeader = () => (
   <DialogHeader title="Withdraw your" desc="Withdraw your staked position" />
@@ -28,9 +25,8 @@ function DialogHeader({ title, desc }: { title: string; desc: string }) {
   );
 }
 
-export function useGetHeader() {
-  const { state } = useDashboardLiquidityProvider();
-  const header = useMemo(() => {
+export function useGetHeader({ state }: { state: StateType }) {
+  return useMemo(() => {
     switch (state.actionType) {
       case LiquidityActions.Stake:
         return <StakeHeader />;
@@ -40,5 +36,4 @@ export function useGetHeader() {
         return <WithdrawHeader />;
     }
   }, [state.actionType]);
-  return header;
 }
