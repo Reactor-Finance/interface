@@ -10,7 +10,7 @@ export function useWETHExecutions({
   token1,
   amount,
 }: {
-  amount?: string;
+  amount?: number;
   token0: TToken | null;
   token1: TToken | null;
 }) {

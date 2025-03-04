@@ -6,6 +6,7 @@ import { ETHER, ROUTER, WETH } from "@/data/constants";
 import { TToken } from "@/lib/types";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
+import { useAtomicDate } from "@/lib/hooks/useAtomicDate";
 
 type SwapRoute = {
   from: `0x${string}`;
@@ -19,12 +20,13 @@ export function useSwapSimulation({
   token1,
   minAmountOut = BigInt(0),
 }: {
-  amount: string;
+  amount: number;
   token0: TToken | null;
   token1: TToken | null;
   minAmountOut?: bigint;
 }) {
   const { address } = useAccount();
+  const now = useAtomicDate();
   const chainId = useChainId();
   const router = useMemo(() => ROUTER[chainId], [chainId]);
   const weth = useMemo(() => WETH[chainId], [chainId]);
@@ -33,7 +35,7 @@ export function useSwapSimulation({
   const amountIn = useMemo(
     () =>
       amount !== null && token0 !== null && token1 !== null
-        ? parseUnits(amount, token0.decimals)
+        ? parseUnits(String(amount), token0.decimals)
         : BigInt(0),
     [amount, token0, token1]
   );
@@ -59,9 +61,9 @@ export function useSwapSimulation({
   );
   const deadline = useMemo(() => {
     const ttl =
-      Math.floor(Date.now() / 1000) + transactionDeadlineInMinutes * 60;
-    return () => BigInt(ttl);
-  }, [transactionDeadlineInMinutes]);
+      Math.floor(now.getTime() / 1000) + transactionDeadlineInMinutes * 60;
+    return BigInt(ttl);
+  }, [now, transactionDeadlineInMinutes]);
   const msgValue = useMemo(
     () =>
       token0?.address.toLowerCase() === weth.toLowerCase() ||
@@ -79,7 +81,7 @@ export function useSwapSimulation({
       calculateMinOut(minAmountOut, slippage),
       routes,
       address ?? zeroAddress,
-      deadline(),
+      deadline,
       true,
     ],
     value: msgValue,

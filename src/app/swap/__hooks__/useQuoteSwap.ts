@@ -10,7 +10,7 @@ export function useQuoteSwap({
   tokenIn,
   tokenOut,
 }: {
-  amountIn: string;
+  amountIn: number;
   tokenIn: TToken | null;
   tokenOut: TToken | null;
 }) {
