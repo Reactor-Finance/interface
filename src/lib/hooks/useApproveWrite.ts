@@ -45,11 +45,10 @@ export default function useApproveWrite({
       void refetch();
     },
   });
-
-  const needsApproval = allowance
-    ? allowance < parseUnits(amount, decimals) &&
-      tokenAddress?.toLowerCase() !== ETHER.toLowerCase()
-    : false;
+  console.log({ allowance });
+  const needsApproval =
+    (allowance ?? 0n) < parseUnits(amount, decimals) &&
+    tokenAddress?.toLowerCase() !== ETHER.toLowerCase();
   return {
     approveWriteRequest: data?.request,
     needsApproval,

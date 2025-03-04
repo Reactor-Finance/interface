@@ -172,6 +172,8 @@ export default function InitializePool() {
       if (!token0NeedsApproval || !token1NeedsApproval) {
         queryClient.invalidateQueries({ queryKey: bal0Key });
         queryClient.invalidateQueries({ queryKey: bal1Key });
+        setAmount0("");
+        setAmount1("");
       }
       reset();
     }
@@ -283,6 +285,10 @@ export default function InitializePool() {
       amountADesired,
       amountBDesired,
     ]
+  );
+  console.log(
+    { stateValid, token0, token1, token0NeedsApproval, token1NeedsApproval },
+    "STATE VALID"
   );
   const { balance } = useGetBalance({
     tokenAddress: (pair?.id as Address) ?? zeroAddress,
