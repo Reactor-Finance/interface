@@ -19,7 +19,7 @@ export function useSwapSimulation({
   token1,
   minAmountOut = BigInt(0),
 }: {
-  amount: number | null;
+  amount: string;
   token0: TToken | null;
   token1: TToken | null;
   minAmountOut?: bigint;
@@ -33,7 +33,7 @@ export function useSwapSimulation({
   const amountIn = useMemo(
     () =>
       amount !== null && token0 !== null && token1 !== null
-        ? parseUnits(String(amount), token0.decimals)
+        ? parseUnits(amount, token0.decimals)
         : BigInt(0),
     [amount, token0, token1]
   );

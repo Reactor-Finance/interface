@@ -6,11 +6,11 @@ import { TToken } from "@/lib/types";
 import { ETHER, TRADE_HELPER, WETH } from "@/data/constants";
 
 export function useQuoteSwap({
-  amountIn = 0,
+  amountIn,
   tokenIn,
   tokenOut,
 }: {
-  amountIn: number;
+  amountIn: string;
   tokenIn: TToken | null;
   tokenOut: TToken | null;
 }) {
@@ -46,7 +46,7 @@ export function useQuoteSwap({
       address1 ?? zeroAddress,
     ],
     query: {
-      enabled: amountIn > 0 && tokenIn !== null && tokenOut !== null,
+      enabled: !!amountIn && tokenIn !== null && tokenOut !== null,
     },
   });
 
@@ -64,8 +64,8 @@ export function useQuoteSwap({
       isIntrinsicWETHProcess
         ? amountIn
         : tokenOut
-          ? Number(formatUnits(receivedAmount, tokenOut.decimals))
-          : 0,
+          ? formatUnits(receivedAmount, tokenOut.decimals)
+          : "0",
     [receivedAmount, amountIn, tokenOut, isIntrinsicWETHProcess]
   );
 

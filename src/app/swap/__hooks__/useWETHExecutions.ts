@@ -8,9 +8,9 @@ import { parseEther } from "viem";
 export function useWETHExecutions({
   token0,
   token1,
-  amount = 0,
+  amount,
 }: {
-  amount?: number;
+  amount?: string;
   token0: TToken | null;
   token1: TToken | null;
 }) {

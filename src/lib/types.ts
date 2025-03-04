@@ -2,7 +2,10 @@
 
 import { isAddress } from "viem";
 import { z } from "zod";
-
+export enum ErrorMessage {
+  INSUFFICIENT_BALANCE = "Insufficient Balance.",
+  UNKNOWN_ERROR = "Unknown Error.",
+}
 export const TokenlistSchema = z.array(
   z
     .object({

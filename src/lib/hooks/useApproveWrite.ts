@@ -25,7 +25,7 @@ export default function useApproveWrite({
   decimals?: number;
 }) {
   const {
-    data: allowance = BigInt(0),
+    data: allowance,
     queryKey,
     isLoading,
     refetch,
@@ -46,11 +46,13 @@ export default function useApproveWrite({
     },
   });
 
+  const needsApproval = allowance
+    ? allowance < parseUnits(amount, decimals) &&
+      tokenAddress?.toLowerCase() !== ETHER.toLowerCase()
+    : false;
   return {
     approveWriteRequest: data?.request,
-    needsApproval:
-      allowance < parseUnits(amount, decimals) &&
-      tokenAddress?.toLowerCase() !== ETHER.toLowerCase(),
+    needsApproval,
     allowanceKey: queryKey,
     isFetching: isLoading, // refactor this naming
   };

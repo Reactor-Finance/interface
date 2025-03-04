@@ -23,8 +23,7 @@ export function useGetBalance({
   return useMemo(
     () => ({
       balance:
-        tokenAddress?.toLowerCase() === ETHER.toLowerCase() ||
-        tokenAddress === zeroAddress
+        tokenAddress?.toLowerCase() === ETHER.toLowerCase()
           ? etherData.value
           : erc20Balance,
       queryKey,
