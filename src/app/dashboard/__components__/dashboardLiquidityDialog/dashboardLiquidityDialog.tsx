@@ -60,9 +60,23 @@ export default function DashboardLiquidityDialog({
       amount,
     });
 
-  const { needsApproval, approveWriteRequest, isFetching } = useApproveWrite({
+  const {
+    needsApproval: routerNeedsApproval,
+    approveWriteRequest: routerApprovalWriteRequest,
+    isFetching: routerApprovalFetching,
+  } = useApproveWrite({
     tokenAddress: pairInfo.pair_address,
     spender: router,
+    amount: String(amount),
+    decimals: Number(pairInfo.decimals),
+  });
+  const {
+    needsApproval: gaugeNeedsApproval,
+    approveWriteRequest: gaugeApprovalWriteRequest,
+    isFetching: gaugeApprovalFetching,
+  } = useApproveWrite({
+    tokenAddress: pairInfo.pair_address,
+    spender: pairInfo.gauge,
     amount: String(amount),
     decimals: Number(pairInfo.decimals),
   });
@@ -73,13 +87,20 @@ export default function DashboardLiquidityDialog({
   const isValid = useMemo(() => {
     switch (state.actionType) {
       case LiquidityActions.Stake:
-        return Boolean(stakeSimulation) || Boolean(createGaugeSimulation);
+        return (
+          Boolean(stakeSimulation) ||
+          Boolean(createGaugeSimulation) ||
+          gaugeNeedsApproval ||
+          Boolean(gaugeApprovalWriteRequest)
+        );
       case LiquidityActions.Unstake:
         return Boolean(unstakeSimulation);
       case LiquidityActions.Withdraw:
         return (
           Boolean(removeLiquidityEthSimulation.data) ||
-          Boolean(removeLiquiditySimulation.data)
+          Boolean(removeLiquiditySimulation.data) ||
+          routerNeedsApproval ||
+          Boolean(routerApprovalWriteRequest)
         );
       default:
         return false;
@@ -91,11 +112,25 @@ export default function DashboardLiquidityDialog({
     removeLiquidityEthSimulation,
     removeLiquiditySimulation,
     state.actionType,
+    gaugeNeedsApproval,
+    gaugeApprovalWriteRequest,
+    routerNeedsApproval,
+    routerApprovalWriteRequest,
   ]);
 
   const onSubmit = useCallback(() => {
     switch (state.actionType) {
       case LiquidityActions.Stake: {
+        if (pairInfo.gauge === zeroAddress && createGaugeSimulation) {
+          reset();
+          writeContract(createGaugeSimulation);
+          break;
+        }
+        if (gaugeApprovalWriteRequest && gaugeNeedsApproval) {
+          reset();
+          writeContract(gaugeApprovalWriteRequest);
+          break;
+        }
         if (!stakeSimulation) break;
         reset();
         writeContract(stakeSimulation);
@@ -108,9 +143,9 @@ export default function DashboardLiquidityDialog({
         break;
       }
       case LiquidityActions.Withdraw: {
-        if (needsApproval && approveWriteRequest) {
+        if (routerNeedsApproval && routerApprovalWriteRequest) {
           reset();
-          writeContract(approveWriteRequest);
+          writeContract(routerApprovalWriteRequest);
           return;
         }
         if (removeLiquiditySimulation.data) {
@@ -132,10 +167,14 @@ export default function DashboardLiquidityDialog({
     reset,
     stakeSimulation,
     unstakeSimulation,
-    needsApproval,
-    approveWriteRequest,
+    routerNeedsApproval,
+    routerApprovalWriteRequest,
     removeLiquiditySimulation,
     removeLiquidityEthSimulation,
+    gaugeNeedsApproval,
+    gaugeApprovalWriteRequest,
+    createGaugeSimulation,
+    pairInfo.gauge,
   ]);
 
   const buttonChild = useMemo(() => {
@@ -158,8 +197,18 @@ export default function DashboardLiquidityDialog({
   const { state: buttonState } = useGetButtonStatuses({
     isLoading,
     isPending,
-    needsApproval,
-    isFetching,
+    needsApproval:
+      state.actionType === LiquidityActions.Stake
+        ? pairInfo.gauge !== zeroAddress && gaugeNeedsApproval
+        : state.actionType === LiquidityActions.Withdraw
+          ? routerNeedsApproval
+          : false,
+    isFetching:
+      state.actionType === LiquidityActions.Stake
+        ? gaugeApprovalFetching
+        : state.actionType === LiquidityActions.Withdraw
+          ? routerApprovalFetching
+          : false,
   });
   return (
     <Dialog open={state.dialogOpen} onOpenChange={onOpenChange}>
@@ -187,11 +236,11 @@ export default function DashboardLiquidityDialog({
               step={1}
             />
             <div className="flex justify-between">
-              <span>0%</span>
-              <span>25%</span>
-              <span>50%</span>
-              <span>75%</span>
-              <span>100%</span>
+              <span>Min</span>
+              <span>.</span>
+              <span>.</span>
+              <span>.</span>
+              <span>Max</span>
             </div>
             <EstimatesHeader />
           </div>
@@ -208,17 +257,4 @@ export default function DashboardLiquidityDialog({
       </DialogContent>
     </Dialog>
   );
-}
-
-function getActionTypeString(actionType: LiquidityActions | undefined): string {
-  switch (actionType) {
-    case LiquidityActions.Stake:
-      return "Stake";
-    case LiquidityActions.Unstake:
-      return "Unstake";
-    case LiquidityActions.Withdraw:
-      return "Withdraw";
-    default:
-      return "";
-  }
 }

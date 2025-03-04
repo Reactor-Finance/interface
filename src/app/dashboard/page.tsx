@@ -7,7 +7,6 @@ import InnerLabelInput from "./__components__/input";
 import PageMarginContainer from "@/components/ui/pageMarginContainer";
 import wheel from "@/assets/wheel.svg";
 import DashboardLiquidityTable from "./__components__/dashboardLiquidityTable";
-import { DashboardLiquidityProvider } from "./__context__/dashboardLiquidityProvider";
 
 export default function Dashboard() {
   return (
@@ -33,22 +32,20 @@ export default function Dashboard() {
           </div>
         </div>
         <div className="pt-6"></div>
-        <DashboardLiquidityProvider>
-          <div>
-            <div className="flex justify-between">
-              <Headers.InfoHeaderTwo
-                popupContent={<div>explanation goes here</div>}
-              >
-                Deposit & Staked Liquidity
-              </Headers.InfoHeaderTwo>
-              <Button variant={"primary"} size="md">
-                New Deposit
-              </Button>
-            </div>
-            <div className="pt-6"></div>
-            <DashboardLiquidityTable />
+        <div>
+          <div className="flex justify-between">
+            <Headers.InfoHeaderTwo
+              popupContent={<div>explanation goes here</div>}
+            >
+              Deposit & Staked Liquidity
+            </Headers.InfoHeaderTwo>
+            <Button variant={"primary"} size="md">
+              New Deposit
+            </Button>
           </div>
-        </DashboardLiquidityProvider>
+          <div className="pt-6"></div>
+          <DashboardLiquidityTable />
+        </div>
         <div className="pt-16"></div>
         <Headers.InfoHeaderTwo popupContent={<div>explanation goes here</div>}>
           Locks
