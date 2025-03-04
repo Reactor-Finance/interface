@@ -20,13 +20,14 @@ import { useWETHExecutions } from "../__hooks__/useWETHExecutions";
 import { useGetBalance } from "@/lib/hooks/useGetBalance";
 import { formatNumber } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
+import useSwapValidation from "../__hooks__/useSwapValidation";
 
 export default function SwapView() {
   // Wagmi parameters
   const chainId = useChainId();
 
   // Amount in
-  const [amountIn, setAmountIn] = useState(0);
+  const [amountIn, setAmountIn] = useState("");
   // Selected tokens
   const [token0, setToken0] = useState<TToken | null>(null);
   const [token1, setToken1] = useState<TToken | null>(null);
@@ -70,10 +71,7 @@ export default function SwapView() {
       amount: amountIn,
       token0,
       token1,
-      minAmountOut: parseUnits(
-        String(amountOut.toFixed(4)),
-        token1?.decimals ?? 18
-      ),
+      minAmountOut: parseUnits(String(amountOut), token1?.decimals ?? 18),
     });
 
   // Simulate WETH process
@@ -106,7 +104,12 @@ export default function SwapView() {
     setToken0(t1);
     setToken1(t0);
   }, [token0, token1]);
-
+  const { isValid, message: errorMessage } = useSwapValidation({
+    amountIn,
+    token0,
+    token1,
+    token0Balance: token0Balance.balance,
+  });
   const onSubmit = useCallback(() => {
     if (isIntrinsicWETHProcess) {
       if (isWETHToEther) {
@@ -151,18 +154,17 @@ export default function SwapView() {
       Boolean(swapSimulation?.request) ||
       Boolean(WETHProcessSimulation.depositSimulation.data) ||
       Boolean(WETHProcessSimulation.withdrawalSimulation.data) ||
-      Boolean(approveWriteRequest && needsApproval) ||
-      !!amountIn,
+      Boolean(approveWriteRequest && needsApproval),
     [
       swapSimulation?.request,
       WETHProcessSimulation.depositSimulation.data,
       WETHProcessSimulation.withdrawalSimulation.data,
       approveWriteRequest,
       needsApproval,
-      amountIn,
     ]
   );
-  if (!token0 || !token1) {
+
+  if (!token0 || !token1 || !amountIn || !isValid) {
     stateValid = false;
   }
   useEffect(() => {
@@ -207,7 +209,7 @@ export default function SwapView() {
             token={token0}
           />
           <CurrencyInput.NumberInput
-            onChangeValue={(value: string) => setAmountIn(Number(value))}
+            onChangeValue={(value: string) => setAmountIn(value)}
             disabled={false}
             decimals={10}
           />
@@ -237,6 +239,7 @@ export default function SwapView() {
         <SubmitButton
           state={buttonState}
           isValid={!!stateValid}
+          validationError={errorMessage}
           disabled={!stateValid}
           approveTokenSymbol={token0?.symbol}
           onClick={onSubmit}
