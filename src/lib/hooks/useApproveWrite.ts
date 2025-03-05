@@ -45,7 +45,6 @@ export default function useApproveWrite({
       void refetch();
     },
   });
-  console.log({ allowance });
   const needsApproval =
     (allowance ?? 0n) < parseUnits(amount, decimals) &&
     tokenAddress?.toLowerCase() !== ETHER.toLowerCase();
