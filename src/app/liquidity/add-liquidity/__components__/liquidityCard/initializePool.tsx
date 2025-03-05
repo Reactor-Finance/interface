@@ -165,17 +165,21 @@ export default function InitializePool() {
     if (txReceipt.isSuccess) {
       if (token0NeedsApproval) {
         queryClient.invalidateQueries({ queryKey: token0AllowanceKey });
+        reset();
+        return;
       }
       if (token1NeedsApproval) {
         queryClient.invalidateQueries({ queryKey: token1AllowanceKey });
+        reset();
+        return;
       }
       if (!token0NeedsApproval || !token1NeedsApproval) {
         queryClient.invalidateQueries({ queryKey: bal0Key });
         queryClient.invalidateQueries({ queryKey: bal1Key });
         setAmount0("");
         setAmount1("");
+        reset();
       }
-      reset();
     }
   }, [
     bal0Key,
@@ -285,10 +289,6 @@ export default function InitializePool() {
       amountADesired,
       amountBDesired,
     ]
-  );
-  console.log(
-    { stateValid, token0, token1, token0NeedsApproval, token1NeedsApproval },
-    "STATE VALID"
   );
   const { balance } = useGetBalance({
     tokenAddress: (pair?.id as Address) ?? zeroAddress,
