@@ -13,6 +13,7 @@ interface Props {
   stable: boolean;
   amountADesired: bigint;
   amountBDesired: bigint;
+  disabled: boolean;
 }
 
 export function useAddLiquidity({
@@ -21,6 +22,7 @@ export function useAddLiquidity({
   stable,
   amountADesired,
   amountBDesired,
+  disabled,
 }: Props) {
   const chainId = useChainId();
   const now = useAtomicDate();
@@ -69,7 +71,7 @@ export function useAddLiquidity({
     ],
     value: msgValueLiquidityETH,
     query: {
-      enabled: address !== zeroAddress,
+      enabled: address !== zeroAddress && !disabled,
     },
   });
 
@@ -89,7 +91,7 @@ export function useAddLiquidity({
       deadline,
     ],
     query: {
-      enabled: address !== zeroAddress,
+      enabled: address !== zeroAddress && !disabled,
     },
   });
 

@@ -108,7 +108,7 @@ export default function IncreaseContent({
         <h5 className="text-neutral-300 text-[13px]">
           Available:{" "}
           <span className="text-white">
-            {formatNumber(formatUnits(rctBalance, RCT_DECIMALS))} RCT
+            {formatNumber(formatUnits(rctBalance.balance, RCT_DECIMALS))} RCT
           </span>
         </h5>
       </div>

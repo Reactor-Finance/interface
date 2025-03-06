@@ -20,7 +20,7 @@ export function useSwapSimulation({
   token1,
   minAmountOut = BigInt(0),
 }: {
-  amount: number;
+  amount: string;
   token0: TToken | null;
   token1: TToken | null;
   minAmountOut?: bigint;

@@ -26,16 +26,16 @@ export default function SwapView() {
   const chainId = useChainId();
 
   // Amount in
-  const [amountIn, setAmountIn] = useState(0);
+  const [amountIn, setAmountIn] = useState("");
   // Selected tokens
   const [token0, setToken0] = useState<TToken | null>(null);
   const [token1, setToken1] = useState<TToken | null>(null);
 
   // Balances
-  const token0Balance = useGetBalance({
+  const { balance: token0Balance } = useGetBalance({
     tokenAddress: token0?.address ?? zeroAddress,
   });
-  const token1Balance = useGetBalance({
+  const { balance: token1Balance } = useGetBalance({
     tokenAddress: token1?.address ?? zeroAddress,
   });
 
@@ -69,7 +69,7 @@ export default function SwapView() {
       amount: amountIn,
       token0,
       token1,
-      minAmountOut: parseUnits(String(amountOut), token1?.decimals ?? 18),
+      minAmountOut: parseUnits(amountOut, token1?.decimals ?? 18),
     });
 
   // Simulate WETH process
@@ -134,8 +134,9 @@ export default function SwapView() {
     needsApproval,
     swapSimulation,
     isWETHToEther,
-    WETHProcessSimulation?.depositSimulation?.data?.request,
     WETHProcessSimulation?.withdrawalSimulation?.data?.request,
+    WETHProcessSimulation?.depositSimulation?.data?.request,
+    reset,
     writeContract,
   ]);
 
@@ -144,29 +145,23 @@ export default function SwapView() {
     isLoading,
     needsApproval: needsApproval && !isIntrinsicWETHProcess,
   });
-  const stateValid = useMemo(
+  let stateValid = useMemo(
     () =>
-      !!token0 &&
-      !!token1 &&
-      amountIn > 0 &&
-      isValid &&
-      (Boolean(swapSimulation?.request) ||
-        Boolean(WETHProcessSimulation.depositSimulation.data) ||
-        Boolean(WETHProcessSimulation.withdrawalSimulation.data) ||
-        Boolean(approveWriteRequest && needsApproval)),
+      Boolean(swapSimulation?.request) ||
+      Boolean(WETHProcessSimulation.depositSimulation.data) ||
+      Boolean(WETHProcessSimulation.withdrawalSimulation.data) ||
+      Boolean(approveWriteRequest && needsApproval),
     [
       swapSimulation?.request,
       WETHProcessSimulation.depositSimulation.data,
       WETHProcessSimulation.withdrawalSimulation.data,
       approveWriteRequest,
       needsApproval,
-      token0,
-      token1,
-      amountIn,
-      isValid,
     ]
   );
-
+  if (amountIn === "" || amountIn === "") {
+    stateValid = false;
+  }
   useEffect(() => {
     if (writeError) {
       console.log(writeError);
@@ -209,7 +204,7 @@ export default function SwapView() {
             token={token0}
           />
           <CurrencyInput.NumberInput
-            onChangeValue={(value: string) => setAmountIn(Number(value))}
+            onChangeValue={(value: string) => setAmountIn(value)}
             disabled={false}
             decimals={10}
           />
@@ -238,7 +233,7 @@ export default function SwapView() {
       <div className="pt-2">
         <SubmitButton
           state={buttonState}
-          isValid={!!stateValid}
+          isValid={!!stateValid && isValid}
           validationError={errorMessage}
           disabled={!stateValid}
           approveTokenSymbol={token0?.symbol}

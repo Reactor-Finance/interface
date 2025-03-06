@@ -4,7 +4,7 @@ import { parseUnits } from "viem";
 
 interface Props {
   token0Balance: bigint;
-  amountIn: number;
+  amountIn: string;
   token0: TToken | null;
   token1: TToken | null;
 }

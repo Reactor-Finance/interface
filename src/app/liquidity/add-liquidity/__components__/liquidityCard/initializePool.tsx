@@ -6,7 +6,7 @@ import { useChainId, useWriteContract } from "wagmi";
 import { useAddLiquidity } from "../../../__hooks__/useAddLiquidity";
 import SubmitButton from "@/components/shared/submitBtn";
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
-import { formatUnits, isAddress, parseUnits, zeroAddress } from "viem";
+import { Address, formatUnits, isAddress, parseUnits, zeroAddress } from "viem";
 import { z } from "zod";
 import { useSearchParams } from "next/navigation";
 import { useCheckPair } from "@/lib/hooks/useCheckPair";
@@ -16,9 +16,10 @@ import { useQuoteLiquidity } from "@/app/liquidity/__hooks__/useQuoteLiquidity";
 import { BaseError } from "@wagmi/core";
 import { useGetTokenInfo } from "@/utils";
 import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
+import { useQueryClient } from "@tanstack/react-query";
+import { api } from "@/trpc/react";
+import { useGetBalance } from "@/lib/hooks/useGetBalance";
 import AddLiquidityInfo from "./addLiquidityInfo";
-import { useGetPairInfo } from "@/lib/hooks/useGetPairInfo";
-import { formatNumber } from "@/lib/utils";
 
 const searchParamsSchema = z.object({
   token0: z.string().refine((arg) => isAddress(arg)),
@@ -29,6 +30,7 @@ const searchParamsSchema = z.object({
 export default function InitializePool() {
   // Wagmi parameters
   const chainId = useChainId();
+  const [selectedInput, setSelectedInput] = useState<"0" | "1">("0");
   // Token list
   // Search params
   const params = useSearchParams();
@@ -58,28 +60,39 @@ export default function InitializePool() {
   const token0 = useGetTokenInfo(t0 ?? "0x");
   const token1 = useGetTokenInfo(t1 ?? "0x");
 
+  const { data: pools } = api.pool.findPool.useQuery(
+    {
+      tokenOneAddress: token0?.address ?? "0x",
+      tokenTwoAddress: token1?.address ?? "0x",
+      isStable: version === "stable",
+    },
+    { enabled: Boolean(token0) && Boolean(token1) }
+  );
+
+  const pair = pools?.pairs[0];
   // Amounts
-  const [amount0, setAmount0] = useState(0);
-  const [amount1, setAmount1] = useState(0);
+  const [amount0, setAmount0] = useState("");
+  const [amount1, setAmount1] = useState("");
 
   // Router
   const router = useMemo(() => ROUTER[chainId], [chainId]);
 
   // Check if pair exists
-  const { pairExists, pair } = useCheckPair({
+  const { pairExists } = useCheckPair({
     token0: t0 ?? zeroAddress,
     token1: t1 ?? zeroAddress,
     stable: version === "stable",
   });
-  // Get pair info
-  const { pairInfo } = useGetPairInfo({ pair });
 
   // Quote liquidity
   const quoteLiquidity = useQuoteLiquidity({
-    token0: t0 ?? zeroAddress,
-    token1: t1 ?? zeroAddress,
+    token0: (selectedInput === "0" ? t0 : t1) ?? zeroAddress,
+    token1: (selectedInput === "0" ? t1 : t0) ?? zeroAddress,
     stable: version === "stable",
-    amountIn: parseUnits(String(amount0), token0?.decimals ?? 18),
+    amountIn: parseUnits(
+      selectedInput === "0" ? amount0 : amount1,
+      token0?.decimals ?? 18
+    ),
   });
 
   // Check approval required
@@ -87,6 +100,7 @@ export default function InitializePool() {
     approveWriteRequest: token0ApprovalWriteRequest,
     needsApproval: token0NeedsApproval,
     isFetching: token0ApprovalFetching,
+    allowanceKey: token0AllowanceKey,
   } = useApproveWrite({
     spender: router,
     tokenAddress: token0?.address ?? zeroAddress,
@@ -98,6 +112,7 @@ export default function InitializePool() {
     approveWriteRequest: token1ApprovalWriteRequest,
     needsApproval: token1NeedsApproval,
     isFetching: token1ApprovalFetching,
+    allowanceKey: token1AllowanceKey,
   } = useApproveWrite({
     spender: router,
     tokenAddress: token1?.address ?? zeroAddress,
@@ -122,6 +137,7 @@ export default function InitializePool() {
     addLiquiditySimulation,
     isAddLiquidityETH,
   } = useAddLiquidity({
+    disabled: token1NeedsApproval || token1NeedsApproval,
     token0: token0?.address ?? zeroAddress,
     token1: token1?.address ?? zeroAddress,
     amountADesired,
@@ -131,45 +147,103 @@ export default function InitializePool() {
 
   const {
     writeContract,
+    reset,
     isPending,
     data: hash,
     error: writeContractError,
-    reset,
   } = useWriteContract(); // We'll also call reset when transaction toast is closed
-  const {
-    txReceipt: { isLoading },
-    updateState,
-  } = useTransactionToastProvider();
+  const { txReceipt, updateState } = useTransactionToastProvider();
+
+  const { balance: balance0, balanceQueryKey: bal0Key } = useGetBalance({
+    tokenAddress: token0?.address ?? zeroAddress,
+  });
+  const { balance: balance1, balanceQueryKey: bal1Key } = useGetBalance({
+    tokenAddress: token1?.address ?? zeroAddress,
+  });
+  const queryClient = useQueryClient();
   useEffect(() => {
-    if (hash) {
-      updateState({
-        hash,
+    if (txReceipt.isSuccess) {
+      reset();
+      if (token0NeedsApproval) {
+        queryClient.invalidateQueries({ queryKey: token0AllowanceKey });
+        return;
+      }
+      if (token1NeedsApproval) {
+        queryClient.invalidateQueries({ queryKey: token1AllowanceKey });
+        return;
+      }
+      if (!token0NeedsApproval || !token1NeedsApproval) {
+        queryClient.invalidateQueries({ queryKey: bal0Key });
+        queryClient.invalidateQueries({ queryKey: bal1Key });
+        setAmount0("");
+        setAmount1("");
+      }
+    }
+  }, [
+    bal0Key,
+    bal1Key,
+    queryClient,
+    reset,
+    token0AllowanceKey,
+    token0NeedsApproval,
+    token1AllowanceKey,
+    token1NeedsApproval,
+    txReceipt.isSuccess,
+  ]);
+  useEffect(() => {
+    updateState({
+      hash,
+    });
+  }, [hash, token0NeedsApproval, token1NeedsApproval, updateState]);
+  useEffect(() => {
+    if (amount0 && amount1) {
+      console.log({
         actionTitle:
           token0NeedsApproval || token1NeedsApproval
-            ? "Approve"
-            : "Added Liquidity",
+            ? `Approved ${token0NeedsApproval ? token0?.symbol : token1?.symbol}`
+            : "Added Liquidity.",
       });
     }
-  }, [hash, token0NeedsApproval, token1NeedsApproval, updateState]);
+    if (
+      amount0 &&
+      amount1 &&
+      !token0ApprovalFetching &&
+      !token1ApprovalFetching
+    ) {
+      updateState({
+        actionTitle:
+          token0NeedsApproval || token1NeedsApproval
+            ? `Approved ${token0NeedsApproval ? token0?.symbol : token1?.symbol}`
+            : "Added Liquidity.",
+      });
+    }
+  }, [
+    amount0,
+    amount1,
+    token0?.symbol,
+    token0ApprovalFetching,
+    token0NeedsApproval,
+    token1?.symbol,
+    token1ApprovalFetching,
+    token1NeedsApproval,
+    updateState,
+  ]);
+  const { isLoading } = txReceipt;
   const onSubmit = useCallback(() => {
     if (token0NeedsApproval && token0ApprovalWriteRequest) {
-      reset();
       writeContract(token0ApprovalWriteRequest);
       return;
     }
     if (token1NeedsApproval && token1ApprovalWriteRequest) {
-      reset();
       writeContract(token1ApprovalWriteRequest);
       return;
     }
     if (isAddLiquidityETH) {
       if (addLiquidityETHSimulation.data?.request) {
-        reset();
         writeContract(addLiquidityETHSimulation.data.request);
       }
     } else {
       if (addLiquiditySimulation.data?.request) {
-        reset();
         writeContract(addLiquiditySimulation.data.request);
       }
     }
@@ -182,7 +256,6 @@ export default function InitializePool() {
     writeContract,
     addLiquidityETHSimulation,
     addLiquiditySimulation,
-    reset,
   ]);
 
   const tokenNeedingApproval = useMemo(() => {
@@ -215,14 +288,40 @@ export default function InitializePool() {
       amountBDesired,
     ]
   );
-
+  const { balance } = useGetBalance({
+    tokenAddress: (pair?.id as Address) ?? zeroAddress,
+  });
   const { state: buttonState } = useGetButtonStatuses({
     isLoading,
     isPending,
     isFetching: token0ApprovalFetching || token1ApprovalFetching,
     needsApproval: token0NeedsApproval || token1NeedsApproval,
   });
-
+  useEffect(() => {
+    if (selectedInput === "0") {
+      if (quoteLiquidity && pairExists) {
+        setAmount1(formatUnits(quoteLiquidity, token1?.decimals ?? 18));
+      }
+      if (amount0 === "" && pairExists) {
+        setAmount1("");
+      }
+    } else {
+      if (quoteLiquidity && pairExists) {
+        setAmount0(formatUnits(quoteLiquidity, token0?.decimals ?? 18));
+      }
+      if (amount1 === "" && pairExists) {
+        setAmount0("");
+      }
+    }
+  }, [
+    amount0,
+    amount1,
+    pairExists,
+    quoteLiquidity,
+    selectedInput,
+    token0?.decimals,
+    token1?.decimals,
+  ]);
   return (
     <>
       <h2 className="text-xl">
@@ -234,9 +333,11 @@ export default function InitializePool() {
             <label htmlFor="">Asset 1</label>
           </div>
           <AssetCard
+            balance={balance0}
             onValueChange={setAmount0}
             token={token0}
             value={amount0}
+            onFocus={() => setSelectedInput("0")}
           />
         </div>
       )}
@@ -246,18 +347,15 @@ export default function InitializePool() {
             <label htmlFor="">Asset 2</label>
           </div>
           <AssetCard
+            balance={balance1}
             onValueChange={setAmount1}
             token={token1}
-            value={
-              pairExists && quoteLiquidity > 0n
-                ? Number(formatUnits(quoteLiquidity, token1.decimals))
-                : amount1
-            }
-            disableInput={pairExists && quoteLiquidity > 0n}
-          />{" "}
+            value={amount1}
+            onFocus={() => setSelectedInput("1")}
+          />
         </div>
       )}
-      {!pairExists && (
+      {!pair && (
         <AddLiquidityInfo
           amount0={amount0}
           amount1={amount1}
@@ -265,7 +363,7 @@ export default function InitializePool() {
           token1={token1}
         />
       )}
-      {pairExists && !!pairInfo && (
+      {pair && (
         <>
           <div className="">
             <h5>Reserve Info</h5>
@@ -274,39 +372,19 @@ export default function InitializePool() {
               <div className="flex text-neutral-300 text-sm justify-between">
                 <span>{token0?.symbol} Amount</span>
                 <span>
-                  {pairInfo.token0.toLowerCase() ===
-                  token0?.address.toLowerCase()
-                    ? formatNumber(
-                        formatUnits(
-                          pairInfo.reserve0,
-                          Number(pairInfo.token0_decimals)
-                        )
-                      )
-                    : formatNumber(
-                        formatUnits(
-                          pairInfo.reserve1,
-                          Number(pairInfo.token1_decimals)
-                        )
-                      )}
+                  {formatUnits(
+                    parseUnits(pair.token0.totalSupply ?? "0", 0),
+                    Number(pair.token0.decimals)
+                  )}
                 </span>
               </div>
               <div className="flex text-neutral-300 text-sm justify-between">
                 <span>{token1?.symbol} Amount</span>
                 <span>
-                  {pairInfo.token1.toLowerCase() ===
-                  token1?.address.toLowerCase()
-                    ? formatNumber(
-                        formatUnits(
-                          pairInfo.reserve1,
-                          Number(pairInfo.token1_decimals)
-                        )
-                      )
-                    : formatNumber(
-                        formatUnits(
-                          pairInfo.reserve0,
-                          Number(pairInfo.token0_decimals)
-                        )
-                      )}
+                  {formatUnits(
+                    parseUnits(pair.token0.totalSupply ?? "0", 0),
+                    Number(pair.token1.decimals)
+                  )}
                 </span>
               </div>
             </div>
@@ -316,9 +394,7 @@ export default function InitializePool() {
 
             <div className="flex pt-1 text-neutral-300 text-sm justify-between">
               <span>Amount</span>
-              <span>
-                {formatNumber(formatUnits(pairInfo.account_lp_balance, 18))} lp
-              </span>
+              <span>{formatUnits(balance, 18)} lp</span>
             </div>
           </div>
         </>
