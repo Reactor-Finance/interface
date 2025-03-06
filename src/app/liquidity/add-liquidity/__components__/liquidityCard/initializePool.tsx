@@ -163,17 +163,21 @@ export default function InitializePool() {
   const queryClient = useQueryClient();
   useEffect(() => {
     if (txReceipt.isSuccess) {
+      reset();
       if (token0NeedsApproval) {
         queryClient.invalidateQueries({ queryKey: token0AllowanceKey });
+        return;
       }
       if (token1NeedsApproval) {
         queryClient.invalidateQueries({ queryKey: token1AllowanceKey });
+        return;
       }
       if (!token0NeedsApproval || !token1NeedsApproval) {
         queryClient.invalidateQueries({ queryKey: bal0Key });
         queryClient.invalidateQueries({ queryKey: bal1Key });
+        setAmount0("");
+        setAmount1("");
       }
-      reset();
     }
   }, [
     bal0Key,
