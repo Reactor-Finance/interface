@@ -29,7 +29,7 @@ export default function IncreaseContent({
   const rct = React.useMemo(() => RCT[chainId], [chainId]); // RCT
   const ve = React.useMemo(() => VE[chainId], [chainId]); // Escrow
   const [amount, setAmount] = React.useState(0);
-  const { balance: rctBalance } = useGetBalance({ tokenAddress: rct });
+  const rctBalance = useGetBalance({ tokenAddress: rct });
   const { writeContract, reset, data: hash, isPending } = useWriteContract();
   const { isLoading } = useWaitForTransactionReceipt({
     hash,
@@ -108,7 +108,7 @@ export default function IncreaseContent({
         <h5 className="text-neutral-300 text-[13px]">
           Available:{" "}
           <span className="text-white">
-            {formatNumber(formatUnits(rctBalance, RCT_DECIMALS))} RCT
+            {formatNumber(formatUnits(rctBalance.balance, RCT_DECIMALS))} RCT
           </span>
         </h5>
       </div>

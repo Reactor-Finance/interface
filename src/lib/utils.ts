@@ -85,7 +85,10 @@ export function formatNumber(number: number | string, decimals = 3): string {
 
   return n.toString();
 }
-
+/**
+ * inputPatternMatch
+ * Ensures value is a number
+ */
 export function inputPatternMatch(s: string, decimals = 18) {
   const pattern = /^[0-9]*[.,]?[0-9]*$/;
   const decimalPattern = RegExp(`^\\d+(\\.\\d{0,${decimals}})?$`);

@@ -4,7 +4,6 @@ import AssetSymbolAndName from "./assetSymbolAndName";
 import { formatUnits } from "viem";
 import { TToken } from "@/lib/types";
 import Input from "@/components/ui/input";
-
 import { formatNumber, inputPatternMatch } from "@/lib/utils";
 
 interface Props {
@@ -12,8 +11,8 @@ interface Props {
   onValueChange: (value: string) => void;
   value: string;
   disableInput?: boolean;
-  balance: bigint;
   onFocus?: () => void;
+  balance: bigint;
 }
 
 export default function AssetCard({
@@ -21,8 +20,8 @@ export default function AssetCard({
   onValueChange,
   value,
   disableInput,
-  balance,
   onFocus,
+  balance,
 }: Props) {
   const formattedBalance = useMemo(
     () => formatNumber(formatUnits(balance, token.decimals)),
@@ -40,9 +39,9 @@ export default function AssetCard({
             value={value}
             disabled={disableInput}
             onChange={(s) => {
-              // Add this check to prevent NaN errors
-              if (inputPatternMatch(s.target.value)) {
-                onValueChange(s.target.value);
+              const value = s.target.value;
+              if (inputPatternMatch(value)) {
+                onValueChange(value);
               }
             }}
           />

@@ -154,10 +154,10 @@ export default function InitializePool() {
   } = useWriteContract(); // We'll also call reset when transaction toast is closed
   const { txReceipt, updateState } = useTransactionToastProvider();
 
-  const { balance: balance0, queryKey: bal0Key } = useGetBalance({
+  const { balance: balance0, balanceQueryKey: bal0Key } = useGetBalance({
     tokenAddress: token0?.address ?? zeroAddress,
   });
-  const { balance: balance1, queryKey: bal1Key } = useGetBalance({
+  const { balance: balance1, balanceQueryKey: bal1Key } = useGetBalance({
     tokenAddress: token1?.address ?? zeroAddress,
   });
   const queryClient = useQueryClient();
@@ -165,21 +165,15 @@ export default function InitializePool() {
     if (txReceipt.isSuccess) {
       if (token0NeedsApproval) {
         queryClient.invalidateQueries({ queryKey: token0AllowanceKey });
-        reset();
-        return;
       }
       if (token1NeedsApproval) {
         queryClient.invalidateQueries({ queryKey: token1AllowanceKey });
-        reset();
-        return;
       }
       if (!token0NeedsApproval || !token1NeedsApproval) {
         queryClient.invalidateQueries({ queryKey: bal0Key });
         queryClient.invalidateQueries({ queryKey: bal1Key });
-        setAmount0("");
-        setAmount1("");
-        reset();
       }
+      reset();
     }
   }, [
     bal0Key,
@@ -335,9 +329,9 @@ export default function InitializePool() {
             <label htmlFor="">Asset 1</label>
           </div>
           <AssetCard
+            balance={balance0}
             onValueChange={setAmount0}
             token={token0}
-            balance={balance0}
             value={amount0}
             onFocus={() => setSelectedInput("0")}
           />
@@ -349,8 +343,8 @@ export default function InitializePool() {
             <label htmlFor="">Asset 2</label>
           </div>
           <AssetCard
-            onValueChange={setAmount1}
             balance={balance1}
+            onValueChange={setAmount1}
             token={token1}
             value={amount1}
             onFocus={() => setSelectedInput("1")}
@@ -361,8 +355,8 @@ export default function InitializePool() {
         <AddLiquidityInfo
           amount0={amount0}
           amount1={amount1}
-          token0Symbol={token0?.symbol}
-          token1Symbol={token1?.symbol}
+          token0={token0}
+          token1={token1}
         />
       )}
       {pair && (

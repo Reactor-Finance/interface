@@ -1,4 +1,4 @@
-export const GauageAbi = [
+export const abi = [
   {
     inputs: [
       {

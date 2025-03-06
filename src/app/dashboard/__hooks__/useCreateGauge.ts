@@ -1,49 +1,22 @@
-import {
-  useChainId,
-  useSimulateContract,
-  useWaitForTransactionReceipt,
-  useWriteContract,
-} from "wagmi";
-import { useDashboardLiquidityProvider } from "../__context__/dashboardLiquidityProvider";
-import { abi } from "@/lib/abis/Voter";
+import { useChainId, useSimulateContract } from "wagmi";
 import { VOTER } from "@/data/constants";
-import { FormAction } from "../types";
-import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
 import { Address } from "viem";
-import { useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
+import * as Voter from "@/lib/abis/Voter";
 
-export default function useCreateGauge(): FormAction {
-  const { selectedUserLiquidityPosition } = useDashboardLiquidityProvider();
-
+export function useCreateGauge({ pair }: { pair: Address }) {
   const chainId = useChainId();
-  const pairAddress = selectedUserLiquidityPosition?.pair.id
-    ? (selectedUserLiquidityPosition?.pair.id as Address)
-    : "0x";
-  const { data, error, queryKey } = useSimulateContract({
-    abi,
-    address: VOTER[chainId],
+  const voter = useMemo(() => VOTER[chainId], [chainId]);
+  const { data, error } = useSimulateContract({
+    ...Voter,
+    address: voter,
     functionName: "createGauge",
-    args: [pairAddress, 0n],
+    args: [pair, 0n],
   });
-  console.log({ data, error });
-  const { writeContract, reset, data: hash, isPending } = useWriteContract();
-  const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash });
-  const onSubmit = () => {
-    if (data?.request) writeContract(data?.request);
-  };
-  const queryClient = useQueryClient();
+
   useEffect(() => {
-    if (isSuccess) {
-      reset();
-      queryClient.invalidateQueries({ queryKey });
-    }
-  }, [isSuccess, queryClient, queryKey, reset]);
-  const { state } = useGetButtonStatuses({ isPending, isLoading });
-  return {
-    isValid: !!data?.request,
-    onSubmit,
-    buttonProps: { state },
-    errorMessage: error?.name ?? null,
-  };
+    if (error) console.error(error);
+  }, [error]);
+
+  return { simulation: data?.request };
 }

@@ -5,6 +5,7 @@ import { ETHER, ROUTER } from "@/data/constants";
 import * as Router from "@/lib/abis/Router";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
+import { useAtomicDate } from "@/lib/hooks/useAtomicDate";
 
 interface Props {
   token0: `0x${string}`;
@@ -24,6 +25,7 @@ export function useAddLiquidity({
   disabled,
 }: Props) {
   const chainId = useChainId();
+  const now = useAtomicDate();
   const { address = zeroAddress } = useAccount();
   const { transactionDeadlineInMinutes } = useSelector(
     (root: RootState) => root.settings
@@ -50,15 +52,10 @@ export function useAddLiquidity({
 
   const deadline = useMemo(() => {
     const ttl =
-      Math.floor(Date.now() / 1000) + transactionDeadlineInMinutes * 60;
-    return () => BigInt(ttl);
-  }, [transactionDeadlineInMinutes]);
-  const isAddLiquidityETH = useMemo(
-    () =>
-      token0.toLowerCase() === ETHER.toLowerCase() ||
-      token1.toLowerCase() === ETHER.toLowerCase(),
-    [token0, token1]
-  );
+      Math.floor(now.getTime() / 1000) + transactionDeadlineInMinutes * 60;
+    return BigInt(ttl);
+  }, [now, transactionDeadlineInMinutes]);
+
   const addLiquidityETHSimulation = useSimulateContract({
     ...Router,
     address: router,
@@ -70,11 +67,11 @@ export function useAddLiquidity({
       BigInt(0),
       BigInt(0),
       address,
-      deadline(),
+      deadline,
     ],
     value: msgValueLiquidityETH,
     query: {
-      enabled: address !== zeroAddress && isAddLiquidityETH && !disabled,
+      enabled: address !== zeroAddress && !disabled,
     },
   });
 
@@ -91,12 +88,19 @@ export function useAddLiquidity({
       BigInt(0),
       BigInt(0),
       address,
-      deadline(),
+      deadline,
     ],
     query: {
-      enabled: address !== zeroAddress && !isAddLiquidityETH && !disabled,
+      enabled: address !== zeroAddress && !disabled,
     },
   });
+
+  const isAddLiquidityETH = useMemo(
+    () =>
+      token0.toLowerCase() === ETHER.toLowerCase() ||
+      token1.toLowerCase() === ETHER.toLowerCase(),
+    [token0, token1]
+  );
 
   useEffect(() => {
     if (addLiquidityETHSimulation.data || addLiquidityETHSimulation.error) {
@@ -107,7 +111,7 @@ export function useAddLiquidity({
 
   useEffect(() => {
     if (addLiquiditySimulation.data || addLiquiditySimulation.error) {
-      console.log(addLiquiditySimulation.error);
+      console.error(addLiquiditySimulation.error);
       console.log(addLiquiditySimulation.data);
     }
   }, [addLiquiditySimulation]);
