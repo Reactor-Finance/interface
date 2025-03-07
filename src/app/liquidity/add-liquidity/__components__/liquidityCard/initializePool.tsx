@@ -13,7 +13,6 @@ import { useCheckPair } from "@/lib/hooks/useCheckPair";
 import useApproveWrite from "@/lib/hooks/useApproveWrite";
 import { ROUTER } from "@/data/constants";
 import { useQuoteLiquidity } from "@/app/liquidity/__hooks__/useQuoteLiquidity";
-import { BaseError } from "@wagmi/core";
 import { useGetTokenInfo } from "@/utils";
 import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
 import { useQueryClient } from "@tanstack/react-query";
@@ -394,7 +393,7 @@ export default function InitializePool() {
 
             <div className="flex pt-1 text-neutral-300 text-sm justify-between">
               <span>Amount</span>
-              <span>{formatUnits(balance, 18)} lp</span>
+              <span>{formatUnits(balance ?? 0n, 18)} lp</span>
             </div>
           </div>
         </>
@@ -408,10 +407,7 @@ export default function InitializePool() {
         Add Liquidity
       </SubmitButton>
       {writeContractError && (
-        <span className="text-[13px] text-red-400 pt-3 text-center">
-          {(writeContractError as BaseError).shortMessage ||
-            writeContractError.message}
-        </span>
+        <span className="text-[13px] text-red-400 pt-3 text-center"></span>
       )}
     </>
   );

@@ -28,7 +28,7 @@ export default function LiquidityCard() {
           token1: undefined,
         };
   }, [params]);
-
+  console.log("HELLO");
   return !token0 || !token1 ? undefined : (
     <Card border="900" bg="1000" className="p-4 space-y-4 w-[440px] rounded-md">
       <InitializePool />
