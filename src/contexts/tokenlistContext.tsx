@@ -2,13 +2,7 @@
 
 import { TToken } from "@/lib/types";
 import { api } from "@/trpc/react";
-import React, {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import React, { createContext, ReactNode, useContext, useState } from "react";
 import { useChainId } from "wagmi";
 
 interface TokenlistContextType {
@@ -26,15 +20,15 @@ const TokenlistContext = createContext<TokenlistContextType>({
   setSearchQuery: console.log,
   searchQuery: "",
 });
-
-function useSetInterval(cb: () => void, INTERVAL = 60000) {
-  return useEffect(() => {
-    const interval = setInterval(cb, INTERVAL);
-    return () => {
-      clearInterval(interval);
-    };
-  }, [INTERVAL, cb]);
-}
+// no reason to refetch this will change infrequently
+// function useSetInterval(cb: () => void, INTERVAL = 60000) {
+//   return useEffect(() => {
+//     const interval = setInterval(cb, INTERVAL);
+//     return () => {
+//       clearInterval(interval);
+//     };
+//   }, [INTERVAL, cb]);
+// }
 
 export const TokenlistContextProvider: React.FC<{ children: ReactNode }> = ({
   children,
@@ -45,11 +39,7 @@ export const TokenlistContextProvider: React.FC<{ children: ReactNode }> = ({
     data: tokenlist = [],
     isLoading: loading,
     error,
-    refetch,
   } = api.tokens.getTokens.useQuery({ chainId, searchQuery });
-  useSetInterval(() => {
-    void refetch();
-  });
   return (
     <TokenlistContext.Provider
       value={{
