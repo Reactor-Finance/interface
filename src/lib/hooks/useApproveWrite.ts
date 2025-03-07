@@ -1,5 +1,5 @@
 import { Address, erc20Abi, maxUint256, parseUnits } from "viem";
-import { useSimulateContract, useWatchBlocks } from "wagmi";
+import { useSimulateContract } from "wagmi";
 import useGetAllowance from "./useGetAllowance";
 import { ETHER } from "@/data/constants";
 
@@ -28,7 +28,6 @@ export default function useApproveWrite({
     data: allowance,
     queryKey,
     isLoading,
-    refetch,
   } = useGetAllowance({
     tokenAddress,
     spender,
@@ -40,11 +39,11 @@ export default function useApproveWrite({
     args: [spender, maxUint256],
   });
 
-  useWatchBlocks({
-    onBlock: () => {
-      void refetch();
-    },
-  });
+  // useWatchBlocks({
+  //   onBlock: () => {
+  //     void refetch();
+  //   },
+  // });
   const needsApproval =
     (allowance ?? 0n) < parseUnits(amount, decimals) &&
     tokenAddress?.toLowerCase() !== ETHER.toLowerCase();

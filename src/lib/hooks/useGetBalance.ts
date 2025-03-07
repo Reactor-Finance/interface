@@ -3,25 +3,25 @@ import { useAccount, useBalance, useReadContract } from "wagmi";
 
 export function useGetBalance({
   tokenAddress,
-  enabled,
+  disabled,
 }: {
   tokenAddress: `0x${string}` | undefined;
-  enabled?: boolean;
+  disabled?: boolean;
 }) {
   const { address } = useAccount();
   const { data: etherData = { value: BigInt(0) }, queryKey: ethKey } =
     useBalance({
       address,
-      query: { enabled: !!enabled },
+      query: { enabled: !disabled },
     });
-  const { data: balance = BigInt(0), queryKey } = useReadContract({
+
+  const { data: balance, queryKey } = useReadContract({
     address: tokenAddress,
     abi: erc20Abi,
     functionName: "balanceOf",
     args: [address ?? zeroAddress],
-    query: { enabled: !!enabled },
+    query: { enabled: !disabled },
   });
-
   return {
     balance,
     balanceQueryKey: queryKey,
