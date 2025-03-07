@@ -138,7 +138,8 @@ export default function InitializePool() {
   } = useAddLiquidity({
     disabled:
       token1NeedsApproval ||
-      (token1NeedsApproval && (amount0 === "" || amount1 === "")),
+      token1NeedsApproval ||
+      (amount0 === "" && amount1 === ""),
     token0: token0?.address ?? zeroAddress,
     token1: token1?.address ?? zeroAddress,
     amountADesired,
