@@ -121,7 +121,7 @@ export default function InitializePool() {
 
   // Amounts parsed
   const amountADesired = useMemo(
-    () => parseUnits(String(amount0), token0?.decimals ?? 18),
+    () => parseUnits(amount0, token0?.decimals ?? 18),
     [amount0, token0]
   );
   const amountBDesired = useMemo(
@@ -136,7 +136,9 @@ export default function InitializePool() {
     addLiquiditySimulation,
     isAddLiquidityETH,
   } = useAddLiquidity({
-    disabled: token1NeedsApproval || token1NeedsApproval,
+    disabled:
+      token1NeedsApproval ||
+      (token1NeedsApproval && (amount0 === "" || amount1 === "")),
     token0: token0?.address ?? zeroAddress,
     token1: token1?.address ?? zeroAddress,
     amountADesired,
