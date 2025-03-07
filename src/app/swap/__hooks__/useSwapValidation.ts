@@ -22,7 +22,7 @@ export default function useSwapValidation({
     if (token0Balance < parseUnits(String(amountIn), token0?.decimals ?? 18)) {
       return { isValid: false, message: ErrorMessage.INSUFFICIENT_BALANCE };
     }
-    return { isValid: false, message: null };
+    return { isValid: true, message: null };
   }, [amountIn, token0, token0Balance, token1]);
   return { isValid, message };
 }
