@@ -1,6 +1,6 @@
 import { PAIR_HELPER } from "@/data/constants";
 import { useMemo } from "react";
-import { useAccount, useChainId, useReadContract, useWatchBlocks } from "wagmi";
+import { useAccount, useChainId, useReadContract } from "wagmi";
 import * as PairHelper from "@/lib/abis/PairHelper";
 import { zeroAddress } from "viem";
 
@@ -14,18 +14,18 @@ export function useGetPairs({
   const chainId = useChainId();
   const { address = zeroAddress } = useAccount();
   const pairHelper = useMemo(() => PAIR_HELPER[chainId], [chainId]);
-  const { data = [], refetch } = useReadContract({
+  const { data = [] } = useReadContract({
     ...PairHelper,
     address: pairHelper,
     functionName: "getAllPair",
     args: [address, limit, offset],
   });
 
-  useWatchBlocks({
-    onBlock: () => {
-      void refetch();
-    },
-  });
+  // useWatchBlocks({
+  //   onBlock: () => {
+  //     void refetch();
+  //   },
+  // });
 
   return data;
 }

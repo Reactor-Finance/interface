@@ -12,7 +12,7 @@ interface Props {
   value: string;
   disableInput?: boolean;
   onFocus?: () => void;
-  balance: bigint;
+  balance: bigint | undefined;
 }
 
 export default function AssetCard({
@@ -24,9 +24,10 @@ export default function AssetCard({
   balance,
 }: Props) {
   const formattedBalance = useMemo(
-    () => formatNumber(formatUnits(balance, token.decimals)),
+    () => formatNumber(formatUnits(balance ?? 0n, token.decimals)),
     [balance, token.decimals]
   );
+  console.log(formattedBalance);
   return (
     <Card border="900" className="py-3 rounded-md px-4 space-y-2">
       <div className="flex justify-between">
@@ -53,7 +54,9 @@ export default function AssetCard({
         <div className="flex gap-x-1">
           <div>{formattedBalance} </div>
           <button
-            onClick={() => onValueChange(formatUnits(balance, token.decimals))}
+            onClick={() =>
+              onValueChange(formatUnits(balance ?? 0n, token.decimals))
+            }
             aria-label="Set Max Balance"
             className="text-primary-400"
           >

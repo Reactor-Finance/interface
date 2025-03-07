@@ -55,7 +55,7 @@ export function useAddLiquidity({
       Math.floor(now.getTime() / 1000) + transactionDeadlineInMinutes * 60;
     return BigInt(ttl);
   }, [now, transactionDeadlineInMinutes]);
-
+  console.log(amountADesired, amountBDesired, "AMOUNTS", disabled);
   const addLiquidityETHSimulation = useSimulateContract({
     ...Router,
     address: router,
@@ -111,7 +111,9 @@ export function useAddLiquidity({
 
   useEffect(() => {
     if (addLiquiditySimulation.data || addLiquiditySimulation.error) {
-      console.error(addLiquiditySimulation.error);
+      if (addLiquiditySimulation.error)
+        console.error(addLiquiditySimulation.error);
+
       console.log(addLiquiditySimulation.data);
     }
   }, [addLiquiditySimulation]);
