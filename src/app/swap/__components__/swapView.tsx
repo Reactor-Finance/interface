@@ -4,11 +4,7 @@ import SwapIconBorder from "@/components/shared/swapIconBorder";
 import TokensDialog from "@/components/shared/tokensDialog";
 import CurrencyInput from "@/components/shared/currencyInput";
 import useApproveWrite from "@/lib/hooks/useApproveWrite";
-import {
-  useChainId,
-  useWaitForTransactionReceipt,
-  useWriteContract,
-} from "wagmi";
+import { useChainId, useWriteContract } from "wagmi";
 import { useSwapSimulation } from "../__hooks__/useSwapSimulation";
 import SubmitButton from "@/components/shared/submitBtn";
 import { useQuoteSwap } from "../__hooks__/useQuoteSwap";
@@ -20,6 +16,7 @@ import { useWETHExecutions } from "../__hooks__/useWETHExecutions";
 import { useGetBalance } from "@/lib/hooks/useGetBalance";
 import { formatNumber } from "@/lib/utils";
 import useSwapValidation from "../__hooks__/useSwapValidation";
+import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
 
 export default function SwapView() {
   // Wagmi parameters
@@ -87,7 +84,17 @@ export default function SwapView() {
     error: writeError,
     reset,
   } = useWriteContract();
-  const { isLoading } = useWaitForTransactionReceipt({ hash });
+  const { txReceipt, updateState } = useTransactionToastProvider({});
+  useEffect(() => {
+    updateState({ hash });
+  }, [hash, updateState]);
+  useEffect(() => {
+    if (txReceipt.isSuccess) {
+      reset();
+      setAmountIn("");
+    }
+  }, [reset, txReceipt.isSuccess]);
+  const { isLoading } = txReceipt;
   const switchTokens = useCallback(() => {
     const t0 = token0;
     const t1 = token1;
@@ -162,6 +169,7 @@ export default function SwapView() {
   if (amountIn === "" || amountIn === "") {
     stateValid = false;
   }
+  console.log({ stateValid });
   useEffect(() => {
     if (writeError) {
       console.log(writeError);
@@ -205,6 +213,7 @@ export default function SwapView() {
           />
           <CurrencyInput.NumberInput
             onChangeValue={(value: string) => setAmountIn(value)}
+            value={amountIn}
             disabled={false}
             decimals={10}
           />
@@ -233,7 +242,7 @@ export default function SwapView() {
       <div className="pt-2">
         <SubmitButton
           state={buttonState}
-          isValid={!!stateValid && isValid}
+          isValid={stateValid && isValid}
           validationError={errorMessage}
           disabled={!stateValid}
           approveTokenSymbol={token0?.symbol}
