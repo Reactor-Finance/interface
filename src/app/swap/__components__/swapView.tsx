@@ -20,6 +20,7 @@ import { useWETHExecutions } from "../__hooks__/useWETHExecutions";
 import { useGetBalance } from "@/lib/hooks/useGetBalance";
 import { formatNumber } from "@/lib/utils";
 import useSwapValidation from "../__hooks__/useSwapValidation";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function SwapView() {
   // Wagmi parameters
@@ -32,12 +33,16 @@ export default function SwapView() {
   const [token1, setToken1] = useState<TToken | null>(null);
 
   // Balances
-  const { balance: token0Balance } = useGetBalance({
-    tokenAddress: token0?.address ?? zeroAddress,
-  });
-  const { balance: token1Balance } = useGetBalance({
-    tokenAddress: token1?.address ?? zeroAddress,
-  });
+  const { balance: token0Balance, queryKey: token0BalanceQueryKey } =
+    useGetBalance({
+      tokenAddress: token0?.address ?? zeroAddress,
+      enabled: true,
+    });
+  const { balance: token1Balance, queryKey: token1BalanceQueryKey } =
+    useGetBalance({
+      tokenAddress: token1?.address ?? zeroAddress,
+      enabled: true,
+    });
 
   // Modal state
   const [firstDialogOpen, setFirstDialogOpen] = useState(false);
@@ -87,7 +92,7 @@ export default function SwapView() {
     error: writeError,
     reset,
   } = useWriteContract();
-  const { isLoading } = useWaitForTransactionReceipt({ hash });
+  const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash });
   const switchTokens = useCallback(() => {
     const t0 = token0;
     const t1 = token1;
@@ -147,10 +152,11 @@ export default function SwapView() {
   });
   let stateValid = useMemo(
     () =>
-      Boolean(swapSimulation?.request) ||
-      Boolean(WETHProcessSimulation.depositSimulation.data) ||
-      Boolean(WETHProcessSimulation.withdrawalSimulation.data) ||
-      Boolean(approveWriteRequest && needsApproval),
+      (Boolean(swapSimulation?.request) ||
+        Boolean(WETHProcessSimulation.depositSimulation.data) ||
+        Boolean(WETHProcessSimulation.withdrawalSimulation.data) ||
+        Boolean(approveWriteRequest && needsApproval)) &&
+      !isNaN(Number(amountIn)),
     [
       swapSimulation?.request,
       WETHProcessSimulation.depositSimulation.data,
@@ -159,18 +165,15 @@ export default function SwapView() {
       needsApproval,
     ]
   );
-  if (amountIn === "" || amountIn === "") {
-    stateValid = false;
-  }
-  useEffect(() => {
-    if (writeError) {
-      console.log(writeError);
-    }
 
-    if (swapSimulationError) {
-      console.log(swapSimulationError);
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (isSuccess) {
+      queryClient.invalidateQueries({ queryKey: token0BalanceQueryKey });
+      queryClient.invalidateQueries({ queryKey: token1BalanceQueryKey });
     }
-  }, [writeError, swapSimulationError]);
+  }, [isSuccess, queryClient, token0BalanceQueryKey, token1BalanceQueryKey]);
 
   return (
     <div className="relative space-y-2">

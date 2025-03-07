@@ -228,7 +228,10 @@ export default function DashboardLiquidityDialog({
                 setSliderValue(value);
 
                 const calc =
-                  (BigInt(value) * pairInfo.account_lp_balance) / 100n;
+                  state.actionType === LiquidityActions.Stake ||
+                  state.actionType === LiquidityActions.Withdraw
+                    ? (BigInt(value) * pairInfo.account_lp_balance) / 100n
+                    : (BigInt(value) * pairInfo.account_gauge_balance) / 100n;
                 setAmount(calc);
               }}
               min={0}

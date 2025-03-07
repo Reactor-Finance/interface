@@ -10,12 +10,47 @@ import { useGetTokenInfo } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useGetPairs } from "@/lib/hooks/useGetPairs";
 import { LiquidityActions } from "../types";
-import { useCallback, useMemo } from "react";
+import { Fragment, useCallback, useMemo } from "react";
 import { useGetMarketQuote } from "@/lib/hooks/useGetMarketQuote";
 import { formatNumber } from "@/lib/utils";
-import { formatEther, formatUnits } from "viem";
+import { Address, formatEther, formatUnits } from "viem";
+import { useGetPairBribe } from "@/lib/hooks/useGetPairBribe";
+import ImageWithFallback from "@/components/shared/imageWithFallback";
 
 type ElementType<T extends readonly object[]> = T[number];
+
+function RangeColumn({ pair }: { pair: Address }) {
+  const pairBribes = useGetPairBribe({ pair, limit: 10n });
+  return (
+    <td className="flex flex-col gap-y-2 justify-center items-center">
+      {pairBribes.map((pairBribe, index0) => (
+        <Fragment key={index0}>
+          {pairBribe.bribes.map((bribe, index1) => {
+            const tokenInfo = useGetTokenInfo(bribe.token);
+            const { quote: marketQuote } = useGetMarketQuote({
+              tokenAddress: bribe.token,
+              value: bribe.amount,
+            });
+            return (
+              <div
+                key={index1}
+                className="flex justify-start gap-x-1 w-full items-start"
+              >
+                <ImageWithFallback
+                  src={tokenInfo?.logoURI ?? ""}
+                  alt={tokenInfo?.symbol ?? ""}
+                />
+                <span className="text-sm">
+                  ${formatNumber(formatEther(marketQuote[0]))}
+                </span>
+              </div>
+            );
+          })}
+        </Fragment>
+      ))}
+    </td>
+  );
+}
 
 export function LiquidityRow({
   pairInfo: {
@@ -27,6 +62,7 @@ export function LiquidityRow({
     emissions,
     account_gauge_earned,
     emissions_token,
+    pair_address,
   },
   onItemClick,
 }: {
@@ -70,7 +106,7 @@ export function LiquidityRow({
   );
 
   return (
-    <tr className="grid text-center rounded-sm grid-cols-7 items-center bg-neutral-1000 py-2 px-6">
+    <tr className="text-center rounded-sm bg-neutral-1000 py-2 px-6 w-full">
       <td className="bg-neutral-1000 text-left col-span-2">
         <div className="flex items-center justify-start gap-4">
           <PoolHeader
@@ -82,21 +118,26 @@ export function LiquidityRow({
       </td>
       <td className="flex flex-col gap-y-2 justify-center items-center">
         <Badge
-          className="inline-block px-1 py-1 w-full"
+          className="inline-block px-4 py-1 text-center"
           border="none"
           colors={isInRange ? "success" : "error"}
           size="sm"
         >
           {isInRange ? "In Range" : "Out Of Range"}
         </Badge>
-        <div className="flex items-center gap-1">
-          <Dot color={isInRange ? "#4ade80" : "#f87171"} width={8} height={8} />
+        <div className="flex items-center justify-center gap-1">
+          <Dot
+            color={isInRange ? "#4ade80" : "#f87171"}
+            width={22}
+            height={22}
+          />
           <span className="text-[10px] leading-[16px]">
             {isInRange ? "Earning emissions" : "Not earning emissions"}
           </span>
         </div>
       </td>
       <td className="text-sm">${totalMarketQuote}</td>
+      <RangeColumn pair={pair_address} />
       <td className="text-blue-light text-sm">{formatEther(emissions)}%</td>
       <td className="flex flex-col items-center justify-center">
         <div className="flex items-center gap-[9px]">
