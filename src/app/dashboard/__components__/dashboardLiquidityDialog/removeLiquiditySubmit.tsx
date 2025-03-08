@@ -9,7 +9,7 @@ import { SimulateContractReturnType } from "@wagmi/core";
 interface Props {
   pairInfo: TPair;
   amount: bigint;
-  resetSlider: () => void;
+  closeModal: () => void;
   balanceQueryKey: readonly unknown[];
 }
 
@@ -17,7 +17,7 @@ type SimulateReturnType = SimulateContractReturnType["request"] | undefined;
 export default function RemoveLiquiditySubmit({
   pairInfo,
   amount,
-  resetSlider,
+  closeModal,
   balanceQueryKey,
 }: Props) {
   const chainId = useChainId();
@@ -36,8 +36,8 @@ export default function RemoveLiquiditySubmit({
   const removeLiquidity = useRemoveLiquidity({
     token0: pairInfo.token0,
     token1: pairInfo.token1,
+    closeModal,
     amount,
-    resetSlider,
     isStable: pairInfo.stable,
     pairQueryKey: pairInfo.queryKey,
     balanceQueryKey: balanceQueryKey,
