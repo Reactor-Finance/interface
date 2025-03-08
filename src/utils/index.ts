@@ -3,6 +3,7 @@ import { useMemo } from "react";
 
 export function useGetTokenInfo(address: string | undefined) {
   const { tokenlist } = useTokenlistContext();
+  console.log(tokenlist, "tokenlist", { address });
   return useMemo(
     () =>
       tokenlist.find(

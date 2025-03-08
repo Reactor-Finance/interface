@@ -23,7 +23,7 @@ export default function TokensDailog({
   onTokenSelected: (token: TToken) => void;
   selectedTokens: `0x${string}`[];
 }) {
-  const { tokenlist, setSearchQuery, searchQuery } = useTokenlistContext();
+  const { filteredList, setSearchQuery, searchQuery } = useTokenlistContext();
 
   return (
     <Dialog open={open} onOpenChange={onOpen}>
@@ -39,10 +39,10 @@ export default function TokensDailog({
           </div>
           <div className="relative z-0 h-[calc(100%-179px)] border-t border-gray-600  ">
             <h2 className="py-3 font-geistMono text-[14px] text-[#999999] pl-6">
-              Tokens ({tokenlist.length})
+              Tokens ({filteredList.length})
             </h2>
             <div className=" h-[calc(100%-22px)] space-y-2 scrollbar overflow-y-auto pb-2 px-2">
-              {tokenlist
+              {filteredList
                 .filter((token) => !selectedTokens.includes(token.address))
                 .map((token) => {
                   return (
