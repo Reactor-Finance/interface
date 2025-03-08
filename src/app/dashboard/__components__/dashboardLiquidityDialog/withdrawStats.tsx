@@ -21,7 +21,11 @@ export default function WithdrawStats({
   pairInfo,
 }: Props) {
   const chainId = useChainId();
-  const { data, isLoading: quoteLoading } = useReadContract({
+  const {
+    data,
+    isLoading: quoteLoading,
+    queryKey,
+  } = useReadContract({
     abi,
     address: ROUTER[chainId],
     functionName: "quoteRemoveLiquidity",
@@ -32,6 +36,7 @@ export default function WithdrawStats({
       amount,
     ],
   });
+  console.log({ queryKey }, "quoteRemoveLiq queryKey!!");
   const isLoading = usePadLoading({ value: quoteLoading, duration: 400 });
   if (!token0 || !token1) return;
   return (

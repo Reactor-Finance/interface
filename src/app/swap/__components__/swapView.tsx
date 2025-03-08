@@ -108,6 +108,7 @@ export default function SwapView() {
     token1,
     token0Balance,
   });
+  console.log(approveWriteRequest, swapSimulation);
   const onSubmit = useCallback(() => {
     if (isIntrinsicWETHProcess) {
       if (isWETHToEther) {
@@ -166,6 +167,7 @@ export default function SwapView() {
       needsApproval,
     ]
   );
+  console.log();
   if (amountIn === "" || amountIn === "") {
     stateValid = false;
   }
