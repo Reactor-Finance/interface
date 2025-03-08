@@ -9,9 +9,15 @@ import Image, { StaticImageData } from "next/image";
 import { Button } from "@/components/ui/button";
 import PoolsTable from "./poolsTable";
 import { api } from "@/trpc/server";
+import { TPools } from "@/server/queries/pools/getPools";
 
 export default async function Page() {
-  const initialPools = await api.pool.getPools({});
+  let initialPools: TPools | undefined;
+  try {
+    initialPools = await api.pool.getPools({});
+  } catch {
+    console.error("error fetching pools");
+  }
   return (
     <PageMarginContainer>
       <Headers.GradiantHeaderOne colorOne="#A0055D" colorTwo="#836EF9">
