@@ -128,14 +128,17 @@ export function useRemoveLiquidity({
   };
   const queryClient = useQueryClient();
   useEffect(() => {
+    console.log({ pairQueryKey });
     if (txReceipt.isSuccess) {
-      reset();
       if (needsApproval) {
         queryClient.invalidateQueries({ queryKey: allowanceKey });
+        reset();
         return;
       }
       resetSlider();
+      console.log({ pairQueryKey });
       queryClient.invalidateQueries({ queryKey: pairQueryKey });
+      reset();
     }
   }, [
     allowanceKey,

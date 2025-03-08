@@ -21,6 +21,7 @@ import { useUnstake } from "../../__hooks__/unstake/useUnstake";
 import useSwitchActionType from "../../__hooks__/useSwitchActionType";
 import WithdrawStats from "./withdrawStats";
 import { useDebounce } from "@/lib/hooks/useDebounce";
+import { useGetBalance } from "@/lib/hooks/useGetBalance";
 
 type ElementType<T extends readonly object[]> = T[number];
 
@@ -39,7 +40,10 @@ export default function DashboardLiquidityDialog({
   const chainId = useChainId();
   const router = useMemo(() => ROUTER[chainId], [chainId]);
   const [sliderValue, setSliderValue] = useState(0);
-  const rawAmount = (BigInt(sliderValue) * pairInfo.account_lp_balance) / 100n;
+  const { balance, balanceQueryKey } = useGetBalance({
+    tokenAddress: pairInfo.pair_address,
+  });
+  const rawAmount = (BigInt(sliderValue) * balance) / 100n;
   const { debouncedValue: amount } = useDebounce(rawAmount, 400);
   const resetSlider = useCallback(() => {
     setSliderValue(0);
@@ -97,7 +101,7 @@ export default function DashboardLiquidityDialog({
     needsApproval: routerNeedsApproval,
     approvalSimulation: routerApprovalWriteRequest as SimulateReturnType,
     fetchingApproval: routerApprovalFetching,
-    pairQueryKey: pairInfo.queryKey,
+    pairQueryKey: balanceQueryKey,
     allowanceKey: routerAllowanceKey,
   });
   let actionData = useSwitchActionType(
