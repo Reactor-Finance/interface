@@ -1,27 +1,23 @@
 import { DialogContent, Dialog } from "@/components/ui/dialog";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Slider } from "@/components/ui/slider";
 import EstimatesHeader from "@/app/lock/estimateHeader";
 import PoolHeader from "@/components/shared/poolHeader";
 import { TPoolType } from "@/lib/types";
-import SubmitButton, { ButtonState } from "@/components/shared/submitBtn";
 import { useGetTokenInfo } from "@/utils";
 import { useGetHeader } from "./dialogHeaders";
 import { zeroAddress } from "viem";
-import { useCreateGauge } from "../../__hooks__/useCreateGauge";
 import { useGetPairs } from "@/lib/hooks/useGetPairs";
 import { LiquidityActions, StateType } from "../../types";
-import { useChainId } from "wagmi";
 import useApproveWrite from "@/lib/hooks/useApproveWrite";
-import { ROUTER } from "@/data/constants";
-import { useRemoveLiquidity } from "../../__hooks__/removeLiquidity/useRemoveLiquidity";
-import { useStake } from "../../__hooks__/stake/useStake";
 import { SimulateContractReturnType } from "@wagmi/core";
-import { useUnstake } from "../../__hooks__/unstake/useUnstake";
 import useSwitchActionType from "../../__hooks__/useSwitchActionType";
 import WithdrawStats from "./withdrawStats";
 import { useDebounce } from "@/lib/hooks/useDebounce";
 import { useGetBalance } from "@/lib/hooks/useGetBalance";
+import RemoveLiquiditySubmit from "./removeLiquiditySubmit";
+import StakeSubmit from "./stakeSubmit";
+import UnstakeSubmit from "./unstakeSubmit";
 
 type ElementType<T extends readonly object[]> = T[number];
 
@@ -37,8 +33,6 @@ export default function DashboardLiquidityDialog({
   onOpenChange,
 }: Props) {
   const header = useGetHeader({ state });
-  const chainId = useChainId();
-  const router = useMemo(() => ROUTER[chainId], [chainId]);
   const [sliderValue, setSliderValue] = useState(0);
   const { balance, balanceQueryKey } = useGetBalance({
     tokenAddress: pairInfo.pair_address,
@@ -63,65 +57,32 @@ export default function DashboardLiquidityDialog({
     amount: String(amount),
     decimals: Number(pairInfo.decimals),
   });
-  const {
-    needsApproval: routerNeedsApproval,
-    approveWriteRequest: routerApprovalWriteRequest,
-    isFetching: routerApprovalFetching,
-    allowanceKey: routerAllowanceKey,
-  } = useApproveWrite({
-    tokenAddress: pairInfo.pair_address,
-    spender: router,
-    amount: String(amount),
-    decimals: Number(pairInfo.decimals),
-  });
-  const createGauge = useCreateGauge({
-    pair: pairInfo.pair_address,
-    enabled: isCreateGauge,
-  });
-  const stake = useStake({
+  const approvalInfo = {
     needsApproval: gaugeNeedsApproval,
     approvalSimulation: gaugeApprovalWriteRequest as SimulateReturnType,
     fetchingApproval: gaugeApprovalFetching,
-    gaugeAddress: pairInfo.gauge,
-    amount,
-    pairQueryKey: pairInfo.queryKey,
-  });
-  const unstake = useUnstake({
-    gaugeAddress: pairInfo.gauge,
-    amount,
-    pairQueryKey: pairInfo.queryKey,
-  });
-
-  const removeLiquidity = useRemoveLiquidity({
-    token0: pairInfo.token0,
-    token1: pairInfo.token1,
-    isStable: pairInfo.stable,
-    amount,
-    resetSlider,
-    needsApproval: routerNeedsApproval,
-    approvalSimulation: routerApprovalWriteRequest as SimulateReturnType,
-    fetchingApproval: routerApprovalFetching,
-    pairQueryKey: balanceQueryKey,
-    allowanceKey: routerAllowanceKey,
-  });
-  let actionData = useSwitchActionType(
-    stake,
-    unstake,
-    removeLiquidity,
+  };
+  const info = { pairInfo, amount };
+  const FormSubmit = useSwitchActionType(
+    <UnstakeSubmit {...info} />,
+    <StakeSubmit
+      isCreateGauge={isCreateGauge}
+      {...approvalInfo}
+      amount={amount}
+      pairInfo={pairInfo}
+    />,
+    <RemoveLiquiditySubmit
+      balanceQueryKey={balanceQueryKey}
+      amount={amount}
+      pairInfo={pairInfo}
+      resetSlider={resetSlider}
+    />,
     state.actionType
   );
-  if (isCreateGauge) actionData = createGauge;
-  const onSubmit = useCallback(() => {
-    actionData?.onSubmit?.();
-  }, [actionData]);
 
   const token0 = useGetTokenInfo(pairInfo.token0);
   const token1 = useGetTokenInfo(pairInfo.token1);
-  const { buttonChild } = useButtonChild({
-    actionType: state.actionType,
-    gaugeExist: pairInfo.gauge !== zeroAddress,
-  });
-  console.log({ token1, token0 });
+
   return (
     <Dialog open={state.dialogOpen} onOpenChange={onOpenChange}>
       <DialogContent className="p-0">
@@ -163,39 +124,9 @@ export default function DashboardLiquidityDialog({
             )}
             {/* <div>Balance:{pairInfo.account_lp_balance}</div> */}
           </div>
-          <div className="p-4">
-            <SubmitButton
-              onClick={onSubmit}
-              isValid={actionData.isValid}
-              state={actionData.buttonProps?.state ?? ButtonState.Default}
-            >
-              {buttonChild}
-            </SubmitButton>
-          </div>
+          <div className="p-4">{FormSubmit}</div>
         </div>
       </DialogContent>
     </Dialog>
   );
-}
-function useButtonChild({
-  actionType,
-  gaugeExist,
-}: {
-  actionType: LiquidityActions;
-  gaugeExist: boolean;
-}) {
-  const buttonChild = useMemo(() => {
-    switch (actionType) {
-      case LiquidityActions.Stake: {
-        return gaugeExist ? "Stake" : "Create Vault";
-      }
-      case LiquidityActions.Unstake: {
-        return "Unstake";
-      }
-      case LiquidityActions.Withdraw: {
-        return "Withdraw";
-      }
-    }
-  }, [actionType, gaugeExist]);
-  return { buttonChild };
 }

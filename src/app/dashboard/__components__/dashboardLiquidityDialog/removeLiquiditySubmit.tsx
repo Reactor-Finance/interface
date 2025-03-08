@@ -1,23 +1,27 @@
-import SubmitButton, { ButtonState } from "@/components/shared/submitBtn";
+import SubmitButton from "@/components/shared/submitBtn";
 import React, { useMemo } from "react";
 import { useRemoveLiquidity } from "../../__hooks__/removeLiquidity/useRemoveLiquidity";
-import { TToken } from "@/lib/types";
 import useApproveWrite from "@/lib/hooks/useApproveWrite";
 import { TPair } from "../../types";
-import { SimulateContractReturnType } from "viem";
 import { ROUTER } from "@/data/constants";
+import { useChainId } from "wagmi";
+import { SimulateContractReturnType } from "@wagmi/core";
 interface Props {
   pairInfo: TPair;
   amount: bigint;
-  pairKey: readonly unknown[];
+  resetSlider: () => void;
+  balanceQueryKey: readonly unknown[];
 }
 
 type SimulateReturnType = SimulateContractReturnType["request"] | undefined;
 export default function RemoveLiquiditySubmit({
   pairInfo,
   amount,
-  pairKey,
+  resetSlider,
+  balanceQueryKey,
 }: Props) {
+  console.log("render remove liq sub");
+  const chainId = useChainId();
   const router = useMemo(() => ROUTER[chainId], [chainId]);
   const {
     needsApproval,
@@ -30,20 +34,26 @@ export default function RemoveLiquiditySubmit({
     amount: String(amount),
     decimals: Number(pairInfo.decimals),
   });
-  const {} = useRemoveLiquidity({
+  const removeLiquidity = useRemoveLiquidity({
     token0: pairInfo.token0,
     token1: pairInfo.token1,
     amount,
-    isStable: false,
-    pairQueryKey: pairKey,
+    resetSlider,
+    isStable: pairInfo.stable,
+    pairQueryKey: pairInfo.queryKey,
+    balanceQueryKey: balanceQueryKey,
     needsApproval,
     approvalSimulation: routerApprovalWriteRequest as SimulateReturnType,
     fetchingApproval: routerApprovalFetching,
     allowanceKey,
   });
-
   return (
-    <SubmitButton state={ButtonState.Default} isValid={false}>
+    <SubmitButton
+      validationError={removeLiquidity.errorMessage}
+      onClick={removeLiquidity.onSubmit}
+      state={removeLiquidity.buttonProps.state}
+      isValid={removeLiquidity.isValid}
+    >
       Withdraw
     </SubmitButton>
   );

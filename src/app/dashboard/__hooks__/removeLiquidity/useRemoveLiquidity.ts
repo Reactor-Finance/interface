@@ -26,6 +26,7 @@ interface Props {
   fetchingApproval: boolean;
   approvalSimulation: SimulateContractReturnType["request"] | undefined;
   pairQueryKey: readonly unknown[];
+  balanceQueryKey: readonly unknown[];
   allowanceKey: readonly unknown[];
   resetSlider: () => void;
 }
@@ -39,6 +40,7 @@ export function useRemoveLiquidity({
   fetchingApproval,
   approvalSimulation,
   pairQueryKey,
+  balanceQueryKey,
   resetSlider,
 }: Props): FormAction {
   const { address = zeroAddress } = useAccount();
@@ -138,10 +140,12 @@ export function useRemoveLiquidity({
       resetSlider();
       console.log({ pairQueryKey });
       queryClient.invalidateQueries({ queryKey: pairQueryKey });
+      queryClient.invalidateQueries({ queryKey: balanceQueryKey });
       reset();
     }
   }, [
     allowanceKey,
+    balanceQueryKey,
     needsApproval,
     pairQueryKey,
     queryClient,

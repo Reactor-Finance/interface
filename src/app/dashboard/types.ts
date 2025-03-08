@@ -1,5 +1,6 @@
 import { ButtonState } from "@/components/shared/submitBtn";
 import { useGetPairs } from "@/lib/hooks/useGetPairs";
+import { SimulateContractReturnType } from "@wagmi/core";
 
 export type FormAction = {
   onSubmit: () => void;
@@ -17,6 +18,9 @@ export enum LiquidityActions {
   Withdraw,
 }
 
+export type SimulateReturnType =
+  | SimulateContractReturnType["request"]
+  | undefined;
 type ElementType<T extends readonly object[]> = T[number];
 export type TPair = ElementType<ReturnType<typeof useGetPairs>>;
 export interface StateType {
