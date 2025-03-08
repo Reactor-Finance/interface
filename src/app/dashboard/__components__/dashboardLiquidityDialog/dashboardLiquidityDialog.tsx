@@ -60,6 +60,7 @@ export default function DashboardLiquidityDialog({
     needsApproval: routerNeedsApproval,
     approveWriteRequest: routerApprovalWriteRequest,
     isFetching: routerApprovalFetching,
+    allowanceKey: routerAllowanceKey,
   } = useApproveWrite({
     tokenAddress: pairInfo.pair_address,
     spender: router,
@@ -93,6 +94,7 @@ export default function DashboardLiquidityDialog({
     approvalSimulation: routerApprovalWriteRequest as SimulateReturnType,
     fetchingApproval: routerApprovalFetching,
     pairQueryKey: pairInfo.queryKey,
+    allowanceKey: routerAllowanceKey,
   });
   let actionData = useSwitchActionType(
     stake,

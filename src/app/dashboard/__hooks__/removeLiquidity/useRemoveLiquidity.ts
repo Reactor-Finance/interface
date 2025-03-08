@@ -26,11 +26,13 @@ interface Props {
   fetchingApproval: boolean;
   approvalSimulation: SimulateContractReturnType["request"] | undefined;
   pairQueryKey: readonly unknown[];
+  allowanceKey: readonly unknown[];
 }
 export function useRemoveLiquidity({
   token0,
   token1,
   isStable,
+  allowanceKey,
   amount,
   needsApproval,
   fetchingApproval,
@@ -125,10 +127,21 @@ export function useRemoveLiquidity({
   const queryClient = useQueryClient();
   useEffect(() => {
     if (txReceipt.isSuccess) {
-      queryClient.invalidateQueries({ queryKey: pairQueryKey });
       reset();
+      if (needsApproval) {
+        queryClient.invalidateQueries({ queryKey: allowanceKey });
+        return;
+      }
+      queryClient.invalidateQueries({ queryKey: pairQueryKey });
     }
-  }, [pairQueryKey, queryClient, reset, txReceipt.isSuccess]);
+  }, [
+    allowanceKey,
+    needsApproval,
+    pairQueryKey,
+    queryClient,
+    reset,
+    txReceipt.isSuccess,
+  ]);
 
   const { state: buttonState } = useGetButtonStatuses({
     isLoading: txReceipt.isLoading,
