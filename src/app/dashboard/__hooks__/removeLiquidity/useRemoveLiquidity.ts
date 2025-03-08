@@ -27,6 +27,7 @@ interface Props {
   approvalSimulation: SimulateContractReturnType["request"] | undefined;
   pairQueryKey: readonly unknown[];
   allowanceKey: readonly unknown[];
+  resetSlider: () => void;
 }
 export function useRemoveLiquidity({
   token0,
@@ -38,6 +39,7 @@ export function useRemoveLiquidity({
   fetchingApproval,
   approvalSimulation,
   pairQueryKey,
+  resetSlider,
 }: Props): FormAction {
   const { address = zeroAddress } = useAccount();
   const chainId = useChainId();
@@ -132,6 +134,7 @@ export function useRemoveLiquidity({
         queryClient.invalidateQueries({ queryKey: allowanceKey });
         return;
       }
+      resetSlider();
       queryClient.invalidateQueries({ queryKey: pairQueryKey });
     }
   }, [
@@ -140,6 +143,7 @@ export function useRemoveLiquidity({
     pairQueryKey,
     queryClient,
     reset,
+    resetSlider,
     txReceipt.isSuccess,
   ]);
 
