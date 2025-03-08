@@ -20,7 +20,6 @@ export default function RemoveLiquiditySubmit({
   resetSlider,
   balanceQueryKey,
 }: Props) {
-  console.log("render remove liq sub");
   const chainId = useChainId();
   const router = useMemo(() => ROUTER[chainId], [chainId]);
   const {

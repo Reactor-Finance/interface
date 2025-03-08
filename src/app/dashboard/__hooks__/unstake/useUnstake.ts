@@ -10,8 +10,14 @@ export interface UnstakeProps {
   pairInfo: TPair;
   amount: bigint;
   balanceKey: readonly unknown[];
+  closeModal: () => void;
 }
-export function useUnstake({ pairInfo, amount }: UnstakeProps): FormAction {
+export function useUnstake({
+  pairInfo,
+  closeModal,
+  amount,
+}: UnstakeProps): FormAction {
+  console.log({ amount }, "unstake");
   const gaugeExists = pairInfo.gauge !== zeroAddress;
   const { data, error } = useSimulateContract({
     ...Gauge,
@@ -33,9 +39,10 @@ export function useUnstake({ pairInfo, amount }: UnstakeProps): FormAction {
   useEffect(() => {
     if (txReceipt.isSuccess) {
       queryClient.invalidateQueries({ queryKey: pairInfo.queryKey });
+      closeModal();
       reset();
     }
-  }, [pairInfo.queryKey, queryClient, reset, txReceipt.isSuccess]);
+  }, [closeModal, pairInfo.queryKey, queryClient, reset, txReceipt.isSuccess]);
   const onSubmit = () => {
     if (data?.request) {
       writeContract(data.request);

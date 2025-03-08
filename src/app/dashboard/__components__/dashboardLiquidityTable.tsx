@@ -11,7 +11,6 @@ export default function DashboardLiquidityTable() {
     () => pairs.filter((pair) => pair.account_lp_balance > 0n),
     [pairs]
   );
-  console.log({ pairs }, "PAIRSS====");
   const [selectedPair, setSelectedPair] = useState(activePairs[0]);
   const [stateType, setStateType] = useState<StateType>({
     dialogOpen: false,

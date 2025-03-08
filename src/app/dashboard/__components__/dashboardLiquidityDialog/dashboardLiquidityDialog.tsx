@@ -33,6 +33,10 @@ export default function DashboardLiquidityDialog({
   pairInfo,
   onOpenChange,
 }: Props) {
+  const closeModal = useCallback(() => {
+    onOpenChange(false);
+    setSliderValue(0);
+  }, [onOpenChange]);
   const header = useGetHeader({ state });
   const [sliderValue, setSliderValue] = useState(0);
   const { balance, balanceQueryKey } = useGetBalance({
@@ -40,20 +44,21 @@ export default function DashboardLiquidityDialog({
   });
   const { balance: gaugeBalance, balanceQueryKey: gaugeBalanceKey } =
     useGetBalance({
-      tokenAddress: pairInfo.pair_address,
+      tokenAddress: pairInfo.gauge,
     });
   const rawAmount = useMemo(() => {
     if (state.actionType === LiquidityActions.Withdraw) {
       return (BigInt(sliderValue) * balance) / 100n;
     }
     if (state.actionType === LiquidityActions.Stake) {
-      return (BigInt(sliderValue) * (balance - gaugeBalance)) / 100n;
+      return (BigInt(sliderValue) * balance - gaugeBalance) / 100n;
     }
     if (state.actionType === LiquidityActions.Unstake) {
       return (BigInt(sliderValue) * gaugeBalance) / 100n;
     }
     return 0n;
   }, [balance, gaugeBalance, sliderValue, state.actionType]);
+  console.log({ rawAmount, gaugeBalance, balance });
   const { debouncedValue: amount } = useDebounce(rawAmount, 400);
   const resetSlider = useCallback(() => {
     setSliderValue(0);
@@ -80,15 +85,16 @@ export default function DashboardLiquidityDialog({
     fetchingApproval: gaugeApprovalFetching,
     allowanceKey: gaugeAllowanceKey,
   };
-  const info = { pairInfo, balanceKey: gaugeBalanceKey, amount };
+  const stakingProps = {
+    pairInfo,
+    closeModal,
+    amount,
+    balanceKey: gaugeBalanceKey,
+  };
+  const stakeProps = { ...stakingProps, ...approvalInfo };
   let FormSubmit = useSwitchActionType(
-    <StakeSubmit
-      balanceKey={gaugeBalanceKey}
-      pairInfo={pairInfo}
-      {...approvalInfo}
-      amount={amount}
-    />,
-    <UnstakeSubmit {...info} />,
+    <StakeSubmit {...stakeProps} />,
+    <UnstakeSubmit {...stakingProps} />,
     <RemoveLiquiditySubmit
       balanceQueryKey={balanceQueryKey}
       amount={amount}
@@ -115,6 +121,7 @@ export default function DashboardLiquidityDialog({
               token1={token1}
               poolType={pairInfo.stable ? TPoolType.STABLE : TPoolType.VOLATILE}
             />
+
             <Slider
               value={[sliderValue]}
               onValueChange={([value]) => {
@@ -144,7 +151,7 @@ export default function DashboardLiquidityDialog({
             )}
             {/* <div>Balance:{pairInfo.account_lp_balance}</div> */}
           </div>
-          <div className="p-4">{FormSubmit}</div>
+          <div className="p-4">{state.dialogOpen && FormSubmit}</div>
         </div>
       </DialogContent>
     </Dialog>

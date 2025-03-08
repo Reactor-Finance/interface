@@ -9,11 +9,12 @@ import { useQueryClient } from "@tanstack/react-query";
 export interface StakeProps {
   pairInfo: TPair;
   amount: bigint;
-  balanceKey: readonly unknown[];
   needsApproval: boolean;
   fetchingApproval: boolean;
   approvalSimulation: SimulateContractReturnType["request"] | undefined;
   allowanceKey: readonly unknown[];
+  balanceKey: readonly unknown[];
+  closeModal: () => void;
 }
 export function useStake({
   amount,
@@ -21,6 +22,8 @@ export function useStake({
   fetchingApproval,
   needsApproval,
   allowanceKey,
+  closeModal,
+  balanceKey,
   pairInfo,
 }: StakeProps): FormAction {
   const gaugeExists = pairInfo.gauge !== zeroAddress;
@@ -45,14 +48,21 @@ export function useStake({
         return;
       }
       queryClient.invalidateQueries({ queryKey: pairInfo.queryKey });
+      queryClient.invalidateQueries({ queryKey: balanceKey });
+      // TODO: this will be fixed with new toast
+      updateState({ hash: undefined });
+      closeModal();
     }
   }, [
     allowanceKey,
+    balanceKey,
+    closeModal,
     needsApproval,
     pairInfo.queryKey,
     queryClient,
     reset,
     txReceipt.isSuccess,
+    updateState,
   ]);
   useEffect(() => {
     if (error) console.log(error);
