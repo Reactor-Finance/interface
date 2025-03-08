@@ -18,6 +18,7 @@ import { useGetBalance } from "@/lib/hooks/useGetBalance";
 import RemoveLiquiditySubmit from "./removeLiquiditySubmit";
 import StakeSubmit from "./stakeSubmit";
 import UnstakeSubmit from "./unstakeSubmit";
+import CreateGaugeSubmit from "./createGauageSubmit";
 
 type ElementType<T extends readonly object[]> = T[number];
 
@@ -63,7 +64,7 @@ export default function DashboardLiquidityDialog({
     fetchingApproval: gaugeApprovalFetching,
   };
   const info = { pairInfo, amount };
-  const FormSubmit = useSwitchActionType(
+  let FormSubmit = useSwitchActionType(
     <UnstakeSubmit {...info} />,
     <StakeSubmit
       isCreateGauge={isCreateGauge}
@@ -79,7 +80,9 @@ export default function DashboardLiquidityDialog({
     />,
     state.actionType
   );
-
+  if (isCreateGauge) {
+    FormSubmit = <CreateGaugeSubmit pairInfo={pairInfo} />;
+  }
   const token0 = useGetTokenInfo(pairInfo.token0);
   const token1 = useGetTokenInfo(pairInfo.token1);
 
