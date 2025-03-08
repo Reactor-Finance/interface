@@ -16,6 +16,7 @@ export function useGetPairInfo({
     data: pairInfo,
     isLoading,
     isFetching,
+    queryKey,
   } = useReadContract({
     ...PairHelper,
     address: pairHelper,
@@ -29,5 +30,5 @@ export function useGetPairInfo({
   //   },
   // });
 
-  return { pairInfo, isLoading: isLoading || isFetching };
+  return { pairInfo, isLoading: isLoading || isFetching, queryKey };
 }

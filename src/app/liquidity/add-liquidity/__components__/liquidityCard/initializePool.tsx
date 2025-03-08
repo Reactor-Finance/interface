@@ -47,23 +47,12 @@ export default function InitializePool() {
     const { token1, token0, version: v } = afterParse.data;
     return { t1: token1, t0: token0, version: v };
   }, [params]);
-  useEffect(() => {}, []);
 
   console.log({ t0, t1 }, "LOOGGG===========");
   // Tokens
   const token0 = useGetTokenInfo(t0 ?? "0x");
   const token1 = useGetTokenInfo(t1 ?? "0x");
 
-  // const { data: pools } = api.pool.findPool.useQuery(
-  //   {
-  //     tokenOneAddress: token0?.address ?? "0x",
-  //     tokenTwoAddress: token1?.address ?? "0x",
-  //     isStable: version === "stable",
-  //   },
-  //   { enabled: Boolean(token0) && Boolean(token1) }
-  // );
-  // const pair = pools?.pairs[0];
-  // Amounts
   const [amount0, setAmount0] = useState("");
   const [amount1, setAmount1] = useState("");
 
@@ -157,6 +146,8 @@ export default function InitializePool() {
     tokenAddress: token1?.address ?? zeroAddress,
   });
   const queryClient = useQueryClient();
+
+  const { pairInfo, queryKey: pairKey } = useGetPairInfo({ pair });
   useEffect(() => {
     if (txReceipt.isSuccess) {
       reset();
@@ -171,6 +162,7 @@ export default function InitializePool() {
       if (!token0NeedsApproval || !token1NeedsApproval) {
         queryClient.invalidateQueries({ queryKey: bal0Key });
         queryClient.invalidateQueries({ queryKey: bal1Key });
+        queryClient.invalidateQueries({ queryKey: pairKey });
         setAmount0("");
         setAmount1("");
       }
@@ -178,6 +170,7 @@ export default function InitializePool() {
   }, [
     bal0Key,
     bal1Key,
+    pairKey,
     queryClient,
     reset,
     token0AllowanceKey,
@@ -318,7 +311,6 @@ export default function InitializePool() {
     token0?.decimals,
     token1?.decimals,
   ]);
-  const { pairInfo } = useGetPairInfo({ pair });
   return (
     <>
       <h2 className="text-xl">
