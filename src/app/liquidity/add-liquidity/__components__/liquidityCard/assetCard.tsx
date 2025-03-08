@@ -27,7 +27,7 @@ export default function AssetCard({
     () => formatNumber(formatUnits(balance ?? 0n, token.decimals)),
     [balance, token.decimals]
   );
-  console.log(formattedBalance);
+  console.log({ formattedBalance });
   return (
     <Card border="900" className="py-3 rounded-md px-4 space-y-2">
       <div className="flex justify-between">
