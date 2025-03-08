@@ -95,7 +95,7 @@ export default function Page() {
         </Alert>
       </div>
       <div className="pt-8">
-        <h3>Available pools</h3>
+        {isTokensSelected && <h3>Available pools</h3>}
         <div className="space-y-2 pt-4">
           {tokensExist && volatilePoolExists && (
             <AvailablePoolRow
