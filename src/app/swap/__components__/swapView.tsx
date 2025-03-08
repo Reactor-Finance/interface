@@ -84,7 +84,7 @@ export default function SwapView() {
     error: writeError,
     reset,
   } = useWriteContract();
-  const { txReceipt, updateState } = useTransactionToastProvider({});
+  const { txReceipt, updateState } = useTransactionToastProvider();
   useEffect(() => {
     updateState({ hash });
   }, [hash, updateState]);
