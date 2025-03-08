@@ -1,5 +1,9 @@
 import { SimulateContractReturnType, zeroAddress } from "viem";
-import { useSimulateContract, useWriteContract } from "wagmi";
+import {
+  useSimulateContract,
+  useWaitForTransactionReceipt,
+  useWriteContract,
+} from "wagmi";
 import { useEffect, useMemo } from "react";
 import * as Gauge from "@/lib/abis/Gauge";
 import { FormAction, TPair } from "../../types";
@@ -35,34 +39,43 @@ export function useStake({
     query: { enabled: gaugeExists && !needsApproval },
   });
   const { writeContract, reset, data: hash, isPending } = useWriteContract({});
-  const { updateState, txReceipt } = useTransactionToastProvider();
-  useEffect(() => {
-    updateState({ hash });
-  }, [hash, updateState]);
+  const { isSuccess, isLoading } = useWaitForTransactionReceipt({ hash });
+  const { setToast } = useTransactionToastProvider();
   const queryClient = useQueryClient();
   useEffect(() => {
-    if (txReceipt.isSuccess) {
+    if (isSuccess) {
       reset();
       if (needsApproval) {
         queryClient.invalidateQueries({ queryKey: allowanceKey });
+        setToast({
+          hash,
+          actionDescription: "Approved",
+          actionTitle: "",
+        });
         return;
       }
+
+      setToast({
+        hash,
+        actionDescription: "Approved",
+        actionTitle: "",
+      });
       queryClient.invalidateQueries({ queryKey: pairInfo.queryKey });
       queryClient.invalidateQueries({ queryKey: balanceKey });
-      // TODO: this will be fixed with new toast
-      updateState({ hash: undefined });
       closeModal();
     }
   }, [
     allowanceKey,
     balanceKey,
     closeModal,
+    hash,
+    isLoading,
+    isSuccess,
     needsApproval,
     pairInfo.queryKey,
     queryClient,
     reset,
-    txReceipt.isSuccess,
-    updateState,
+    setToast,
   ]);
   useEffect(() => {
     if (error) console.log(error);
@@ -86,7 +99,6 @@ export function useStake({
     }
     return { isValid: false, errorMessage: null };
   }, [approvalSimulation, data?.request, needsApproval]);
-  const { isLoading } = txReceipt;
   const { state: buttonState } = useGetButtonStatuses({
     needsApproval,
     isFetching: fetchingApproval,

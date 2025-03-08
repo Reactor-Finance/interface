@@ -1,36 +1,31 @@
 "use client";
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import React, { createContext, useCallback, useContext, useState } from "react";
 import { Address } from "viem";
-import {
-  useWaitForTransactionReceipt,
-  UseWaitForTransactionReceiptReturnType,
-} from "wagmi";
-interface State {
+type Toast = {
   hash: Address | undefined;
   actionTitle: string | undefined;
   actionDescription: string | undefined;
-  open: boolean;
+};
+interface State {
+  toastInfo:
+    | {
+        hash: Address | undefined;
+        actionTitle: string | undefined;
+        actionDescription: string | undefined;
+      }
+    | undefined;
 }
 
 const initialState: State = {
-  hash: undefined,
-  actionTitle: undefined,
-  actionDescription: undefined,
-  open: false,
+  toastInfo: {
+    hash: undefined,
+    actionTitle: undefined,
+    actionDescription: undefined,
+  },
 };
 interface ContextType {
   state: State;
-  testToast: () => void;
-  updateState: (payload: Partial<State>) => void;
-  resetState: () => void;
-  txReceipt: UseWaitForTransactionReceiptReturnType;
-  parsedInputAmount?: string;
+  setToast: (toast: Toast | undefined) => void;
 }
 const TransactionToastContext = createContext<ContextType | undefined>(
   undefined
@@ -41,36 +36,14 @@ interface Props {
 
 export const TransactionToastProvider = ({ children }: Props) => {
   const [state, setState] = useState(initialState);
-  const txReceipt = useWaitForTransactionReceipt({ hash: state.hash });
-  const updateState = useCallback(
-    (payload: Partial<State>) => {
-      setState((prevState) => ({ ...prevState, ...payload }));
-    },
-    [setState]
-  );
-  useEffect(() => {
-    if (txReceipt.isLoading) {
-      updateState({ open: false });
-    }
-  }, [txReceipt.isLoading, updateState]);
-  useEffect(() => {
-    if (txReceipt.isSuccess) {
-      updateState({ open: true });
-    }
-  }, [txReceipt.isSuccess, updateState]);
-  const resetState = useCallback(() => {
-    setState(initialState);
-  }, [setState]);
-
-  function testToast() {}
+  const setToast = useCallback((toast: Toast | undefined) => {
+    setState((prev) => ({ ...prev, toastInfo: toast }));
+  }, []);
   return (
     <TransactionToastContext.Provider
       value={{
-        updateState,
-        testToast,
         state,
-        resetState,
-        txReceipt,
+        setToast,
       }}
     >
       {children}

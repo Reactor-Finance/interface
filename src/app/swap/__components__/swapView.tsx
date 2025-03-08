@@ -4,7 +4,11 @@ import SwapIconBorder from "@/components/shared/swapIconBorder";
 import TokensDialog from "@/components/shared/tokensDialog";
 import CurrencyInput from "@/components/shared/currencyInput";
 import useApproveWrite from "@/lib/hooks/useApproveWrite";
-import { useChainId, useWriteContract } from "wagmi";
+import {
+  useChainId,
+  useWaitForTransactionReceipt,
+  useWriteContract,
+} from "wagmi";
 import { useSwapSimulation } from "../__hooks__/useSwapSimulation";
 import SubmitButton from "@/components/shared/submitBtn";
 import { useQuoteSwap } from "../__hooks__/useQuoteSwap";
@@ -84,17 +88,23 @@ export default function SwapView() {
     error: writeError,
     reset,
   } = useWriteContract();
-  const { txReceipt, updateState } = useTransactionToastProvider();
+  const { isSuccess, isLoading } = useWaitForTransactionReceipt({ hash });
+  const { setToast } = useTransactionToastProvider();
   useEffect(() => {
-    updateState({ hash });
-  }, [hash, updateState]);
+    if (isSuccess) {
+      setToast({
+        hash,
+        actionTitle: "Swapped",
+        actionDescription: "Swapped something",
+      });
+    }
+  }, [hash, isLoading, isSuccess, setToast]);
   useEffect(() => {
-    if (txReceipt.isSuccess) {
+    if (isSuccess) {
       reset();
       setAmountIn("");
     }
-  }, [reset, txReceipt.isSuccess]);
-  const { isLoading } = txReceipt;
+  }, [isSuccess, reset]);
   const switchTokens = useCallback(() => {
     const t0 = token0;
     const t1 = token1;

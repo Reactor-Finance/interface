@@ -60,9 +60,6 @@ export default function DashboardLiquidityDialog({
   }, [balance, gaugeBalance, sliderValue, state.actionType]);
   console.log({ rawAmount, gaugeBalance, balance });
   const { debouncedValue: amount } = useDebounce(rawAmount, 400);
-  const resetSlider = useCallback(() => {
-    setSliderValue(0);
-  }, []);
 
   const isCreateGauge =
     pairInfo.gauge === zeroAddress &&
@@ -99,7 +96,7 @@ export default function DashboardLiquidityDialog({
       balanceQueryKey={balanceQueryKey}
       amount={amount}
       pairInfo={pairInfo}
-      resetSlider={resetSlider}
+      closeModal={closeModal}
     />,
     state.actionType
   );
@@ -126,7 +123,6 @@ export default function DashboardLiquidityDialog({
               value={[sliderValue]}
               onValueChange={([value]) => {
                 setSliderValue(value);
-                // TODO: Need to use staked and unstaked lp balance for Stake/Unstake
               }}
               min={0}
               max={100}

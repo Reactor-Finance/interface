@@ -1,11 +1,13 @@
 "use client";
 import React from "react";
 import Spinner from "./ui/spinner";
-import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
 
-export default function TransactionSpinner() {
-  const { txReceipt } = useTransactionToastProvider();
-  if (!txReceipt.isLoading) return;
+export default function TransactionSpinner({
+  isLoading,
+}: {
+  isLoading: boolean;
+}) {
+  if (!isLoading) return;
   return (
     <div className="fixed z-[100] right-[34px] top-[74px]">
       <Spinner />

@@ -1,4 +1,9 @@
-import { useChainId, useSimulateContract, useWriteContract } from "wagmi";
+import {
+  useChainId,
+  useSimulateContract,
+  useWaitForTransactionReceipt,
+  useWriteContract,
+} from "wagmi";
 import { VOTER } from "@/data/constants";
 import { Address } from "viem";
 import { useEffect, useMemo } from "react";
@@ -20,10 +25,17 @@ export function useCreateGauge({ pair }: { pair: Address }): FormAction {
     if (error) console.log(error);
   }, [error]);
   const { writeContract, data: hash, isPending } = useWriteContract();
-  const { updateState, txReceipt } = useTransactionToastProvider();
+  const { setToast } = useTransactionToastProvider();
+  const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash });
   useEffect(() => {
-    if (hash) updateState({ hash });
-  }, [hash, updateState]);
+    if (isSuccess) {
+      setToast({
+        hash,
+        actionDescription: "Created Gauge",
+        actionTitle: "",
+      });
+    }
+  }, [hash, isSuccess, setToast]);
   const onSubmit = () => {
     if (data?.request) {
       writeContract(data.request);
@@ -31,7 +43,7 @@ export function useCreateGauge({ pair }: { pair: Address }): FormAction {
   };
   const { state: buttonState } = useGetButtonStatuses({
     isPending,
-    isLoading: txReceipt.isLoading,
+    isLoading: isLoading,
   });
   const { isValid, errorMessage } = useMemo(() => {
     if (data?.request) {

@@ -1,5 +1,9 @@
 import { zeroAddress } from "viem";
-import { useSimulateContract, useWriteContract } from "wagmi";
+import {
+  useSimulateContract,
+  useTransactionReceipt,
+  useWriteContract,
+} from "wagmi";
 import { useEffect, useMemo } from "react";
 import * as Gauge from "@/lib/abis/Gauge";
 import { FormAction, TPair } from "../../types";
@@ -30,19 +34,31 @@ export function useUnstake({
     console.log(error);
   }, [error]);
   const { isPending, data: hash, reset, writeContract } = useWriteContract();
-  const { txReceipt, updateState } = useTransactionToastProvider();
-  useEffect(() => {
-    updateState({ hash });
-  }, [hash, updateState]);
+  const { isSuccess, isLoading } = useTransactionReceipt({ hash });
+  const { setToast } = useTransactionToastProvider();
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (txReceipt.isSuccess) {
-      queryClient.invalidateQueries({ queryKey: pairInfo.queryKey });
-      closeModal();
+    if (isSuccess) {
       reset();
+      queryClient.invalidateQueries({ queryKey: pairInfo.queryKey });
+      setToast({
+        hash,
+        actionDescription: "Unstaked",
+        actionTitle: "",
+      });
+      closeModal();
     }
-  }, [closeModal, pairInfo.queryKey, queryClient, reset, txReceipt.isSuccess]);
+  }, [
+    closeModal,
+    hash,
+    isLoading,
+    isSuccess,
+    pairInfo.queryKey,
+    queryClient,
+    reset,
+    setToast,
+  ]);
   const onSubmit = () => {
     if (data?.request) {
       writeContract(data.request);
@@ -50,7 +66,7 @@ export function useUnstake({
   };
   const { state } = useGetButtonStatuses({
     isPending,
-    isLoading: txReceipt.isLoading,
+    isLoading: isLoading,
   });
   const { isValid, errorMessage } = useMemo(() => {
     if (data?.request) {

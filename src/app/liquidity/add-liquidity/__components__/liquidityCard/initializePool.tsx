@@ -2,7 +2,11 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import AssetCard from "./assetCard";
-import { useChainId, useWriteContract } from "wagmi";
+import {
+  useChainId,
+  useWaitForTransactionReceipt,
+  useWriteContract,
+} from "wagmi";
 import { useAddLiquidity } from "../../../__hooks__/useAddLiquidity";
 import SubmitButton from "@/components/shared/submitBtn";
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
@@ -137,8 +141,8 @@ export default function InitializePool() {
     data: hash,
     error: writeContractError,
   } = useWriteContract(); // We'll also call reset when transaction toast is closed
-  const { txReceipt, updateState } = useTransactionToastProvider();
-
+  const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash });
+  const { setToast } = useTransactionToastProvider();
   const { balance: balance0, balanceQueryKey: bal0Key } = useGetBalance({
     tokenAddress: token0?.address ?? zeroAddress,
   });
@@ -149,20 +153,35 @@ export default function InitializePool() {
 
   const { pairInfo, queryKey: pairKey } = useGetPairInfo({ pair });
   useEffect(() => {
-    if (txReceipt.isSuccess) {
+    if (isSuccess) {
       reset();
       if (token0NeedsApproval) {
         queryClient.invalidateQueries({ queryKey: token0AllowanceKey });
+        setToast({
+          actionTitle: "Approved",
+          actionDescription: "",
+          hash,
+        });
         return;
       }
       if (token1NeedsApproval) {
         queryClient.invalidateQueries({ queryKey: token1AllowanceKey });
+        setToast({
+          actionTitle: "Approved",
+          actionDescription: "",
+          hash,
+        });
         return;
       }
       if (!token0NeedsApproval || !token1NeedsApproval) {
         queryClient.invalidateQueries({ queryKey: bal0Key });
         queryClient.invalidateQueries({ queryKey: bal1Key });
         queryClient.invalidateQueries({ queryKey: pairKey });
+        setToast({
+          actionTitle: "Added Liquidity",
+          actionDescription: "",
+          hash,
+        });
         setAmount0("");
         setAmount1("");
       }
@@ -170,54 +189,17 @@ export default function InitializePool() {
   }, [
     bal0Key,
     bal1Key,
+    hash,
+    isSuccess,
     pairKey,
     queryClient,
     reset,
+    setToast,
     token0AllowanceKey,
     token0NeedsApproval,
     token1AllowanceKey,
     token1NeedsApproval,
-    txReceipt.isSuccess,
   ]);
-  useEffect(() => {
-    updateState({
-      hash,
-    });
-  }, [hash, token0NeedsApproval, token1NeedsApproval, updateState]);
-  useEffect(() => {
-    if (amount0 && amount1) {
-      console.log({
-        actionTitle:
-          token0NeedsApproval || token1NeedsApproval
-            ? `Approved ${token0NeedsApproval ? token0?.symbol : token1?.symbol}`
-            : "Added Liquidity.",
-      });
-    }
-    if (
-      amount0 &&
-      amount1 &&
-      !token0ApprovalFetching &&
-      !token1ApprovalFetching
-    ) {
-      updateState({
-        actionTitle:
-          token0NeedsApproval || token1NeedsApproval
-            ? `Approved ${token0NeedsApproval ? token0?.symbol : token1?.symbol}`
-            : "Added Liquidity.",
-      });
-    }
-  }, [
-    amount0,
-    amount1,
-    token0?.symbol,
-    token0ApprovalFetching,
-    token0NeedsApproval,
-    token1?.symbol,
-    token1ApprovalFetching,
-    token1NeedsApproval,
-    updateState,
-  ]);
-  const { isLoading } = txReceipt;
   const onSubmit = useCallback(() => {
     if (token0NeedsApproval && token0ApprovalWriteRequest) {
       writeContract(token0ApprovalWriteRequest);

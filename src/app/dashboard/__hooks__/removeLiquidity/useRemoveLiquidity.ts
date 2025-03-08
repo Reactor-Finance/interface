@@ -11,6 +11,7 @@ import {
   useAccount,
   useChainId,
   useSimulateContract,
+  useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
 import { FormAction } from "../../types";
@@ -105,13 +106,11 @@ export function useRemoveLiquidity({
     query: { enabled: isEth && amount > 0n },
   });
   const { writeContract, isPending, reset, data: hash } = useWriteContract();
-  const { txReceipt, updateState } = useTransactionToastProvider();
+  const { isSuccess, isLoading } = useWaitForTransactionReceipt({ hash });
+  const { setToast } = useTransactionToastProvider();
   console.log({
     error: removeLiquiditySimulation.data?.request,
   });
-  useEffect(() => {
-    updateState({ hash });
-  }, [hash, updateState]);
   const onSubmit = () => {
     if (needsApproval) {
       if (approvalSimulation) {
@@ -131,31 +130,42 @@ export function useRemoveLiquidity({
   const queryClient = useQueryClient();
   useEffect(() => {
     console.log({ pairQueryKey });
-    if (txReceipt.isSuccess) {
+    if (isSuccess) {
       if (needsApproval) {
         queryClient.invalidateQueries({ queryKey: allowanceKey });
         reset();
+        setToast({
+          hash,
+          actionDescription: "Approved",
+          actionTitle: "",
+        });
         return;
       }
-      closeModal();
-      console.log({ pairQueryKey });
+      setToast({
+        hash,
+        actionDescription: "Removed Liquidity",
+        actionTitle: "",
+      });
       queryClient.invalidateQueries({ queryKey: pairQueryKey });
       queryClient.invalidateQueries({ queryKey: balanceQueryKey });
+      closeModal();
       reset();
     }
   }, [
     allowanceKey,
     balanceQueryKey,
     closeModal,
+    hash,
+    isSuccess,
     needsApproval,
     pairQueryKey,
     queryClient,
     reset,
-    txReceipt.isSuccess,
+    setToast,
   ]);
 
   const { state: buttonState } = useGetButtonStatuses({
-    isLoading: txReceipt.isLoading,
+    isLoading: isLoading,
     isPending,
     isFetching: fetchingApproval,
     needsApproval,
