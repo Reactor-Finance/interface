@@ -16,7 +16,6 @@ import { useQuoteLiquidity } from "@/app/liquidity/__hooks__/useQuoteLiquidity";
 import { useGetTokenInfo } from "@/utils";
 import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
 import { useQueryClient } from "@tanstack/react-query";
-import { api } from "@/trpc/react";
 import { useGetBalance } from "@/lib/hooks/useGetBalance";
 import AddLiquidityInfo from "./addLiquidityInfo";
 
@@ -54,15 +53,15 @@ export default function InitializePool() {
   const token0 = useGetTokenInfo(t0 ?? "0x");
   const token1 = useGetTokenInfo(t1 ?? "0x");
 
-  const { data: pools } = api.pool.findPool.useQuery(
-    {
-      tokenOneAddress: token0?.address ?? "0x",
-      tokenTwoAddress: token1?.address ?? "0x",
-      isStable: version === "stable",
-    },
-    { enabled: Boolean(token0) && Boolean(token1) }
-  );
-  const pair = pools?.pairs[0];
+  // const { data: pools } = api.pool.findPool.useQuery(
+  //   {
+  //     tokenOneAddress: token0?.address ?? "0x",
+  //     tokenTwoAddress: token1?.address ?? "0x",
+  //     isStable: version === "stable",
+  //   },
+  //   { enabled: Boolean(token0) && Boolean(token1) }
+  // );
+  // const pair = pools?.pairs[0];
   // Amounts
   const [amount0, setAmount0] = useState("");
   const [amount1, setAmount1] = useState("");
@@ -71,7 +70,7 @@ export default function InitializePool() {
   const router = useMemo(() => ROUTER[chainId], [chainId]);
 
   // Check if pair exists
-  const { pairExists } = useCheckPair({
+  const { pairExists, pair } = useCheckPair({
     token0: t0 ?? zeroAddress,
     token1: t1 ?? zeroAddress,
     stable: version === "stable",
@@ -285,7 +284,7 @@ export default function InitializePool() {
     ]
   );
   const { balance } = useGetBalance({
-    tokenAddress: (pair?.id as Address) ?? zeroAddress,
+    tokenAddress: (pair as Address) ?? zeroAddress,
   });
   const { state: buttonState } = useGetButtonStatuses({
     isLoading,
