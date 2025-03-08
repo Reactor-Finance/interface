@@ -38,9 +38,12 @@ export default function DashboardLiquidityDialog({
   const header = useGetHeader({ state });
   const chainId = useChainId();
   const router = useMemo(() => ROUTER[chainId], [chainId]);
-  const [rawAmount, setAmount] = useState(0n);
-  const { debouncedValue: amount } = useDebounce(rawAmount, 400);
   const [sliderValue, setSliderValue] = useState(0);
+  const rawAmount = (BigInt(sliderValue) * pairInfo.account_lp_balance) / 100n;
+  const { debouncedValue: amount } = useDebounce(rawAmount, 400);
+  const resetSlider = useCallback(() => {
+    setSliderValue(0);
+  }, []);
 
   const isCreateGauge =
     pairInfo.gauge === zeroAddress &&
@@ -90,6 +93,7 @@ export default function DashboardLiquidityDialog({
     token1: pairInfo.token1,
     isStable: pairInfo.stable,
     amount,
+    resetSlider,
     needsApproval: routerNeedsApproval,
     approvalSimulation: routerApprovalWriteRequest as SimulateReturnType,
     fetchingApproval: routerApprovalFetching,
@@ -131,9 +135,6 @@ export default function DashboardLiquidityDialog({
               onValueChange={([value]) => {
                 setSliderValue(value);
                 // TODO: Need to use staked and unstaked lp balance for Stake/Unstake
-                const calc =
-                  (BigInt(value) * pairInfo.account_lp_balance) / 100n;
-                setAmount(calc);
               }}
               min={0}
               max={100}
