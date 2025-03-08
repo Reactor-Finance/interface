@@ -1,58 +1,251 @@
-import Input from "@/components/ui/input";
-import { ArrowDown, ChevronDown } from "lucide-react";
-import React from "react";
-import wallet from "@/assets/wallet.svg";
-import Image from "next/image";
-import { Button } from "@/components/ui/button";
+"use client";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import TokensDialog from "@/components/shared/tokensDialog";
+import useApproveWrite from "@/lib/hooks/useApproveWrite";
+import {
+  useChainId,
+  useWaitForTransactionReceipt,
+  useWriteContract,
+} from "wagmi";
+import { useSwapSimulation } from "../__hooks__/useSwapSimulation";
+import { useQuoteSwap } from "../__hooks__/useQuoteSwap";
+import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
+import { TToken } from "@/lib/types";
+import { ROUTER } from "@/data/constants";
+import { formatUnits, parseUnits, zeroAddress } from "viem";
+import { useWETHExecutions } from "../__hooks__/useWETHExecutions";
+import { useGetBalance } from "@/lib/hooks/useGetBalance";
+import useSwapValidation from "../__hooks__/useSwapValidation";
+import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
+import { ArrowDown } from "lucide-react";
+import SwapCard from "./swapCard";
+import SubmitButton from "@/components/shared/submitBtn";
 
 export default function NewSwapView() {
+  // Wagmi parameters
+  const chainId = useChainId();
+
+  // Amount in
+  const [amountIn, setAmountIn] = useState("");
+  const [amountOut, setAmountOut] = useState("");
+  // Selected tokens
+  const [token0, setToken0] = useState<TToken | null>(null);
+  const [token1, setToken1] = useState<TToken | null>(null);
+
+  // Balances
+  const { balance: token0Balance } = useGetBalance({
+    tokenAddress: token0?.address ?? zeroAddress,
+  });
+  const { balance: token1Balance } = useGetBalance({
+    tokenAddress: token1?.address ?? zeroAddress,
+  });
+
+  // Modal state
+  const [firstDialogOpen, setFirstDialogOpen] = useState(false);
+  const [secondDialogOpen, setSecondDialogOpen] = useState(false);
+
+  // Active input pane
+  // const [activePane, setActivePane] = useState<0 | 1 | null>(null);
+
+  // Quote
+  const { amountOut: quoteOut } = useQuoteSwap({
+    amountIn,
+    tokenIn: token0,
+    tokenOut: token1,
+  });
+  useEffect(() => {
+    setAmountOut(quoteOut);
+  }, [quoteOut]);
+
+  // Router by chain ID
+  const router = useMemo(() => ROUTER[chainId], [chainId]);
+  // checks allowance
+  const { approveWriteRequest, needsApproval } = useApproveWrite({
+    tokenAddress: token0?.address,
+    spender: router,
+    amount: String(amountIn),
+    decimals: token0?.decimals,
+  });
+
+  // Simulate swap
+  const { data: swapSimulation, error: swapSimulationError } =
+    useSwapSimulation({
+      amount: amountIn,
+      token0,
+      token1,
+      minAmountOut: parseUnits(amountOut, token1?.decimals ?? 18),
+    });
+
+  // Simulate WETH process
+  const { isIntrinsicWETHProcess, WETHProcessSimulation, isWETHToEther } =
+    useWETHExecutions({
+      amount: amountIn,
+      token0,
+      token1,
+    });
+
+  const {
+    writeContract,
+    isPending,
+    data: hash,
+    error: writeError,
+    reset,
+  } = useWriteContract();
+  const { isSuccess, isLoading } = useWaitForTransactionReceipt({ hash });
+  const { setToast } = useTransactionToastProvider();
+  useEffect(() => {
+    if (isSuccess) {
+      setToast({
+        hash,
+        actionTitle: "Swapped",
+        actionDescription: "Swapped something",
+      });
+    }
+  }, [hash, isLoading, isSuccess, setToast]);
+  useEffect(() => {
+    if (isSuccess) {
+      reset();
+      setAmountIn("");
+    }
+  }, [isSuccess, reset]);
+  const switchTokens = useCallback(() => {
+    const t0 = token0;
+    const t1 = token1;
+    // Switch
+    setToken0(t1);
+    setToken1(t0);
+  }, [token0, token1]);
+  const { isValid, message: errorMessage } = useSwapValidation({
+    amountIn,
+    token0,
+    token1,
+    token0Balance,
+  });
+  console.log(approveWriteRequest, swapSimulation);
+  const onSubmit = useCallback(() => {
+    if (isIntrinsicWETHProcess) {
+      if (isWETHToEther) {
+        const req = WETHProcessSimulation?.withdrawalSimulation?.data?.request;
+        if (req) {
+          reset();
+          writeContract(req);
+        }
+      } else {
+        const req = WETHProcessSimulation?.depositSimulation?.data?.request;
+        if (req) {
+          reset();
+          writeContract(req);
+        }
+      }
+      return;
+    }
+
+    if (approveWriteRequest && needsApproval) {
+      reset();
+      writeContract(approveWriteRequest);
+      return;
+    }
+    if (swapSimulation) {
+      reset();
+      writeContract(swapSimulation.request);
+    }
+  }, [
+    isIntrinsicWETHProcess,
+    approveWriteRequest,
+    needsApproval,
+    swapSimulation,
+    isWETHToEther,
+    WETHProcessSimulation?.withdrawalSimulation?.data?.request,
+    WETHProcessSimulation?.depositSimulation?.data?.request,
+    reset,
+    writeContract,
+  ]);
+
+  const { state: buttonState } = useGetButtonStatuses({
+    isPending,
+    isLoading,
+    needsApproval: needsApproval && !isIntrinsicWETHProcess,
+  });
+  let stateValid = useMemo(
+    () =>
+      Boolean(swapSimulation?.request) ||
+      Boolean(WETHProcessSimulation.depositSimulation.data) ||
+      Boolean(WETHProcessSimulation.withdrawalSimulation.data) ||
+      Boolean(approveWriteRequest && needsApproval),
+    [
+      swapSimulation?.request,
+      WETHProcessSimulation.depositSimulation.data,
+      WETHProcessSimulation.withdrawalSimulation.data,
+      approveWriteRequest,
+      needsApproval,
+    ]
+  );
+  console.log();
+  if (amountIn === "" || amountIn === "") {
+    stateValid = false;
+  }
+  console.log({ stateValid });
+  useEffect(() => {
+    if (writeError) {
+      console.log(writeError);
+    }
+
+    if (swapSimulationError) {
+      console.log(swapSimulationError);
+    }
+  }, [writeError, swapSimulationError]);
   return (
     <div className="space-y-1">
+      <TokensDialog
+        open={firstDialogOpen}
+        onOpen={setFirstDialogOpen}
+        onTokenSelected={setToken0}
+        selectedTokens={[
+          token0?.address ?? zeroAddress,
+          token1?.address ?? zeroAddress,
+        ]}
+      />
+      <TokensDialog
+        open={secondDialogOpen}
+        onOpen={setSecondDialogOpen}
+        onTokenSelected={setToken1}
+        selectedTokens={[
+          token0?.address ?? zeroAddress,
+          token1?.address ?? zeroAddress,
+        ]}
+      />
       <div className="space-y-1 relative">
-        <SwapCard />
-        <SwapCard />
-        <Button size="submit" variant="primary">
-          Swap
-        </Button>
-      </div>
-      <button className="h-14 flex items-center justify-center rounded-full w-14 bg-black absolute left-1/2 top-1/2 -translate-y-[calc(50%+4px)] -translate-x-1/2">
-        <div className="h-12 w-12 rounded-full bg-neutral-950 flex items-center justify-center">
-          <ArrowDown className="text-neutral-300" size={18} />
-        </div>
-      </button>
-    </div>
-  );
-}
-
-function SwapCard() {
-  return (
-    <div className="rounded-[16px] bg-[#303136] border border-[#43444C] space-y-3 p-6 ">
-      <h2 className="text-sm">Sell</h2>
-      <div className="flex items-center gap-x-4 ">
-        <Input
-          textSize="2xl"
-          className="bg-transparent px-0 border-transparent placeholder:text-xl text-xl"
-          placeholder="0"
+        <SwapCard
+          openDialog={() => setFirstDialogOpen(true)}
+          balance={formatUnits(token0Balance, token0?.decimals ?? 18)}
+          value={amountIn}
+          token={token0}
+          setValue={setAmountIn}
         />
-        <div className="rounded-r-lg ml-8 h-14 flex items-center relative bg-[#43444C] pl-9 pr-2">
-          <div className="flex items-center z-10 gap-x-2 cursor-pointer">
-            <span className="z-10 text-[16px]">ETH</span>
-            <ChevronDown />
+        <SwapCard
+          openDialog={() => setSecondDialogOpen(true)}
+          token={token1}
+          balance={formatUnits(token1Balance, token1?.decimals ?? 18)}
+          value={amountOut}
+          setValue={setAmountOut}
+        />
+        <button
+          onClick={switchTokens}
+          className="h-14 flex items-center justify-center rounded-full w-14 bg-black absolute left-1/2 top-1/2 -translate-y-[calc(50%+4px)] -translate-x-1/2"
+        >
+          <div className="h-12 w-12 rounded-full bg-neutral-950 flex items-center justify-center">
+            <ArrowDown className="text-neutral-300" size={18} />
           </div>
-          <div className="h-10 w-10 bg-blue-400 absolute rounded-full z-10 -left-4"></div>
-          <div className="h-14 w-14 absolute bg-[#43444C] -left-6 top-0 rounded-full "></div>
-        </div>
+        </button>
       </div>
-      <div className="flex justify-between">
-        <span>$0</span>
-        <div className="flex gap-x-4">
-          <div className="flex gap-x-1">
-            <Image src={wallet} alt="Wallet" />
-            <span>0</span>
-          </div>
-          <button className="text-sm text-neutral-300">Max</button>
-        </div>
-      </div>
+      <SubmitButton
+        onSubmit={onSubmit}
+        validationError={errorMessage}
+        state={buttonState}
+        isValid={isValid}
+      >
+        Swap
+      </SubmitButton>
     </div>
   );
 }
