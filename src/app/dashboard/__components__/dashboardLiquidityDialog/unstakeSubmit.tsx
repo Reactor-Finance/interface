@@ -1,18 +1,8 @@
 import SubmitButton from "@/components/shared/submitBtn";
-import { useUnstake } from "../../__hooks__/unstake/useUnstake";
-import { TPair } from "../../types";
+import { UnstakeProps, useUnstake } from "../../__hooks__/unstake/useUnstake";
 
-interface Props {
-  pairInfo: TPair;
-  amount: bigint;
-}
-
-export default function UnstakeSubmit({ amount, pairInfo }: Props) {
-  const unstake = useUnstake({
-    gaugeAddress: pairInfo.gauge,
-    amount,
-    pairQueryKey: pairInfo.queryKey,
-  });
+export default function UnstakeSubmit(props: UnstakeProps) {
+  const unstake = useUnstake(props);
   return (
     <SubmitButton
       onClick={unstake.onSubmit}

@@ -1,33 +1,37 @@
-import { Address, SimulateContractReturnType, zeroAddress } from "viem";
+import { SimulateContractReturnType, zeroAddress } from "viem";
 import { useSimulateContract, useWriteContract } from "wagmi";
 import { useEffect, useMemo } from "react";
 import * as Gauge from "@/lib/abis/Gauge";
-import { FormAction } from "../../types";
+import { FormAction, TPair } from "../../types";
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
 import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
 import { useQueryClient } from "@tanstack/react-query";
-
-export function useStake({
-  gaugeAddress,
-  amount,
-  pairQueryKey,
-}: {
-  gaugeAddress: Address;
+export interface StakeProps {
+  pairInfo: TPair;
   amount: bigint;
+  balanceKey: readonly unknown[];
   needsApproval: boolean;
   fetchingApproval: boolean;
   approvalSimulation: SimulateContractReturnType["request"] | undefined;
-  pairQueryKey: readonly unknown[];
-}): FormAction {
-  const gaugeExists = gaugeAddress !== zeroAddress;
+  allowanceKey: readonly unknown[];
+}
+export function useStake({
+  amount,
+  approvalSimulation,
+  fetchingApproval,
+  needsApproval,
+  allowanceKey,
+  pairInfo,
+}: StakeProps): FormAction {
+  const gaugeExists = pairInfo.gauge !== zeroAddress;
   const { data, error } = useSimulateContract({
     ...Gauge,
-    address: gaugeAddress,
+    address: pairInfo.gauge,
     functionName: "deposit",
     args: [amount],
-    query: { enabled: gaugeExists },
+    query: { enabled: gaugeExists && !needsApproval },
   });
-  const { writeContract, data: hash, isPending } = useWriteContract({});
+  const { writeContract, reset, data: hash, isPending } = useWriteContract({});
   const { updateState, txReceipt } = useTransactionToastProvider();
   useEffect(() => {
     updateState({ hash });
@@ -35,25 +39,50 @@ export function useStake({
   const queryClient = useQueryClient();
   useEffect(() => {
     if (txReceipt.isSuccess) {
-      queryClient.invalidateQueries({ queryKey: pairQueryKey });
+      reset();
+      if (needsApproval) {
+        queryClient.invalidateQueries({ queryKey: allowanceKey });
+        return;
+      }
+      queryClient.invalidateQueries({ queryKey: pairInfo.queryKey });
     }
-  }, [pairQueryKey, queryClient, txReceipt.isSuccess]);
+  }, [
+    allowanceKey,
+    needsApproval,
+    pairInfo.queryKey,
+    queryClient,
+    reset,
+    txReceipt.isSuccess,
+  ]);
   useEffect(() => {
     if (error) console.log(error);
   }, [error]);
   const onSubmit = () => {
+    if (needsApproval && approvalSimulation) {
+      writeContract(approvalSimulation);
+    }
     if (data?.request) {
       writeContract(data.request);
     }
   };
   const { isValid, errorMessage } = useMemo(() => {
+    if (needsApproval) {
+      if (approvalSimulation) {
+        return { isValid: true, errorMessage: null };
+      }
+    }
     if (data?.request) {
       return { isValid: true, errorMessage: null };
     }
     return { isValid: false, errorMessage: null };
-  }, [data?.request]);
+  }, [approvalSimulation, data?.request, needsApproval]);
   const { isLoading } = txReceipt;
-  const { state: buttonState } = useGetButtonStatuses({ isLoading, isPending });
+  const { state: buttonState } = useGetButtonStatuses({
+    needsApproval,
+    isFetching: fetchingApproval,
+    isLoading,
+    isPending,
+  });
   return {
     onSubmit,
     isValid,

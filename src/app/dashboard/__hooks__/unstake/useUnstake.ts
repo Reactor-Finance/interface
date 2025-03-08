@@ -1,25 +1,21 @@
-import { Address, zeroAddress } from "viem";
+import { zeroAddress } from "viem";
 import { useSimulateContract, useWriteContract } from "wagmi";
 import { useEffect, useMemo } from "react";
 import * as Gauge from "@/lib/abis/Gauge";
-import { FormAction } from "../../types";
+import { FormAction, TPair } from "../../types";
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
 import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
 import { useQueryClient } from "@tanstack/react-query";
-
-export function useUnstake({
-  gaugeAddress,
-  amount,
-  pairQueryKey,
-}: {
-  gaugeAddress: Address;
+export interface UnstakeProps {
+  pairInfo: TPair;
   amount: bigint;
-  pairQueryKey: readonly unknown[];
-}): FormAction {
-  const gaugeExists = gaugeAddress !== zeroAddress;
+  balanceKey: readonly unknown[];
+}
+export function useUnstake({ pairInfo, amount }: UnstakeProps): FormAction {
+  const gaugeExists = pairInfo.gauge !== zeroAddress;
   const { data, error } = useSimulateContract({
     ...Gauge,
-    address: gaugeAddress,
+    address: pairInfo.gauge,
     functionName: "withdraw",
     args: [amount],
     query: { enabled: gaugeExists },
@@ -36,10 +32,10 @@ export function useUnstake({
 
   useEffect(() => {
     if (txReceipt.isSuccess) {
-      queryClient.invalidateQueries({ queryKey: pairQueryKey });
+      queryClient.invalidateQueries({ queryKey: pairInfo.queryKey });
       reset();
     }
-  }, [pairQueryKey, queryClient, reset, txReceipt.isSuccess]);
+  }, [pairInfo.queryKey, queryClient, reset, txReceipt.isSuccess]);
   const onSubmit = () => {
     if (data?.request) {
       writeContract(data.request);
