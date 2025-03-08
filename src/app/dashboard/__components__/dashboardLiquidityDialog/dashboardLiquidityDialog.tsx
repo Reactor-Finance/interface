@@ -1,5 +1,5 @@
 import { DialogContent, Dialog } from "@/components/ui/dialog";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { Slider } from "@/components/ui/slider";
 import EstimatesHeader from "@/app/lock/estimateHeader";
 import PoolHeader from "@/components/shared/poolHeader";
@@ -38,7 +38,22 @@ export default function DashboardLiquidityDialog({
   const { balance, balanceQueryKey } = useGetBalance({
     tokenAddress: pairInfo.pair_address,
   });
-  const rawAmount = (BigInt(sliderValue) * balance) / 100n;
+  const { balance: gaugeBalance, balanceQueryKey: gaugeBalanceKey } =
+    useGetBalance({
+      tokenAddress: pairInfo.pair_address,
+    });
+  const rawAmount = useMemo(() => {
+    if (state.actionType === LiquidityActions.Withdraw) {
+      return (BigInt(sliderValue) * balance) / 100n;
+    }
+    if (state.actionType === LiquidityActions.Stake) {
+      return (BigInt(sliderValue) * (balance - gaugeBalance)) / 100n;
+    }
+    if (state.actionType === LiquidityActions.Unstake) {
+      return (BigInt(sliderValue) * gaugeBalance) / 100n;
+    }
+    return 0n;
+  }, [balance, gaugeBalance, sliderValue, state.actionType]);
   const { debouncedValue: amount } = useDebounce(rawAmount, 400);
   const resetSlider = useCallback(() => {
     setSliderValue(0);
@@ -52,6 +67,7 @@ export default function DashboardLiquidityDialog({
     needsApproval: gaugeNeedsApproval,
     approveWriteRequest: gaugeApprovalWriteRequest,
     isFetching: gaugeApprovalFetching,
+    allowanceKey: gaugeAllowanceKey,
   } = useApproveWrite({
     tokenAddress: pairInfo.pair_address,
     spender: pairInfo.gauge,
@@ -62,16 +78,17 @@ export default function DashboardLiquidityDialog({
     needsApproval: gaugeNeedsApproval,
     approvalSimulation: gaugeApprovalWriteRequest as SimulateReturnType,
     fetchingApproval: gaugeApprovalFetching,
+    allowanceKey: gaugeAllowanceKey,
   };
-  const info = { pairInfo, amount };
+  const info = { pairInfo, balanceKey: gaugeBalanceKey, amount };
   let FormSubmit = useSwitchActionType(
-    <UnstakeSubmit {...info} />,
     <StakeSubmit
-      isCreateGauge={isCreateGauge}
+      balanceKey={gaugeBalanceKey}
+      pairInfo={pairInfo}
       {...approvalInfo}
       amount={amount}
-      pairInfo={pairInfo}
     />,
+    <UnstakeSubmit {...info} />,
     <RemoveLiquiditySubmit
       balanceQueryKey={balanceQueryKey}
       amount={amount}
