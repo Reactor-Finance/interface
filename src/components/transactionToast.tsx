@@ -1,5 +1,6 @@
 "use client";
 import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
+import useOutBounce from "@/lib/hooks/useOutBounce";
 import { X } from "lucide-react";
 import React, { useEffect } from "react";
 
@@ -13,6 +14,7 @@ export default function TransactionToast() {
       return () => clearTimeout(clear);
     }
   }, [setToast, state.toastInfo]);
+  const toastInfo = useOutBounce({ value: state.toastInfo, duration: 400 });
   return (
     <div
       data-state={state.toastInfo ? "open" : "closed"}
@@ -30,9 +32,7 @@ export default function TransactionToast() {
           </button>
         </div>
         <div>
-          <span>
-            {state.toastInfo?.actionTitle ?? "Transaction Successful"}
-          </span>
+          <span>{toastInfo?.actionTitle}</span>
         </div>
         <div></div>
       </div>
