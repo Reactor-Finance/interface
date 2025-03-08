@@ -18,6 +18,7 @@ import { useTransactionToastProvider } from "@/contexts/transactionToastProvider
 import { useQueryClient } from "@tanstack/react-query";
 import { useGetBalance } from "@/lib/hooks/useGetBalance";
 import AddLiquidityInfo from "./addLiquidityInfo";
+import { useGetPairInfo } from "@/lib/hooks/useGetPairInfo";
 
 const searchParamsSchema = z.object({
   token0: z.string().refine((arg) => isAddress(arg)),
@@ -317,7 +318,7 @@ export default function InitializePool() {
     token0?.decimals,
     token1?.decimals,
   ]);
-  console.log({ token1, token0 }, "LOGSSSKj");
+  const { pairInfo } = useGetPairInfo({ pair });
   return (
     <>
       <h2 className="text-xl">
@@ -369,8 +370,8 @@ export default function InitializePool() {
                 <span>{token0?.symbol} Amount</span>
                 <span>
                   {formatUnits(
-                    parseUnits(pair.token0.totalSupply ?? "0", 0),
-                    Number(pair.token0.decimals)
+                    pairInfo?.reserve0 ?? "0",
+                    token0?.decimals ?? 18
                   )}
                 </span>
               </div>
@@ -378,8 +379,8 @@ export default function InitializePool() {
                 <span>{token1?.symbol} Amount</span>
                 <span>
                   {formatUnits(
-                    parseUnits(pair.token0.totalSupply ?? "0", 0),
-                    Number(pair.token1.decimals)
+                    pairInfo?.reserve0 ?? "0",
+                    token0?.decimals ?? 18
                   )}
                 </span>
               </div>
