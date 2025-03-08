@@ -75,7 +75,7 @@ export function useRemoveLiquidity({
       token0,
       token1,
       isStable,
-      100n, // liquidity
+      amount, // liquidity
       0n, //amountBMin
       0n, //amountBMin
       address,
