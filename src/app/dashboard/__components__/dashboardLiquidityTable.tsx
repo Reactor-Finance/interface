@@ -40,7 +40,7 @@ export default function DashboardLiquidityTable() {
             <th></th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="flex flex-col space-y-2">
           {activePairs.map((pair) => (
             <LiquidityRow
               key={pair.pair_address}
