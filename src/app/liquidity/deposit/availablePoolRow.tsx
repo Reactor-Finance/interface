@@ -16,7 +16,6 @@ export default function AvailablePoolRow({ poolType, token0, token1 }: Props) {
     <Card bg="1000" className="grid py-3 grid-cols-6 text-sm">
       <div className="col-span-2">
         <PoolHeader token0={token0} token1={token1} poolType={poolType} />
-        <PoolHeader token0={token0} token1={token1} poolType={poolType} />
       </div>
       <div className="flex flex-col">
         <span className="text-neutral-300">TVL</span>

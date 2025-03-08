@@ -9,7 +9,6 @@ import TokensDialog from "@/components/shared/tokensDialog";
 import ImageWithFallback from "@/components/shared/imageWithFallback";
 import { TPoolType, TToken } from "@/lib/types";
 import AvailablePoolRow from "./availablePoolRow";
-import { api } from "@/trpc/react";
 import { zeroAddress } from "viem";
 import { useCheckPair } from "@/lib/hooks/useCheckPair";
 import { ETHER, WETH } from "@/data/constants";
@@ -23,21 +22,13 @@ export default function Page() {
   const [token0, setToken0] = useState<TToken | undefined>();
   const [token1, setToken1] = useState<TToken | undefined>();
 
-  const { data: pools } = api.pool.findPool.useQuery(
-    {
-      tokenOneAddress: token0?.address ?? "0x",
-      tokenTwoAddress: token1?.address ?? "0x",
-    },
-    { enabled: Boolean(token0) && Boolean(token1) }
-  );
-
   // Check pairs
-  const { pairExists: stablePoolExists } = useCheckPair({
+  const { pairExists: stablePoolExists, pair: stablePair } = useCheckPair({
     token0: token0?.address ?? zeroAddress,
     token1: token1?.address ?? zeroAddress,
     stable: true,
   });
-  const { pairExists: volatilePoolExists } = useCheckPair({
+  const { pairExists: volatilePoolExists, pair: volatilePair } = useCheckPair({
     token0: token0?.address ?? zeroAddress,
     token1: token1?.address ?? zeroAddress,
     stable: false,
@@ -62,7 +53,7 @@ export default function Page() {
         : [token0?.address ?? zeroAddress, token1?.address ?? zeroAddress],
     [token0, token1, weth]
   );
-
+  const tokensExist = token0 && token1;
   return (
     <PageMarginContainer>
       <Headers.GradiantHeaderOne colorOne="#A0055D" colorTwo="#836EF9">
@@ -106,21 +97,22 @@ export default function Page() {
       <div className="pt-8">
         <h3>Available pools</h3>
         <div className="space-y-2 pt-4">
-          {!!pools &&
-            !!token0 &&
-            !!token1 &&
-            pools.pairs.map((pool) => {
-              return (
-                <AvailablePoolRow
-                  key={pool.id}
-                  token0={token0}
-                  token1={token1}
-                  poolType={
-                    pool.isStable ? TPoolType.STABLE : TPoolType.VOLATILE
-                  }
-                />
-              );
-            })}
+          {tokensExist && volatilePoolExists && (
+            <AvailablePoolRow
+              key={volatilePair}
+              token0={token0}
+              token1={token1}
+              poolType={TPoolType.VOLATILE}
+            />
+          )}
+          {tokensExist && stablePoolExists && (
+            <AvailablePoolRow
+              key={stablePair}
+              token0={token0}
+              token1={token1}
+              poolType={TPoolType.STABLE}
+            />
+          )}
           {isTokensSelected && !stablePoolExists && !!token0 && !!token1 && (
             <>
               <AvailablePoolRow
