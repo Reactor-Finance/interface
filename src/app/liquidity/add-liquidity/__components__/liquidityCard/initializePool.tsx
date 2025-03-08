@@ -370,7 +370,7 @@ export default function InitializePool() {
                 <span>{token0?.symbol} Amount</span>
                 <span>
                   {formatUnits(
-                    pairInfo?.reserve0 ?? "0",
+                    pairInfo?.reserve0 ?? 0n,
                     token0?.decimals ?? 18
                   )}
                 </span>
@@ -379,7 +379,7 @@ export default function InitializePool() {
                 <span>{token1?.symbol} Amount</span>
                 <span>
                   {formatUnits(
-                    pairInfo?.reserve0 ?? "0",
+                    pairInfo?.reserve0 ?? 0n,
                     token0?.decimals ?? 18
                   )}
                 </span>
