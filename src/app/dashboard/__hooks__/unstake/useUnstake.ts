@@ -44,8 +44,8 @@ export function useUnstake({
       queryClient.invalidateQueries({ queryKey: pairInfo.queryKey });
       setToast({
         hash,
-        actionDescription: "Unstaked",
-        actionTitle: "",
+        actionDescription: "",
+        actionTitle: "Unstaked",
       });
       closeModal();
     }
