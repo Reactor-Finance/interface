@@ -352,7 +352,7 @@ export default function InitializePool() {
           />
         </div>
       )}
-      {version && (
+      {!pair && (
         <AddLiquidityInfo
           amount0={amount0}
           amount1={amount1}
