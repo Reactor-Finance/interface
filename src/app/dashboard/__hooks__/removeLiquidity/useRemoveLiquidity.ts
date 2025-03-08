@@ -129,27 +129,25 @@ export function useRemoveLiquidity({
   };
   const queryClient = useQueryClient();
   useEffect(() => {
-    console.log({ pairQueryKey });
     if (isSuccess) {
+      reset();
       if (needsApproval) {
         queryClient.invalidateQueries({ queryKey: allowanceKey });
-        reset();
         setToast({
           hash,
           actionDescription: "Approved",
-          actionTitle: "",
+          actionTitle: "Approved",
         });
         return;
       }
       setToast({
         hash,
         actionDescription: "Removed Liquidity",
-        actionTitle: "",
+        actionTitle: "Removed Liquidity",
       });
       queryClient.invalidateQueries({ queryKey: pairQueryKey });
       queryClient.invalidateQueries({ queryKey: balanceQueryKey });
       closeModal();
-      reset();
     }
   }, [
     allowanceKey,
