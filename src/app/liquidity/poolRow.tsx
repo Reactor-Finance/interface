@@ -52,7 +52,7 @@ export default function PoolRow({
       <th className="text-blue-light">11%</th>
       <th>{volumeUSD}</th>
       <th>43,444</th>
-      <th className="text-left col-span-3 ">
+      <th className="text-left pl-4 col-span-3 ">
         <div className="flex justify-between">
           <span></span>
           <Button variant="filled" onClick={addLiquidityHandler}>

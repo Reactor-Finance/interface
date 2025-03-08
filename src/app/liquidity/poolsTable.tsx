@@ -121,7 +121,7 @@ export default function PoolsTable({
               <th>APR</th>
               <th>Volume</th>
               <th>Fees</th>
-              <th className="text-left col-span-3 ">Liquidity Manager</th>
+              <th className="text-left col-span-3 pl-4">Liquidity Manager</th>
             </tr>
           </thead>
           <tbody className="gap-y-2 pt-2 flex flex-col">
