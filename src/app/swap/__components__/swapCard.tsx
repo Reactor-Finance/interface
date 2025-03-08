@@ -35,10 +35,13 @@ export default function SwapCard({
         />
         <button
           onClick={openDialog}
-          className="rounded-r-lg ml-8 h-14 flex items-center relative bg-[#43444C] pl-9 pr-2"
+          data-state={token ? "active" : "inactive"}
+          className="rounded-r-lg ml-8 h-14 flex items-center relative bg-[#43444C] data-[state=active]:pl-9 pr-2"
         >
           <div className="flex items-center z-10 gap-x-2 cursor-pointer">
-            <span className="z-10 text-[16px]">ETH</span>
+            <span className="z-10 text-[16px] text-nowrap ">
+              {token ? token.symbol : "Select"}
+            </span>
             <ChevronDown />
           </div>
           <div className="h-10 w-10  absolute rounded-full z-10 -left-4">
