@@ -17,6 +17,9 @@ export default function AddLiquidityInfo({
   const { result0, result1 } = useMemo(() => {
     const amt0 = parseFloat(amount0);
     const amt1 = parseFloat(amount1);
+    if (isNaN(amt0) || isNaN(amt1)) {
+      return { result0: 0, result1: 0 };
+    }
     const result0 = amt1 > 0 ? amt0 / amt1 : amt0 / 1;
     const result1 = amt0 > 0 ? amt1 / amt0 : amt1 / 1;
     return { result0, result1 };

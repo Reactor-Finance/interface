@@ -33,28 +33,23 @@ export default function InitializePool() {
   // Token list
   // Search params
   const params = useSearchParams();
-  const [t0, t1, version] = useMemo(() => {
+  const { t0, t1, version } = useMemo(() => {
     const t0 = params.get("token0");
     const t1 = params.get("token1");
     const version = params.get("version");
     const param = { token0: t0, token1: t1, version };
 
     const afterParse = searchParamsSchema.safeParse(param);
-    return (
-      afterParse.success
-        ? [
-            afterParse.data.token0,
-            afterParse.data.token1,
-            afterParse.data.version,
-          ]
-        : [null, null, "volatile"]
-    ) as [
-      `0x${string}` | null,
-      `0x${string}` | null,
-      "stable" | "concentrated" | "volatile",
-    ];
+    if (!afterParse.success) {
+      console.log("failed parse");
+      return { t0: undefined, t1: undefined, version: "stable" };
+    }
+    const { token1, token0, version: v } = afterParse.data;
+    return { t1: token1, t0: token0, version: v };
   }, [params]);
+  useEffect(() => {}, []);
 
+  console.log({ t0, t1 }, "LOOGGG===========");
   // Tokens
   const token0 = useGetTokenInfo(t0 ?? "0x");
   const token1 = useGetTokenInfo(t1 ?? "0x");
@@ -67,7 +62,6 @@ export default function InitializePool() {
     },
     { enabled: Boolean(token0) && Boolean(token1) }
   );
-
   const pair = pools?.pairs[0];
   // Amounts
   const [amount0, setAmount0] = useState("");
@@ -324,6 +318,7 @@ export default function InitializePool() {
     token0?.decimals,
     token1?.decimals,
   ]);
+  console.log({ token1, token0 }, "LOGSSSKj");
   return (
     <>
       <h2 className="text-xl">
@@ -357,7 +352,7 @@ export default function InitializePool() {
           />
         </div>
       )}
-      {!pair && (
+      {version && (
         <AddLiquidityInfo
           amount0={amount0}
           amount1={amount1}
