@@ -88,6 +88,7 @@ const getPools = (filter: Filter) => {
 };
 
 export type TPool = z.infer<typeof PoolSchema>;
+export type TPools = z.infer<typeof PoolsSchema>;
 export const executeGetPools = async (filter: Filter) => {
   console.log("made it here");
   try {
