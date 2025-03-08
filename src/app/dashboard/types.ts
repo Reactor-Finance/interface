@@ -1,4 +1,5 @@
 import { ButtonState } from "@/components/shared/submitBtn";
+import { useGetPairs } from "@/lib/hooks/useGetPairs";
 
 export type FormAction = {
   onSubmit: () => void;
@@ -16,6 +17,8 @@ export enum LiquidityActions {
   Withdraw,
 }
 
+type ElementType<T extends readonly object[]> = T[number];
+export type TPair = ElementType<ReturnType<typeof useGetPairs>>;
 export interface StateType {
   actionType: LiquidityActions;
   dialogOpen: boolean;
