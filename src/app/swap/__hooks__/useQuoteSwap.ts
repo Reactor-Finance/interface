@@ -1,4 +1,4 @@
-import { useChainId, useReadContract, useWatchBlocks } from "wagmi";
+import { useChainId, useReadContract } from "wagmi";
 import * as TradeHelper from "@/lib/abis/TradeHelper";
 import { formatUnits, parseUnits, zeroAddress } from "viem";
 import { useMemo } from "react";
@@ -35,7 +35,7 @@ export function useQuoteSwap({
     data: [receivedAmount] = [BigInt(0), false],
     error,
     isLoading,
-    refetch,
+    // refetch,
   } = useReadContract({
     address,
     ...TradeHelper,
@@ -47,6 +47,7 @@ export function useQuoteSwap({
     ],
     query: {
       enabled: !!amountIn && tokenIn !== null && tokenOut !== null,
+      staleTime: 5_000
     },
   });
 
@@ -69,11 +70,11 @@ export function useQuoteSwap({
     [receivedAmount, amountIn, tokenOut, isIntrinsicWETHProcess]
   );
 
-  useWatchBlocks({
-    onBlock: () => {
-      void refetch();
-    },
-  });
+  // useWatchBlocks({
+  //   onBlock: () => {
+  //     void refetch();
+  //   },
+  // });
 
   return { amountOut, error, isLoading };
 }

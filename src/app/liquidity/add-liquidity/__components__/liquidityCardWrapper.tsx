@@ -20,6 +20,7 @@ export default function LiquidityCardWrapper() {
           poolType: undefined,
         };
   }, [params]);
+  console.log("HELLO");
   return (
     <div className="flex justify-center p-4">
       {poolType !== undefined && <LiquidityCard />}

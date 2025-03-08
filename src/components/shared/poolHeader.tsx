@@ -29,7 +29,7 @@ export default function PoolHeader({
           </h4>
           <div className="space-x-1">
             <PoolBadge poolType={poolType} />
-            <Badge border="one" colors="neutral">
+            <Badge colors="neutral" border="one">
               0.3%
             </Badge>
           </div>

@@ -1,5 +1,5 @@
 "use client";
-import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
+import { useTransactionToastProvider } from "@/contexts/transactionProvider";
 import { X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
@@ -40,7 +40,7 @@ export default function TransactionToast() {
   return (
     <div
       data-state={state.open ? "open" : "closed"}
-      className="absolute transition-all  z-50 top-[74px] data-[state=closed]:translate-x-[120%] data-[state=open]:right-[34px] right-0"
+      className="absolute transition-all  z-[100] top-[74px] data-[state=closed]:translate-x-[120%] data-[state=open]:right-[34px] right-0"
     >
       <div className="bg-neutral-950 relative py-6 pl-4 pr-8 border-b-success-400 border-b-2 rounded-lg">
         <div className="absolute right-1 top-1">

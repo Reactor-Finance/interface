@@ -17,7 +17,7 @@ import { TokenlistContextProvider } from "@/contexts/tokenlistContext";
 import { PersistGate } from "redux-persist/integration/react";
 import { Provider as ReduxProvider } from "react-redux";
 import { persistor, store } from "@/store";
-import { TransactionToastProvider } from "@/contexts/transactionToastProvider";
+import { TransactionToastProvider } from "@/contexts/transactionProvider";
 
 export const wagmiConfig = getDefaultConfig({
   appName: "Reactor Finance",

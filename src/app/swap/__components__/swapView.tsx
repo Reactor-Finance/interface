@@ -4,11 +4,7 @@ import SwapIconBorder from "@/components/shared/swapIconBorder";
 import TokensDialog from "@/components/shared/tokensDialog";
 import CurrencyInput from "@/components/shared/currencyInput";
 import useApproveWrite from "@/lib/hooks/useApproveWrite";
-import {
-  useChainId,
-  useWaitForTransactionReceipt,
-  useWriteContract,
-} from "wagmi";
+import { useChainId, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { useSwapSimulation } from "../__hooks__/useSwapSimulation";
 import SubmitButton from "@/components/shared/submitBtn";
 import { useQuoteSwap } from "../__hooks__/useQuoteSwap";
@@ -36,12 +32,12 @@ export default function SwapView() {
   const { balance: token0Balance, queryKey: token0BalanceQueryKey } =
     useGetBalance({
       tokenAddress: token0?.address ?? zeroAddress,
-      enabled: true,
+      disabled: false,
     });
   const { balance: token1Balance, queryKey: token1BalanceQueryKey } =
     useGetBalance({
       tokenAddress: token1?.address ?? zeroAddress,
-      enabled: true,
+      disabled: false,
     });
 
   // Modal state
@@ -208,6 +204,7 @@ export default function SwapView() {
           />
           <CurrencyInput.NumberInput
             onChangeValue={(value: string) => setAmountIn(value)}
+            value={amountIn}
             disabled={false}
             decimals={10}
           />
@@ -236,7 +233,7 @@ export default function SwapView() {
       <div className="pt-2">
         <SubmitButton
           state={buttonState}
-          isValid={!!stateValid && isValid}
+          isValid={stateValid && isValid}
           validationError={errorMessage}
           disabled={!stateValid}
           approveTokenSymbol={token0?.symbol}

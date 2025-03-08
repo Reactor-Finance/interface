@@ -1,4 +1,4 @@
-import { useChainId, useReadContract, useWatchBlocks } from "wagmi";
+import { useChainId, useReadContract } from "wagmi";
 import * as Oracle from "../abis/Oracle";
 import { useMemo } from "react";
 import { ORACLE } from "@/data/constants";
@@ -17,7 +17,6 @@ export function useGetMarketQuote({
     data = [BigInt(0), BigInt(0)],
     isLoading,
     error,
-    refetch,
   } = useReadContract({
     ...Oracle,
     address: oracle,
@@ -25,11 +24,11 @@ export function useGetMarketQuote({
     args: [tokenAddress, value],
   });
 
-  useWatchBlocks({
-    onBlock: () => {
-      void refetch();
-    },
-  });
+  // useWatchBlocks({
+  //   onBlock: () => {
+  //     void refetch();
+  //   },
+  // });
 
   return { quote: data, isLoading, error };
 }

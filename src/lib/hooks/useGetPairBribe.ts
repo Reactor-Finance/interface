@@ -15,7 +15,11 @@ export function useGetPairBribe({
 }) {
   const chainId = useChainId();
   const pairHelper = useMemo(() => PAIR_HELPER[chainId], [chainId]);
-  const { data = [], refetch, error } = useReadContract({
+  const {
+    data = [],
+    refetch,
+    error,
+  } = useReadContract({
     ...PairHelper,
     address: pairHelper,
     functionName: "getPairBribe",

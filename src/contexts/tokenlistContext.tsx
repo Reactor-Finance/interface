@@ -6,13 +6,14 @@ import React, {
   createContext,
   ReactNode,
   useContext,
-  useEffect,
+  useMemo,
   useState,
 } from "react";
 import { useChainId } from "wagmi";
 
 interface TokenlistContextType {
   tokenlist: TToken[];
+  filteredList: TToken[];
   loading: boolean;
   hasError?: boolean | null;
   setSearchQuery: (query: string) => void;
@@ -21,20 +22,12 @@ interface TokenlistContextType {
 
 const TokenlistContext = createContext<TokenlistContextType>({
   tokenlist: [],
+  filteredList: [],
   loading: false,
   hasError: null,
   setSearchQuery: console.log,
   searchQuery: "",
 });
-
-function useSetInterval(cb: () => void, INTERVAL = 60000) {
-  return useEffect(() => {
-    const interval = setInterval(cb, INTERVAL);
-    return () => {
-      clearInterval(interval);
-    };
-  }, [INTERVAL, cb]);
-}
 
 export const TokenlistContextProvider: React.FC<{ children: ReactNode }> = ({
   children,
@@ -45,15 +38,24 @@ export const TokenlistContextProvider: React.FC<{ children: ReactNode }> = ({
     data: tokenlist = [],
     isLoading: loading,
     error,
-    refetch,
-  } = api.tokens.getTokens.useQuery({ chainId, searchQuery });
-  useSetInterval(() => {
-    void refetch();
-  });
+  } = api.tokens.getTokens.useQuery({ chainId });
+
+  const filteredTokenlist = useMemo(
+    () =>
+      tokenlist.filter(
+        (token) =>
+          token.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          token.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          token.address.toLowerCase().startsWith(searchQuery.toLowerCase())
+      ),
+    [tokenlist, searchQuery]
+  );
+
   return (
     <TokenlistContext.Provider
       value={{
         tokenlist,
+        filteredList: filteredTokenlist,
         loading,
         hasError: Boolean(error),
         setSearchQuery,

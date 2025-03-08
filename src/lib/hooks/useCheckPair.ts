@@ -1,6 +1,6 @@
 import { TRADE_HELPER } from "@/data/constants";
 import { useMemo } from "react";
-import { useChainId, useReadContract, useWatchBlocks } from "wagmi";
+import { useChainId, useReadContract } from "wagmi";
 import * as TradeHelper from "../abis/TradeHelper";
 import { zeroAddress } from "viem";
 
@@ -17,7 +17,6 @@ export function useCheckPair({
   const tradeHelper = useMemo(() => TRADE_HELPER[chainId], [chainId]);
   const {
     data = zeroAddress,
-    refetch,
     isLoading,
     error,
   } = useReadContract({
@@ -27,11 +26,11 @@ export function useCheckPair({
     args: [token0, token1, stable],
   });
   // why do we need to refetch here?
-  useWatchBlocks({
-    onBlock: () => {
-      void refetch();
-    },
-  });
+  // useWatchBlocks({
+  //   onBlock: () => {
+  //     void refetch();
+  //   },
+  // });
 
   return { pairExists: data !== zeroAddress, isLoading, error, pair: data };
 }

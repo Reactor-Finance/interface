@@ -14,6 +14,7 @@ export default function useQuoteRemoveLiquidity({
   isStable: boolean | undefined;
   amount: bigint;
   enabled: boolean;
+  needsApproval: boolean;
 }) {
   const chainId = useChainId();
   const t0 = token0 ? getAddress(token0) : undefined;

@@ -1,4 +1,5 @@
 "use client";
+
 import React, {
   createContext,
   useCallback,
@@ -11,6 +12,7 @@ import {
   useWaitForTransactionReceipt,
   UseWaitForTransactionReceiptReturnType,
 } from "wagmi";
+
 interface State {
   hash: Address | undefined;
   actionTitle: string | undefined;
@@ -24,6 +26,7 @@ const initialState: State = {
   actionDescription: undefined,
   open: false,
 };
+
 interface ContextType {
   state: State;
   testToast: () => void;
@@ -32,6 +35,7 @@ interface ContextType {
   txReceipt: UseWaitForTransactionReceiptReturnType;
   parsedInputAmount?: string;
 }
+
 const TransactionToastContext = createContext<ContextType | undefined>(
   undefined
 );

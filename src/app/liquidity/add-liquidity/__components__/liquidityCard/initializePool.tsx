@@ -13,13 +13,12 @@ import { useCheckPair } from "@/lib/hooks/useCheckPair";
 import useApproveWrite from "@/lib/hooks/useApproveWrite";
 import { ROUTER } from "@/data/constants";
 import { useQuoteLiquidity } from "@/app/liquidity/__hooks__/useQuoteLiquidity";
-import { BaseError } from "@wagmi/core";
 import { useGetTokenInfo } from "@/utils";
 import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
-import { useQueryClient } from "@tanstack/react-query";
-import { api } from "@/trpc/react";
+import { useQueryClient } from "@tanstack/rea@/contexts/transactionProvider
 import { useGetBalance } from "@/lib/hooks/useGetBalance";
 import AddLiquidityInfo from "./addLiquidityInfo";
+import { useGetPairInfo } from "@/lib/hooks/useGetPairInfo";
 
 const searchParamsSchema = z.object({
   token0: z.string().refine((arg) => isAddress(arg)),
@@ -34,43 +33,26 @@ export default function InitializePool() {
   // Token list
   // Search params
   const params = useSearchParams();
-  const [t0, t1, version] = useMemo(() => {
+  const { t0, t1, version } = useMemo(() => {
     const t0 = params.get("token0");
     const t1 = params.get("token1");
     const version = params.get("version");
     const param = { token0: t0, token1: t1, version };
 
     const afterParse = searchParamsSchema.safeParse(param);
-    return (
-      afterParse.success
-        ? [
-            afterParse.data.token0,
-            afterParse.data.token1,
-            afterParse.data.version,
-          ]
-        : [null, null, "volatile"]
-    ) as [
-      `0x${string}` | null,
-      `0x${string}` | null,
-      "stable" | "concentrated" | "volatile",
-    ];
+    if (!afterParse.success) {
+      console.log("failed parse");
+      return { t0: undefined, t1: undefined, version: "stable" };
+    }
+    const { token1, token0, version: v } = afterParse.data;
+    return { t1: token1, t0: token0, version: v };
   }, [params]);
 
+  console.log({ t0, t1 }, "LOOGGG===========");
   // Tokens
   const token0 = useGetTokenInfo(t0 ?? "0x");
   const token1 = useGetTokenInfo(t1 ?? "0x");
 
-  const { data: pools } = api.pool.findPool.useQuery(
-    {
-      tokenOneAddress: token0?.address ?? "0x",
-      tokenTwoAddress: token1?.address ?? "0x",
-      isStable: version === "stable",
-    },
-    { enabled: Boolean(token0) && Boolean(token1) }
-  );
-
-  const pair = pools?.pairs[0];
-  // Amounts
   const [amount0, setAmount0] = useState("");
   const [amount1, setAmount1] = useState("");
 
@@ -78,7 +60,7 @@ export default function InitializePool() {
   const router = useMemo(() => ROUTER[chainId], [chainId]);
 
   // Check if pair exists
-  const { pairExists } = useCheckPair({
+  const { pairExists, pair } = useCheckPair({
     token0: t0 ?? zeroAddress,
     token1: t1 ?? zeroAddress,
     stable: version === "stable",
@@ -122,7 +104,7 @@ export default function InitializePool() {
 
   // Amounts parsed
   const amountADesired = useMemo(
-    () => parseUnits(String(amount0), token0?.decimals ?? 18),
+    () => parseUnits(amount0, token0?.decimals ?? 18),
     [amount0, token0]
   );
   const amountBDesired = useMemo(
@@ -137,7 +119,10 @@ export default function InitializePool() {
     addLiquiditySimulation,
     isAddLiquidityETH,
   } = useAddLiquidity({
-    disabled: token1NeedsApproval || token1NeedsApproval,
+    disabled:
+      token1NeedsApproval ||
+      token1NeedsApproval ||
+      (amount0 === "" && amount1 === ""),
     token0: token0?.address ?? zeroAddress,
     token1: token1?.address ?? zeroAddress,
     amountADesired,
@@ -161,6 +146,8 @@ export default function InitializePool() {
     tokenAddress: token1?.address ?? zeroAddress,
   });
   const queryClient = useQueryClient();
+
+  const { pairInfo, queryKey: pairKey } = useGetPairInfo({ pair });
   useEffect(() => {
     if (txReceipt.isSuccess) {
       reset();
@@ -175,6 +162,7 @@ export default function InitializePool() {
       if (!token0NeedsApproval || !token1NeedsApproval) {
         queryClient.invalidateQueries({ queryKey: bal0Key });
         queryClient.invalidateQueries({ queryKey: bal1Key });
+        queryClient.invalidateQueries({ queryKey: pairKey });
         setAmount0("");
         setAmount1("");
       }
@@ -182,6 +170,7 @@ export default function InitializePool() {
   }, [
     bal0Key,
     bal1Key,
+    pairKey,
     queryClient,
     reset,
     token0AllowanceKey,
@@ -289,7 +278,7 @@ export default function InitializePool() {
     ]
   );
   const { balance } = useGetBalance({
-    tokenAddress: (pair?.id as Address) ?? zeroAddress,
+    tokenAddress: (pair as Address) ?? zeroAddress,
   });
   const { state: buttonState } = useGetButtonStatuses({
     isLoading,
@@ -373,8 +362,8 @@ export default function InitializePool() {
                 <span>{token0?.symbol} Amount</span>
                 <span>
                   {formatUnits(
-                    parseUnits(pair.token0.totalSupply ?? "0", 0),
-                    Number(pair.token0.decimals)
+                    pairInfo?.reserve0 ?? 0n,
+                    token0?.decimals ?? 18
                   )}
                 </span>
               </div>
@@ -382,8 +371,8 @@ export default function InitializePool() {
                 <span>{token1?.symbol} Amount</span>
                 <span>
                   {formatUnits(
-                    parseUnits(pair.token0.totalSupply ?? "0", 0),
-                    Number(pair.token1.decimals)
+                    pairInfo?.reserve0 ?? 0n,
+                    token0?.decimals ?? 18
                   )}
                 </span>
               </div>
@@ -394,7 +383,7 @@ export default function InitializePool() {
 
             <div className="flex pt-1 text-neutral-300 text-sm justify-between">
               <span>Amount</span>
-              <span>{formatUnits(balance, 18)} lp</span>
+              <span>{formatUnits(balance ?? 0n, 18)} lp</span>
             </div>
           </div>
         </>
@@ -408,10 +397,7 @@ export default function InitializePool() {
         Add Liquidity
       </SubmitButton>
       {writeContractError && (
-        <span className="text-[13px] text-red-400 pt-3 text-center">
-          {(writeContractError as BaseError).shortMessage ||
-            writeContractError.message}
-        </span>
+        <span className="text-[13px] text-red-400 pt-3 text-center"></span>
       )}
     </>
   );

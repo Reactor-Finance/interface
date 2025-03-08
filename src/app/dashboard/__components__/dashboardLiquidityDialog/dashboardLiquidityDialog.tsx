@@ -4,24 +4,24 @@ import { Slider } from "@/components/ui/slider";
 import EstimatesHeader from "@/app/lock/estimateHeader";
 import PoolHeader from "@/components/shared/poolHeader";
 import { TPoolType } from "@/lib/types";
-import SubmitButton from "@/components/shared/submitBtn";
+import SubmitButton, { ButtonState } from "@/components/shared/submitBtn";
 import { useGetTokenInfo } from "@/utils";
 import { useGetHeader } from "./dialogHeaders";
-import { useRemoveLiquidity } from "../../__hooks__/useRemoveLiquidity";
 import { zeroAddress } from "viem";
-import { useStake } from "../../__hooks__/useStake";
-import { useUnstake } from "../../__hooks__/useUnstake";
 import { useCreateGauge } from "../../__hooks__/useCreateGauge";
 import { useGetPairs } from "@/lib/hooks/useGetPairs";
 import { LiquidityActions, StateType } from "../../types";
-import {
-  useChainId,
-  useWaitForTransactionReceipt,
-  useWriteContract,
-} from "wagmi";
+import { useChainId } from "wagmi";
 import useApproveWrite from "@/lib/hooks/useApproveWrite";
 import { ROUTER } from "@/data/constants";
-import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
+import { useRemoveLiquidity } from "../../__hooks__/removeLiquidity/useRemoveLiquidity";
+import { useStake } from "../../__hooks__/stake/useStake";
+import { SimulateContractReturnType } from "@wagmi/core";
+import { useUnstake } from "../../__hooks__/unstake/useUnstake";
+import useSwitchActionType from "../../__hooks__/useSwitchActionType";
+import WithdrawStats from "./withdrawStats";
+import { useDebounce } from "@/lib/hooks/useDebounce";
+import { useGetBalance } from "@/lib/hooks/useGetBalance";
 
 type ElementType<T extends readonly object[]> = T[number];
 
@@ -30,7 +30,7 @@ interface Props {
   pairInfo: ElementType<ReturnType<typeof useGetPairs>>;
   onOpenChange: (isOpen: boolean) => void;
 }
-
+type SimulateReturnType = SimulateContractReturnType["request"] | undefined;
 export default function DashboardLiquidityDialog({
   state,
   pairInfo,
@@ -39,37 +39,20 @@ export default function DashboardLiquidityDialog({
   const header = useGetHeader({ state });
   const chainId = useChainId();
   const router = useMemo(() => ROUTER[chainId], [chainId]);
-  const [amount, setAmount] = useState(0n);
   const [sliderValue, setSliderValue] = useState(0);
-  const { simulation: createGaugeSimulation } = useCreateGauge({
-    pair: pairInfo.pair_address,
-  });
-  const { simulation: stakeSimulation } = useStake({
-    gaugeAddress: pairInfo.gauge,
-    amount,
-  });
-  const { simulation: unstakeSimulation } = useUnstake({
-    gaugeAddress: pairInfo.gauge,
-    amount,
-  });
-  const { removeLiquidityEthSimulation, removeLiquiditySimulation } =
-    useRemoveLiquidity({
-      token0: pairInfo.token0,
-      token1: pairInfo.token0,
-      isStable: pairInfo.stable,
-      amount,
-    });
-
-  const {
-    needsApproval: routerNeedsApproval,
-    approveWriteRequest: routerApprovalWriteRequest,
-    isFetching: routerApprovalFetching,
-  } = useApproveWrite({
+  const { balance, balanceQueryKey } = useGetBalance({
     tokenAddress: pairInfo.pair_address,
-    spender: router,
-    amount: String(amount),
-    decimals: Number(pairInfo.decimals),
   });
+  const rawAmount = (BigInt(sliderValue) * balance) / 100n;
+  const { debouncedValue: amount } = useDebounce(rawAmount, 400);
+  const resetSlider = useCallback(() => {
+    setSliderValue(0);
+  }, []);
+
+  const isCreateGauge =
+    pairInfo.gauge === zeroAddress &&
+    (state.actionType === LiquidityActions.Stake ||
+      state.actionType === LiquidityActions.Unstake);
   const {
     needsApproval: gaugeNeedsApproval,
     approveWriteRequest: gaugeApprovalWriteRequest,
@@ -80,136 +63,65 @@ export default function DashboardLiquidityDialog({
     amount: String(amount),
     decimals: Number(pairInfo.decimals),
   });
-  const { writeContract, reset, data: hash, isPending } = useWriteContract();
-  const { isLoading } = useWaitForTransactionReceipt({
-    hash,
+  const {
+    needsApproval: routerNeedsApproval,
+    approveWriteRequest: routerApprovalWriteRequest,
+    isFetching: routerApprovalFetching,
+    allowanceKey: routerAllowanceKey,
+  } = useApproveWrite({
+    tokenAddress: pairInfo.pair_address,
+    spender: router,
+    amount: String(amount),
+    decimals: Number(pairInfo.decimals),
   });
-  const isValid = useMemo(() => {
-    switch (state.actionType) {
-      case LiquidityActions.Stake:
-        return (
-          Boolean(stakeSimulation) ||
-          Boolean(createGaugeSimulation) ||
-          gaugeNeedsApproval ||
-          Boolean(gaugeApprovalWriteRequest)
-        );
-      case LiquidityActions.Unstake:
-        return Boolean(unstakeSimulation);
-      case LiquidityActions.Withdraw:
-        return (
-          Boolean(removeLiquidityEthSimulation.data) ||
-          Boolean(removeLiquiditySimulation.data) ||
-          routerNeedsApproval ||
-          Boolean(routerApprovalWriteRequest)
-        );
-      default:
-        return false;
-    }
-  }, [
-    stakeSimulation,
-    createGaugeSimulation,
-    unstakeSimulation,
-    removeLiquidityEthSimulation,
-    removeLiquiditySimulation,
-    state.actionType,
-    gaugeNeedsApproval,
-    gaugeApprovalWriteRequest,
-    routerNeedsApproval,
-    routerApprovalWriteRequest,
-  ]);
+  const createGauge = useCreateGauge({
+    pair: pairInfo.pair_address,
+    enabled: isCreateGauge,
+  });
+  const stake = useStake({
+    needsApproval: gaugeNeedsApproval,
+    approvalSimulation: gaugeApprovalWriteRequest as SimulateReturnType,
+    fetchingApproval: gaugeApprovalFetching,
+    gaugeAddress: pairInfo.gauge,
+    amount,
+    pairQueryKey: pairInfo.queryKey,
+  });
+  const unstake = useUnstake({
+    gaugeAddress: pairInfo.gauge,
+    amount,
+    pairQueryKey: pairInfo.queryKey,
+  });
 
+  const removeLiquidity = useRemoveLiquidity({
+    token0: pairInfo.token0,
+    token1: pairInfo.token1,
+    isStable: pairInfo.stable,
+    amount,
+    resetSlider,
+    needsApproval: routerNeedsApproval,
+    approvalSimulation: routerApprovalWriteRequest as SimulateReturnType,
+    fetchingApproval: routerApprovalFetching,
+    pairQueryKey: balanceQueryKey,
+    allowanceKey: routerAllowanceKey,
+  });
+  let actionData = useSwitchActionType(
+    stake,
+    unstake,
+    removeLiquidity,
+    state.actionType
+  );
+  if (isCreateGauge) actionData = createGauge;
   const onSubmit = useCallback(() => {
-    switch (state.actionType) {
-      case LiquidityActions.Stake: {
-        if (pairInfo.gauge === zeroAddress && createGaugeSimulation) {
-          reset();
-          writeContract(createGaugeSimulation);
-          break;
-        }
-        if (gaugeApprovalWriteRequest && gaugeNeedsApproval) {
-          reset();
-          writeContract(gaugeApprovalWriteRequest);
-          break;
-        }
-        if (!stakeSimulation) break;
-        reset();
-        writeContract(stakeSimulation);
-        break;
-      }
-      case LiquidityActions.Unstake: {
-        if (!unstakeSimulation) break;
-        reset();
-        writeContract(unstakeSimulation);
-        break;
-      }
-      case LiquidityActions.Withdraw: {
-        if (routerNeedsApproval && routerApprovalWriteRequest) {
-          reset();
-          writeContract(routerApprovalWriteRequest);
-          return;
-        }
-        if (removeLiquiditySimulation.data) {
-          reset();
-          writeContract(removeLiquiditySimulation.data.request);
-          return;
-        }
-        if (removeLiquidityEthSimulation.data) {
-          reset();
-          writeContract(removeLiquidityEthSimulation.data.request);
-          return;
-        }
-        break;
-      }
-    }
-  }, [
-    state.actionType,
-    writeContract,
-    reset,
-    stakeSimulation,
-    unstakeSimulation,
-    routerNeedsApproval,
-    routerApprovalWriteRequest,
-    removeLiquiditySimulation,
-    removeLiquidityEthSimulation,
-    gaugeNeedsApproval,
-    gaugeApprovalWriteRequest,
-    createGaugeSimulation,
-    pairInfo.gauge,
-  ]);
-
-  const buttonChild = useMemo(() => {
-    switch (state.actionType) {
-      case LiquidityActions.Stake: {
-        return pairInfo.gauge !== zeroAddress ? "Stake" : "Create Vault";
-      }
-      case LiquidityActions.Unstake: {
-        return "Unstake";
-      }
-      case LiquidityActions.Withdraw: {
-        return "Withdraw";
-      }
-    }
-  }, [state.actionType, pairInfo.gauge]);
+    actionData?.onSubmit?.();
+  }, [actionData]);
 
   const token0 = useGetTokenInfo(pairInfo.token0);
   const token1 = useGetTokenInfo(pairInfo.token1);
-
-  const { state: buttonState } = useGetButtonStatuses({
-    isLoading,
-    isPending,
-    needsApproval:
-      state.actionType === LiquidityActions.Stake
-        ? pairInfo.gauge !== zeroAddress && gaugeNeedsApproval
-        : state.actionType === LiquidityActions.Withdraw
-          ? routerNeedsApproval
-          : false,
-    isFetching:
-      state.actionType === LiquidityActions.Stake
-        ? gaugeApprovalFetching
-        : state.actionType === LiquidityActions.Withdraw
-          ? routerApprovalFetching
-          : false,
+  const { buttonChild } = useButtonChild({
+    actionType: state.actionType,
+    gaugeExist: pairInfo.gauge !== zeroAddress,
   });
+  console.log({ token1, token0 });
   return (
     <Dialog open={state.dialogOpen} onOpenChange={onOpenChange}>
       <DialogContent className="p-0">
@@ -226,6 +138,7 @@ export default function DashboardLiquidityDialog({
               value={[sliderValue]}
               onValueChange={([value]) => {
                 setSliderValue(value);
+<<<<<<< HEAD
 
                 const calc =
                   state.actionType === LiquidityActions.Stake ||
@@ -233,6 +146,9 @@ export default function DashboardLiquidityDialog({
                     ? (BigInt(value) * pairInfo.account_lp_balance) / 100n
                     : (BigInt(value) * pairInfo.account_gauge_balance) / 100n;
                 setAmount(calc);
+=======
+                // TODO: Need to use staked and unstaked lp balance for Stake/Unstake
+>>>>>>> @{-1}
               }}
               min={0}
               max={100}
@@ -246,15 +162,22 @@ export default function DashboardLiquidityDialog({
               <span>Max</span>
             </div>
             <EstimatesHeader />
-            {/* {state.actionType === LiquidityActions.Withdraw && (
-              <WithdrawStats />
-            )} */}
+            {state.actionType === LiquidityActions.Withdraw && (
+              <WithdrawStats
+                amount={amount}
+                percent={sliderValue.toString()}
+                pairInfo={pairInfo}
+                token0={token0}
+                token1={token1}
+              />
+            )}
+            {/* <div>Balance:{pairInfo.account_lp_balance}</div> */}
           </div>
           <div className="p-4">
             <SubmitButton
               onClick={onSubmit}
-              isValid={isValid}
-              state={buttonState}
+              isValid={actionData.isValid}
+              state={actionData.buttonProps?.state ?? ButtonState.Default}
             >
               {buttonChild}
             </SubmitButton>
@@ -263,4 +186,26 @@ export default function DashboardLiquidityDialog({
       </DialogContent>
     </Dialog>
   );
+}
+function useButtonChild({
+  actionType,
+  gaugeExist,
+}: {
+  actionType: LiquidityActions;
+  gaugeExist: boolean;
+}) {
+  const buttonChild = useMemo(() => {
+    switch (actionType) {
+      case LiquidityActions.Stake: {
+        return gaugeExist ? "Stake" : "Create Vault";
+      }
+      case LiquidityActions.Unstake: {
+        return "Unstake";
+      }
+      case LiquidityActions.Withdraw: {
+        return "Withdraw";
+      }
+    }
+  }, [actionType, gaugeExist]);
+  return { buttonChild };
 }
