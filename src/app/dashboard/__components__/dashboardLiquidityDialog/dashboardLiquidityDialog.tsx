@@ -19,6 +19,8 @@ import { useStake } from "../../__hooks__/stake/useStake";
 import { SimulateContractReturnType } from "@wagmi/core";
 import { useUnstake } from "../../__hooks__/unstake/useUnstake";
 import useSwitchActionType from "../../__hooks__/useSwitchActionType";
+import WithdrawStats from "./withdrawStats";
+import { useDebounce } from "@/lib/hooks/useDebounce";
 
 type ElementType<T extends readonly object[]> = T[number];
 
@@ -36,7 +38,8 @@ export default function DashboardLiquidityDialog({
   const header = useGetHeader({ state });
   const chainId = useChainId();
   const router = useMemo(() => ROUTER[chainId], [chainId]);
-  const [amount, setAmount] = useState(0n);
+  const [rawAmount, setAmount] = useState(0n);
+  const { debouncedValue: amount } = useDebounce(rawAmount, 400);
   const [sliderValue, setSliderValue] = useState(0);
 
   const isCreateGauge =
@@ -108,6 +111,7 @@ export default function DashboardLiquidityDialog({
     actionType: state.actionType,
     gaugeExist: pairInfo.gauge !== zeroAddress,
   });
+  console.log({ token1, token0 });
   return (
     <Dialog open={state.dialogOpen} onOpenChange={onOpenChange}>
       <DialogContent className="p-0">
@@ -141,9 +145,16 @@ export default function DashboardLiquidityDialog({
               <span>Max</span>
             </div>
             <EstimatesHeader />
-            {/* {state.actionType === LiquidityActions.Withdraw && (
-              <WithdrawStats />
-            )} */}
+            {state.actionType === LiquidityActions.Withdraw && (
+              <WithdrawStats
+                amount={amount}
+                percent={sliderValue.toString()}
+                pairInfo={pairInfo}
+                token0={token0}
+                token1={token1}
+              />
+            )}
+            {/* <div>Balance:{pairInfo.account_lp_balance}</div> */}
           </div>
           <div className="p-4">
             <SubmitButton

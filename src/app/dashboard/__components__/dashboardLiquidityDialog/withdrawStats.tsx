@@ -2,61 +2,81 @@ import React from "react";
 import { useChainId, useReadContract } from "wagmi";
 import { abi } from "@/lib/abis/Router";
 import { ROUTER } from "@/data/constants";
-import { Address, formatUnits, zeroAddress } from "viem";
-import { useDashboardLiquidityProvider } from "../../__context__/dashboardLiquidityProvider";
-import { useGetBalance } from "@/lib/hooks/useGetBalance";
-export default function WithdrawStats() {
-  const { selectedUserLiquidityPosition, state } =
-    useDashboardLiquidityProvider();
-  const amountPercent = state.sliderValue;
-  const { balance } = useGetBalance({
-    tokenAddress: selectedUserLiquidityPosition?.pair.id as Address,
-  });
-  const amount = (balance * BigInt(amountPercent)) / 100n;
+import { formatUnits, zeroAddress } from "viem";
+import { TPair } from "../../types";
+import { TToken } from "@/lib/types";
+import usePadLoading from "@/lib/hooks/usePadLoading";
+interface Props {
+  amount: bigint;
+  pairInfo: TPair;
+  token0: TToken | undefined;
+  token1: TToken | undefined;
+  percent: string;
+}
+export default function WithdrawStats({
+  token0,
+  token1,
+  amount,
+  percent,
+  pairInfo,
+}: Props) {
   const chainId = useChainId();
-  const token0Addr = selectedUserLiquidityPosition?.pair.token0.id as
-    | Address
-    | undefined;
-  const token1Addr = selectedUserLiquidityPosition?.pair.token1.id as
-    | Address
-    | undefined;
-  const { data } = useReadContract({
+  const { data, isLoading: quoteLoading } = useReadContract({
     abi,
     address: ROUTER[chainId],
     functionName: "quoteRemoveLiquidity",
     args: [
-      token0Addr ?? zeroAddress,
-      token1Addr ?? zeroAddress,
-      !!selectedUserLiquidityPosition?.pair.isStable,
+      pairInfo.token0 ?? zeroAddress,
+      pairInfo.token1 ?? zeroAddress,
+      pairInfo?.stable,
       amount,
     ],
   });
+  const isLoading = usePadLoading({ value: quoteLoading, duration: 400 });
+  if (!token0 || !token1) return;
   return (
-    <div>
+    <div className="space-y-2">
       <StatRow
-        title={`Withdrawing ${selectedUserLiquidityPosition?.pair.token0.name} `}
-        value={formatUnits(
-          data?.[0] ?? 0n,
-          Number(selectedUserLiquidityPosition?.pair.token0.decimals) ?? 18
-        )}
+        title={`Withdrawing ${token0.symbol} `}
+        value={formatUnits(data?.[0] ?? 0n, Number(token0.decimals) ?? 18)}
+        isLoading={isLoading}
       />
       <StatRow
-        title={`Withdrawing ${selectedUserLiquidityPosition?.pair.token1.name} `}
-        value={formatUnits(
-          data?.[1] ?? 0n,
-          Number(selectedUserLiquidityPosition?.pair.token0.decimals) ?? 18
-        )}
+        title={`Withdrawing ${token1.symbol} `}
+        value={formatUnits(data?.[1] ?? 0n, Number(token1.decimals) ?? 18)}
+        isLoading={isLoading}
       />
-      <StatRow title="Percent" value={amountPercent.toString()} />
+      <StatRow title="Percent" value={percent + "%"} />
+      {/* <StatRow */}
+      {/*   title={`Withdrawing ${selectedUserLiquidityPosition?.pair.token1.name} `} */}
+      {/*   value={formatUnits( */}
+      {/*     data?.[1] ?? 0n, */}
+      {/*     Number(selectedUserLiquidityPosition?.pair.token0.decimals) ?? 18 */}
+      {/*   )} */}
+      {/* /> */}
     </div>
   );
 }
 
-function StatRow({ title, value }: { title: string; value: string }) {
+function StatRow({
+  title,
+  isLoading,
+  value,
+}: {
+  isLoading?: boolean;
+  title: string;
+  value: string;
+}) {
   return (
-    <div className="flex justify-between">
-      <span className="text-white">{title}</span>
-      <span>{value}</span>
+    <div className="flex justify-between  text-sm">
+      <span className=" text-neutral-300">{title}</span>
+      {isLoading ? (
+        <div className="bg-neutral-700/70 rounded-md animate-pulse">
+          <span className="text-transparent">hello</span>
+        </div>
+      ) : (
+        <span className="text-neutral-100">{value}</span>
+      )}
     </div>
   );
 }
