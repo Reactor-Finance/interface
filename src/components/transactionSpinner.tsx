@@ -7,7 +7,7 @@ export default function TransactionSpinner() {
   const { txReceipt } = useTransactionToastProvider();
   if (!txReceipt.isLoading) return;
   return (
-    <div className="absolute z-[100] right-[34px] top-[74px]">
+    <div className="fixed z-[100] right-[34px] top-[74px]">
       <Spinner />
     </div>
   );
