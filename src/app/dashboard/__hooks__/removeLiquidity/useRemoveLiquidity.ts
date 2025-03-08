@@ -64,7 +64,7 @@ export function useRemoveLiquidity({
       Math.floor(now.getTime() / 1000) + transactionDeadlineInMinutes * 60;
     return BigInt(ttl);
   }, [now, transactionDeadlineInMinutes]);
-
+  console.log({ deadline });
   const isEth =
     token0.toLowerCase() === weth.toLowerCase() ||
     token1.toLowerCase() === weth.toLowerCase();
@@ -83,7 +83,7 @@ export function useRemoveLiquidity({
       address,
       deadline, //deadline
     ],
-    query: { enabled: !isEth },
+    query: { enabled: !isEth && amount > 0n },
   });
 
   const removeLiquidityEthSimulation = useSimulateContract({
@@ -100,7 +100,7 @@ export function useRemoveLiquidity({
       deadline, //deadline
       true, //withFeeOnTransferTokens
     ],
-    query: { enabled: isEth },
+    query: { enabled: isEth && amount > 0n },
   });
   const { writeContract, isPending, reset, data: hash } = useWriteContract();
   const { txReceipt, updateState } = useTransactionToastProvider();
