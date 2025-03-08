@@ -6,13 +6,7 @@ import * as Voter from "@/lib/abis/Voter";
 import { FormAction } from "../types";
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
 import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
-export function useCreateGauge({
-  pair,
-  enabled,
-}: {
-  pair: Address;
-  enabled: boolean;
-}): FormAction {
+export function useCreateGauge({ pair }: { pair: Address }): FormAction {
   const chainId = useChainId();
   const voter = useMemo(() => VOTER[chainId], [chainId]);
   const { data, error } = useSimulateContract({
@@ -28,8 +22,8 @@ export function useCreateGauge({
   const { writeContract, data: hash, isPending } = useWriteContract();
   const { updateState, txReceipt } = useTransactionToastProvider();
   useEffect(() => {
-    if (enabled) updateState({ hash });
-  }, [enabled, hash, updateState]);
+    if (hash) updateState({ hash });
+  }, [hash, updateState]);
   const onSubmit = () => {
     if (data?.request) {
       writeContract(data.request);
@@ -39,10 +33,21 @@ export function useCreateGauge({
     isPending,
     isLoading: txReceipt.isLoading,
   });
+  const { isValid, errorMessage } = useMemo(() => {
+    if (data?.request) {
+      return { isValid: true, errorMessage: null };
+    }
+    if (error) {
+      if (error.message.includes("whitelisted")) {
+        return { isValid: false, errorMessage: "Pair Not Whitelisted" };
+      }
+    }
+    return { isValid: false, errorMessage: null };
+  }, [data?.request, error]);
   return {
     onSubmit,
-    isValid: Boolean(data?.request),
+    isValid,
     buttonProps: { state: buttonState },
-    errorMessage: null,
+    errorMessage,
   };
 }
