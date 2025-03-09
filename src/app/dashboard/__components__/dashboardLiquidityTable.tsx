@@ -64,7 +64,7 @@ export default function DashboardLiquidityTable() {
         </div>
       )}
       {!activePairs.length && !isLoading && (
-        <div className="text-start mt-4 text-sm rounded-sm bg-neutral-1000 font-normal text-neutral-400 p-4">
+        <div className="text-start text-sm rounded-sm bg-neutral-1000 font-normal text-neutral-400 p-4">
           To receive emissions{" "}
           <span className="underline decoration-gray-500 font-semibold cursor-pointer text-white">
             deposit and stake
