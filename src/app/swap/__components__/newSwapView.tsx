@@ -225,6 +225,7 @@ export default function NewSwapView() {
       />
       <div className="space-y-1 relative">
         <SwapCard
+          title="Sell"
           openDialog={() => setFirstDialogOpen(true)}
           balance={formatUnits(token0Balance, token0?.decimals ?? 18)}
           value={amountIn}
@@ -233,6 +234,7 @@ export default function NewSwapView() {
           setValue={setAmountIn}
         />
         <SwapCard
+          title="Buy"
           selectPain={() => setActivePane(1)}
           openDialog={() => setSecondDialogOpen(true)}
           token={token1}

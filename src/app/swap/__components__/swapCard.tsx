@@ -11,6 +11,7 @@ interface Props {
   token: TToken | null;
   openDialog: () => void;
   selectPain: () => void;
+  title: string;
 }
 export default function SwapCard({
   openDialog,
@@ -19,13 +20,14 @@ export default function SwapCard({
   token,
   value,
   setValue,
+  title,
 }: Props) {
   return (
     <div
       onClick={selectPain}
       className="rounded-[16px] bg-[#303136] border border-[#43444C] space-y-3 p-6 "
     >
-      <h2 className="text-sm">Sell</h2>
+      <h2 className="text-sm text-[#CCCCCC]">{title}</h2>
       <div className="flex items-center gap-x-4 ">
         <Input
           value={value}
@@ -64,7 +66,7 @@ export default function SwapCard({
         </button>
       </div>
       <div className="flex justify-between">
-        <span>$0</span>
+        <span className="text-sm text-[#CCCCCC]">$0</span>
         <div className="flex gap-x-4">
           <div className="flex gap-x-1">
             <Image src={wallet} alt="Wallet" />
