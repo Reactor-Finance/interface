@@ -8,9 +8,9 @@ export default function EstimateRow({
   value: string;
 }) {
   return (
-    <div className="flex justify-between">
-      <h5 className="text-sm text-neutral-200">{title}</h5>
-      <h5 className="text-neutral-100">{value}</h5>
+    <div className="flex justify-between text-sm">
+      <h5 className="text-neutral-200">{title}</h5>
+      <h5 className="">{value}</h5>
     </div>
   );
 }
