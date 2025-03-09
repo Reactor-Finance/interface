@@ -47,8 +47,10 @@ export default function WithdrawStats({
         title={`Withdrawing ${token0.symbol} `}
         value={formatUnits(data?.[0] ?? 0n, Number(token0.decimals) ?? 18)}
         isLoading={isLoading}
+        formatNum
       />
       <StatRow
+        formatNum
         title={`Withdrawing ${token1.symbol} `}
         value={formatUnits(data?.[1] ?? 0n, Number(token1.decimals) ?? 18)}
         isLoading={isLoading}

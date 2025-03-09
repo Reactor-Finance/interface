@@ -24,7 +24,7 @@ export function StatRow({
           {!formatNum ? (
             value
           ) : (
-            <DisplayFormattedNumber num={formatNumber(value)} />
+            <DisplayFormattedNumber num={formatNumber(value, 5)} />
           )}
         </span>
       )}
