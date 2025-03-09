@@ -8,6 +8,7 @@ import DashboardLiquidityTable from "./__components__/dashboardLiquidityTable";
 import LockTable from "../lock/lockTable/lockTable";
 import ClaimAllLocks from "../lock/claimAllLocks";
 import { LockProvider } from "../lock/lockProvider";
+import Link from "next/link";
 
 export default function Dashboard() {
   return (
@@ -40,9 +41,11 @@ export default function Dashboard() {
             >
               Deposit & Staked Liquidity
             </Headers.InfoHeaderTwo>
-            <Button variant={"primary"} size="md">
-              New Deposit
-            </Button>
+            <Link href="/liquidity/deposit">
+              <Button variant={"primary"} size="md">
+                New Deposit
+              </Button>
+            </Link>
           </div>
           <div className="pt-6"></div>
           <DashboardLiquidityTable />
