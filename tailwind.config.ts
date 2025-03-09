@@ -11,7 +11,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        geistMono: ["var(--font-geist-mono)"],
+        jetbrainsMono: ["var(--font-jetbrains-mono)"],
       },
       margin: {},
       gridTemplateColumns: {

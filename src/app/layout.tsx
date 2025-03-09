@@ -26,7 +26,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`text-white overflow-x-hidden ${jetbrainsMono.className} antialiased`}
+        className={`text-white bg-background  overflow-x-hidden ${jetbrainsMono.className} antialiased`}
       >
         <Providers>
           <TransactionToast />

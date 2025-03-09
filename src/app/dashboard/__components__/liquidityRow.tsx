@@ -8,14 +8,11 @@ import PoolHeader from "@/components/shared/poolHeader";
 import { TPoolType } from "@/lib/types";
 import { useGetTokenInfo } from "@/utils";
 import { useRouter } from "next/navigation";
-import { useGetPairs } from "@/lib/hooks/useGetPairs";
-import { LiquidityActions } from "../types";
+import { LiquidityActions, TPair } from "../types";
 import { useCallback, useMemo } from "react";
 import { useGetMarketQuote } from "@/lib/hooks/useGetMarketQuote";
 import { formatNumber } from "@/lib/utils";
 import { formatEther, formatUnits } from "viem";
-
-type ElementType<T extends readonly object[]> = T[number];
 
 export function LiquidityRow({
   pairInfo: {
@@ -30,7 +27,7 @@ export function LiquidityRow({
   },
   onItemClick,
 }: {
-  pairInfo: ElementType<ReturnType<typeof useGetPairs>>;
+  pairInfo: TPair;
   onItemClick: (action: LiquidityActions) => void;
 }) {
   const router = useRouter();
@@ -117,7 +114,11 @@ export function LiquidityRow({
       </td>
       <td>
         <div className="flex gap-x-2 justify-end">
-          <Button variant={"primary"} size="xs">
+          <Button
+            disabled={account_gauge_earned === 0n}
+            variant={"primary"}
+            size="xs"
+          >
             Claim
           </Button>
           <DropdownMenu.Root>

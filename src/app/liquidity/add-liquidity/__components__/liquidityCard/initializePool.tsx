@@ -21,8 +21,10 @@ import { useGetTokenInfo } from "@/utils";
 import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
 import { useQueryClient } from "@tanstack/react-query";
 import { useGetBalance } from "@/lib/hooks/useGetBalance";
-import AddLiquidityInfo from "./addLiquidityInfo";
 import { useGetPairInfo } from "@/lib/hooks/useGetPairInfo";
+import DisplayFormattedNumber from "@/components/shared/displayFormattedNumber";
+import { formatNumber } from "@/lib/utils";
+import InitPoolInfo from "./initPoolInfo";
 
 const searchParamsSchema = z.object({
   token0: z.string().refine((arg) => isAddress(arg)),
@@ -52,13 +54,17 @@ export default function InitializePool() {
     return { t1: token1, t0: token0, version: v };
   }, [params]);
 
-  console.log({ t0, t1 }, "LOOGGG===========");
   // Tokens
   const token0 = useGetTokenInfo(t0 ?? "0x");
   const token1 = useGetTokenInfo(t1 ?? "0x");
 
   const [amount0, setAmount0] = useState("");
   const [amount1, setAmount1] = useState("");
+  useEffect(() => {
+    // reset inputs if change pool version
+    setAmount0("");
+    setAmount1("");
+  }, [version]);
 
   // Router
   const router = useMemo(() => ROUTER[chainId], [chainId]);
@@ -271,14 +277,22 @@ export default function InitializePool() {
   useEffect(() => {
     if (selectedInput === "0") {
       if (quoteLiquidity && pairExists) {
-        setAmount1(formatUnits(quoteLiquidity, token1?.decimals ?? 18));
+        let num = parseFloat(
+          formatUnits(quoteLiquidity, token1?.decimals ?? 18)
+        );
+        num = Math.floor(num * 100) / 100;
+        setAmount1(num.toString());
       }
       if (amount0 === "" && pairExists) {
         setAmount1("");
       }
     } else {
       if (quoteLiquidity && pairExists) {
-        setAmount0(formatUnits(quoteLiquidity, token0?.decimals ?? 18));
+        let num = parseFloat(
+          formatUnits(quoteLiquidity, token1?.decimals ?? 18)
+        );
+        num = Math.floor(num * 100) / 100;
+        setAmount0(num.toString());
       }
       if (amount1 === "" && pairExists) {
         setAmount0("");
@@ -326,15 +340,15 @@ export default function InitializePool() {
           />
         </div>
       )}
-      {!pair && (
-        <AddLiquidityInfo
+      {!pairExists && (
+        <InitPoolInfo
           amount0={amount0}
           amount1={amount1}
           token0={token0}
           token1={token1}
         />
       )}
-      {pair && (
+      {pairExists && (
         <>
           <div className="">
             <h5>Reserve Info</h5>
@@ -343,19 +357,27 @@ export default function InitializePool() {
               <div className="flex text-neutral-300 text-sm justify-between">
                 <span>{token0?.symbol} Amount</span>
                 <span>
-                  {formatUnits(
-                    pairInfo?.reserve0 ?? 0n,
-                    token0?.decimals ?? 18
-                  )}
+                  <DisplayFormattedNumber
+                    num={formatNumber(
+                      formatUnits(
+                        pairInfo?.reserve0 ?? 0n,
+                        token0?.decimals ?? 18
+                      )
+                    )}
+                  />
                 </span>
               </div>
               <div className="flex text-neutral-300 text-sm justify-between">
                 <span>{token1?.symbol} Amount</span>
                 <span>
-                  {formatUnits(
-                    pairInfo?.reserve0 ?? 0n,
-                    token0?.decimals ?? 18
-                  )}
+                  <DisplayFormattedNumber
+                    num={formatNumber(
+                      formatUnits(
+                        pairInfo?.reserve0 ?? 0n,
+                        token0?.decimals ?? 18
+                      )
+                    )}
+                  />
                 </span>
               </div>
             </div>
@@ -365,7 +387,12 @@ export default function InitializePool() {
 
             <div className="flex pt-1 text-neutral-300 text-sm justify-between">
               <span>Amount</span>
-              <span>{formatUnits(balance ?? 0n, 18)} lp</span>
+              <span>
+                <DisplayFormattedNumber
+                  num={formatNumber(formatUnits(balance ?? 0n, 18))}
+                />{" "}
+                lp
+              </span>
             </div>
           </div>
         </>
