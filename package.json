@@ -18,7 +18,8 @@
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
-      "eslint_d --fix"
+      "eslint_d --fix",
+      "prettier --check"
     ]
   },
   "commitlint": {
