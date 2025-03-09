@@ -17,11 +17,7 @@ interface State {
 }
 
 const initialState: State = {
-  toastInfo: {
-    hash: undefined,
-    actionTitle: undefined,
-    actionDescription: undefined,
-  },
+  toastInfo: undefined,
 };
 interface ContextType {
   state: State;
