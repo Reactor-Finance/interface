@@ -37,7 +37,7 @@ export default function LockTable() {
           {!lockTokens.length && (
             <tr className="rounded-sm items-center bg-neutral-1000 py-4 px-4">
               <td>
-                <p className="text-sm text-neutral-400 px-6">
+                <p className="text-sm text-neutral-400">
                   To receive incentives and fees, you need to create a lock and
                   vote with it.
                 </p>

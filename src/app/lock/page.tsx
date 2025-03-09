@@ -39,7 +39,7 @@ export default function Lock() {
 
             <ClaimAllLocks />
           </div>
-          <div className="pt-8"></div>
+          <div className="pt-6"></div>
           <div>
             <LockTable />
           </div>

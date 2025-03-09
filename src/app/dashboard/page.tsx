@@ -59,7 +59,7 @@ export default function Dashboard() {
 
             <ClaimAllLocks />
           </div>
-          <div className="pt-8"></div>
+          <div className="pt-6"></div>
           <div>
             <LockTable />
           </div>
