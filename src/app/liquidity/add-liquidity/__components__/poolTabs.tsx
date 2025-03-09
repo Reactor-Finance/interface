@@ -88,7 +88,7 @@ export default function PoolTabs() {
             onClick={() => tabTriggerHandle(TPoolType.VOLATILE)}
             value="volatile"
           >
-            Classic
+            Volatile
           </TabsTrigger>
           <TabsTrigger
             onClick={() => tabTriggerHandle(TPoolType.CONCENTRATED)}
