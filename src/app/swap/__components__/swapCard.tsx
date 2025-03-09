@@ -2,7 +2,7 @@ import Input from "@/components/ui/input";
 import { ChevronDown } from "lucide-react";
 import Image from "next/image";
 import wallet from "@/assets/wallet.svg";
-import { inputPatternMatch } from "@/lib/utils";
+import { formatNumber, inputPatternMatch } from "@/lib/utils";
 import { TToken } from "@/lib/types";
 interface Props {
   balance: string;
@@ -70,7 +70,7 @@ export default function SwapCard({
         <div className="flex gap-x-4">
           <div className="flex gap-x-1">
             <Image src={wallet} alt="Wallet" />
-            <span>{balance}</span>
+            <span>{formatNumber(balance)}</span>
           </div>
           <button className="text-sm text-neutral-300">Max</button>
         </div>

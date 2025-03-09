@@ -63,6 +63,12 @@ export default function NewSwapView() {
     if (!token0 || !token1) {
       return;
     }
+    if (activePane === 0 && amountIn === "") {
+      setAmountOut("");
+    }
+    if (activePane === 1 && amountOut === "") {
+      setAmountIn("");
+    }
     if (activePane === 0 && !amountOutLoading && amountIn !== "") {
       setAmountOut(quoteAmount);
     } else if (activePane === 1 && !amountInLoading && amountOut !== "") {
@@ -128,6 +134,7 @@ export default function NewSwapView() {
     if (isSuccess) {
       reset();
       setAmountIn("");
+      setAmountOut("");
     }
   }, [isSuccess, reset]);
   const switchTokens = useCallback(() => {
