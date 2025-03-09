@@ -21,10 +21,10 @@ import { useGetTokenInfo } from "@/utils";
 import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
 import { useQueryClient } from "@tanstack/react-query";
 import { useGetBalance } from "@/lib/hooks/useGetBalance";
-import AddLiquidityInfo from "./addLiquidityInfo";
 import { useGetPairInfo } from "@/lib/hooks/useGetPairInfo";
 import DisplayFormattedNumber from "@/components/shared/displayFormattedNumber";
 import { formatNumber } from "@/lib/utils";
+import InitPoolInfo from "./initPoolInfo";
 
 const searchParamsSchema = z.object({
   token0: z.string().refine((arg) => isAddress(arg)),
@@ -336,15 +336,15 @@ export default function InitializePool() {
           />
         </div>
       )}
-      {!pair && (
-        <AddLiquidityInfo
+      {!pairExists && (
+        <InitPoolInfo
           amount0={amount0}
           amount1={amount1}
           token0={token0}
           token1={token1}
         />
       )}
-      {pair && (
+      {pairExists && (
         <>
           <div className="">
             <h5>Reserve Info</h5>

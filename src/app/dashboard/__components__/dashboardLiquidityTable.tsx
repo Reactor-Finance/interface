@@ -4,9 +4,10 @@ import DashboardLiquidityDialog from "./dashboardLiquidityDialog/dashboardLiquid
 import { LiquidityRow } from "./liquidityRow";
 import { useMemo, useState } from "react";
 import { LiquidityActions, StateType } from "../types";
+import usePadLoading from "@/lib/hooks/usePadLoading";
 
 export default function DashboardLiquidityTable() {
-  const pairs = useGetPairs({});
+  const { data: pairs, isLoading } = useGetPairs({});
   const activePairs = useMemo(
     () => pairs.filter((pair) => pair.account_lp_balance > 0n),
     [pairs]
@@ -16,6 +17,7 @@ export default function DashboardLiquidityTable() {
     dialogOpen: false,
     actionType: LiquidityActions.Stake,
   });
+  const isLoadingPadded = usePadLoading({ value: isLoading, duration: 200 });
   return (
     <>
       {stateType && selectedPair && (
@@ -40,20 +42,22 @@ export default function DashboardLiquidityTable() {
           </tr>
         </thead>
         <tbody className="flex flex-col space-y-2">
-          {activePairs.map((pair) => (
-            <LiquidityRow
-              key={pair.pair_address}
-              pairInfo={pair}
-              onItemClick={(actionType) => {
-                setSelectedPair(pair);
-                setStateType({ actionType, dialogOpen: true });
-              }}
-            />
-          ))}
+          {/* {isLoadingPadded && <RowSkeleton />} */}
+          {!isLoadingPadded &&
+            activePairs.map((pair) => (
+              <LiquidityRow
+                key={pair.pair_address}
+                pairInfo={pair}
+                onItemClick={(actionType) => {
+                  setSelectedPair(pair);
+                  setStateType({ actionType, dialogOpen: true });
+                }}
+              />
+            ))}
         </tbody>
       </table>
 
-      {!activePairs.length && (
+      {!activePairs.length && !isLoading && (
         <div className="text-start rounded-sm bg-neutral-1000 font-normal text-neutral-400 py-4 px-6">
           To receive emissions{" "}
           <span className="underline decoration-gray-500 font-semibold cursor-pointer text-white">
@@ -65,3 +69,21 @@ export default function DashboardLiquidityTable() {
     </>
   );
 }
+// function RowSkeleton() {
+//   return (
+//     <tr className="grid text-center rounded-sm grid-cols-7 items-center bg-neutral-1000 py-2 px-6">
+//       <td className="col-span-2 text-left">
+//         <div className="h-4 w-10 bg-neutral-950 animate-pulse"></div>
+//       </td>
+//       <td className="col-span-2 text-left">
+//         <div className="h-4 w-10 bg-neutral-950 animate-pulse"></div>
+//       </td>
+//       <td className="col-span-2 text-left">
+//         <div className="h-4 w-10 bg-neutral-950 animate-pulse"></div>
+//       </td>
+//       <td className="col-span-2 text-left">
+//         <div className="h-4 w-10 bg-neutral-950 animate-pulse"></div>
+//       </td>
+//     </tr>
+//   );
+// }
