@@ -29,9 +29,11 @@ export default function StakeStats({
       />
       <StatRow
         title={verb + " " + token0?.symbol}
+        formatNum
         value={`${formatUnits(a, token0?.decimals ?? 18)} ${token0?.symbol}`}
       />
       <StatRow
+        formatNum
         title={verb + " " + token1?.symbol}
         value={`${formatUnits(b, token1?.decimals ?? 18)} ${token1?.symbol}`}
       />

@@ -1,9 +1,14 @@
+import DisplayFormattedNumber from "@/components/shared/displayFormattedNumber";
+import { formatNumber } from "@/lib/utils";
+
 export function StatRow({
   title,
   isLoading,
   value,
+  formatNum,
 }: {
   isLoading?: boolean;
+  formatNum?: boolean;
   title: string;
   value: string;
 }) {
@@ -15,7 +20,13 @@ export function StatRow({
           <span className="text-transparent">hello</span>
         </div>
       ) : (
-        <span className="text-white">{value}</span>
+        <span className="text-white">
+          {!formatNum ? (
+            value
+          ) : (
+            <DisplayFormattedNumber num={formatNumber(value)} />
+          )}
+        </span>
       )}
     </div>
   );
