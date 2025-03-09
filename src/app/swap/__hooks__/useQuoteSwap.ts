@@ -7,10 +7,14 @@ import { ETHER, TRADE_HELPER, WETH } from "@/data/constants";
 
 export function useQuoteSwap({
   amountIn,
+  amountOut,
   tokenIn,
   tokenOut,
+  selected,
 }: {
   amountIn: string;
+  amountOut: string;
+  selected: 0 | 1;
   tokenIn: TToken | null;
   tokenOut: TToken | null;
 }) {
@@ -31,11 +35,14 @@ export function useQuoteSwap({
         : tokenOut?.address,
     [tokenOut?.address, weth]
   );
+  const tokensExist = useMemo(
+    () => tokenIn !== null && tokenOut !== null,
+    [tokenIn, tokenOut]
+  );
   const {
-    data: [receivedAmount] = [BigInt(0), false],
+    data: [receivedAmountOut] = [BigInt(0), false],
     error,
     isLoading,
-    // refetch,
   } = useReadContract({
     address,
     ...TradeHelper,
@@ -46,10 +53,24 @@ export function useQuoteSwap({
       address1 ?? zeroAddress,
     ],
     query: {
-      enabled: !!amountIn && tokenIn !== null && tokenOut !== null,
+      enabled: !!amountIn && tokensExist && selected === 0,
     },
   });
-
+  const { data: [receivedAmountIn] = [BigInt(0), false], error: e } =
+    useReadContract({
+      address,
+      ...TradeHelper,
+      functionName: "getAmountIn",
+      args: [
+        parseUnits(String(amountOut), tokenOut?.decimals ?? 18),
+        address0 ?? zeroAddress,
+        address1 ?? zeroAddress,
+      ],
+      query: {
+        enabled: !!amountOut && tokensExist && selected === 1,
+      },
+    });
+  console.log(e, receivedAmountIn);
   const isIntrinsicWETHProcess = useMemo(
     () =>
       (tokenIn?.address.toLowerCase() === weth.toLowerCase() &&
@@ -58,8 +79,11 @@ export function useQuoteSwap({
         tokenOut?.address.toLowerCase() === weth.toLowerCase()),
     [weth, tokenIn?.address, tokenOut?.address]
   );
-
-  const amountOut = useMemo(
+  const receivedAmount = useMemo(
+    () => (selected === 0 ? receivedAmountOut : receivedAmountIn),
+    [selected, receivedAmountOut, receivedAmountIn]
+  );
+  const quoteAmount = useMemo(
     () =>
       isIntrinsicWETHProcess
         ? amountIn
@@ -69,11 +93,5 @@ export function useQuoteSwap({
     [receivedAmount, amountIn, tokenOut, isIntrinsicWETHProcess]
   );
 
-  // useWatchBlocks({
-  //   onBlock: () => {
-  //     void refetch();
-  //   },
-  // });
-
-  return { amountOut, error, isLoading };
+  return { quoteAmount, error, isLoading };
 }

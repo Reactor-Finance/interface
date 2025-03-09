@@ -45,17 +45,25 @@ export default function NewSwapView() {
   const [secondDialogOpen, setSecondDialogOpen] = useState(false);
 
   // Active input pane
-  // const [activePane, setActivePane] = useState<0 | 1 | null>(null);
+  const [activePane, setActivePane] = useState<0 | 1>(1);
 
   // Quote
-  const { amountOut: quoteOut } = useQuoteSwap({
+  const { quoteAmount } = useQuoteSwap({
     amountIn,
+    amountOut,
+    selected: activePane ?? 0,
     tokenIn: token0,
     tokenOut: token1,
   });
+  console.log({ quoteAmount });
+  console.log({ activePane });
   useEffect(() => {
-    setAmountOut(quoteOut);
-  }, [quoteOut]);
+    if (activePane === 0) {
+      setAmountOut(quoteAmount);
+    } else if (activePane === 1) {
+      setAmountIn(quoteAmount);
+    }
+  }, [activePane, quoteAmount]);
 
   // Router by chain ID
   const router = useMemo(() => ROUTER[chainId], [chainId]);
@@ -121,7 +129,6 @@ export default function NewSwapView() {
     token1,
     token0Balance,
   });
-  console.log(approveWriteRequest, swapSimulation);
   const onSubmit = useCallback(() => {
     if (isIntrinsicWETHProcess) {
       if (isWETHToEther) {
@@ -219,10 +226,12 @@ export default function NewSwapView() {
           openDialog={() => setFirstDialogOpen(true)}
           balance={formatUnits(token0Balance, token0?.decimals ?? 18)}
           value={amountIn}
+          selectPain={() => setActivePane(0)}
           token={token0}
           setValue={setAmountIn}
         />
         <SwapCard
+          selectPain={() => setActivePane(1)}
           openDialog={() => setSecondDialogOpen(true)}
           token={token1}
           balance={formatUnits(token1Balance, token1?.decimals ?? 18)}

@@ -10,16 +10,21 @@ interface Props {
   setValue: (value: string) => void;
   token: TToken | null;
   openDialog: () => void;
+  selectPain: () => void;
 }
 export default function SwapCard({
   openDialog,
+  selectPain,
   balance,
   token,
   value,
   setValue,
 }: Props) {
   return (
-    <div className="rounded-[16px] bg-[#303136] border border-[#43444C] space-y-3 p-6 ">
+    <div
+      onClick={selectPain}
+      className="rounded-[16px] bg-[#303136] border border-[#43444C] space-y-3 p-6 "
+    >
       <h2 className="text-sm">Sell</h2>
       <div className="flex items-center gap-x-4 ">
         <Input
