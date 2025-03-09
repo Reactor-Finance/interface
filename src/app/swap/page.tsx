@@ -1,6 +1,6 @@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import SwapView from "./__components__/swapView";
 import { Card } from "@/components/ui/card";
+import NewSwapView from "./__components__/newSwapView";
 
 export default function Swap() {
   return (
@@ -26,7 +26,8 @@ export default function Swap() {
           </Tabs>
         </div>
         <Card className="min-w-[380px] p-0 rounded-md">
-          <SwapView />
+          {/* <SwapView /> */}
+          <NewSwapView />
         </Card>
       </div>
     </div>

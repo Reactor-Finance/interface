@@ -1,8 +1,6 @@
 "use client";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import SwapIconBorder from "@/components/shared/swapIconBorder";
 import TokensDialog from "@/components/shared/tokensDialog";
-import CurrencyInput from "@/components/shared/currencyInput";
 import useApproveWrite from "@/lib/hooks/useApproveWrite";
 import {
   useChainId,
@@ -10,7 +8,6 @@ import {
   useWriteContract,
 } from "wagmi";
 import { useSwapSimulation } from "../__hooks__/useSwapSimulation";
-import SubmitButton from "@/components/shared/submitBtn";
 import { useQuoteSwap } from "../__hooks__/useQuoteSwap";
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
 import { TToken } from "@/lib/types";
@@ -18,16 +15,19 @@ import { ROUTER } from "@/data/constants";
 import { formatUnits, parseUnits, zeroAddress } from "viem";
 import { useWETHExecutions } from "../__hooks__/useWETHExecutions";
 import { useGetBalance } from "@/lib/hooks/useGetBalance";
-import { formatNumber } from "@/lib/utils";
 import useSwapValidation from "../__hooks__/useSwapValidation";
 import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
+import { ArrowDown } from "lucide-react";
+import SwapCard from "./swapCard";
+import SubmitButton from "@/components/shared/submitBtn";
 
-export default function SwapView() {
+export default function NewSwapView() {
   // Wagmi parameters
   const chainId = useChainId();
 
   // Amount in
   const [amountIn, setAmountIn] = useState("");
+  const [amountOut, setAmountOut] = useState("");
   // Selected tokens
   const [token0, setToken0] = useState<TToken | null>(null);
   const [token1, setToken1] = useState<TToken | null>(null);
@@ -45,14 +45,27 @@ export default function SwapView() {
   const [secondDialogOpen, setSecondDialogOpen] = useState(false);
 
   // Active input pane
-  const [activePane, setActivePane] = useState<0 | 1 | null>(null);
+  const [activePane, setActivePane] = useState<0 | 1>(0);
 
   // Quote
-  const { amountOut } = useQuoteSwap({
+  const {
+    quoteAmount,
+    isLoading: amountOutLoading,
+    amountInLoading,
+  } = useQuoteSwap({
     amountIn,
+    amountOut,
+    selected: activePane ?? 0,
     tokenIn: token0,
     tokenOut: token1,
   });
+  useEffect(() => {
+    if (activePane === 0 && !amountOutLoading) {
+      setAmountOut(quoteAmount);
+    } else if (activePane === 1 && !amountInLoading) {
+      setAmountIn(quoteAmount);
+    }
+  }, [activePane, amountInLoading, amountOutLoading, quoteAmount]);
 
   // Router by chain ID
   const router = useMemo(() => ROUTER[chainId], [chainId]);
@@ -118,7 +131,6 @@ export default function SwapView() {
     token1,
     token0Balance,
   });
-  console.log(approveWriteRequest, swapSimulation);
   const onSubmit = useCallback(() => {
     if (isIntrinsicWETHProcess) {
       if (isWETHToEther) {
@@ -191,9 +203,8 @@ export default function SwapView() {
       console.log(swapSimulationError);
     }
   }, [writeError, swapSimulationError]);
-
   return (
-    <div className="relative space-y-2">
+    <div className="space-y-1">
       <TokensDialog
         open={firstDialogOpen}
         onOpen={setFirstDialogOpen}
@@ -212,81 +223,42 @@ export default function SwapView() {
           token1?.address ?? zeroAddress,
         ]}
       />
-      <InputPane active={activePane === 0} onClick={() => setActivePane(0)}>
-        <CurrencyInput.Root
+      <div className="space-y-1 relative">
+        <SwapCard
           title="Sell"
-          estimate={formatNumber(
-            formatUnits(token0Balance, token0?.decimals ?? 18)
-          )}
-        >
-          <CurrencyInput.CurrencySelect
-            onClick={() => setFirstDialogOpen(true)}
-            token={token0}
-          />
-          <CurrencyInput.NumberInput
-            onChangeValue={(value: string) => setAmountIn(value)}
-            value={amountIn}
-            disabled={false}
-            decimals={10}
-          />
-        </CurrencyInput.Root>
-      </InputPane>
-      <SwapIconBorder swapIconClick={switchTokens} />
-      <InputPane active={activePane === 1} onClick={() => setActivePane(1)}>
-        <CurrencyInput.Root
+          openDialog={() => setFirstDialogOpen(true)}
+          balance={formatUnits(token0Balance, token0?.decimals ?? 18)}
+          value={amountIn}
+          selectPain={() => setActivePane(0)}
+          token={token0}
+          setValue={setAmountIn}
+        />
+        <SwapCard
           title="Buy"
-          estimate={formatNumber(
-            formatUnits(token1Balance, token1?.decimals ?? 18)
-          )}
+          selectPain={() => setActivePane(1)}
+          openDialog={() => setSecondDialogOpen(true)}
+          token={token1}
+          balance={formatUnits(token1Balance, token1?.decimals ?? 18)}
+          value={amountOut}
+          setValue={setAmountOut}
+        />
+        <button
+          onClick={switchTokens}
+          className="h-14 flex items-center justify-center rounded-full w-14 bg-black absolute left-1/2 top-1/2 -translate-y-[calc(50%+4px)] -translate-x-1/2"
         >
-          <CurrencyInput.CurrencySelect
-            onClick={() => setSecondDialogOpen(true)}
-            token={token1}
-          />
-          <CurrencyInput.NumberInput
-            value={amountOut}
-            disabled={true}
-            decimals={10}
-          />
-        </CurrencyInput.Root>
-      </InputPane>
-
-      <div className="pt-2">
-        <SubmitButton
-          state={buttonState}
-          isValid={stateValid && isValid}
-          validationError={errorMessage}
-          disabled={!stateValid}
-          approveTokenSymbol={token0?.symbol}
-          onClick={onSubmit}
-        >
-          {isIntrinsicWETHProcess
-            ? isWETHToEther
-              ? "Unwrap"
-              : "Wrap"
-            : "Swap"}
-        </SubmitButton>
+          <div className="h-12 w-12 rounded-full bg-neutral-950 flex items-center justify-center">
+            <ArrowDown className="text-neutral-300" size={18} />
+          </div>
+        </button>
       </div>
-    </div>
-  );
-}
-
-function InputPane({
-  children,
-  onClick,
-  active,
-}: {
-  children: React.ReactNode;
-  onClick: () => void;
-  active: boolean;
-}) {
-  return (
-    <div
-      data-state={active ? "active" : "inactive"}
-      onClick={onClick}
-      className="rounded-xl bg-neutral-1000 cursor-pointer data-[state=active]:bg-neutral-1050  py-6 px-4"
-    >
-      {children}
+      <SubmitButton
+        onSubmit={onSubmit}
+        validationError={errorMessage}
+        state={buttonState}
+        isValid={isValid}
+      >
+        Swap
+      </SubmitButton>
     </div>
   );
 }
