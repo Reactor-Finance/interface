@@ -12,7 +12,7 @@ function GradiantHeaderOne({
 }) {
   return (
     <h1
-      className={`bg-clip-text text-transparent text-5xl inline-block font-medium`}
+      className={`bg-clip-text text-transparent text-[32px] inline-block font-medium`}
       style={{
         backgroundImage: `linear-gradient(to right, ${colorOne}, ${colorTwo})`,
       }}
