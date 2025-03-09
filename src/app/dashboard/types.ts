@@ -22,7 +22,9 @@ export type SimulateReturnType =
   | SimulateContractReturnType["request"]
   | undefined;
 type ElementType<T extends readonly object[]> = T[number];
-export type TPair = ElementType<ReturnType<typeof useGetPairs>>;
+type GetType<T extends object> = T;
+type TGetPairs = GetType<ReturnType<typeof useGetPairs>>;
+export type TPair = ElementType<TGetPairs["data"]>;
 export interface StateType {
   actionType: LiquidityActions;
   dialogOpen: boolean;

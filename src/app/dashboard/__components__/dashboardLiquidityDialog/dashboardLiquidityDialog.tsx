@@ -7,8 +7,7 @@ import { TPoolType } from "@/lib/types";
 import { useGetTokenInfo } from "@/utils";
 import { useGetHeader } from "./dialogHeaders";
 import { zeroAddress } from "viem";
-import { useGetPairs } from "@/lib/hooks/useGetPairs";
-import { LiquidityActions, StateType } from "../../types";
+import { LiquidityActions, StateType, TPair } from "../../types";
 import useApproveWrite from "@/lib/hooks/useApproveWrite";
 import { SimulateContractReturnType } from "@wagmi/core";
 import useSwitchActionType from "../../__hooks__/useSwitchActionType";
@@ -22,11 +21,9 @@ import CreateGaugeSubmit from "./createGauageSubmit";
 import StakeStats from "./stakeStat";
 import useLpToTokens from "../../__hooks__/useLpToTokens";
 
-type ElementType<T extends readonly object[]> = T[number];
-
 interface Props {
   state: StateType;
-  pairInfo: ElementType<ReturnType<typeof useGetPairs>>;
+  pairInfo: TPair;
   onOpenChange: (isOpen: boolean) => void;
 }
 type SimulateReturnType = SimulateContractReturnType["request"] | undefined;
