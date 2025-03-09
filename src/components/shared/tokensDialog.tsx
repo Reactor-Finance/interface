@@ -1,5 +1,5 @@
 import Image from "next/image";
-import React from "react";
+import React, { useEffect } from "react";
 import verified from "@/assets/verified.svg";
 import info from "@/assets/info.svg";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -24,7 +24,12 @@ export default function TokensDailog({
   selectedTokens: `0x${string}`[];
 }) {
   const { filteredList, setSearchQuery, searchQuery } = useTokenlistContext();
-
+  useEffect(() => {
+    // reset search after leaving dialog
+    if (!open) {
+      setSearchQuery("");
+    }
+  }, [open, setSearchQuery]);
   return (
     <Dialog open={open} onOpenChange={onOpen}>
       <DialogContent
