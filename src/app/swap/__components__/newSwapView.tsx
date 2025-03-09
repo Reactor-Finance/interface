@@ -97,7 +97,7 @@ export default function NewSwapView() {
       token1,
       minAmountOut: parseUnits(amountOut, token1?.decimals ?? 18),
     });
-
+  console.log({ swapSimulation });
   // Simulate WETH process
   const { isIntrinsicWETHProcess, WETHProcessSimulation, isWETHToEther } =
     useWETHExecutions({
@@ -142,8 +142,10 @@ export default function NewSwapView() {
     token0,
     token1,
     token0Balance,
+    simulation: !!swapSimulation?.request,
   });
   const onSubmit = useCallback(() => {
+    console.log("in here");
     if (isIntrinsicWETHProcess) {
       if (isWETHToEther) {
         const req = WETHProcessSimulation?.withdrawalSimulation?.data?.request;
@@ -162,12 +164,10 @@ export default function NewSwapView() {
     }
 
     if (approveWriteRequest && needsApproval) {
-      reset();
       writeContract(approveWriteRequest);
       return;
     }
     if (swapSimulation) {
-      reset();
       writeContract(swapSimulation.request);
     }
   }, [
@@ -264,7 +264,7 @@ export default function NewSwapView() {
         </button>
       </div>
       <SubmitButton
-        onSubmit={onSubmit}
+        onClick={onSubmit}
         validationError={errorMessage}
         state={buttonState}
         isValid={isValid}
