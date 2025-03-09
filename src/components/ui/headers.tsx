@@ -2,8 +2,6 @@ import React, { ReactNode } from "react";
 import questionMark from "@/assets/question-mark.svg";
 import Tooltip from "./tooltip";
 function GradiantHeaderOne({
-  colorOne,
-  colorTwo,
   children,
 }: {
   colorOne: string;
@@ -14,7 +12,7 @@ function GradiantHeaderOne({
     <h1
       className={`bg-clip-text text-transparent text-[32px] inline-block font-medium`}
       style={{
-        backgroundImage: `linear-gradient(to right, ${colorOne}, ${colorTwo})`,
+        backgroundImage: `linear-gradient(to right, #EEF2FF, #836EF9)`,
       }}
     >
       {children}
