@@ -1,5 +1,5 @@
 "use client";
 
 export default function Home() {
-  return <div className="min-h-screen font-geistMono "></div>;
+  return <div className="min-h-screen font-jetbrainsMono "></div>;
 }

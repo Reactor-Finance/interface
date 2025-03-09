@@ -38,12 +38,11 @@ export default function TokensDailog({
       >
         <div className="relative  h-[80vh] space-y-6 pt-4 text-white">
           <div className="space-y-6 px-6">
-            <DialogTitle className="font-geistMono">Select a token</DialogTitle>
-            {/* <h1 className="font-geistMono">Select a token</h1> */}
+            <DialogTitle className="">Select a token</DialogTitle>
             <SearchInput setValue={setSearchQuery} value={searchQuery} />
           </div>
           <div className="relative z-0 h-[calc(100%-179px)] border-t border-gray-600  ">
-            <h2 className="py-3 font-geistMono text-[14px] text-[#999999] pl-6">
+            <h2 className="py-3 text-[14px] text-[#999999] pl-6">
               Tokens ({filteredList.length})
             </h2>
             <div className=" h-[calc(100%-22px)] space-y-2 scrollbar overflow-y-auto pb-2 px-2">
