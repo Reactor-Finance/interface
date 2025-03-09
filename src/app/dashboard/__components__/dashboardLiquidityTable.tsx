@@ -5,6 +5,7 @@ import { LiquidityRow } from "./liquidityRow";
 import { useMemo, useState } from "react";
 import { LiquidityActions, StateType } from "../types";
 import usePadLoading from "@/lib/hooks/usePadLoading";
+import Spinner from "@/components/ui/spinner";
 
 export default function DashboardLiquidityTable() {
   const { data: pairs, isLoading } = useGetPairs({});
@@ -17,7 +18,7 @@ export default function DashboardLiquidityTable() {
     dialogOpen: false,
     actionType: LiquidityActions.Stake,
   });
-  const isLoadingPadded = usePadLoading({ value: isLoading, duration: 200 });
+  const isLoadingPadded = usePadLoading({ value: isLoading, duration: 500 });
   return (
     <>
       {stateType && selectedPair && (
@@ -41,8 +42,12 @@ export default function DashboardLiquidityTable() {
             <th></th>
           </tr>
         </thead>
-        <tbody className="flex flex-col space-y-2">
-          {/* {isLoadingPadded && <RowSkeleton />} */}
+        <tbody className="flex flex-col space-y-2 min-h-24">
+          {isLoadingPadded && (
+            <div className=" w-full  h-24 flex items-center justify-center">
+              <Spinner height="24px" width="24px" />
+            </div>
+          )}
           {!isLoadingPadded &&
             activePairs.map((pair) => (
               <LiquidityRow
