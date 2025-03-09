@@ -63,7 +63,7 @@ export default function DashboardLiquidityTable() {
       </table>
 
       {!activePairs.length && !isLoading && (
-        <div className="text-start rounded-sm bg-neutral-1000 font-normal text-neutral-400 py-4 px-6">
+        <div className="text-start rounded-sm bg-neutral-1000 font-normal text-neutral-400 p-4">
           To receive emissions{" "}
           <span className="underline decoration-gray-500 font-semibold cursor-pointer text-white">
             deposit and stake
@@ -74,21 +74,3 @@ export default function DashboardLiquidityTable() {
     </>
   );
 }
-// function RowSkeleton() {
-//   return (
-//     <tr className="grid text-center rounded-sm grid-cols-7 items-center bg-neutral-1000 py-2 px-6">
-//       <td className="col-span-2 text-left">
-//         <div className="h-4 w-10 bg-neutral-950 animate-pulse"></div>
-//       </td>
-//       <td className="col-span-2 text-left">
-//         <div className="h-4 w-10 bg-neutral-950 animate-pulse"></div>
-//       </td>
-//       <td className="col-span-2 text-left">
-//         <div className="h-4 w-10 bg-neutral-950 animate-pulse"></div>
-//       </td>
-//       <td className="col-span-2 text-left">
-//         <div className="h-4 w-10 bg-neutral-950 animate-pulse"></div>
-//       </td>
-//     </tr>
-//   );
-// }
