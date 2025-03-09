@@ -117,7 +117,11 @@ export function LiquidityRow({
       </td>
       <td>
         <div className="flex gap-x-2 justify-end">
-          <Button variant={"primary"} size="xs">
+          <Button
+            disabled={account_gauge_earned === 0n}
+            variant={"primary"}
+            size="xs"
+          >
             Claim
           </Button>
           <DropdownMenu.Root>
