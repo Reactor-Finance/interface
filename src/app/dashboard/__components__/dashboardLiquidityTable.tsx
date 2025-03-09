@@ -44,7 +44,7 @@ export default function DashboardLiquidityTable() {
               <th></th>
             </tr>
           </thead>
-          <tbody className="flex flex-col space-y-2 min-h-24">
+          <tbody className="flex flex-col space-y-2 min-h-[52px]">
             {!isLoadingPadded &&
               activePairs.map((pair) => (
                 <LiquidityRow
@@ -60,11 +60,11 @@ export default function DashboardLiquidityTable() {
         </table>
       )}
       {isLoadingPadded && (
-        <div className=" w-full  h-24 flex items-center justify-center">
+        <div className=" w-full  h-[52px] flex items-center justify-center">
           <Spinner height="24px" width="24px" />
         </div>
       )}
-      {!activePairs.length && !isLoading && (
+      {!activePairs.length && !isLoadingPadded && (
         <div className="text-start text-sm rounded-sm bg-neutral-1000 font-normal text-neutral-400 p-4">
           To receive emissions{" "}
           <Link

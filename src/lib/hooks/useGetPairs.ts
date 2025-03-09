@@ -24,5 +24,8 @@ export function useGetPairs({
     functionName: "getAllPair",
     args: [address, limit, offset],
   });
-  return { data: data.map((pair) => ({ ...pair, queryKey })), isLoading };
+  return {
+    data: data.map((pair) => ({ ...pair, queryKey })),
+    isLoading: address !== zeroAddress ? isLoading : false,
+  };
 }
