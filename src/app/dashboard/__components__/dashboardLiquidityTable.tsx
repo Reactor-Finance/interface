@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import { LiquidityActions, StateType } from "../types";
 import usePadLoading from "@/lib/hooks/usePadLoading";
 import Spinner from "@/components/ui/spinner";
+import Link from "next/link";
 
 export default function DashboardLiquidityTable() {
   const { data: pairs, isLoading } = useGetPairs({});
@@ -66,9 +67,12 @@ export default function DashboardLiquidityTable() {
       {!activePairs.length && !isLoading && (
         <div className="text-start text-sm rounded-sm bg-neutral-1000 font-normal text-neutral-400 p-4">
           To receive emissions{" "}
-          <span className="underline decoration-gray-500 font-semibold cursor-pointer text-white">
+          <Link
+            href="/liquidity/deposit"
+            className="underline decoration-gray-500 font-semibold cursor-pointer text-white"
+          >
             deposit and stake
-          </span>{" "}
+          </Link>{" "}
           your liquidity first.
         </div>
       )}
