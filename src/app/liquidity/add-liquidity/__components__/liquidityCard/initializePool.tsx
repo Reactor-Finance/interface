@@ -23,6 +23,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useGetBalance } from "@/lib/hooks/useGetBalance";
 import AddLiquidityInfo from "./addLiquidityInfo";
 import { useGetPairInfo } from "@/lib/hooks/useGetPairInfo";
+import DisplayFormattedNumber from "@/components/shared/displayFormattedNumber";
+import { formatNumber } from "@/lib/utils";
 
 const searchParamsSchema = z.object({
   token0: z.string().refine((arg) => isAddress(arg)),
@@ -271,14 +273,22 @@ export default function InitializePool() {
   useEffect(() => {
     if (selectedInput === "0") {
       if (quoteLiquidity && pairExists) {
-        setAmount1(formatUnits(quoteLiquidity, token1?.decimals ?? 18));
+        let num = parseFloat(
+          formatUnits(quoteLiquidity, token1?.decimals ?? 18)
+        );
+        num = Math.floor(num * 100) / 100;
+        setAmount1(num.toString());
       }
       if (amount0 === "" && pairExists) {
         setAmount1("");
       }
     } else {
       if (quoteLiquidity && pairExists) {
-        setAmount0(formatUnits(quoteLiquidity, token0?.decimals ?? 18));
+        let num = parseFloat(
+          formatUnits(quoteLiquidity, token1?.decimals ?? 18)
+        );
+        num = Math.floor(num * 100) / 100;
+        setAmount0(num.toString());
       }
       if (amount1 === "" && pairExists) {
         setAmount0("");
@@ -343,19 +353,27 @@ export default function InitializePool() {
               <div className="flex text-neutral-300 text-sm justify-between">
                 <span>{token0?.symbol} Amount</span>
                 <span>
-                  {formatUnits(
-                    pairInfo?.reserve0 ?? 0n,
-                    token0?.decimals ?? 18
-                  )}
+                  <DisplayFormattedNumber
+                    num={formatNumber(
+                      formatUnits(
+                        pairInfo?.reserve0 ?? 0n,
+                        token0?.decimals ?? 18
+                      )
+                    )}
+                  />
                 </span>
               </div>
               <div className="flex text-neutral-300 text-sm justify-between">
                 <span>{token1?.symbol} Amount</span>
                 <span>
-                  {formatUnits(
-                    pairInfo?.reserve0 ?? 0n,
-                    token0?.decimals ?? 18
-                  )}
+                  <DisplayFormattedNumber
+                    num={formatNumber(
+                      formatUnits(
+                        pairInfo?.reserve0 ?? 0n,
+                        token0?.decimals ?? 18
+                      )
+                    )}
+                  />
                 </span>
               </div>
             </div>
@@ -365,7 +383,12 @@ export default function InitializePool() {
 
             <div className="flex pt-1 text-neutral-300 text-sm justify-between">
               <span>Amount</span>
-              <span>{formatUnits(balance ?? 0n, 18)} lp</span>
+              <span>
+                <DisplayFormattedNumber
+                  num={formatNumber(formatUnits(balance ?? 0n, 18))}
+                />{" "}
+                lp
+              </span>
             </div>
           </div>
         </>
