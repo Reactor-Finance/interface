@@ -45,25 +45,27 @@ export default function NewSwapView() {
   const [secondDialogOpen, setSecondDialogOpen] = useState(false);
 
   // Active input pane
-  const [activePane, setActivePane] = useState<0 | 1>(1);
+  const [activePane, setActivePane] = useState<0 | 1>(0);
 
   // Quote
-  const { quoteAmount } = useQuoteSwap({
+  const {
+    quoteAmount,
+    isLoading: amountOutLoading,
+    amountInLoading,
+  } = useQuoteSwap({
     amountIn,
     amountOut,
     selected: activePane ?? 0,
     tokenIn: token0,
     tokenOut: token1,
   });
-  console.log({ quoteAmount });
-  console.log({ activePane });
   useEffect(() => {
-    if (activePane === 0) {
+    if (activePane === 0 && !amountOutLoading) {
       setAmountOut(quoteAmount);
-    } else if (activePane === 1) {
+    } else if (activePane === 1 && !amountInLoading) {
       setAmountIn(quoteAmount);
     }
-  }, [activePane, quoteAmount]);
+  }, [activePane, amountInLoading, amountOutLoading, quoteAmount]);
 
   // Router by chain ID
   const router = useMemo(() => ROUTER[chainId], [chainId]);

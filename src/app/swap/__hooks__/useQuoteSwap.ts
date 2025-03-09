@@ -56,20 +56,23 @@ export function useQuoteSwap({
       enabled: !!amountIn && tokensExist && selected === 0,
     },
   });
-  const { data: [receivedAmountIn] = [BigInt(0), false], error: e } =
-    useReadContract({
-      address,
-      ...TradeHelper,
-      functionName: "getAmountIn",
-      args: [
-        parseUnits(String(amountOut), tokenOut?.decimals ?? 18),
-        address0 ?? zeroAddress,
-        address1 ?? zeroAddress,
-      ],
-      query: {
-        enabled: !!amountOut && tokensExist && selected === 1,
-      },
-    });
+  const {
+    isLoading: amountInLoading,
+    data: [receivedAmountIn] = [BigInt(0), false],
+    error: e,
+  } = useReadContract({
+    address,
+    ...TradeHelper,
+    functionName: "getAmountIn",
+    args: [
+      parseUnits(String(amountOut), tokenOut?.decimals ?? 18),
+      address0 ?? zeroAddress,
+      address1 ?? zeroAddress,
+    ],
+    query: {
+      enabled: !!amountOut && tokensExist && selected === 1,
+    },
+  });
   console.log(e, receivedAmountIn);
   const isIntrinsicWETHProcess = useMemo(
     () =>
@@ -93,5 +96,5 @@ export function useQuoteSwap({
     [receivedAmount, amountIn, tokenOut, isIntrinsicWETHProcess]
   );
 
-  return { quoteAmount, error, isLoading };
+  return { quoteAmount, error, isLoading, amountInLoading };
 }
