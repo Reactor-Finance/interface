@@ -19,6 +19,8 @@ import RemoveLiquiditySubmit from "./removeLiquiditySubmit";
 import StakeSubmit from "./stakeSubmit";
 import UnstakeSubmit from "./unstakeSubmit";
 import CreateGaugeSubmit from "./createGauageSubmit";
+import StakeStats from "./stakeStat";
+import useLpToTokens from "../../__hooks__/useLpToTokens";
 
 type ElementType<T extends readonly object[]> = T[number];
 
@@ -51,7 +53,7 @@ export default function DashboardLiquidityDialog({
       return (BigInt(sliderValue) * balance) / 100n;
     }
     if (state.actionType === LiquidityActions.Stake) {
-      return (BigInt(sliderValue) * balance - gaugeBalance) / 100n;
+      return (BigInt(sliderValue) * balance) / 100n;
     }
     if (state.actionType === LiquidityActions.Unstake) {
       return (BigInt(sliderValue) * gaugeBalance) / 100n;
@@ -86,7 +88,7 @@ export default function DashboardLiquidityDialog({
     pairInfo,
     closeModal,
     amount,
-    balanceKey: gaugeBalanceKey,
+    resetKeys: [balanceQueryKey, gaugeBalanceKey],
   };
   const stakeProps = { ...stakingProps, ...approvalInfo };
   let FormSubmit = useSwitchActionType(
@@ -105,7 +107,14 @@ export default function DashboardLiquidityDialog({
   }
   const token0 = useGetTokenInfo(pairInfo.token0);
   const token1 = useGetTokenInfo(pairInfo.token1);
-
+  const data = useLpToTokens({
+    lpBalance:
+      state.actionType === LiquidityActions.Stake ? balance : gaugeBalance,
+    reverse0: pairInfo.reserve0,
+    reverse1: pairInfo.reserve1,
+    totalLpSupply: pairInfo.total_supply,
+  });
+  console.log({ data });
   return (
     <Dialog open={state.dialogOpen} onOpenChange={onOpenChange}>
       <DialogContent className="p-0">
@@ -143,6 +152,21 @@ export default function DashboardLiquidityDialog({
                 pairInfo={pairInfo}
                 token0={token0}
                 token1={token1}
+              />
+            )}
+            {(state.actionType === LiquidityActions.Stake ||
+              state.actionType === LiquidityActions.Unstake) && (
+              <StakeStats
+                action={
+                  state.actionType === LiquidityActions.Stake
+                    ? "stake"
+                    : "unstake"
+                }
+                userTokens0={data.userToken0Amt}
+                userTokens1={data.userToken1Amt}
+                token0={token0}
+                token1={token1}
+                percent={sliderValue.toString()}
               />
             )}
             {/* <div>Balance:{pairInfo.account_lp_balance}</div> */}

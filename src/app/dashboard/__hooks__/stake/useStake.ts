@@ -17,7 +17,7 @@ export interface StakeProps {
   fetchingApproval: boolean;
   approvalSimulation: SimulateContractReturnType["request"] | undefined;
   allowanceKey: readonly unknown[];
-  balanceKey: readonly unknown[];
+  resetKeys: (readonly unknown[])[];
   closeModal: () => void;
 }
 export function useStake({
@@ -27,7 +27,7 @@ export function useStake({
   needsApproval,
   allowanceKey,
   closeModal,
-  balanceKey,
+  resetKeys,
   pairInfo,
 }: StakeProps): FormAction {
   const gaugeExists = pairInfo.gauge !== zeroAddress;
@@ -60,13 +60,13 @@ export function useStake({
         actionDescription: "Approved",
         actionTitle: "",
       });
-      queryClient.invalidateQueries({ queryKey: pairInfo.queryKey });
-      queryClient.invalidateQueries({ queryKey: balanceKey });
+      [...resetKeys, pairInfo.queryKey].forEach((key) => {
+        queryClient.invalidateQueries({ queryKey: key });
+      });
       closeModal();
     }
   }, [
     allowanceKey,
-    balanceKey,
     closeModal,
     hash,
     isLoading,
@@ -75,6 +75,7 @@ export function useStake({
     pairInfo.queryKey,
     queryClient,
     reset,
+    resetKeys,
     setToast,
   ]);
   useEffect(() => {
