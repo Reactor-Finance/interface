@@ -75,7 +75,7 @@ export default function PoolTabs() {
     [createQueryString, router]
   );
   return (
-    <div className="flex gap-x-4 items-center">
+    <div className="flex gap-x-4 items-end">
       <Tabs value={version}>
         <TabsList colors="muted">
           <TabsTrigger
