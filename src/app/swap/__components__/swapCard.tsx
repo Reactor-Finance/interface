@@ -12,6 +12,7 @@ interface Props {
   openDialog: () => void;
   selectPain: () => void;
   title: string;
+  selected: boolean;
 }
 export default function SwapCard({
   openDialog,
@@ -21,11 +22,13 @@ export default function SwapCard({
   value,
   setValue,
   title,
+  selected,
 }: Props) {
   return (
     <div
       onClick={selectPain}
-      className="rounded-[16px] bg-[#303136] border border-[#43444C] space-y-3 p-6 "
+      data-state={selected ? "active" : "inactive"}
+      className="rounded-[16px] data-[state=active]:bg-[#303136]/90 bg-[#303136] data- border border-[#43444C] space-y-3 p-6 "
     >
       <h2 className="text-sm text-[#CCCCCC]">{title}</h2>
       <div className="flex items-center gap-x-4 ">

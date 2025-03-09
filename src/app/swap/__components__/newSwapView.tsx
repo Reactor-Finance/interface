@@ -70,9 +70,11 @@ export default function NewSwapView() {
       setAmountIn("");
     }
     if (activePane === 0 && !amountOutLoading && amountIn !== "") {
-      setAmountOut(quoteAmount);
+      const rounded = Math.floor(Number(quoteAmount) * 100) / 100;
+      setAmountOut(rounded.toString());
     } else if (activePane === 1 && !amountInLoading && amountOut !== "") {
-      setAmountIn(quoteAmount);
+      const rounded = Math.floor(Number(quoteAmount) * 100) / 100;
+      setAmountIn(rounded.toString());
     }
   }, [
     token0,
@@ -244,6 +246,7 @@ export default function NewSwapView() {
       />
       <div className="space-y-1 relative">
         <SwapCard
+          selected={activePane === 0}
           title="Sell"
           openDialog={() => setFirstDialogOpen(true)}
           balance={formatUnits(token0Balance, token0?.decimals ?? 18)}
@@ -253,6 +256,7 @@ export default function NewSwapView() {
           setValue={setAmountIn}
         />
         <SwapCard
+          selected={activePane === 1}
           title="Buy"
           selectPain={() => setActivePane(1)}
           openDialog={() => setSecondDialogOpen(true)}
