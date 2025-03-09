@@ -258,7 +258,7 @@ export default function NewSwapView() {
           onClick={switchTokens}
           className="h-14 flex items-center justify-center rounded-full w-14 bg-black absolute left-1/2 top-1/2 -translate-y-[calc(50%+4px)] -translate-x-1/2"
         >
-          <div className="h-12 w-12 rounded-full bg-neutral-950 flex items-center justify-center">
+          <div className="h-12 w-12 rounded-full bg-neutral-1000 flex items-center justify-center">
             <ArrowDown className="text-neutral-300" size={18} />
           </div>
         </button>
