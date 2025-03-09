@@ -60,12 +60,24 @@ export default function NewSwapView() {
     tokenOut: token1,
   });
   useEffect(() => {
-    if (activePane === 0 && !amountOutLoading) {
+    if (!token0 || !token1) {
+      return;
+    }
+    if (activePane === 0 && !amountOutLoading && amountIn !== "") {
       setAmountOut(quoteAmount);
-    } else if (activePane === 1 && !amountInLoading) {
+    } else if (activePane === 1 && !amountInLoading && amountOut !== "") {
       setAmountIn(quoteAmount);
     }
-  }, [activePane, amountInLoading, amountOutLoading, quoteAmount]);
+  }, [
+    token0,
+    token1,
+    activePane,
+    amountIn,
+    amountInLoading,
+    amountOut,
+    amountOutLoading,
+    quoteAmount,
+  ]);
 
   // Router by chain ID
   const router = useMemo(() => ROUTER[chainId], [chainId]);

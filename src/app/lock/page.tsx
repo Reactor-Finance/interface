@@ -3,7 +3,6 @@ import React from "react";
 import Headers from "@/components/ui/headers";
 import PageMarginContainer from "@/components/ui/pageMarginContainer";
 import CreateLockDialog from "./createLockDialog/createLockDialog";
-import HiveTable from "./hiveTable/hiveTable";
 import LockTable from "./lockTable/lockTable";
 import ClaimAllLocks from "./claimAllLocks";
 import { LockProvider } from "./lockProvider";
@@ -44,11 +43,11 @@ export default function Lock() {
           <div>
             <LockTable />
           </div>
-          <div className="pt-16"></div>
-          <Headers.InfoHeaderTwo popupContent={<div></div>}>
-            Hive
-          </Headers.InfoHeaderTwo>
-          <HiveTable />
+          {/* <div className="pt-16"></div> */}
+          {/* <Headers.InfoHeaderTwo popupContent={<div></div>}> */}
+          {/*   Hive */}
+          {/* </Headers.InfoHeaderTwo> */}
+          {/* <HiveTable /> */}
         </PageMarginContainer>
       </div>
     </LockProvider>

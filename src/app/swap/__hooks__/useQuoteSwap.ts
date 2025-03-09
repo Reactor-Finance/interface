@@ -53,7 +53,7 @@ export function useQuoteSwap({
       address1 ?? zeroAddress,
     ],
     query: {
-      enabled: !!amountIn && tokensExist && selected === 0,
+      enabled: !!amountIn && tokensExist && selected === 0 && amountIn !== "",
     },
   });
   const {
@@ -70,7 +70,7 @@ export function useQuoteSwap({
       address1 ?? zeroAddress,
     ],
     query: {
-      enabled: !!amountOut && tokensExist && selected === 1,
+      enabled: !!amountOut && tokensExist && selected === 1 && amountOut !== "",
     },
   });
   console.log(e, receivedAmountIn);

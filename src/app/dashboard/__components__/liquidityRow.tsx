@@ -71,7 +71,7 @@ export function LiquidityRow({
 
   return (
     <tr className="grid text-center rounded-sm grid-cols-7 items-center bg-neutral-1000 py-2 px-6">
-      <td className="bg-neutral-1000 text-left col-span-2">
+      <td className=" text-left col-span-2">
         <div className="flex items-center justify-start gap-4">
           <PoolHeader
             token0={token0}

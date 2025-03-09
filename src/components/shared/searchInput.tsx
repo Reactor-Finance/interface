@@ -17,7 +17,10 @@ export default function SearchInput({ value, setValue, className }: Props) {
       }
     >
       <div className="flex items-center">
-        <Search className="text-gray-400 h-5 w-5" />
+        <Search
+          data-focused={isFocused ? "focused" : "not-focused"}
+          className="data-[focused=focused]:text-white text-neutral-400 h-5 w-5"
+        />
       </div>
       <input
         onFocus={() => setIsFocused(true)}

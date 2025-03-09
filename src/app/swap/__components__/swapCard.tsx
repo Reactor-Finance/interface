@@ -51,11 +51,11 @@ export default function SwapCard({
             </span>
             <ChevronDown />
           </div>
-          <div className="h-10 w-10  absolute rounded-full z-10 -left-4">
+          <div className="h-11 w-11  absolute rounded-full z-10 -left-4">
             {token && (
               <Image
-                width={40}
-                height={40}
+                width={50}
+                height={50}
                 className="w-full h-full rounded-full"
                 src={token.logoURI}
                 alt={token.name}

@@ -13,13 +13,14 @@ import { useQueryClient } from "@tanstack/react-query";
 export interface UnstakeProps {
   pairInfo: TPair;
   amount: bigint;
-  balanceKey: readonly unknown[];
+  resetKeys: (readonly unknown[])[];
   closeModal: () => void;
 }
 export function useUnstake({
   pairInfo,
   closeModal,
   amount,
+  resetKeys,
 }: UnstakeProps): FormAction {
   console.log({ amount }, "unstake");
   const gaugeExists = pairInfo.gauge !== zeroAddress;
@@ -41,7 +42,9 @@ export function useUnstake({
   useEffect(() => {
     if (isSuccess) {
       reset();
-      queryClient.invalidateQueries({ queryKey: pairInfo.queryKey });
+      [...resetKeys, pairInfo.queryKey].forEach((key) => {
+        queryClient.invalidateQueries({ queryKey: key });
+      });
       setToast({
         hash,
         actionDescription: "",
@@ -57,6 +60,7 @@ export function useUnstake({
     pairInfo.queryKey,
     queryClient,
     reset,
+    resetKeys,
     setToast,
   ]);
   const onSubmit = () => {
