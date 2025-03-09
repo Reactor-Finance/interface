@@ -54,13 +54,17 @@ export default function InitializePool() {
     return { t1: token1, t0: token0, version: v };
   }, [params]);
 
-  console.log({ t0, t1 }, "LOOGGG===========");
   // Tokens
   const token0 = useGetTokenInfo(t0 ?? "0x");
   const token1 = useGetTokenInfo(t1 ?? "0x");
 
   const [amount0, setAmount0] = useState("");
   const [amount1, setAmount1] = useState("");
+  useEffect(() => {
+    // reset inputs if change pool version
+    setAmount0("");
+    setAmount1("");
+  }, [version]);
 
   // Router
   const router = useMemo(() => ROUTER[chainId], [chainId]);
