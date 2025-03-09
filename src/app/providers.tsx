@@ -36,7 +36,7 @@ const queryClient = new QueryClient({
     queries: {
       queryKeyHashFn: hashFn,
       refetchOnWindowFocus: false,
-      retry: 2,
+      retry: 1,
     },
   },
 });

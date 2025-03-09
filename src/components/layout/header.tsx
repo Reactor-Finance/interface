@@ -13,7 +13,7 @@ export default function Header() {
         <Image src={reactor} alt="" />
       </div>
       <div className="col-span-2">
-        <ul className="grid justify-center  grid-cols-6 place-items-center text-[13px]">
+        <ul className="grid justify-center  grid-cols-5 place-items-center text-[14px]">
           <NavLink href="/swap">Swap</NavLink>
           <NavLink href="/lock">Lock</NavLink>
           <NavLink href="/dashboard">Dashboard</NavLink>
