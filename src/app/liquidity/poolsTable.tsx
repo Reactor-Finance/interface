@@ -81,7 +81,9 @@ export default function PoolsTable() {
     }
     return result;
   }, [data, filersBounced, filters.isStable, filters.orderTvl, page]);
-
+  useEffect(() => {
+    newPools.forEach((p) => console.log(p.fee));
+  }, [newPools]);
   useEffect(() => {
     setPage(1);
   }, [filters.searchQuery, filters.isStable]);
