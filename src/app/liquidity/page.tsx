@@ -8,16 +8,8 @@ import house from "@/assets/house.svg";
 import Image, { StaticImageData } from "next/image";
 import { Button } from "@/components/ui/button";
 import PoolsTable from "./poolsTable";
-import { api } from "@/trpc/server";
-import { TPools } from "@/server/queries/pools/getPools";
 
 export default async function Page() {
-  let initialPools: TPools | undefined;
-  try {
-    initialPools = await api.pool.getPools({});
-  } catch {
-    console.error("error fetching pools");
-  }
   return (
     <PageMarginContainer>
       <Headers.GradiantHeaderOne colorOne="#A0055D" colorTwo="#836EF9">
@@ -52,7 +44,7 @@ export default async function Page() {
       </Card>
       <div className="pt-12"></div>
       <h2 className="text-2xl">Pools</h2>
-      <PoolsTable initialPools={initialPools} />
+      <PoolsTable />
     </PageMarginContainer>
   );
 }
