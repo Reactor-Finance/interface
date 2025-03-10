@@ -1,10 +1,11 @@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import NewSwapView from "./__components__/newSwapView";
+import PageMarginContainer from "@/components/ui/pageMarginContainer";
 
 export default function Swap() {
   return (
-    <div className="min-h-[85vh] px-4 font-geistMono pt-12">
+    <PageMarginContainer>
       <div className="mx-auto w-[440px]">
         <div className="py-4">
           <div className="py-2 flex justify-between">
@@ -30,6 +31,6 @@ export default function Swap() {
           <NewSwapView />
         </Card>
       </div>
-    </div>
+    </PageMarginContainer>
   );
 }

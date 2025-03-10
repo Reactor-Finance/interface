@@ -17,7 +17,7 @@ import { useWETHExecutions } from "../__hooks__/useWETHExecutions";
 import { useGetBalance } from "@/lib/hooks/useGetBalance";
 import useSwapValidation from "../__hooks__/useSwapValidation";
 import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
-import { ArrowDown } from "lucide-react";
+import { ArrowDown, ChevronDown } from "lucide-react";
 import SwapCard from "./swapCard";
 import SubmitButton from "@/components/shared/submitBtn";
 
@@ -272,6 +272,24 @@ export default function NewSwapView() {
           <div className="h-12 w-12 rounded-full bg-neutral-1000 flex items-center justify-center">
             <ArrowDown className="text-neutral-300" size={18} />
           </div>
+        </button>
+      </div>
+      <div className="text-[12px] border border-neutral-700 rounded-md p-4 space-y-4">
+        <div className="flex justify-between">
+          <span className="text-neutral-500">Receieved</span>
+          <span>100</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-neutral-500">Exchange Rate</span>
+          <span>100</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-neutral-500">Slippage</span>
+          <span>100</span>
+        </div>
+        <button type="button" className="text-blue-light text-sm flex gap-x-1">
+          <span>Show detailed Breakdown</span>
+          <ChevronDown />
         </button>
       </div>
       <SubmitButton
