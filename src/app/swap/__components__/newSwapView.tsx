@@ -274,7 +274,7 @@ export default function NewSwapView() {
           </div>
         </button>
       </div>
-      <div className="text-[12px] border border-neutral-700 rounded-md p-4 space-y-4">
+      <div className="text-[12px] border border-neutral-700 rounded-[16px] p-4 space-y-4">
         <div className="flex justify-between">
           <span className="text-neutral-500">Receieved</span>
           <span>100</span>
