@@ -27,7 +27,7 @@ export const TableBody = forwardRef<
 TableBody.displayName = "TableBody";
 
 const tableVariants = cva(
-  "grid items-center text-sm text-right gap-x-4 py-[10px] bg-neutral-1000 px-4 rounded-md",
+  "grid items-center text-sm text-right gap-x-4 py-[10px] bg-neutral-950 px-4 rounded-md",
   {
     variants: {
       cols: {
