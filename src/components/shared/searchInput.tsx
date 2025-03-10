@@ -12,7 +12,7 @@ export default function SearchInput({ value, setValue, className }: Props) {
     <div
       data-focused={isFocused ? "focused" : "not-focused"}
       className={
-        "flex gap-x-3 bg-neutral-900 h-[42px] rounded-md p-2 outline-1 data-[focused=focused]:outline data-[focused=focused]:outline-white " +
+        "flex gap-x-3 bg-neutral-950 h-[42px] rounded-md p-2 outline-1 data-[focused=focused]:outline data-[focused=focused]:outline-white " +
         className
       }
     >

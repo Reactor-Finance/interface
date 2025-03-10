@@ -34,7 +34,7 @@ export default function TokensDailog({
     <Dialog open={open} onOpenChange={onOpen}>
       <DialogContent
         title="Search Tokens"
-        className="w-[440px] overflow-hidden border-none bg-[#1a1a1a] p-0 text-white"
+        className="w-[440px] overflow-hidden border-none bg-neutral-1000  p-0 text-white"
       >
         <div className="relative  h-[80vh] space-y-6 pt-4 text-white">
           <div className="space-y-6 px-6">
@@ -97,7 +97,7 @@ function TokenItem({
     <button
       type="button"
       onClick={() => selectToken(token)}
-      className="mb-2 hover:bg-neutral-800 transition-colors flex w-full text-left justify-between rounded-md bg-neutral-900 px-4 py-2"
+      className="mb-2 hover:bg-neutral-900 transition-colors flex w-full text-left justify-between rounded-md bg-neutral-950 px-4 py-2"
     >
       <div className="flex items-center gap-x-2">
         <ImageWithFallback
