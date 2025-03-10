@@ -7,22 +7,23 @@ import { TToken } from "@/lib/types";
 interface Props {
   balance: string;
   value: string;
-  setValue: (value: string) => void;
   token: TToken | null;
-  openDialog: () => void;
-  selectPain: () => void;
   title: string;
   selected: boolean;
+  setValue: (value: string) => void;
+  setMax: (value: string) => void;
+  openDialog: () => void;
+  selectPain: () => void;
 }
 export default function SwapCard({
-  openDialog,
-  selectPain,
   balance,
   token,
   value,
-  setValue,
   title,
   selected,
+  openDialog,
+  selectPain,
+  setValue,
 }: Props) {
   return (
     <div
@@ -75,7 +76,12 @@ export default function SwapCard({
             <Image src={wallet} alt="Wallet" />
             <span>{formatNumber(balance)}</span>
           </div>
-          <button className="text-sm text-neutral-300">Max</button>
+          <button
+            onClick={() => setValue(balance)}
+            className="text-sm text-neutral-300"
+          >
+            Max
+          </button>
         </div>
       </div>
     </div>

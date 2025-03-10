@@ -248,21 +248,21 @@ export default function NewSwapView() {
         <SwapCard
           selected={activePane === 0}
           title="Sell"
-          openDialog={() => setFirstDialogOpen(true)}
-          balance={formatUnits(token0Balance, token0?.decimals ?? 18)}
           value={amountIn}
           selectPain={() => setActivePane(0)}
           token={token0}
+          openDialog={() => setFirstDialogOpen(true)}
+          balance={formatUnits(token0Balance, token0?.decimals ?? 18)}
           setValue={setAmountIn}
         />
         <SwapCard
           selected={activePane === 1}
           title="Buy"
-          selectPain={() => setActivePane(1)}
-          openDialog={() => setSecondDialogOpen(true)}
           token={token1}
           balance={formatUnits(token1Balance, token1?.decimals ?? 18)}
           value={amountOut}
+          selectPain={() => setActivePane(1)}
+          openDialog={() => setSecondDialogOpen(true)}
           setValue={setAmountOut}
         />
         <button
