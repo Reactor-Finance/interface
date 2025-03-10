@@ -11,7 +11,6 @@ interface Props {
   title: string;
   selected: boolean;
   setValue: (value: string) => void;
-  setMax: (value: string) => void;
   openDialog: () => void;
   selectPain: () => void;
 }
