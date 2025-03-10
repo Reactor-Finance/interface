@@ -97,7 +97,7 @@ function TokenItem({
     <button
       type="button"
       onClick={() => selectToken(token)}
-      className="mb-2 hover:bg-neutral-900 transition-colors flex w-full text-left justify-between rounded-md bg-neutral-1000 px-4 py-2"
+      className="mb-2 hover:bg-neutral-900 transition-colors flex w-full text-left justify-between rounded-md bg-neutral-950 px-4 py-2"
     >
       <div className="flex items-center gap-x-2">
         <ImageWithFallback
