@@ -50,7 +50,7 @@ export default function PoolRow({
       <th className="">$5,505,444</th>
       <th className="text-blue-light">11%</th>
       <th>{emissions.toString()}</th>
-      <th>43,444</th>
+      <th>{}</th>
       <th className="text-left pl-4 col-span-3 ">
         <div className="flex justify-between">
           <span></span>
