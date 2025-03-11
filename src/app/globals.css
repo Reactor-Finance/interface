@@ -27,7 +27,11 @@ body {
 .scrollbar::-webkit-scrollbar-track {
   background: transparent; /* Background of the scrollbar track */
 }
-
+/* styles.css */
+.no-ring:focus {
+  outline: none;
+  box-shadow: none;
+}
 @layer base {
   :root {
     --background: 210 7%, 6%;

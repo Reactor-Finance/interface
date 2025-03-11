@@ -5,22 +5,26 @@ import reactor from "@/assets/reactor.svg";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { CustomConnectButton } from "./customConnectButton";
+import { useAccount } from "wagmi";
 
 export default function Header() {
+  const { isConnected } = useAccount();
   return (
     <div className="h-[88px] px-8 items-center grid grid-cols-4">
       <div>
         <Image src={reactor} alt="" />
       </div>
       <div className="col-span-2">
-        <ul className="grid justify-center  grid-cols-5 place-items-center text-[14px]">
-          <NavLink href="/swap">Swap</NavLink>
-          <NavLink href="/lock">Lock</NavLink>
-          <NavLink href="/dashboard">Dashboard</NavLink>
-          <NavLink href="/liquidity">Liquidity</NavLink>
-          <NavLink href="/voting">Voting</NavLink>
-          {/* <NavLink href="/uniswap">Faucet</NavLink> */}
-        </ul>
+        {isConnected && (
+          <ul className="grid justify-center  grid-cols-5 place-items-center text-[14px]">
+            <NavLink href="/swap">Swap</NavLink>
+            <NavLink href="/lock">Lock</NavLink>
+            <NavLink href="/dashboard">Dashboard</NavLink>
+            <NavLink href="/liquidity">Liquidity</NavLink>
+            <NavLink href="/voting">Voting</NavLink>
+            {/* <NavLink href="/uniswap">Faucet</NavLink> */}
+          </ul>
+        )}
       </div>
       <div className="flex justify-end">
         <CustomConnectButton />

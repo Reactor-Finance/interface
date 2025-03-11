@@ -43,7 +43,7 @@ export default function PointsHeaders() {
           </div>
         </Card>
 
-        <div className="bg-[#121212] border border-[#333333] rounded-lg p-4 flex-1 flex flex-col">
+        <Card bg="1000" className="  rounded-lg p-4 flex-1 flex flex-col">
           <h3 className="text-white font-semibold text-lg uppercase mb-2">
             Ways to Earn
           </h3>
@@ -115,9 +115,9 @@ export default function PointsHeaders() {
             </li>
           </ul>
           <div className="mt-auto"></div>
-        </div>
+        </Card>
 
-        <div className="bg-[#121212] border border-[#333333] rounded-lg p-4 flex-1 flex flex-col">
+        <Card bg="1000" className="rounded-lg  flex-1 flex flex-col">
           <div className="flex items-center space-x-2 mb-2">
             <svg
               width="20"
@@ -157,7 +157,7 @@ export default function PointsHeaders() {
               Submit
             </button>
           </div>
-        </div>
+        </Card>
       </div>
     </div>
   );
