@@ -56,7 +56,7 @@ export default function PointsHeaders() {
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <g clip-path="url(#clip0_2054_47862)">
+                <g clipPath="url(#clip0_2054_47862)">
                   <path
                     opacity="0.2"
                     d="M15.3333 8.25C15.3333 9.4925 13.0945 10.5 10.3333 10.5C9.10825 10.5 7.98575 10.3019 7.11638 9.9725C9.50575 9.80312 11.3333 8.875 11.3333 7.75V6.045C13.6158 6.25375 15.3333 7.16125 15.3333 8.25ZM11.3333 5.25C11.3333 4.0075 9.0945 3 6.33325 3C3.572 3 1.33325 4.0075 1.33325 5.25C1.33325 6.4925 3.572 7.5 6.33325 7.5C9.0945 7.5 11.3333 6.4925 11.3333 5.25Z"
@@ -124,19 +124,19 @@ export default function PointsHeaders() {
               height="20"
               fill="none"
               stroke="currentColor"
-              stroke-width="1.5"
+              strokeWidth="1.5"
               viewBox="0 0 24 24"
               className="text-gray-300"
             >
               <path
                 d="M12 4.5c1.933 0 3.5 1.567 3.5 3.5S13.933 11.5 12 11.5 8.5 9.933 8.5 8s1.567-3.5 3.5-3.5z"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               />
               <path
                 d="M5.5 19.5c0-3.038 3.19-5.5 6.5-5.5s6.5 2.462 6.5 5.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               />
             </svg>
             <h3 className="text-white text-lg font-semibold uppercase">

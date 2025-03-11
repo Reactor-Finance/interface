@@ -14,16 +14,18 @@ const EntrySchema = z.object({
   totalPoints: z.number(),
   rank: z.number(),
 });
-const LeaderboardSchema = z.array(EntrySchema);
+const LeaderboardSchema = z.object({ result: z.array(EntrySchema) });
 export type TPointsEntry = z.infer<typeof EntrySchema>;
 export default function PointsTable() {
-  const { data } = useQuery({
+  const { data, error } = useQuery({
     queryKey: ["leaderboard"],
     queryFn: async () => {
-      const resp = await fetch("/api/points/points/leaderboard");
-      return LeaderboardSchema.parse(await resp.json());
+      const resp = await fetch("/api/points").then((r) => r.json());
+      console.log(resp);
+      return LeaderboardSchema.parse(resp);
     },
   });
+  console.log({ data, error });
   return (
     <>
       <table className="w-full border-collapse text-left">
@@ -40,10 +42,12 @@ export default function PointsTable() {
           </tr>
         </thead>
         <tbody className="text-sm">
-          {data?.map((entry) => <PointsRow {...entry} key={entry.rank} />)}
+          {data?.result.map((entry) => (
+            <PointsRow {...entry} key={entry.rank} />
+          ))}
         </tbody>
       </table>
-      {(data?.length === 0 || !data) && (
+      {(data?.result.length === 0 || !data) && (
         <div className="w-full text-center py-6">No Entries Yet.</div>
       )}
     </>
