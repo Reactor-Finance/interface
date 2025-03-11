@@ -29,12 +29,12 @@ export default function Header() {
       </button>
       <div className="col-span-2">
         {isConnected && (
-          <ul className="grid justify-center  grid-cols-5 place-items-center text-[14px]">
+          <ul className="grid justify-center  grid-cols-3 place-items-center text-[14px]">
             <NavLink href="/swap">Swap</NavLink>
-            <NavLink href="/lock">Lock</NavLink>
+            {/* <NavLink href="/lock">Lock</NavLink> */}
             <NavLink href="/dashboard">Dashboard</NavLink>
             <NavLink href="/liquidity">Liquidity</NavLink>
-            <NavLink href="/voting">Voting</NavLink>
+            {/* <NavLink href="/voting">Voting</NavLink> */}
             {/* <NavLink href="/uniswap">Faucet</NavLink> */}
           </ul>
         )}
