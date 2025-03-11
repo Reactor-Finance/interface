@@ -2,18 +2,31 @@
 import Image from "next/image";
 import React from "react";
 import reactor from "@/assets/reactor.svg";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { CustomConnectButton } from "./customConnectButton";
 import { useAccount } from "wagmi";
+import { useAtom } from "jotai";
+import { inviteCodeAtom } from "@/store";
 
 export default function Header() {
   const { isConnected } = useAccount();
+  const router = useRouter();
+  const [inviteCode] = useAtom(inviteCodeAtom);
   return (
     <div className="h-[88px] px-8 items-center grid grid-cols-4">
-      <div>
+      <button
+        role="link"
+        onClick={() => {
+          if (inviteCode.length > 0) {
+            router.push("/points");
+          } else {
+            router.push("/");
+          }
+        }}
+      >
         <Image src={reactor} alt="" />
-      </div>
+      </button>
       <div className="col-span-2">
         {isConnected && (
           <ul className="grid justify-center  grid-cols-5 place-items-center text-[14px]">
