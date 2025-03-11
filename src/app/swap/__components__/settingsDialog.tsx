@@ -21,7 +21,7 @@ export default function SettingsDialog() {
   const [slippage, updateSlippage] = useAtom(slippageAtom);
   const [inputState, setInputState] = useState<State>({
     slippageInput: (slippage / 100).toString(),
-    deadlineInput: (deadline / 100).toString(),
+    deadlineInput: deadline.toString(),
     deadlineFocus: false,
     slippageFocus: false,
   });
@@ -32,24 +32,23 @@ export default function SettingsDialog() {
     [setInputState]
   );
   useEffect(() => {
-    if (inputState.deadlineInput && !inputState.deadlineFocus) {
-      const num = Number(inputState.deadlineInput) * 100;
-      console.log({ num });
-      updateDeadline(num);
+    if (open) {
+      updateState({
+        slippageInput: (slippage / 100).toString(),
+        deadlineInput: deadline.toString(),
+      });
     }
-    if (inputState.slippageInput && !inputState.slippageFocus) {
-      const num = Number(inputState.slippageInput) * 100;
-      console.log({ num });
-      updateSlippage(num);
+  }, [deadline, open, slippage, updateState]);
+  useEffect(() => {
+    if (!inputState.slippageFocus) {
+      updateState({ slippageInput: (slippage / 100).toString() });
     }
-  }, [
-    inputState.deadlineFocus,
-    inputState.deadlineInput,
-    inputState.slippageFocus,
-    inputState.slippageInput,
-    updateDeadline,
-    updateSlippage,
-  ]);
+  }, [updateSlippage, slippage, inputState.slippageFocus, updateState]);
+  useEffect(() => {
+    if (!inputState.deadlineFocus) {
+      updateState({ deadlineInput: deadline.toString() });
+    }
+  }, [updateSlippage, updateState, inputState.deadlineFocus, deadline]);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <button
@@ -70,10 +69,7 @@ export default function SettingsDialog() {
             <h3 className="text-sm">Slippage Tolerance</h3>
             <div className="flex gap-x-2">
               <div className="w-full">
-                <Tabs
-                  defaultValue="swap"
-                  value={!inputState.slippageFocus ? slippage.toString() : "0"}
-                >
+                <Tabs defaultValue="swap" value={slippage.toString()}>
                   <TabsList
                     border={"border-1"}
                     size="sm"
@@ -124,6 +120,9 @@ export default function SettingsDialog() {
                       if (Number(e.target.value) > 100) {
                         return;
                       }
+                      if (Number(e.target.value) > 0) {
+                        updateSlippage(Number(e.target.value) * 100);
+                      }
                       updateState({ slippageInput: e.target.value });
                     }
                   }}
@@ -145,10 +144,16 @@ export default function SettingsDialog() {
                 variant="transparent"
                 ring="none"
                 onChange={(e) => {
+                  console.log(e.target.value);
                   if (inputPatternNumberMatch(e.target.value)) {
+                    console.log(e.target.value);
                     if (Number(e.target.value) > 400) {
                       updateState({ deadlineInput: "400" });
+                      updateDeadline(400);
                       return;
+                    }
+                    if (Number(e.target.value) > 0) {
+                      updateDeadline(Number(e.target.value));
                     }
                     updateState({ deadlineInput: e.target.value });
                   }
