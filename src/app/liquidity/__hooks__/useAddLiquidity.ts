@@ -3,9 +3,9 @@ import { zeroAddress } from "viem";
 import { useEffect, useMemo } from "react";
 import { ETHER, ROUTER } from "@/data/constants";
 import * as Router from "@/lib/abis/Router";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
 import { useAtomicDate } from "@/lib/hooks/useAtomicDate";
+import { useAtom } from "jotai/react";
+import { transactionDeadlineAtom } from "@/store";
 
 interface Props {
   token0: `0x${string}`;
@@ -27,9 +27,7 @@ export function useAddLiquidity({
   const chainId = useChainId();
   const now = useAtomicDate();
   const { address = zeroAddress } = useAccount();
-  const { transactionDeadlineInMinutes } = useSelector(
-    (root: RootState) => root.settings
-  );
+  const [txDeadline] = useAtom(transactionDeadlineAtom);
   const router = useMemo(() => ROUTER[chainId], [chainId]);
   const liquidityETHNonETHToken = useMemo(
     () => (token0.toLowerCase() !== ETHER.toLowerCase() ? token0 : token1),
@@ -51,10 +49,9 @@ export function useAddLiquidity({
   );
 
   const deadline = useMemo(() => {
-    const ttl =
-      Math.floor(now.getTime() / 1000) + transactionDeadlineInMinutes * 60;
+    const ttl = Math.floor(now.getTime() / 1000) + Number(txDeadline) * 60;
     return BigInt(ttl);
-  }, [now, transactionDeadlineInMinutes]);
+  }, [now, txDeadline]);
   console.log(amountADesired, amountBDesired, "AMOUNTS", disabled);
   const addLiquidityETHSimulation = useSimulateContract({
     ...Router,

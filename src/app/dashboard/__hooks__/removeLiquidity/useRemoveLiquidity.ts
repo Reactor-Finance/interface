@@ -3,9 +3,7 @@ import { useTransactionToastProvider } from "@/contexts/transactionToastProvider
 import { ROUTER, WETH } from "@/data/constants";
 import * as Router from "@/lib/abis/Router";
 import { useAtomicDate } from "@/lib/hooks/useAtomicDate";
-import { RootState } from "@/store";
 import { useEffect, useMemo } from "react";
-import { useSelector } from "react-redux";
 import { Address, zeroAddress } from "viem";
 import {
   useAccount,
@@ -18,6 +16,8 @@ import { FormAction } from "../../types";
 import { SimulateContractReturnType } from "@wagmi/core";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRemoveLiquidityValidation } from "./useRemoveLiquidityValidation";
+import { useAtom } from "jotai/react";
+import { transactionDeadlineAtom } from "@/store";
 interface Props {
   amount: bigint;
   token0: Address;
@@ -47,9 +47,7 @@ export function useRemoveLiquidity({
   const { address = zeroAddress } = useAccount();
   const chainId = useChainId();
   const now = useAtomicDate();
-  const { transactionDeadlineInMinutes } = useSelector(
-    (state: RootState) => state.settings
-  );
+  const [transactionDeadlineInMinutes] = useAtom(transactionDeadlineAtom);
   const router = useMemo(() => ROUTER[chainId], [chainId]);
   const weth = useMemo(() => WETH[chainId], [chainId]);
   const nonETHToken = useMemo(
@@ -64,7 +62,8 @@ export function useRemoveLiquidity({
 
   const deadline = useMemo(() => {
     const ttl =
-      Math.floor(now.getTime() / 1000) + transactionDeadlineInMinutes * 60;
+      Math.floor(now.getTime() / 1000) +
+      Number(transactionDeadlineInMinutes) * 60;
     return BigInt(ttl);
   }, [now, transactionDeadlineInMinutes]);
   console.log({ deadline });
