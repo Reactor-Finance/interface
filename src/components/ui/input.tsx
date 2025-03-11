@@ -14,6 +14,9 @@ const inputVariants = cva(
         none: "",
         ringOne: `focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2`,
       },
+      variant: {
+        transparent: "bg-transparent ring-0 border-none",
+      },
       textSize: {
         sm: "md:text-sm md:placeholder:text-sm",
         md: "md:text-md md:placeholder:text-md",
@@ -33,11 +36,11 @@ export interface InputProps
     VariantProps<typeof inputVariants> {}
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, ring, textSize, ...props }, ref) => {
+  ({ className, ring, variant, textSize, ...props }, ref) => {
     return (
       <input
         type="text"
-        className={cn(inputVariants({ ring, textSize }), className)}
+        className={cn(inputVariants({ variant, ring, textSize }), className)}
         ref={ref}
         {...props}
       />

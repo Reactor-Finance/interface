@@ -28,7 +28,7 @@ export default function SettingsDialog() {
             <h3 className="text-sm">Slippage Tolerance</h3>
             <div className="flex gap-x-2">
               <div className="w-full">
-                <Tabs defaultValue="swap">
+                <Tabs defaultValue="swap" value="">
                   <TabsList
                     border={"border-1"}
                     size="sm"
@@ -47,13 +47,26 @@ export default function SettingsDialog() {
                   </TabsList>
                 </Tabs>
               </div>
-              <Input placeholder="Custom" className="w-20" />
+              <div className="bg-neutral-950 flex gap-x-1 items-center rounded-md">
+                <Input
+                  placeholder="Custom"
+                  variant="transparent"
+                  className="w-20 bg-neutral-900/80 px-2 h-[32px]"
+                />
+                <span>%</span>
+              </div>
             </div>
           </div>
           <div className="space-y-2">
             <h3 className="text-sm">Transaction Deadline</h3>
-            <div>
-              <Input />
+            <div className="bg-neutral-950 px-2 items-center flex justify-end border-neutral-900 border  rounded-md">
+              <Input
+                className="w-full"
+                dir="rtl"
+                variant="transparent"
+                ring="none"
+              />
+              <span className="text-neutral-200">minutes</span>
             </div>
           </div>
           <Button
