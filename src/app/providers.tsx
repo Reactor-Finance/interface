@@ -15,6 +15,8 @@ import { HeroUIProvider } from "@heroui/react";
 import { TRPCReactProvider } from "@/trpc/react";
 import { TokenlistContextProvider } from "@/contexts/tokenlistContext";
 import { TransactionToastProvider } from "@/contexts/transactionToastProvider";
+import { Provider } from "jotai/react";
+import { store } from "@/store";
 
 export const wagmiConfig = getDefaultConfig({
   appName: "Reactor Finance",
@@ -40,22 +42,24 @@ const queryClient = new QueryClient({
 
 export const Providers: FC<PropsWithChildren> = ({ children }) => {
   return (
-    <WagmiProvider config={wagmiConfig}>
-      <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider theme={darkTheme()}>
-          <TRPCReactProvider>
-            <TokenlistContextProvider>
-              <TransactionToastProvider>
-                <HeroUIProvider className="flex min-h-svh flex-col ">
-                  {/* Header goes here */}
-                  {children}
-                  {/* Footer goes here */}
-                </HeroUIProvider>
-              </TransactionToastProvider>
-            </TokenlistContextProvider>
-          </TRPCReactProvider>
-        </RainbowKitProvider>
-      </QueryClientProvider>
-    </WagmiProvider>
+    <Provider store={store}>
+      <WagmiProvider config={wagmiConfig}>
+        <QueryClientProvider client={queryClient}>
+          <RainbowKitProvider theme={darkTheme()}>
+            <TRPCReactProvider>
+              <TokenlistContextProvider>
+                <TransactionToastProvider>
+                  <HeroUIProvider className="flex min-h-svh flex-col ">
+                    {/* Header goes here */}
+                    {children}
+                    {/* Footer goes here */}
+                  </HeroUIProvider>
+                </TransactionToastProvider>
+              </TokenlistContextProvider>
+            </TRPCReactProvider>
+          </RainbowKitProvider>
+        </QueryClientProvider>
+      </WagmiProvider>
+    </Provider>
   );
 };
