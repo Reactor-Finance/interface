@@ -275,7 +275,14 @@ export default function NewSwapView() {
           </div>
         </button>
       </div>
-      <SwapDetails />
+      {token1 && token0 && amountIn !== "" && (
+        <SwapDetails
+          amountIn={parseUnits(amountIn, token0?.decimals ?? 18)}
+          amountOut={parseUnits(amountOut, token1?.decimals ?? 18)}
+          token0={token0}
+          token1={token1}
+        />
+      )}
       <SubmitButton
         onClick={onSubmit}
         validationError={errorMessage}
