@@ -47,13 +47,13 @@ export default function SettingsDialog() {
                   </TabsList>
                 </Tabs>
               </div>
-              <div className="bg-neutral-950 flex gap-x-1 items-center rounded-md">
+              <div className="bg-neutral-950  flex gap-x-1 items-center rounded-md">
                 <Input
                   placeholder="Custom"
                   variant="transparent"
-                  className="w-20 bg-neutral-900/80 px-2 h-[32px]"
+                  className="w-20 bg-neutral-900/50 px-2 h-[32px]"
                 />
-                <span>%</span>
+                <span className="px-1">%</span>
               </div>
             </div>
           </div>
