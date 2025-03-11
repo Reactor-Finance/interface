@@ -7,3 +7,4 @@ export const transactionDeadlineAtom = atomWithStorage(
 );
 export const slippageAtom = atomWithStorage("slippage", 10);
 export const multiHopsAtom = atomWithStorage("multiHops", false);
+export const settingDialogOpenAtom = atomWithStorage("dialogOpen", false);

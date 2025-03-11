@@ -1,9 +1,39 @@
 import { ChevronDown, Settings } from "lucide-react";
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useMemo, useState } from "react";
 import infoIcon from "@/assets/info.svg";
 import Tooltip from "@/components/ui/tooltip";
-export default function SwapDetails() {
+import { formatUnits } from "viem";
+import { TToken } from "@/lib/types";
+import { useAtom } from "jotai/react";
+import { settingDialogOpenAtom, slippageAtom } from "@/store";
+interface Props {
+  amountIn: bigint;
+  amountOut: bigint;
+  token0: TToken;
+  token1: TToken;
+}
+export default function SwapDetails({
+  amountIn,
+  amountOut,
+  token0,
+  token1,
+}: Props) {
+  console.log({ amountIn, amountOut });
   const [open, setOpen] = useState(false);
+  const [slippage] = useAtom(slippageAtom);
+
+  const dialog = useAtom(settingDialogOpenAtom);
+  const setDialogOpen = dialog[1];
+
+  const { per, min } = useMemo(() => {
+    const zeros = 100_000_000n;
+    if (amountOut === 0n) {
+      return { per: 0n, min: 0n };
+    }
+    const per = (amountIn * zeros) / amountOut;
+    const min = amountOut - (amountOut * BigInt(slippage)) / 1000n;
+    return { min, per };
+  }, [amountIn, amountOut, slippage]);
   return (
     <div className="text-[13px] border border-neutral-800 rounded-[16px] p-4 space-y-4">
       <Row title="Received Value" value="$23.44" />
@@ -11,7 +41,8 @@ export default function SwapDetails() {
         title="Exchange Rate"
         value={
           <p>
-            1 ETH <span className="text-neutral-200">≃</span> 23.232 USDC
+            1 {token0.symbol} <span className="text-neutral-200">≃</span>{" "}
+            {formatUnits(per, 8)} {token1.symbol}{" "}
           </p>
         }
       />
@@ -19,8 +50,10 @@ export default function SwapDetails() {
         title="Slippage"
         value={
           <>
-            <span>1.00%</span>
-            <Settings className="text-neutral-200" size={16} />
+            <span>{slippage / 100}%</span>
+            <button onClick={() => setDialogOpen(true)}>
+              <Settings className="text-neutral-200" size={16} />
+            </button>
           </>
         }
         info="Slippage Info"
@@ -42,7 +75,11 @@ export default function SwapDetails() {
           data-state={open ? "open" : "closed"}
           className="pt-4 data-[state=closed]:opacity-0 transition-all duration-500 data-[state=closed]:h-0 overflow-hidden fade-in space-y-4"
         >
-          <Row title="Minumum Receieved" value="$23.44" info="Info" />
+          <Row
+            title="Minumum Receieved"
+            value={formatUnits(min, token0.decimals)}
+            info="Info"
+          />
           <Row title="Fee" value="$23.44" info="Info" />
           <Row title="Price Impact" value="$23.44" info="Info" />
           <Row title="Route" value="$23.44" info="Info" />

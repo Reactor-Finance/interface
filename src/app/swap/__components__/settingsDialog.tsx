@@ -4,7 +4,11 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import Input from "@/components/ui/input";
 import { Tabs, TabsTrigger, TabsList } from "@/components/ui/tabs";
 import { inputPatternMatch } from "@/lib/utils";
-import { slippageAtom, transactionDeadlineAtom } from "@/store";
+import {
+  settingDialogOpenAtom,
+  slippageAtom,
+  transactionDeadlineAtom,
+} from "@/store";
 import { inputPatternNumberMatch } from "@/utils";
 import { useAtom } from "jotai/react";
 import { Settings } from "lucide-react";
@@ -16,9 +20,9 @@ type State = {
   slippageFocus: boolean;
 };
 export default function SettingsDialog() {
-  const [open, setOpen] = useState(false);
   const [deadline, updateDeadline] = useAtom(transactionDeadlineAtom);
   const [slippage, updateSlippage] = useAtom(slippageAtom);
+  const [dialogOpen, setDialogOpen] = useAtom(settingDialogOpenAtom);
   const [inputState, setInputState] = useState<State>({
     slippageInput: (slippage / 100).toString(),
     deadlineInput: deadline.toString(),
@@ -32,13 +36,13 @@ export default function SettingsDialog() {
     [setInputState]
   );
   useEffect(() => {
-    if (open) {
+    if (dialogOpen) {
       updateState({
         slippageInput: (slippage / 100).toString(),
         deadlineInput: deadline.toString(),
       });
     }
-  }, [deadline, open, slippage, updateState]);
+  }, [deadline, dialogOpen, slippage, updateState]);
   useEffect(() => {
     if (!inputState.slippageFocus) {
       updateState({ slippageInput: (slippage / 100).toString() });
@@ -50,13 +54,13 @@ export default function SettingsDialog() {
     }
   }, [updateSlippage, updateState, inputState.deadlineFocus, deadline]);
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <button
         className="bg-neutral-950 p-1 rounded-full flex items-center gap-x-2"
-        onClick={() => setOpen(true)}
+        onClick={() => setDialogOpen(true)}
       >
         <div className="bg-neutral-900 rounded-full text-sm text-neutral-400 px-2 py-1">
-          1.00% Slippage
+          {slippage / 100}% Slippage
         </div>
         <Settings className="text-neutral-400" />
       </button>
@@ -164,7 +168,7 @@ export default function SettingsDialog() {
             </div>
           </div>
           <Button
-            onClick={() => setOpen(false)}
+            onClick={() => setDialogOpen(false)}
             variant={"primary"}
             size="submit"
           >
