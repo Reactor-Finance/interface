@@ -19,6 +19,10 @@ const nextConfig = {
         source: "/api/rpc",
         destination: process.env.NEXT_PUBLIC_RPC_URL,
       },
+      {
+        source: "/api/points",
+        destination: process.env.POINTS_API_URL,
+      },
     ];
   },
 };
