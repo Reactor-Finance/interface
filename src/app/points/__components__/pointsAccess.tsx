@@ -37,6 +37,8 @@ export default function PointsAccess() {
     if (isFilled) {
       setInviteCode(pin.join(""));
       router.push("/points");
+    } else {
+      router.push("/points");
     }
   };
   return (
