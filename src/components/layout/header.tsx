@@ -6,22 +6,20 @@ import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { CustomConnectButton } from "./customConnectButton";
 import { useAccount } from "wagmi";
-import { useAtom } from "jotai";
-import { inviteCodeAtom } from "@/store";
-
+import usePointsAccount from "@/app/points/__hooks__/usePointsAccount";
 export default function Header() {
   const { isConnected } = useAccount();
   const router = useRouter();
-  const [inviteCode] = useAtom(inviteCodeAtom);
+  const { data } = usePointsAccount();
   return (
     <div className="h-[88px] px-8 items-center grid grid-cols-4">
       <button
         role="link"
         onClick={() => {
-          if (inviteCode.length > 0) {
-            router.push("/points");
-          } else {
+          if (!data?.result.invitationCode) {
             router.push("/");
+          } else {
+            router.push("/points");
           }
         }}
       >

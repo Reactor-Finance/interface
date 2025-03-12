@@ -2,35 +2,18 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { Card } from "@/components/ui/card";
-import { useQuery } from "@tanstack/react-query";
 import { useAccount } from "wagmi";
-
-import { z } from "zod";
 import Input from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Check, Copy } from "lucide-react";
 import useRegister from "../__hooks__/useRegister";
+import usePointsAccount from "../__hooks__/usePointsAccount";
 
-const userInfoSchema = z.object({
-  result: z.object({
-    countOfReferred: z.number(),
-    rank: z.number(),
-    totalPoints: z.number(),
-    invitationCode: z.string().optional(),
-  }),
-});
 export default function PointsHeaders() {
   const [copied, setCopied] = useState(false);
 
   const { address } = useAccount();
-  const { data } = useQuery({
-    queryKey: ["userPoints"],
-    queryFn: async () => {
-      const resp = await fetch("/api/points/user/info/" + address);
-      return userInfoSchema.parse(await resp.json());
-    },
-    enabled: !!address,
-  });
+  const { data } = usePointsAccount();
 
   const handleCopy = () => {
     navigator.clipboard

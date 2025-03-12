@@ -1,9 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { inviteCodeAtom } from "@/store";
-import { useAtom } from "jotai";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import useRegister from "../__hooks__/useRegister";
+import usePointsAccount from "../__hooks__/usePointsAccount";
 
 export default function PointsAccess() {
   const [pin, setPin] = useState(["", "", "", "", "", ""]);
@@ -27,17 +26,16 @@ export default function PointsAccess() {
       }
     }
   };
-  const [inviteCode, setInviteCode] = useAtom(inviteCodeAtom);
   const router = useRouter();
+  const { data } = usePointsAccount();
   useEffect(() => {
-    if (inviteCode.length > 0) {
+    if (data?.result.invitationCode) {
       router.push("/points");
     }
-  }, [inviteCode, router]);
+  }, [data?.result.invitationCode, router]);
   const { mutateAsync } = useRegister({ inviteCode: pin.join("") });
   const handleSubmit = () => {
     if (isFilled) {
-      setInviteCode(pin.join(""));
       mutateAsync().then(() => {
         router.push("/points");
       });
@@ -46,7 +44,7 @@ export default function PointsAccess() {
     }
   };
   return (
-    inviteCode.length === 0 && (
+    !data?.result.invitationCode && (
       <div className="flex flex-col text-center mb-[88px] gap-y-4 w-[384px]">
         <h1 className="text-[32px] leading-[40px] text-primary-400">
           REACTOR EARLY ACCESS
