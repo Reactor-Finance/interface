@@ -4,8 +4,8 @@ import { formatNumber } from "@/lib/utils";
 import { useMemo } from "react";
 
 interface Props {
-  amount0: string;
-  amount1: string;
+  amount0: number;
+  amount1: number;
   token0: TToken | undefined;
   token1: TToken | undefined;
 }
@@ -17,13 +17,8 @@ export default function InitPoolInfo({
   token1,
 }: Props) {
   const { result0, result1 } = useMemo(() => {
-    const amt0 = parseFloat(amount0);
-    const amt1 = parseFloat(amount1);
-    if (!isFinite(amt0) || !isFinite(amt1)) {
-      return { result0: 0, result1: 0 };
-    }
-    const result0 = amt1 > 0 ? amt0 / amt1 : amt0 / 1;
-    const result1 = amt0 > 0 ? amt1 / amt0 : amt1 / 1;
+    const result0 = amount1 > 0 ? amount0 / amount1 : amount0 / 1;
+    const result1 = amount0 > 0 ? amount1 / amount0 : amount1 / 1;
     return { result0, result1 };
   }, [amount0, amount1]);
   return (

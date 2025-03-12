@@ -9,10 +9,15 @@ import SearchInput from "@/components/shared/searchInput";
 import ImageWithFallback from "@/components/shared/imageWithFallback";
 import { TToken } from "@/lib/types";
 import { useTokenlistContext } from "@/contexts/tokenlistContext";
+import { useGetBalance } from "@/lib/hooks/useGetBalance";
+import Spinner from "../ui/spinner";
+import { formatNumber } from "@/lib/utils";
+import { formatUnits, formatEther } from "viem";
+import { useGetMarketQuote } from "@/lib/hooks/useGetMarketQuote";
 // import { useGetBalance } from "@/lib/hooks/useGetBalance";
 // import { useGetMarketQuote } from "@/lib/hooks/useGetMarketQuote";
 
-export default function TokensDailog({
+export default function TokensDialog({
   open,
   onOpen,
   onTokenSelected,
@@ -88,11 +93,11 @@ function TokenItem({
   token: TToken;
   selectToken: (token: TToken) => void;
 }) {
-  // n+1 problem
-  // https://planetscale.com/blog/what-is-n-1-query-problem-and-how-to-solve-it
-  // need backend endpoint that returns portfolio of token bals
-  // instead of querying each token
-  // const balance = useGetBalance({ tokenAddress: token.address });
+  const balance = useGetBalance({ tokenAddress: token.address }); // This, is at this point a necessary evil, so to speak. Until we concoct an aternative, we might have to rely on this trade-off
+  const { quote, isLoading: quoteLoading } = useGetMarketQuote({
+    tokenAddress: token.address,
+    value: balance,
+  });
   return (
     <button
       type="button"
@@ -117,17 +122,17 @@ function TokenItem({
         </div>
       </div>
       <div className="flex flex-col items-end font-geistMono">
-        {/* <div> */}
-        {/*   <span>{formatNumber(formatUnits(0n, token.decimals))}</span> */}
-        {/* </div> */}
         <div>
-          {/* {quoteLoading ? ( */}
-          {/*   <Spinner /> */}
-          {/* ) : ( */}
-          {/*   <span className="text-gray-400"> */}
-          {/*     ${formatNumber(formatEther(quote[0]))} */}
-          {/*   </span> */}
-          {/* )} */}
+          <span>{formatNumber(formatUnits(balance, token.decimals))}</span>
+        </div>
+        <div>
+          {quoteLoading ? (
+            <Spinner />
+          ) : (
+            <span className="text-gray-400">
+              ${formatNumber(formatEther(quote[0]))}
+            </span>
+          )}
         </div>
       </div>
     </button>

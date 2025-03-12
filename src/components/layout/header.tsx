@@ -18,7 +18,7 @@ export default function Header() {
           <NavLink href="/lock">Lock</NavLink>
           <NavLink href="/dashboard">Dashboard</NavLink>
           <NavLink href="/liquidity">Liquidity</NavLink>
-          <NavLink href="/voting">Voting</NavLink>
+          {/* <NavLink href="/voting">Voting</NavLink> */}
           {/* <NavLink href="/uniswap">Faucet</NavLink> */}
         </ul>
       </div>

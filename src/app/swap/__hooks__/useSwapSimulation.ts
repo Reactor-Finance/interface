@@ -19,11 +19,13 @@ export function useSwapSimulation({
   token0,
   token1,
   minAmountOut = BigInt(0),
+  stable = false,
 }: {
-  amount: string;
+  amount: number | null;
   token0: TToken | null;
   token1: TToken | null;
   minAmountOut?: bigint;
+  stable?: boolean;
 }) {
   const { address } = useAccount();
   const now = useAtomicDate();
@@ -55,10 +57,10 @@ export function useSwapSimulation({
             {
               from: token0?.address ?? zeroAddress,
               to: token1?.address ?? zeroAddress,
-              stable: false,
+              stable,
             },
           ],
-    [multihops, token0?.address, token1?.address, weth]
+    [multihops, token0?.address, token1?.address, weth, stable]
   );
   const deadline = useMemo(() => {
     const ttl = Math.floor(now.getTime() / 1000) + Number(txDeadline) * 60;
@@ -78,7 +80,7 @@ export function useSwapSimulation({
     functionName: "swap",
     args: [
       amountIn,
-      calculateMinOut(minAmountOut, Number(slippage)),
+      calculateMinOut(minAmountOut, slippage),
       routes,
       address ?? zeroAddress,
       deadline,
@@ -92,6 +94,7 @@ export function useSwapSimulation({
         !!token1 &&
         amount !== null &&
         address !== zeroAddress,
+      refetchInterval: 5_000,
     },
   });
 }

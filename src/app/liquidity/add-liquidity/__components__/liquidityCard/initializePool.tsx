@@ -10,7 +10,7 @@ import {
 import { useAddLiquidity } from "../../../__hooks__/useAddLiquidity";
 import SubmitButton from "@/components/shared/submitBtn";
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
-import { Address, formatUnits, isAddress, parseUnits, zeroAddress } from "viem";
+import { formatUnits, isAddress, parseUnits, zeroAddress } from "viem";
 import { z } from "zod";
 import { useSearchParams } from "next/navigation";
 import { useCheckPair } from "@/lib/hooks/useCheckPair";
@@ -19,12 +19,11 @@ import { ROUTER } from "@/data/constants";
 import { useQuoteLiquidity } from "@/app/liquidity/__hooks__/useQuoteLiquidity";
 import { useGetTokenInfo } from "@/utils";
 import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
-import { useQueryClient } from "@tanstack/react-query";
-import { useGetBalance } from "@/lib/hooks/useGetBalance";
 import { useGetPairInfo } from "@/lib/hooks/useGetPairInfo";
 import DisplayFormattedNumber from "@/components/shared/displayFormattedNumber";
 import { formatNumber } from "@/lib/utils";
 import InitPoolInfo from "./initPoolInfo";
+import { useQueryClient } from "@tanstack/react-query";
 
 const searchParamsSchema = z.object({
   token0: z.string().refine((arg) => isAddress(arg)),
@@ -35,7 +34,7 @@ const searchParamsSchema = z.object({
 export default function InitializePool() {
   // Wagmi parameters
   const chainId = useChainId();
-  const [selectedInput, setSelectedInput] = useState<"0" | "1">("0");
+  const [selectedInput, setSelectedInput] = useState<0 | 1>(0);
   // Token list
   // Search params
   const params = useSearchParams();
@@ -47,7 +46,6 @@ export default function InitializePool() {
 
     const afterParse = searchParamsSchema.safeParse(param);
     if (!afterParse.success) {
-      console.log("failed parse");
       return { t0: undefined, t1: undefined, version: "stable" };
     }
     const { token1, token0, version: v } = afterParse.data;
@@ -58,12 +56,12 @@ export default function InitializePool() {
   const token0 = useGetTokenInfo(t0 ?? "0x");
   const token1 = useGetTokenInfo(t1 ?? "0x");
 
-  const [amount0, setAmount0] = useState("");
-  const [amount1, setAmount1] = useState("");
+  const [amount0, setAmount0] = useState(0);
+  const [amount1, setAmount1] = useState(0);
   useEffect(() => {
     // reset inputs if change pool version
-    setAmount0("");
-    setAmount1("");
+    setAmount0(0);
+    setAmount1(0);
   }, [version]);
 
   // Router
@@ -78,12 +76,12 @@ export default function InitializePool() {
 
   // Quote liquidity
   const quoteLiquidity = useQuoteLiquidity({
-    token0: (selectedInput === "0" ? t0 : t1) ?? zeroAddress,
-    token1: (selectedInput === "0" ? t1 : t0) ?? zeroAddress,
+    token0: (selectedInput === 0 ? t0 : t1) ?? zeroAddress,
+    token1: (selectedInput === 0 ? t1 : t0) ?? zeroAddress,
     stable: version === "stable",
     amountIn: parseUnits(
-      selectedInput === "0" ? amount0 : amount1,
-      token0?.decimals ?? 18
+      selectedInput === 0 ? String(amount0) : String(amount1),
+      (selectedInput === 0 ? token0?.decimals : token1?.decimals) ?? 18
     ),
   });
 
@@ -114,7 +112,7 @@ export default function InitializePool() {
 
   // Amounts parsed
   const amountADesired = useMemo(
-    () => parseUnits(amount0, token0?.decimals ?? 18),
+    () => parseUnits(String(amount0), token0?.decimals ?? 18),
     [amount0, token0]
   );
   const amountBDesired = useMemo(
@@ -132,7 +130,7 @@ export default function InitializePool() {
     disabled:
       token1NeedsApproval ||
       token1NeedsApproval ||
-      (amount0 === "" && amount1 === ""),
+      (amount0 === 0 && amount1 === 0),
     token0: token0?.address ?? zeroAddress,
     token1: token1?.address ?? zeroAddress,
     amountADesired,
@@ -149,15 +147,10 @@ export default function InitializePool() {
   } = useWriteContract(); // We'll also call reset when transaction toast is closed
   const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash });
   const { setToast } = useTransactionToastProvider();
-  const { balance: balance0, balanceQueryKey: bal0Key } = useGetBalance({
-    tokenAddress: token0?.address ?? zeroAddress,
-  });
-  const { balance: balance1, balanceQueryKey: bal1Key } = useGetBalance({
-    tokenAddress: token1?.address ?? zeroAddress,
-  });
   const queryClient = useQueryClient();
 
   const { pairInfo, queryKey: pairKey } = useGetPairInfo({ pair });
+
   useEffect(() => {
     if (isSuccess) {
       reset();
@@ -180,21 +173,17 @@ export default function InitializePool() {
         return;
       }
       if (!token0NeedsApproval || !token1NeedsApproval) {
-        queryClient.invalidateQueries({ queryKey: bal0Key });
-        queryClient.invalidateQueries({ queryKey: bal1Key });
         queryClient.invalidateQueries({ queryKey: pairKey });
         setToast({
           actionTitle: "Added Liquidity",
           actionDescription: "",
           hash,
         });
-        setAmount0("");
-        setAmount1("");
+        setAmount0(0);
+        setAmount1(1);
       }
     }
   }, [
-    bal0Key,
-    bal1Key,
     hash,
     isSuccess,
     pairKey,
@@ -265,48 +254,13 @@ export default function InitializePool() {
       amountBDesired,
     ]
   );
-  const { balance } = useGetBalance({
-    tokenAddress: (pair as Address) ?? zeroAddress,
-  });
   const { state: buttonState } = useGetButtonStatuses({
     isLoading,
     isPending,
     isFetching: token0ApprovalFetching || token1ApprovalFetching,
     needsApproval: token0NeedsApproval || token1NeedsApproval,
   });
-  useEffect(() => {
-    if (selectedInput === "0") {
-      if (quoteLiquidity && pairExists) {
-        let num = parseFloat(
-          formatUnits(quoteLiquidity, token1?.decimals ?? 18)
-        );
-        num = Math.floor(num * 100) / 100;
-        setAmount1(num.toString());
-      }
-      if (amount0 === "" && pairExists) {
-        setAmount1("");
-      }
-    } else {
-      if (quoteLiquidity && pairExists) {
-        let num = parseFloat(
-          formatUnits(quoteLiquidity, token1?.decimals ?? 18)
-        );
-        num = Math.floor(num * 100) / 100;
-        setAmount0(num.toString());
-      }
-      if (amount1 === "" && pairExists) {
-        setAmount0("");
-      }
-    }
-  }, [
-    amount0,
-    amount1,
-    pairExists,
-    quoteLiquidity,
-    selectedInput,
-    token0?.decimals,
-    token1?.decimals,
-  ]);
+
   return (
     <>
       <h2 className="text-xl">
@@ -318,11 +272,14 @@ export default function InitializePool() {
             <label htmlFor="">Asset 1</label>
           </div>
           <AssetCard
-            balance={balance0}
-            onValueChange={setAmount0}
+            onValueChange={(val) => {
+              const parsedNumber = Number(val);
+              const value = !isNaN(parsedNumber) ? parsedNumber : amount0;
+              setAmount0(value);
+            }}
             token={token0}
-            value={amount0}
-            onFocus={() => setSelectedInput("0")}
+            value={String(amount0)}
+            onFocus={() => setSelectedInput(0)}
           />
         </div>
       )}
@@ -332,11 +289,14 @@ export default function InitializePool() {
             <label htmlFor="">Asset 2</label>
           </div>
           <AssetCard
-            balance={balance1}
-            onValueChange={setAmount1}
+            onValueChange={(val) => {
+              const parsedNumber = Number(val);
+              const value = !isNaN(parsedNumber) ? parsedNumber : amount1;
+              setAmount1(value);
+            }}
             token={token1}
-            value={amount1}
-            onFocus={() => setSelectedInput("1")}
+            value={String(amount1)}
+            onFocus={() => setSelectedInput(1)}
           />
         </div>
       )}
@@ -389,7 +349,9 @@ export default function InitializePool() {
               <span>Amount</span>
               <span>
                 <DisplayFormattedNumber
-                  num={formatNumber(formatUnits(balance ?? 0n, 18))}
+                  num={formatNumber(
+                    formatUnits(pairInfo?.account_lp_balance ?? 0n, 18)
+                  )}
                 />{" "}
                 lp
               </span>

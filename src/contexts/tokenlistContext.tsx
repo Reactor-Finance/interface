@@ -2,7 +2,13 @@
 
 import { TToken } from "@/lib/types";
 import { api } from "@/trpc/react";
-import React, { createContext, ReactNode, useContext, useState } from "react";
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useMemo,
+  useState,
+} from "react";
 import { useChainId } from "wagmi";
 
 interface TokenlistContextType {
@@ -33,11 +39,18 @@ export const TokenlistContextProvider: React.FC<{ children: ReactNode }> = ({
     isLoading: loading,
     error,
   } = api.tokens.getTokens.useQuery({ chainId });
-  const filteredTokenlist = tokenlist.filter(
-    (token) =>
-      token.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      token.symbol.toLowerCase().includes(searchQuery.toLowerCase())
+
+  const filteredTokenlist = useMemo(
+    () =>
+      tokenlist.filter(
+        (token) =>
+          token.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          token.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          token.address.toLowerCase().startsWith(searchQuery.toLowerCase())
+      ),
+    [tokenlist, searchQuery]
   );
+
   return (
     <TokenlistContext.Provider
       value={{

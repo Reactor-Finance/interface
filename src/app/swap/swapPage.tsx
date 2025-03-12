@@ -1,6 +1,6 @@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
-import NewSwapView from "./__components__/newSwapView";
+import SwapView from "./__components__/swapView";
 import PageMarginContainer from "@/components/ui/pageMarginContainer";
 import SettingsDialog from "./__components__/settingsDialog";
 
@@ -35,7 +35,7 @@ export default function SwapPage() {
         </div>
         <Card className="min-w-[380px] p-0 rounded-md">
           {/* <SwapView /> */}
-          <NewSwapView />
+          <SwapView />
         </Card>
       </div>
     </PageMarginContainer>

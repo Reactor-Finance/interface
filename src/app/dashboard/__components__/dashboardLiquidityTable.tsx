@@ -14,7 +14,7 @@ export default function DashboardLiquidityTable() {
     () => pairs.filter((pair) => pair.account_lp_balance > 0n),
     [pairs]
   );
-  const [selectedPair, setSelectedPair] = useState(activePairs[0]);
+  const [selectedPairIndex, setSelectedPairIndex] = useState(0);
   const [stateType, setStateType] = useState<StateType>({
     dialogOpen: false,
     actionType: LiquidityActions.Stake,
@@ -22,10 +22,10 @@ export default function DashboardLiquidityTable() {
   const isLoadingPadded = usePadLoading({ value: isLoading, duration: 500 });
   return (
     <>
-      {stateType && selectedPair && (
+      {stateType && activePairs[selectedPairIndex] && (
         <DashboardLiquidityDialog
           state={stateType}
-          pairInfo={selectedPair}
+          pairInfo={activePairs[selectedPairIndex]}
           onOpenChange={(isOpen) =>
             setStateType((s) => ({ ...s, dialogOpen: isOpen }))
           }
@@ -46,12 +46,12 @@ export default function DashboardLiquidityTable() {
           </thead>
           <tbody className="flex flex-col space-y-2 min-h-[52px]">
             {!isLoadingPadded &&
-              activePairs.map((pair) => (
+              activePairs.map((pair, index) => (
                 <LiquidityRow
                   key={pair.pair_address}
                   pairInfo={pair}
                   onItemClick={(actionType) => {
-                    setSelectedPair(pair);
+                    setSelectedPairIndex(index);
                     setStateType({ actionType, dialogOpen: true });
                   }}
                 />

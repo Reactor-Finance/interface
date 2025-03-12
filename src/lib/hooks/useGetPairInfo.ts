@@ -22,6 +22,7 @@ export function useGetPairInfo({
     address: pairHelper,
     functionName: "getPair",
     args: [pair, address],
+    query: { enabled: true, refetchInterval: 10_000 },
   });
 
   // useWatchBlocks({

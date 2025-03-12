@@ -17,6 +17,7 @@ import { TokenlistContextProvider } from "@/contexts/tokenlistContext";
 import { TransactionToastProvider } from "@/contexts/transactionToastProvider";
 
 export const wagmiConfig = getDefaultConfig({
+  pollingInterval: 10_000,
   appName: "Reactor Finance",
   projectId: "75ec6bc09b1280c146d750fbb7aae68a",
   ssr: true,

@@ -1,24 +1,24 @@
+import { useGetBalance } from "@/lib/hooks/useGetBalance";
 import { ErrorMessage, TToken } from "@/lib/types";
 import { useMemo } from "react";
 import { parseUnits } from "viem";
 
 interface Props {
-  token0Balance: bigint;
-  amountIn: string;
+  amountIn: number;
   token0: TToken | null;
   token1: TToken | null;
   simulation: boolean;
 }
 
 export default function useSwapValidation({
-  token0Balance,
   amountIn,
   token0,
   token1,
   simulation,
 }: Props) {
+  const token0Balance = useGetBalance({ tokenAddress: token0?.address });
   const { isValid, message } = useMemo(() => {
-    if (amountIn === "") {
+    if (amountIn === 0 || isNaN(amountIn)) {
       return { isValid: false, message: null };
     }
     if (token0 === null || token1 === null) {
