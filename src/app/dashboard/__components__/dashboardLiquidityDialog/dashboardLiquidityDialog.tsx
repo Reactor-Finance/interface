@@ -24,6 +24,7 @@ import { ROUTER } from "@/data/constants";
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
 import StakeStats from "./stakeStat";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ElementType<T extends Record<string, any>> = T["data"][number];
 
 interface Props {

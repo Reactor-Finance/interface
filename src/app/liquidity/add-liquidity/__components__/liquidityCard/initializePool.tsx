@@ -10,7 +10,7 @@ import {
 import { useAddLiquidity } from "../../../__hooks__/useAddLiquidity";
 import SubmitButton from "@/components/shared/submitBtn";
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
-import { Address, formatUnits, isAddress, parseUnits, zeroAddress } from "viem";
+import { formatUnits, isAddress, parseUnits, zeroAddress } from "viem";
 import { z } from "zod";
 import { useSearchParams } from "next/navigation";
 import { useCheckPair } from "@/lib/hooks/useCheckPair";
@@ -19,7 +19,6 @@ import { ROUTER } from "@/data/constants";
 import { useQuoteLiquidity } from "@/app/liquidity/__hooks__/useQuoteLiquidity";
 import { useGetTokenInfo } from "@/utils";
 import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
-import { useGetBalance } from "@/lib/hooks/useGetBalance";
 import { useGetPairInfo } from "@/lib/hooks/useGetPairInfo";
 import DisplayFormattedNumber from "@/components/shared/displayFormattedNumber";
 import { formatNumber } from "@/lib/utils";

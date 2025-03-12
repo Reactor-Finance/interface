@@ -16,7 +16,7 @@ interface Props {
 export default function SwapDetails({ token0, token1 }: Props) {
   const [open, setOpen] = useState(false);
   const [slippage] = useAtom(slippageAtom);
-  const [_, setDialogOpen] = useAtom(settingDialogOpenAtom);
+  const [, setDialogOpen] = useAtom(settingDialogOpenAtom);
   const { quoteAmount } = useQuoteSwap({
     amountIn: 1,
     amountOut: 0,

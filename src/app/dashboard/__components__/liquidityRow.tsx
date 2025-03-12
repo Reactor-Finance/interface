@@ -24,7 +24,6 @@ export function LiquidityRow({
     emissions,
     account_gauge_earned,
     emissions_token,
-    pair_address,
   },
   onItemClick,
 }: {

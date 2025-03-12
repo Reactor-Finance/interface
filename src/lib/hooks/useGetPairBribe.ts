@@ -1,6 +1,6 @@
 import { PAIR_HELPER } from "@/data/constants";
-import { useEffect, useMemo } from "react";
-import { useChainId, useReadContract, useWatchBlocks } from "wagmi";
+import { useMemo } from "react";
+import { useChainId, useReadContract } from "wagmi";
 import * as PairHelper from "@/lib/abis/PairHelper";
 import { Address, zeroAddress } from "viem";
 
@@ -15,11 +15,7 @@ export function useGetPairBribe({
 }) {
   const chainId = useChainId();
   const pairHelper = useMemo(() => PAIR_HELPER[chainId], [chainId]);
-  const {
-    data = [],
-    refetch,
-    error,
-  } = useReadContract({
+  const { data = [] } = useReadContract({
     ...PairHelper,
     address: pairHelper,
     functionName: "getPairBribe",

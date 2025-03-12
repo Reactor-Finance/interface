@@ -17,29 +17,30 @@ export default function PoolHeader({
   token0,
   token1,
   number,
-  _data,
 }: Props) {
-  if (!token0 || !token1) return;
   const fee = useGetFeeFromFactory(poolType === TPoolType.STABLE);
   return (
-    <div className="flex gap-x-4 items-center">
-      {number && <span>{number}</span>}
-      <div className="flex gap-x-2 items-center">
-        <CurrenciesOverlapIcons token0={token0} token1={token1} />
-        <div>
-          <h4>
-            {`${poolType === TPoolType.STABLE ? "sAMM" : "vAMM"}`}-
-            {token0.symbol}/{token1.symbol}
-          </h4>
-          <div className="space-x-1">
-            <PoolBadge poolType={poolType} />
-            <Badge colors="neutral" border="one">
-              {Number(fee) / 100}%
-            </Badge>
+    token0 &&
+    token1 && (
+      <div className="flex gap-x-4 items-center">
+        {number && <span>{number}</span>}
+        <div className="flex gap-x-2 items-center">
+          <CurrenciesOverlapIcons token0={token0} token1={token1} />
+          <div>
+            <h4>
+              {`${poolType === TPoolType.STABLE ? "sAMM" : "vAMM"}`}-
+              {token0.symbol}/{token1.symbol}
+            </h4>
+            <div className="space-x-1">
+              <PoolBadge poolType={poolType} />
+              <Badge colors="neutral" border="one">
+                {Number(fee) / 100}%
+              </Badge>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    )
   );
 }
 function PoolBadge({ poolType }: { poolType: TPoolType }) {
