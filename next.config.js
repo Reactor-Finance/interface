@@ -21,11 +21,11 @@ const nextConfig = {
       },
       {
         source: "/api/points/leaderboard",
-        destination: process.env.POINTS_API_URL + "points/leaderboard",
+        destination: process.env.POINTS_API_URL + "/points/leaderboard",
       },
       {
-        source: "/api/points/user/info",
-        destination: process.env.POINTS_API_URL + "/user/info",
+        source: "/api/points/user/info/:path*",
+        destination: process.env.POINTS_API_URL + "/user/info/:path*",
       },
       {
         source: "/api/points/user/register",

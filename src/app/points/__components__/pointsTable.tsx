@@ -20,7 +20,7 @@ export default function PointsTable() {
   const { data, error } = useQuery({
     queryKey: ["leaderboard"],
     queryFn: async () => {
-      const resp = await fetch("/api/points").then((r) => r.json());
+      const resp = await fetch("/api/points/leaderboard").then((r) => r.json());
       console.log(resp);
       return LeaderboardSchema.parse(resp);
     },

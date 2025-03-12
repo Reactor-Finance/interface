@@ -1,8 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { inviteCodeAtom } from "@/store";
+import { useMutation } from "@tanstack/react-query";
 import { useAtom } from "jotai";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
+import { useAccount } from "wagmi";
 
 export default function PointsAccess() {
   const [pin, setPin] = useState(["", "", "", "", "", ""]);
@@ -33,10 +35,29 @@ export default function PointsAccess() {
       router.push("/points");
     }
   }, [inviteCode, router]);
+  const { address } = useAccount();
+  const { mutateAsync } = useMutation({
+    mutationFn: async (inviteCode: string) => {
+      const payload = {
+        inviteCode,
+        address,
+      };
+      fetch("api/users/register", {
+        method: "POST",
+        body: JSON.stringify(payload),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      return;
+    },
+  });
   const handleSubmit = () => {
     if (isFilled) {
       setInviteCode(pin.join(""));
-      router.push("/points");
+      mutateAsync(pin.join("")).then(() => {
+        router.push("/points");
+      });
     } else {
       router.push("/points");
     }
