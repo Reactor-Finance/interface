@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import useRegister from "../__hooks__/useRegister";
 import usePointsAccount from "../__hooks__/usePointsAccount";
+import { useAccountModal } from "@rainbow-me/rainbowkit";
 
 export default function PointsAccess() {
   const [pin, setPin] = useState(["", "", "", "", "", ""]);
@@ -43,6 +44,7 @@ export default function PointsAccess() {
       router.push("/points");
     }
   };
+  const { openAccountModal } = useAccountModal();
   return (
     !data?.result.invitationCode && (
       <div className="flex flex-col text-center mb-[88px] gap-y-4 w-[384px]">
@@ -86,7 +88,12 @@ export default function PointsAccess() {
         </Button>
         <div className="pt-6 text-sm flex flex-col space-y-2">
           <span>Already registered?</span>
-          <button className="text-primary-400">Log in with your wallet.</button>
+          <button
+            onClick={() => openAccountModal?.()}
+            className="text-primary-400"
+          >
+            Log in with your wallet.
+          </button>
         </div>
       </div>
     )

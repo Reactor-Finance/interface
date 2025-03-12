@@ -7,8 +7,10 @@ import Link from "next/link";
 import { CustomConnectButton } from "./customConnectButton";
 import { useAccount } from "wagmi";
 import usePointsAccount from "@/app/points/__hooks__/usePointsAccount";
+import { useChainModal } from "@rainbow-me/rainbowkit";
 export default function Header() {
   const { isConnected } = useAccount();
+  const { openChainModal } = useChainModal();
   const router = useRouter();
   const { data } = usePointsAccount();
   return (
@@ -37,7 +39,15 @@ export default function Header() {
           </ul>
         )}
       </div>
-      <div className="flex justify-end">
+      <div className="flex justify-end items-center gap-x-3">
+        {isConnected && (
+          <button
+            className="rounded-full h-6 w-6 bg-blue-400"
+            onClick={() => openChainModal?.()}
+          >
+            M
+          </button>
+        )}
         <CustomConnectButton />
       </div>
     </div>
