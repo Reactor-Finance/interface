@@ -25,7 +25,7 @@ export default function Page() {
                 height="20"
                 fill="none"
                 stroke="currentColor"
-                stroke-width="1.5"
+                strokeWidth="1.5"
                 viewBox="0 0 24 24"
               >
                 <path

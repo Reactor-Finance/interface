@@ -2,13 +2,14 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { Card } from "@/components/ui/card";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useAccount } from "wagmi";
 
 import { z } from "zod";
 import Input from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Check, Copy } from "lucide-react";
+import useRegister from "../__hooks__/useRegister";
 
 const userInfoSchema = z.object({
   result: z.object({
@@ -41,28 +42,7 @@ export default function PointsHeaders() {
   };
   const [inviteCode, setInviteCode] = useState("");
 
-  const { mutate, error } = useMutation({
-    mutationFn: async () => {
-      const payload = {
-        invitationCode: inviteCode,
-        address,
-      };
-      const resp = await fetch("/api/points/user/register", {
-        method: "POST",
-        body: JSON.stringify(payload),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }).then((r) => r.json());
-      console.log(resp);
-      if (resp.error) {
-        throw Error(resp.error);
-      }
-      if (!resp) throw Error("");
-      return;
-    },
-  });
-  console.log(error, "ERROR");
+  const { mutate, error } = useRegister({ inviteCode });
   const handleSubmit = () => {
     if (inviteCode.length !== 6 || !address) {
       return;
