@@ -23,6 +23,7 @@ import useApproveWrite from "@/lib/hooks/useApproveWrite";
 import { ROUTER } from "@/data/constants";
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
 import StakeStats from "./stakeStat";
+import WithdrawStats from "./withdrawStats";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ElementType<T extends Record<string, any>> = T["data"][number];
@@ -291,9 +292,15 @@ export default function DashboardLiquidityDialog({
               <span>Max</span>
             </div>
             <EstimatesHeader />
-            {/* {state.actionType === LiquidityActions.Withdraw && (
-              <WithdrawStats />
-            )} */}
+            {state.actionType === LiquidityActions.Withdraw && (
+              <WithdrawStats
+                token0={token0}
+                token1={token1}
+                pairInfo={pairInfo}
+                percent={sliderValue}
+                amount={amount}
+              />
+            )}
             {(state.actionType === LiquidityActions.Stake ||
               state.actionType === LiquidityActions.Unstake) && (
               <StakeStats
