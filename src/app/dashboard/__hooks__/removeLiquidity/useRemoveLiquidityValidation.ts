@@ -24,7 +24,7 @@ export function useRemoveLiquidityValidation({
     if (removeLiqEthSimulation) {
       return { isValid: true, errorMessage: "" };
     }
-    return { isValid: false, errorMessage: "" };
+    return { isValid: false, errorMessage: "Unknown Error Occured" };
   } else {
     if (removeLiqSimulationError) {
       return { isValid: false, errorMessage: "Error Occured" };
@@ -33,5 +33,5 @@ export function useRemoveLiquidityValidation({
       return { isValid: true, errorMessage: null };
     }
   }
-  return { isValid: false, errorMessage: "" };
+  return { isValid: false, errorMessage: "Withdraw" };
 }

@@ -4,7 +4,6 @@ import { Providers } from "./providers";
 import { JetBrains_Mono } from "next/font/google";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
-import TransactionSpinner from "@/components/transactionSpinner";
 import TransactionToast from "@/components/transactionToast";
 
 const jetbrainsMono = JetBrains_Mono({
@@ -27,10 +26,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`text-white overflow-x-hidden ${jetbrainsMono.className} antialiased`}
+        className={`text-white bg-background  overflow-x-hidden ${jetbrainsMono.className} antialiased`}
       >
         <Providers>
-          <TransactionSpinner />
           <TransactionToast />
           <Header />
           <main className="">{children}</main>

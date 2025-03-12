@@ -14,12 +14,10 @@ import { http, WagmiProvider } from "wagmi";
 import { HeroUIProvider } from "@heroui/react";
 import { TRPCReactProvider } from "@/trpc/react";
 import { TokenlistContextProvider } from "@/contexts/tokenlistContext";
-import { PersistGate } from "redux-persist/integration/react";
-import { Provider as ReduxProvider } from "react-redux";
-import { persistor, store } from "@/store";
-import { TransactionToastProvider } from "@/contexts/transactionProvider";
+import { TransactionToastProvider } from "@/contexts/transactionToastProvider";
 
 export const wagmiConfig = getDefaultConfig({
+  pollingInterval: 10_000,
   appName: "Reactor Finance",
   projectId: "75ec6bc09b1280c146d750fbb7aae68a",
   ssr: true,
@@ -36,33 +34,29 @@ const queryClient = new QueryClient({
     queries: {
       queryKeyHashFn: hashFn,
       refetchOnWindowFocus: false,
-      retry: 2,
+      retry: 1,
     },
   },
 });
 
 export const Providers: FC<PropsWithChildren> = ({ children }) => {
   return (
-    <ReduxProvider store={store}>
-      <PersistGate persistor={persistor}>
-        <WagmiProvider config={wagmiConfig}>
-          <QueryClientProvider client={queryClient}>
-            <RainbowKitProvider theme={darkTheme()}>
-              <TRPCReactProvider>
-                <TokenlistContextProvider>
-                  <TransactionToastProvider>
-                    <HeroUIProvider className="flex min-h-svh flex-col ">
-                      {/* Header goes here */}
-                      {children}
-                      {/* Footer goes here */}
-                    </HeroUIProvider>
-                  </TransactionToastProvider>
-                </TokenlistContextProvider>
-              </TRPCReactProvider>
-            </RainbowKitProvider>
-          </QueryClientProvider>
-        </WagmiProvider>
-      </PersistGate>
-    </ReduxProvider>
+    <WagmiProvider config={wagmiConfig}>
+      <QueryClientProvider client={queryClient}>
+        <RainbowKitProvider theme={darkTheme()}>
+          <TRPCReactProvider>
+            <TokenlistContextProvider>
+              <TransactionToastProvider>
+                <HeroUIProvider className="flex min-h-svh flex-col ">
+                  {/* Header goes here */}
+                  {children}
+                  {/* Footer goes here */}
+                </HeroUIProvider>
+              </TransactionToastProvider>
+            </TokenlistContextProvider>
+          </TRPCReactProvider>
+        </RainbowKitProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 };

@@ -75,7 +75,7 @@ export default function PoolTabs() {
     [createQueryString, router]
   );
   return (
-    <div className="flex gap-x-4 items-center">
+    <div className="flex gap-x-4 items-end">
       <Tabs value={version}>
         <TabsList colors="muted">
           <TabsTrigger
@@ -88,7 +88,7 @@ export default function PoolTabs() {
             onClick={() => tabTriggerHandle(TPoolType.VOLATILE)}
             value="volatile"
           >
-            Classic
+            Volatile
           </TabsTrigger>
           <TabsTrigger
             onClick={() => tabTriggerHandle(TPoolType.CONCENTRATED)}

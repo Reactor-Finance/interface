@@ -14,11 +14,13 @@ export function useGetPairs({
   const chainId = useChainId();
   const { address = zeroAddress } = useAccount();
   const pairHelper = useMemo(() => PAIR_HELPER[chainId], [chainId]);
-  const { data = [], queryKey = [] } = useReadContract({
+  const { data = [], isLoading } = useReadContract({
     ...PairHelper,
     address: pairHelper,
     functionName: "getAllPair",
     args: [address, limit, offset],
+    query: { enabled: true, refetchInterval: 5_000 },
   });
-  return data.map((pair) => ({ ...pair, queryKey }));
+
+  return { data, isLoading };
 }

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import React from "react";
+import React, { useEffect } from "react";
 import verified from "@/assets/verified.svg";
 import info from "@/assets/info.svg";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -9,10 +9,15 @@ import SearchInput from "@/components/shared/searchInput";
 import ImageWithFallback from "@/components/shared/imageWithFallback";
 import { TToken } from "@/lib/types";
 import { useTokenlistContext } from "@/contexts/tokenlistContext";
+import { useGetBalance } from "@/lib/hooks/useGetBalance";
+import Spinner from "../ui/spinner";
+import { formatNumber } from "@/lib/utils";
+import { formatUnits, formatEther } from "viem";
+import { useGetMarketQuote } from "@/lib/hooks/useGetMarketQuote";
 // import { useGetBalance } from "@/lib/hooks/useGetBalance";
 // import { useGetMarketQuote } from "@/lib/hooks/useGetMarketQuote";
 
-export default function TokensDailog({
+export default function TokensDialog({
   open,
   onOpen,
   onTokenSelected,
@@ -24,21 +29,25 @@ export default function TokensDailog({
   selectedTokens: `0x${string}`[];
 }) {
   const { filteredList, setSearchQuery, searchQuery } = useTokenlistContext();
-
+  useEffect(() => {
+    // reset search after leaving dialog
+    if (!open) {
+      setSearchQuery("");
+    }
+  }, [open, setSearchQuery]);
   return (
     <Dialog open={open} onOpenChange={onOpen}>
       <DialogContent
         title="Search Tokens"
-        className="w-[440px] overflow-hidden border-none bg-[#1a1a1a] p-0 text-white"
+        className="w-[440px] overflow-hidden border-none bg-neutral-1000  p-0 text-white"
       >
         <div className="relative  h-[80vh] space-y-6 pt-4 text-white">
           <div className="space-y-6 px-6">
-            <DialogTitle className="font-geistMono">Select a token</DialogTitle>
-            {/* <h1 className="font-geistMono">Select a token</h1> */}
+            <DialogTitle className="">Select a token</DialogTitle>
             <SearchInput setValue={setSearchQuery} value={searchQuery} />
           </div>
           <div className="relative z-0 h-[calc(100%-179px)] border-t border-gray-600  ">
-            <h2 className="py-3 font-geistMono text-[14px] text-[#999999] pl-6">
+            <h2 className="py-3 text-[14px] text-[#999999] pl-6">
               Tokens ({filteredList.length})
             </h2>
             <div className=" h-[calc(100%-22px)] space-y-2 scrollbar overflow-y-auto pb-2 px-2">
@@ -84,16 +93,16 @@ function TokenItem({
   token: TToken;
   selectToken: (token: TToken) => void;
 }) {
-  // n+1 problem
-  // https://planetscale.com/blog/what-is-n-1-query-problem-and-how-to-solve-it
-  // need backend endpoint that returns portfolio of token bals
-  // instead of querying each token
-  // const balance = useGetBalance({ tokenAddress: token.address });
+  const balance = useGetBalance({ tokenAddress: token.address }); // This, is at this point a necessary evil, so to speak. Until we concoct an aternative, we might have to rely on this trade-off
+  const { quote, isLoading: quoteLoading } = useGetMarketQuote({
+    tokenAddress: token.address,
+    value: balance,
+  });
   return (
     <button
       type="button"
       onClick={() => selectToken(token)}
-      className="mb-2 hover:bg-neutral-800 transition-colors flex w-full text-left justify-between rounded-md bg-neutral-900 px-4 py-2"
+      className="mb-2 hover:bg-neutral-900 transition-colors flex w-full text-left justify-between rounded-md bg-neutral-950 px-4 py-2"
     >
       <div className="flex items-center gap-x-2">
         <ImageWithFallback
@@ -113,17 +122,17 @@ function TokenItem({
         </div>
       </div>
       <div className="flex flex-col items-end font-geistMono">
-        {/* <div> */}
-        {/*   <span>{formatNumber(formatUnits(0n, token.decimals))}</span> */}
-        {/* </div> */}
         <div>
-          {/* {quoteLoading ? ( */}
-          {/*   <Spinner /> */}
-          {/* ) : ( */}
-          {/*   <span className="text-gray-400"> */}
-          {/*     ${formatNumber(formatEther(quote[0]))} */}
-          {/*   </span> */}
-          {/* )} */}
+          <span>{formatNumber(formatUnits(balance, token.decimals))}</span>
+        </div>
+        <div>
+          {quoteLoading ? (
+            <Spinner />
+          ) : (
+            <span className="text-gray-400">
+              ${formatNumber(formatEther(quote[0]))}
+            </span>
+          )}
         </div>
       </div>
     </button>

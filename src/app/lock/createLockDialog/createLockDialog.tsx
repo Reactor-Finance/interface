@@ -61,7 +61,7 @@ export default function CreateLockDialog() {
   });
 
   const onSubmit = useCallback(() => {
-    if (approveWriteRequest) {
+    if (approveWriteRequest && needsApproval) {
       reset(); // Reset state first
       writeContract(approveWriteRequest);
       return;
@@ -69,7 +69,13 @@ export default function CreateLockDialog() {
     if (createLockSimulation) {
       writeContract(createLockSimulation.request);
     }
-  }, [approveWriteRequest, reset, writeContract, createLockSimulation]);
+  }, [
+    approveWriteRequest,
+    reset,
+    writeContract,
+    createLockSimulation,
+    needsApproval,
+  ]);
 
   const { state } = useGetButtonStatuses({
     isLoading,
@@ -110,10 +116,7 @@ export default function CreateLockDialog() {
             <label htmlFor="">Amount to Lock</label>
             <span className="text-sm">
               <span className="text-neutral-200">Available:</span>{" "}
-              {formatNumber(
-                formatUnits(rctBalance.balance ?? 0n, RCT_DECIMALS)
-              )}{" "}
-              RCT
+              {formatNumber(formatUnits(rctBalance, RCT_DECIMALS))} RCT
             </span>
           </div>
           <div className="pt-2"></div>

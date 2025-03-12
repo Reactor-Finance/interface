@@ -1,13 +1,15 @@
 import React from "react";
 import CurrenciesOverlapIcons from "./currenciesOverlapIcons";
 import { Badge } from "../ui/badge";
-import { TPoolType, TToken } from "@/lib/types";
+import { TPoolData, TPoolType, TToken } from "@/lib/types";
+import { useGetFeeFromFactory } from "@/lib/hooks/useGetFeeFromFactory";
 
 interface Props {
   poolType: TPoolType;
   token0: TToken | undefined;
   token1: TToken | undefined;
   number?: string;
+  _data?: TPoolData;
 }
 
 export default function PoolHeader({
@@ -15,8 +17,10 @@ export default function PoolHeader({
   token0,
   token1,
   number,
+  _data,
 }: Props) {
   if (!token0 || !token1) return;
+  const fee = useGetFeeFromFactory(poolType === TPoolType.STABLE);
   return (
     <div className="flex gap-x-4 items-center">
       {number && <span>{number}</span>}
@@ -30,7 +34,7 @@ export default function PoolHeader({
           <div className="space-x-1">
             <PoolBadge poolType={poolType} />
             <Badge colors="neutral" border="one">
-              0.3%
+              {Number(fee) / 100}%
             </Badge>
           </div>
         </div>

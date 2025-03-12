@@ -5,6 +5,7 @@ import { formatUnits } from "viem";
 import { TToken } from "@/lib/types";
 import Input from "@/components/ui/input";
 import { formatNumber, inputPatternMatch } from "@/lib/utils";
+import { useGetBalance } from "@/lib/hooks/useGetBalance";
 
 interface Props {
   token: TToken;
@@ -12,7 +13,6 @@ interface Props {
   value: string;
   disableInput?: boolean;
   onFocus?: () => void;
-  balance: bigint | undefined;
 }
 
 export default function AssetCard({
@@ -21,13 +21,12 @@ export default function AssetCard({
   value,
   disableInput,
   onFocus,
-  balance,
 }: Props) {
+  const balance = useGetBalance({ tokenAddress: token.address });
   const formattedBalance = useMemo(
     () => formatNumber(formatUnits(balance ?? 0n, token.decimals)),
     [balance, token.decimals]
   );
-  console.log({ formattedBalance });
   return (
     <Card border="900" className="py-3 rounded-md px-4 space-y-2">
       <div className="flex justify-between">
@@ -54,9 +53,7 @@ export default function AssetCard({
         <div className="flex gap-x-1">
           <div>{formattedBalance} </div>
           <button
-            onClick={() =>
-              onValueChange(formatUnits(balance ?? 0n, token.decimals))
-            }
+            onClick={() => onValueChange(formatUnits(balance, token.decimals))}
             aria-label="Set Max Balance"
             className="text-primary-400"
           >

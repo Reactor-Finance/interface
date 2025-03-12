@@ -24,15 +24,9 @@ export function useGetPairBribe({
     address: pairHelper,
     functionName: "getPairBribe",
     args: [limit, offset, pair],
-  });
-
-  useEffect(() => {
-    if (error) console.error(error);
-  }, [error]);
-
-  useWatchBlocks({
-    onBlock: () => {
-      void refetch();
+    query: {
+      enabled: true,
+      refetchInterval: 10_000,
     },
   });
 

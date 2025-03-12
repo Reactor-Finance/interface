@@ -15,6 +15,9 @@ const alertVariants = cva(
         success: "bg-success-400/15 text-success-400",
         muted: "bg-neutral-950 text-neutral-400",
       },
+      border: {
+        mutedOne: "border border-neutral-900",
+      },
     },
     defaultVariants: {
       colors: "yellow",
@@ -25,11 +28,11 @@ const alertVariants = cva(
 const Alert = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants>
->(({ className, children, colors, ...props }, ref) => (
+>(({ className, border, children, colors, ...props }, ref) => (
   <div
     ref={ref}
     role="alert"
-    className={cn(alertVariants({ colors }), className)}
+    className={cn(alertVariants({ colors, border }), className)}
     {...props}
   >
     <div className="">

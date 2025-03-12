@@ -24,6 +24,7 @@ export function useCheckPair({
     address: tradeHelper,
     functionName: "pairFor",
     args: [token0, token1, stable],
+    query: { enabled: true, refetchInterval: 10_000 },
   });
   // why do we need to refetch here?
   // useWatchBlocks({

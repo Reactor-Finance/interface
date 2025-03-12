@@ -89,7 +89,7 @@ export default function Page() {
         </Card>
       </div>
       <div className="pt-6">
-        <Alert className="items-center" colors="muted">
+        <Alert border="mutedOne" className="items-center" colors="muted">
           Start by selecting the tokens. The liquidity pools available for
           deposit will show up next.
         </Alert>

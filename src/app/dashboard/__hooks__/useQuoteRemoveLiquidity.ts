@@ -1,7 +1,9 @@
 import { ROUTER } from "@/data/constants";
 import { useChainId, useReadContract } from "wagmi";
 import { abi } from "@/lib/abis/Router";
-import { getAddress } from "viem";
+import { getAddress, zeroAddress } from "viem";
+import { useMemo } from "react";
+
 export default function useQuoteRemoveLiquidity({
   token0,
   token1,
@@ -14,18 +16,20 @@ export default function useQuoteRemoveLiquidity({
   isStable: boolean | undefined;
   amount: bigint;
   enabled: boolean;
-  needsApproval: boolean;
 }) {
   const chainId = useChainId();
-  const t0 = token0 ? getAddress(token0) : undefined;
-  const t1 = token1 ? getAddress(token1) : undefined;
+  const t0 = useMemo(() => (token0 ? getAddress(token0) : undefined), [token0]);
+  const t1 = useMemo(() => (token1 ? getAddress(token1) : undefined), [token1]);
+  const router = useMemo(() => ROUTER[chainId], [chainId]);
+
   return useReadContract({
-    address: ROUTER[chainId],
+    address: router,
     abi,
     functionName: "quoteRemoveLiquidity",
-    args: [t0 ?? "0x", t1 ?? "0x", isStable ?? false, amount],
+    args: [t0 ?? zeroAddress, t1 ?? zeroAddress, !!isStable, amount],
     query: {
       enabled,
+      refetchInterval: 5_000,
     },
   });
 }

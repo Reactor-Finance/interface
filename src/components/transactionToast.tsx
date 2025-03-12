@@ -1,46 +1,24 @@
 "use client";
-import { useTransactionToastProvider } from "@/contexts/transactionProvider";
+import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
+import useOutBounce from "@/lib/hooks/useOutBounce";
 import { X } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 
 export default function TransactionToast() {
-  const { state, updateState } = useTransactionToastProvider();
-  const [content, setContent] = useState<
-    | {
-        title: string | undefined;
-        desc: string | undefined;
-      }
-    | undefined
-  >(undefined);
-  console.log({ content });
+  const { state, setToast } = useTransactionToastProvider();
   useEffect(() => {
-    console.log(state.actionTitle, "CONTENT", content);
-    if (!content && state.actionTitle) {
-      setContent({
-        title: state.actionTitle,
-        desc: state.actionDescription,
-      });
-    }
-  }, [content, state.actionDescription, state.actionTitle]);
-  useEffect(() => {
-    if (!state.open) {
-      setTimeout(() => {
-        setContent(undefined);
-      }, 500);
-    }
-  }, [state.open]);
-  useEffect(() => {
-    if (state.open) {
+    if (state.toastInfo) {
       const clear = setTimeout(() => {
-        updateState({ open: false });
+        setToast(undefined);
       }, 5000);
       return () => clearTimeout(clear);
     }
-  }, [state.open, updateState]);
+  }, [setToast, state.toastInfo]);
+  const toastInfo = useOutBounce({ value: state.toastInfo, duration: 400 });
   return (
     <div
-      data-state={state.open ? "open" : "closed"}
-      className="absolute transition-all  z-[100] top-[74px] data-[state=closed]:translate-x-[120%] data-[state=open]:right-[34px] right-0"
+      data-state={state.toastInfo ? "open" : "closed"}
+      className="fixed transition-all  z-[100] top-[74px] data-[state=closed]:translate-x-[120%] data-[state=open]:right-[34px] right-0"
     >
       <div className="bg-neutral-950 relative py-6 pl-4 pr-8 border-b-success-400 border-b-2 rounded-lg">
         <div className="absolute right-1 top-1">
@@ -48,13 +26,13 @@ export default function TransactionToast() {
             <X
               size={20}
               onClick={() => {
-                updateState({ open: false });
+                setToast(undefined);
               }}
             />
           </button>
         </div>
         <div>
-          <span>{content?.title ?? "Transaction Successful"}</span>
+          <span>{toastInfo?.actionTitle}</span>
         </div>
         <div></div>
       </div>

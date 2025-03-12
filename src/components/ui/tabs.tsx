@@ -19,7 +19,7 @@ const tabsListVariants = cva(
       },
       border: {
         none: "",
-        "border-1": "border border-neutral-800",
+        "border-1": "border border-[#43444C]",
       },
       colors: {
         transparent: "",

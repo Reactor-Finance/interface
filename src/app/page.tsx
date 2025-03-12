@@ -1,5 +1,5 @@
-"use client";
+import SwapPage from "./swap/swapPage";
 
-export default function Home() {
-  return <div className="min-h-screen font-geistMono "></div>;
+export default function Swap() {
+  return <SwapPage />;
 }
