@@ -274,8 +274,13 @@ export default function InitializePool() {
     isFetching: token0ApprovalFetching || token1ApprovalFetching,
     needsApproval: token0NeedsApproval || token1NeedsApproval,
   });
+  console.log(quoteLiquidity, "QUOTE LIQUIDITY ====");
   useEffect(() => {
     if (selectedInput === "0") {
+      if (quoteLiquidity === 0n) {
+        setAmount1(amount0);
+        return;
+      }
       if (quoteLiquidity && pairExists) {
         let num = parseFloat(
           formatUnits(quoteLiquidity, token1?.decimals ?? 18)
@@ -287,6 +292,9 @@ export default function InitializePool() {
         setAmount1("");
       }
     } else {
+      if (quoteLiquidity === 0n) {
+        setAmount0(amount0);
+      }
       if (quoteLiquidity && pairExists) {
         let num = parseFloat(
           formatUnits(quoteLiquidity, token1?.decimals ?? 18)
