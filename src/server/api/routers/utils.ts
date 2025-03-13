@@ -1,10 +1,3 @@
-import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
-import { z } from "zod";
+import { createTRPCRouter } from "@/server/api/trpc";
 
-export const utilsRouter = createTRPCRouter({
-  test: publicProcedure
-    .input(z.object({ test: z.string() }))
-    .query(async ({ input }) => {
-      // return await executeGetBlockNumber();
-    }),
-});
+export const utilsRouter = createTRPCRouter({});
