@@ -29,8 +29,8 @@ export default function PointsTable() {
   return (
     <>
       <table className="w-full border-collapse text-left">
-        <thead className="border-b border-gray-700 text-gray-400 text-xs uppercase">
-          <tr>
+        <thead className="border-b border-gray-700 w-full  text-gray-400 text-xs uppercase">
+          <tr className="grid-cols-8 grid">
             <th className="py-3">Rank</th>
             <th className="py-3">Profile</th>
             <th className="py-3">Referral</th>
@@ -41,7 +41,7 @@ export default function PointsTable() {
             <th className="py-3">Total Points</th>
           </tr>
         </thead>
-        <tbody className="text-sm flex flex-col space-y-2">
+        <tbody className="text-sm flex flex-col space-y-2 w-full">
           {data?.result.map((entry) => (
             <PointsRow {...entry} key={entry.rank} />
           ))}

@@ -12,7 +12,7 @@ export default function PointsRow({
 }: TPointsEntry) {
   const boost = false;
   return (
-    <tr className="border-b border-gray-800">
+    <tr className="border-b border-gray-800 grid grid-cols-8 w-full">
       <td className="py-3 text-white">{rank}</td>
       <td className="py-3 flex items-center space-x-2">
         {/* <img */}
@@ -20,7 +20,7 @@ export default function PointsRow({
         {/*   alt="avatar" */}
         {/*   className="w-6 h-6 rounded-full object-cover" */}
         {/* /> */}
-        <span className="text-white">{address}</span>
+        <span className="text-white">{shortenAddress(address)}</span>
       </td>
       <td className="py-3 text-[#BBBBBB]">{referralId}</td>
       <td className="py-3 text-[#BBBBBB]">{referralPoints}</td>
@@ -34,4 +34,7 @@ export default function PointsRow({
       <td className="py-3 text-[#BBBBBB]">{totalPoints}</td>
     </tr>
   );
+}
+function shortenAddress(address: string): string {
+  return `${address.slice(0, 6)}...${address.slice(-3)}`;
 }
