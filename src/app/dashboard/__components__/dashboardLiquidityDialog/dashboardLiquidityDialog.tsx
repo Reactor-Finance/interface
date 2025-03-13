@@ -104,11 +104,13 @@ export default function DashboardLiquidityDialog({
           : 0n;
       }
       case LiquidityActions.Unstake: {
-        return pairInfo.account_lp_balance > 0n
+        return pairInfo.account_gauge_balance > 0n &&
+          pairInfo.gauge_total_supply > 0n &&
+          pairInfo.total_supply > 0n
           ? (pairInfo.account_gauge_balance *
-              ((pairInfo.account_lp_balance * pairInfo.reserve0) /
+              ((pairInfo.gauge_total_supply * pairInfo.reserve0) /
                 pairInfo.total_supply)) /
-              pairInfo.account_lp_balance
+              pairInfo.gauge_total_supply
           : 0n;
       }
       default:
@@ -125,11 +127,13 @@ export default function DashboardLiquidityDialog({
           : 0n;
       }
       case LiquidityActions.Unstake: {
-        return pairInfo.gauge_total_supply > 0n
+        return pairInfo.account_gauge_balance > 0n &&
+          pairInfo.gauge_total_supply > 0n &&
+          pairInfo.total_supply > 0n
           ? (pairInfo.account_gauge_balance *
-              ((pairInfo.account_lp_balance * pairInfo.reserve1) /
+              ((pairInfo.gauge_total_supply * pairInfo.reserve1) /
                 pairInfo.total_supply)) /
-              pairInfo.account_lp_balance
+              pairInfo.gauge_total_supply
           : 0n;
       }
       default:
