@@ -42,7 +42,7 @@ export default function TransactionToast() {
           <span className="font-medium">{toastInfo?.actionTitle}</span>
         </div>
         <Link
-          href="https://etherscan.io"
+          href={`https://testnet.monadexplorer.com/tx/${state.toastInfo?.hash}`}
           className="flex gap-x-1 text-[11px] text-success-400 z-10"
         >
           <div className="flex gap-x-2 items-center text-sm">
