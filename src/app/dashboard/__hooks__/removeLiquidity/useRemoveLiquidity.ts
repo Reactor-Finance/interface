@@ -169,6 +169,7 @@ export function useRemoveLiquidity({
   });
   const { isValid, errorMessage } = useRemoveLiquidityValidation({
     needsApproval,
+    amountInGt0: amount > 0n,
     approvalSimulation: !!approvalSimulation,
     removeLiqsimulation: !!removeLiquiditySimulation.data,
     removeLiqEthSimulation: !!removeLiquidityEthSimulation.data,

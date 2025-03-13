@@ -1,11 +1,11 @@
 import { useAccount, useChainId, useSimulateContract } from "wagmi";
-import { zeroAddress } from "viem";
+import { formatUnits, zeroAddress } from "viem";
 import { useEffect, useMemo } from "react";
 import { ETHER, ROUTER } from "@/data/constants";
 import * as Router from "@/lib/abis/Router";
 import { useAtomicDate } from "@/lib/hooks/useAtomicDate";
 import { useAtom } from "jotai/react";
-import { transactionDeadlineAtom } from "@/store";
+import { slippageAtom, transactionDeadlineAtom } from "@/store";
 
 interface Props {
   token0: `0x${string}`;
@@ -53,6 +53,10 @@ export function useAddLiquidity({
     return BigInt(ttl);
   }, [now, txDeadline]);
   console.log(amountADesired, amountBDesired, "AMOUNTS", disabled);
+  const [slippage] = useAtom(slippageAtom);
+  const minOutA = amountADesired - (amountADesired * BigInt(slippage)) / 1000n;
+  const minOutB = amountBDesired - (amountADesired * BigInt(slippage)) / 1000n;
+  console.log(formatUnits(minOutA, 18), formatUnits(minOutB, 6), "AMOUNTS");
   const addLiquidityETHSimulation = useSimulateContract({
     ...Router,
     address: router,
@@ -61,8 +65,8 @@ export function useAddLiquidity({
       liquidityETHNonETHToken,
       stable,
       amountDesiredLiquidityETH,
-      BigInt(0),
-      BigInt(0),
+      minOutA, //minOutA
+      minOutB, //minOutB
       address,
       deadline,
     ],

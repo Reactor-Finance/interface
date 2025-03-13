@@ -7,9 +7,11 @@ import { ORACLE } from "@/data/constants";
 export function useGetMarketQuote({
   tokenAddress,
   value,
+  staleTime = 0,
 }: {
   tokenAddress: `0x${string}`;
   value: bigint;
+  staleTime?: number;
 }) {
   const chainId = useChainId();
   const oracle = useMemo(() => ORACLE[chainId], [chainId]);
@@ -22,6 +24,9 @@ export function useGetMarketQuote({
     address: oracle,
     functionName: "getAverageValueInUSD",
     args: [tokenAddress, value],
+    query: {
+      staleTime,
+    },
   });
 
   // useWatchBlocks({

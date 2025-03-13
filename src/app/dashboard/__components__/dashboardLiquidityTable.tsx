@@ -12,7 +12,12 @@ import { zeroAddress } from "viem";
 export default function DashboardLiquidityTable() {
   const { data: pairs, isLoading } = useGetPairs({});
   const activePairs = useMemo(
-    () => pairs.filter((pair) => pair.pair_address !== zeroAddress),
+    () =>
+      pairs.filter(
+        (pair) =>
+          pair.pair_address !== zeroAddress &&
+          (pair.account_gauge_balance !== 0n || pair.account_lp_balance !== 0n)
+      ),
     [pairs]
   );
   const [selectedPair, setSelectedPair] = useState(activePairs[0]);

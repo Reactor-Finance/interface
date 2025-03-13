@@ -7,7 +7,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SearchInput from "@/components/shared/searchInput";
 import { useDebounce } from "@/lib/hooks/useDebounce";
 import PoolRowSkeleton from "./poolRowSkeleton";
-import { useChainId, useReadContract } from "wagmi";
+import { useReadContract } from "wagmi";
 import { ChainId, PAIR_HELPER } from "@/data/constants";
 import { zeroAddress } from "viem";
 
@@ -39,12 +39,14 @@ export default function PoolsTable() {
     },
     [filters]
   );
-  const {} = useChainId();
   const { data, isLoading } = useReadContract({
     abi,
     address: PAIR_HELPER[ChainId.MONAD_TESTNET],
     functionName: "getAllPair",
     args: [zeroAddress, 200n, 0n],
+    query: {
+      staleTime: 1000 * 60 * 5,
+    },
   });
 
   // ** this stops react query refetching our data from server

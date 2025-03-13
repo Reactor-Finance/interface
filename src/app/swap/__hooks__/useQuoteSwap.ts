@@ -4,6 +4,7 @@ import { formatUnits, parseUnits, zeroAddress } from "viem";
 import { useMemo } from "react";
 import { TToken } from "@/lib/types";
 import { ETHER, TRADE_HELPER, WETH } from "@/data/constants";
+import { useDebounce } from "@/lib/hooks/useDebounce";
 
 export function useQuoteSwap({
   amountIn,
@@ -18,6 +19,7 @@ export function useQuoteSwap({
   tokenIn: TToken | null;
   tokenOut: TToken | null;
 }) {
+  const { debouncedValue: amountInBounced } = useDebounce(amountIn, 300);
   const chainId = useChainId();
   const weth = useMemo(() => WETH[chainId], [chainId]);
   const address = useMemo(() => TRADE_HELPER[chainId], [chainId]);
@@ -48,12 +50,16 @@ export function useQuoteSwap({
     ...TradeHelper,
     functionName: "getAmountOut",
     args: [
-      parseUnits(String(amountIn), tokenIn?.decimals ?? 18),
+      parseUnits(String(amountInBounced), tokenIn?.decimals ?? 18),
       address0 ?? zeroAddress,
       address1 ?? zeroAddress,
     ],
     query: {
-      enabled: !!amountIn && tokensExist && selected === 0 && amountIn !== "",
+      enabled:
+        !!amountInBounced &&
+        tokensExist &&
+        selected === 0 &&
+        amountInBounced !== "",
     },
   });
   const {
@@ -89,11 +95,11 @@ export function useQuoteSwap({
   const quoteAmount = useMemo(
     () =>
       isIntrinsicWETHProcess
-        ? amountIn
+        ? amountInBounced
         : tokenOut
           ? formatUnits(receivedAmount, tokenOut.decimals)
           : "0",
-    [receivedAmount, amountIn, tokenOut, isIntrinsicWETHProcess]
+    [receivedAmount, amountInBounced, tokenOut, isIntrinsicWETHProcess]
   );
 
   return { quoteAmount, error, isLoading, amountInLoading };

@@ -10,7 +10,9 @@ interface Props {
   simulation: boolean;
   needsApproval: boolean;
   approveSimulation: boolean;
+  wrapSimulation: boolean;
   needsWrap: boolean;
+  isSimulationLoading: boolean;
   isLoading: boolean;
 }
 
@@ -22,24 +24,30 @@ export default function useSwapValidation({
   needsApproval,
   needsWrap,
   approveSimulation,
+  wrapSimulation,
   simulation,
+  isSimulationLoading,
   isLoading,
 }: Props) {
   const { isValid, message } = useMemo(() => {
     if (amountIn === "") {
       return { isValid: false, message: null };
     }
+
+    if (isLoading) {
+      return { isValid: false, message: null };
+    }
     if (token0 === null || token1 === null) {
       return { isValid: false, message: null };
+    }
+    if (needsWrap && wrapSimulation) {
+      return { isValid: true, message: null };
     }
     if (token0Balance < parseUnits(String(amountIn), token0?.decimals ?? 18)) {
       return { isValid: false, message: ErrorMessage.INSUFFICIENT_BALANCE };
     }
     if (needsWrap) {
       return { isValid: true, message: null };
-    }
-    if (isLoading) {
-      return { isValid: false, message: null };
     }
     if (needsApproval) {
       if (approveSimulation) {
@@ -48,7 +56,7 @@ export default function useSwapValidation({
         return { isValid: false, message: null };
       }
     }
-    if (!simulation) {
+    if (!simulation && !isSimulationLoading) {
       return { isValid: false, message: "Error Occured" };
     }
     return { isValid: true, message: null };
@@ -56,11 +64,14 @@ export default function useSwapValidation({
     amountIn,
     approveSimulation,
     isLoading,
+    isSimulationLoading,
     needsApproval,
+    needsWrap,
     simulation,
     token0,
     token0Balance,
     token1,
+    wrapSimulation,
   ]);
   return { isValid, message };
 }

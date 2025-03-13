@@ -15,7 +15,7 @@ import { z } from "zod";
 import { useSearchParams } from "next/navigation";
 import { useCheckPair } from "@/lib/hooks/useCheckPair";
 import useApproveWrite from "@/lib/hooks/useApproveWrite";
-import { ROUTER } from "@/data/constants";
+import { ChainId, ROUTER, WETH } from "@/data/constants";
 import { useQuoteLiquidity } from "@/app/liquidity/__hooks__/useQuoteLiquidity";
 import { useGetTokenInfo } from "@/utils";
 import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
@@ -25,6 +25,7 @@ import { useGetPairInfo } from "@/lib/hooks/useGetPairInfo";
 import DisplayFormattedNumber from "@/components/shared/displayFormattedNumber";
 import { formatNumber } from "@/lib/utils";
 import InitPoolInfo from "./initPoolInfo";
+import useWrapWrite from "@/lib/hooks/useWrapWrite";
 
 const searchParamsSchema = z.object({
   token0: z.string().refine((arg) => isAddress(arg)),
@@ -86,7 +87,20 @@ export default function InitializePool() {
       token0?.decimals ?? 18
     ),
   });
-
+  // find which token is wmon
+  const wmonToken = useMemo(() => {
+    if (token0?.address === WETH[ChainId.MONAD_TESTNET]) {
+      return "token0";
+    }
+    if (token1?.address === WETH[ChainId.MONAD_TESTNET]) {
+      return "token1";
+    }
+    return "none";
+  }, [token0?.address, token1?.address]);
+  const { needsWrap, resetWrap, depositSimulation } = useWrapWrite({
+    amountIn: wmonToken === "token0" ? amount0 : amount1,
+    isWmon: wmonToken !== "none",
+  });
   // Check approval required
   const {
     approveWriteRequest: token0ApprovalWriteRequest,
@@ -161,6 +175,15 @@ export default function InitializePool() {
   useEffect(() => {
     if (isSuccess) {
       reset();
+      if (needsWrap) {
+        resetWrap();
+        setToast({
+          actionTitle: "Wrapped",
+          actionDescription: "",
+          hash,
+        });
+        return;
+      }
       if (token0NeedsApproval) {
         queryClient.invalidateQueries({ queryKey: token0AllowanceKey });
         setToast({
@@ -197,9 +220,11 @@ export default function InitializePool() {
     bal1Key,
     hash,
     isSuccess,
+    needsWrap,
     pairKey,
     queryClient,
     reset,
+    resetWrap,
     setToast,
     token0AllowanceKey,
     token0NeedsApproval,
@@ -207,6 +232,10 @@ export default function InitializePool() {
     token1NeedsApproval,
   ]);
   const onSubmit = useCallback(() => {
+    if (needsWrap && depositSimulation.data?.request) {
+      writeContract(depositSimulation.data?.request);
+      return;
+    }
     if (token0NeedsApproval && token0ApprovalWriteRequest) {
       writeContract(token0ApprovalWriteRequest);
       return;
@@ -225,14 +254,16 @@ export default function InitializePool() {
       }
     }
   }, [
+    needsWrap,
+    depositSimulation.data?.request,
     token0NeedsApproval,
     token0ApprovalWriteRequest,
     token1NeedsApproval,
     token1ApprovalWriteRequest,
     isAddLiquidityETH,
     writeContract,
-    addLiquidityETHSimulation,
-    addLiquiditySimulation,
+    addLiquidityETHSimulation?.data?.request,
+    addLiquiditySimulation?.data?.request,
   ]);
 
   const tokenNeedingApproval = useMemo(() => {
@@ -246,23 +277,25 @@ export default function InitializePool() {
 
   const stateValid = useMemo(
     () =>
-      !!token0 &&
-      !!token1 &&
-      (!token0NeedsApproval && !token1NeedsApproval
-        ? (Boolean(addLiquidityETHSimulation.data?.request) ||
-            Boolean(addLiquiditySimulation.data?.request)) &&
-          amountADesired > 0n &&
-          amountBDesired > 0n
-        : true),
+      (!!token0 &&
+        !!token1 &&
+        (!token0NeedsApproval && !token1NeedsApproval
+          ? (Boolean(addLiquidityETHSimulation.data?.request) ||
+              Boolean(addLiquiditySimulation.data?.request)) &&
+            amountADesired > 0n &&
+            amountBDesired > 0n
+          : true)) ||
+      needsWrap,
     [
       token0,
       token1,
       token0NeedsApproval,
       token1NeedsApproval,
-      addLiquidityETHSimulation,
-      addLiquiditySimulation,
+      addLiquidityETHSimulation.data?.request,
+      addLiquiditySimulation.data?.request,
       amountADesired,
       amountBDesired,
+      needsWrap,
     ]
   );
   const { balance } = useGetBalance({
@@ -274,7 +307,6 @@ export default function InitializePool() {
     isFetching: token0ApprovalFetching || token1ApprovalFetching,
     needsApproval: token0NeedsApproval || token1NeedsApproval,
   });
-  console.log(quoteLiquidity, "QUOTE LIQUIDITY ====");
   useEffect(() => {
     if (selectedInput === "0") {
       if (quoteLiquidity === 0n) {
@@ -411,7 +443,7 @@ export default function InitializePool() {
         approveTokenSymbol={tokenNeedingApproval?.symbol}
         onClick={onSubmit}
       >
-        Add Liquidity
+        {needsWrap ? "Wrap" : "Add Liquidity"}
       </SubmitButton>
       {writeContractError && (
         <span className="text-[13px] text-red-400 pt-3 text-center"></span>

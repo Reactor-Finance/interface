@@ -5,9 +5,11 @@ interface Props {
   removeLiqsimulation: boolean;
   removeLiqSimulationError: string | undefined;
   isEth: boolean;
+  amountInGt0: boolean;
 }
 export function useRemoveLiquidityValidation({
   needsApproval,
+  amountInGt0,
   approvalSimulation,
   removeLiqEthSimulation,
   removeLiqsimulation,
@@ -20,6 +22,9 @@ export function useRemoveLiquidityValidation({
       return { isValid: true, errorMessage: "" };
     }
     return { isValid: false, errorMessage: "" };
+  }
+  if (!amountInGt0) {
+    return { isValid: false, errorMessage: null };
   }
   if (isEth) {
     if (removeLiqEthSimulation) {

@@ -19,7 +19,11 @@ type State = {
   deadlineFocus: boolean;
   slippageFocus: boolean;
 };
-export default function SettingsDialog() {
+export default function SettingsDialog({
+  dontShowButton,
+}: {
+  dontShowButton?: boolean;
+}) {
   const [deadline, updateDeadline] = useAtom(transactionDeadlineAtom);
   const [slippage, updateSlippage] = useAtom(slippageAtom);
   const [dialogOpen, setDialogOpen] = useAtom(settingDialogOpenAtom);
@@ -55,15 +59,17 @@ export default function SettingsDialog() {
   }, [updateSlippage, updateState, inputState.deadlineFocus, deadline]);
   return (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-      <button
-        className="bg-neutral-950 p-1 rounded-full flex items-center gap-x-2"
-        onClick={() => setDialogOpen(true)}
-      >
-        <div className="bg-neutral-900 rounded-full text-sm text-neutral-400 px-2 py-1">
-          {slippage / 100}% Slippage
-        </div>
-        <Settings className="text-neutral-400" />
-      </button>
+      {!dontShowButton && (
+        <button
+          className="bg-neutral-950 p-1 rounded-full flex items-center gap-x-2"
+          onClick={() => setDialogOpen(true)}
+        >
+          <div className="bg-neutral-900 rounded-full text-sm text-neutral-400 px-2 py-1">
+            {slippage / 100}% Slippage
+          </div>
+          <Settings className="text-neutral-400" />
+        </button>
+      )}
       <DialogContent className="p-0 w-[400px]">
         <div className="pt-4 px-4">
           <DialogTitle className="text-lg">Settings</DialogTitle>

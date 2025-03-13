@@ -24,9 +24,7 @@ export const wagmiConfig = getDefaultConfig({
   ssr: true,
   chains: [monadTestnet],
   transports: {
-    [monadTestnet.id]: http(
-      "https://monad-testnet.g.alchemy.com/v2/7wbWB2YsEDHzMwUul1uwHcOapXgLevhY"
-    ),
+    [monadTestnet.id]: http("https://testnet-rpc.monad.xyz"),
   },
 });
 

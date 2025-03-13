@@ -75,11 +75,10 @@ export function useSwapSimulation({
   }, [now, txDeadline]);
   const msgValue = useMemo(
     () =>
-      token0?.address.toLowerCase() === weth.toLowerCase() ||
       token0?.address.toLowerCase() === ETHER.toLowerCase()
         ? parseEther(String(amount))
         : BigInt(0),
-    [token0, weth, amount]
+    [token0, amount]
   );
 
   const mutate = useMutation({
@@ -139,19 +138,20 @@ export function useSwapSimulation({
         !!address &&
         !!token0 &&
         !!token1 &&
-        amount !== null &&
+        amount !== "" &&
         address !== zeroAddress &&
         !needsApproval,
     },
   });
   return {
     swapSimulation,
+
     wrapSwapMutation: mutate,
   };
 }
 
 function calculateMinOut(amount: bigint, slippagePercentage: number) {
-  const slippage = (Number(amount) * slippagePercentage) / 100;
-  const minAmount = Number(amount) - slippage;
+  const slippage = (amount * BigInt(slippagePercentage)) / 1000n;
+  const minAmount = amount - slippage;
   return BigInt(minAmount);
 }

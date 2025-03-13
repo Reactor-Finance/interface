@@ -6,12 +6,18 @@ import { TPoolData, TPoolType } from "@/lib/types";
 import React, { useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useTokenlistContext } from "@/contexts/tokenlistContext";
+import { formatNumber } from "@/lib/utils";
+import { Address, formatEther } from "viem";
+import { useGetMarketQuote } from "@/lib/hooks/useGetMarketQuote";
 
 export default function PoolRow({
   stable,
   token0,
   token1,
   emissions,
+  reserve0,
+  reserve1,
+  ...poolData
 }: TPoolData) {
   const router = useRouter();
   const { tokenlist } = useTokenlistContext();
@@ -30,6 +36,19 @@ export default function PoolRow({
     [tokenlist, token1]
   );
 
+  const { quote: marketQuote0 } = useGetMarketQuote({
+    tokenAddress: token0 as Address,
+    value: reserve0,
+  });
+  const { quote: marketQuote1 } = useGetMarketQuote({
+    tokenAddress: token1 as Address,
+    value: reserve1,
+  });
+  const volumeUSD = useMemo(
+    () => marketQuote0[0] + marketQuote1[0],
+    [marketQuote0, marketQuote1]
+  );
+
   const addLiquidityHandler = useCallback(() => {
     router.push(
       `/liquidity/add-liquidity?token0=${t0?.address}&token1=${t1?.address}&version=${stable ? "stable" : "volatile"}`
@@ -44,12 +63,23 @@ export default function PoolRow({
             token0={t0}
             token1={t1}
             poolType={stable ? TPoolType.STABLE : TPoolType.VOLATILE}
+            _data={{
+              reserve0,
+              reserve1,
+              emissions,
+              token0,
+              token1,
+              stable,
+              ...poolData,
+            }}
           />
         )}
       </th>
-      <th className="">$5,505,444</th>
-      <th className="text-blue-light">11%</th>
-      <th>{emissions.toString()}</th>
+      <th className="">${formatNumber(formatEther(volumeUSD))}</th>
+      <th className="text-blue-light">
+        {formatNumber(formatEther(emissions))}%
+      </th>
+      <th>{}</th>
       <th>{}</th>
       <th className="text-left pl-4 col-span-3 ">
         <div className="flex justify-between">

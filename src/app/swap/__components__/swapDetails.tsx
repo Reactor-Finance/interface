@@ -9,6 +9,7 @@ import { useAtom } from "jotai/react";
 import { settingDialogOpenAtom, slippageAtom } from "@/store";
 import { useReadContract } from "wagmi";
 import { ChainId, ORACLE } from "@/data/constants";
+import { useGetMarketQuote } from "@/lib/hooks/useGetMarketQuote";
 interface Props {
   amountIn: bigint;
   amountOut: bigint;
@@ -21,7 +22,6 @@ export default function SwapDetails({
   token0,
   token1,
 }: Props) {
-  console.log({ amountIn, amountOut }, "biggie");
   const [open, setOpen] = useState(false);
   const [slippage] = useAtom(slippageAtom);
 
@@ -45,9 +45,13 @@ export default function SwapDetails({
     chainId: ChainId.MONAD_TESTNET,
   });
   console.log({ token1Usd, error });
+  const { quote } = useGetMarketQuote({
+    tokenAddress: token0.address,
+    value: amountOut,
+  });
   return (
     <div className="text-[13px] border border-neutral-800 rounded-[16px] p-4 space-y-4">
-      <Row title="Received Value" value="$23.44" />
+      <Row title="Received Value" value={quote[1]} />
       <Row
         title="Exchange Rate"
         value={
