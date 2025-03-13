@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { Providers } from "./providers";
 import { JetBrains_Mono } from "next/font/google";
 import Header from "@/components/layout/header";
-import Footer from "@/components/layout/footer";
 import TransactionToast from "@/components/transactionToast";
 
 const jetbrainsMono = JetBrains_Mono({
@@ -32,7 +31,7 @@ export default function RootLayout({
           <TransactionToast />
           <Header />
           <main className="">{children}</main>
-          <Footer />
+          {/* <Footer /> */}
         </Providers>
       </body>
     </html>
