@@ -328,6 +328,7 @@ export default function InitializePool() {
     needsApproval: token0NeedsApproval || token1NeedsApproval,
   });
   useEffect(() => {
+    if (!pairExists) return;
     if (selectedInput === "0") {
       if (quoteLiquidity === 0n) {
         setAmount1(amount0);
