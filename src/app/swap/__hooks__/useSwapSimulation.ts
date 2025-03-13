@@ -18,6 +18,7 @@ export function useSwapSimulation({
   amount,
   token0,
   token1,
+  needsApproval,
   minAmountOut = BigInt(0),
   stable = false,
 }: {
@@ -25,7 +26,8 @@ export function useSwapSimulation({
   token0: TToken | null;
   token1: TToken | null;
   minAmountOut?: bigint;
-  stable?: boolean;
+  needsApproval: boolean;
+  stable: boolean;
 }) {
   const { address } = useAccount();
   const now = useAtomicDate();
@@ -74,6 +76,7 @@ export function useSwapSimulation({
         : BigInt(0),
     [token0, weth, amount]
   );
+
   return useSimulateContract({
     ...Router,
     address: router,
@@ -93,8 +96,8 @@ export function useSwapSimulation({
         !!token0 &&
         !!token1 &&
         amount !== null &&
-        address !== zeroAddress,
-      refetchInterval: 5_000,
+        address !== zeroAddress &&
+        !needsApproval,
     },
   });
 }

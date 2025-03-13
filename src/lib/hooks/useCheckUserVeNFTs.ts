@@ -15,7 +15,6 @@ export function useCheckUserVeNFTs() {
     args: [address],
     query: {
       enabled: true,
-      refetchInterval: 4_000,
     },
   });
 

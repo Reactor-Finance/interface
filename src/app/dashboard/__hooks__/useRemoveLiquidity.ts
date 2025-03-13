@@ -54,7 +54,7 @@ export function useRemoveLiquidity({
       address,
       deadline, //deadline
     ],
-    query: { enabled: true, refetchInterval: 5_000 },
+    query: { enabled: true },
   });
 
   const removeLiquidityEthSimulation = useSimulateContract({
@@ -71,7 +71,7 @@ export function useRemoveLiquidity({
       deadline, //deadline
       true, //withFeeOnTransferTokens
     ],
-    query: { enabled: true, refetchInterval: 5_000 },
+    query: { enabled: true },
   });
   return { removeLiquiditySimulation, removeLiquidityEthSimulation };
 }

@@ -1,5 +1,5 @@
 import { DialogContent, Dialog } from "@/components/ui/dialog";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Slider } from "@/components/ui/slider";
 import EstimatesHeader from "@/app/lock/estimateHeader";
 import PoolHeader from "@/components/shared/poolHeader";
@@ -20,7 +20,7 @@ import {
   useWriteContract,
 } from "wagmi";
 import useApproveWrite from "@/lib/hooks/useApproveWrite";
-import { ROUTER } from "@/data/constants";
+import { ROUTER, WETH } from "@/data/constants";
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
 import StakeStats from "./stakeStat";
 import WithdrawStats from "./withdrawStats";
@@ -44,6 +44,13 @@ export default function DashboardLiquidityDialog({
   const router = useMemo(() => ROUTER[chainId], [chainId]);
   const [amount, setAmount] = useState(0n);
   const [sliderValue, setSliderValue] = useState(0);
+  const weth = useMemo(() => WETH[chainId], [chainId]);
+  const isWETHPair = useMemo(
+    () =>
+      pairInfo.token0.toLowerCase() === weth.toLowerCase() ||
+      pairInfo.token1.toLowerCase() === weth.toLowerCase(),
+    [pairInfo, weth]
+  );
   const { simulation: createGaugeSimulation } = useCreateGauge({
     pair: pairInfo.pair_address,
   });
@@ -58,7 +65,7 @@ export default function DashboardLiquidityDialog({
   const { removeLiquidityEthSimulation, removeLiquiditySimulation } =
     useRemoveLiquidity({
       token0: pairInfo.token0,
-      token1: pairInfo.token0,
+      token1: pairInfo.token1,
       isStable: pairInfo.stable,
       amount,
     });
@@ -194,12 +201,12 @@ export default function DashboardLiquidityDialog({
           writeContract(routerApprovalWriteRequest);
           return;
         }
-        if (removeLiquiditySimulation.data) {
+        if (removeLiquiditySimulation.data && !isWETHPair) {
           reset();
           writeContract(removeLiquiditySimulation.data.request);
           return;
         }
-        if (removeLiquidityEthSimulation.data) {
+        if (removeLiquidityEthSimulation.data && isWETHPair) {
           reset();
           writeContract(removeLiquidityEthSimulation.data.request);
           return;
@@ -221,6 +228,7 @@ export default function DashboardLiquidityDialog({
     gaugeApprovalWriteRequest,
     createGaugeSimulation,
     pairInfo.gauge,
+    isWETHPair,
   ]);
 
   const buttonChild = useMemo(() => {
@@ -256,6 +264,15 @@ export default function DashboardLiquidityDialog({
           ? routerApprovalFetching
           : false,
   });
+
+  useEffect(() => {
+    if (removeLiquidityEthSimulation.error || removeLiquiditySimulation.error) {
+      console.error(
+        removeLiquidityEthSimulation.error,
+        removeLiquiditySimulation.error
+      );
+    }
+  }, [removeLiquidityEthSimulation, removeLiquiditySimulation]);
   return (
     <Dialog open={state.dialogOpen} onOpenChange={onOpenChange}>
       <DialogContent className="p-0">

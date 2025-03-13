@@ -56,12 +56,13 @@ export default function InitializePool() {
   const token0 = useGetTokenInfo(t0 ?? "0x");
   const token1 = useGetTokenInfo(t1 ?? "0x");
 
-  const [amount0, setAmount0] = useState(0);
-  const [amount1, setAmount1] = useState(0);
+  const [amount0, setAmount0] = useState("");
+  const [amount1, setAmount1] = useState("");
+
   useEffect(() => {
     // reset inputs if change pool version
-    setAmount0(0);
-    setAmount1(0);
+    setAmount0("");
+    setAmount1("");
   }, [version]);
 
   // Router
@@ -130,7 +131,7 @@ export default function InitializePool() {
     disabled:
       token1NeedsApproval ||
       token1NeedsApproval ||
-      (amount0 === 0 && amount1 === 0),
+      (Number(amount0) === 0 && Number(amount1) === 0),
     token0: token0?.address ?? zeroAddress,
     token1: token1?.address ?? zeroAddress,
     amountADesired,
@@ -179,8 +180,9 @@ export default function InitializePool() {
           actionDescription: "",
           hash,
         });
-        setAmount0(0);
-        setAmount1(1);
+
+        setAmount0("");
+        setAmount1("");
       }
     }
   }, [
@@ -261,6 +263,47 @@ export default function InitializePool() {
     needsApproval: token0NeedsApproval || token1NeedsApproval,
   });
 
+  useEffect(() => {
+    if (selectedInput === 0) {
+      if (quoteLiquidity === 0n) {
+        setAmount1(amount0);
+        return;
+      }
+      if (quoteLiquidity && pairExists) {
+        let num = parseFloat(
+          formatUnits(quoteLiquidity, token1?.decimals ?? 18)
+        );
+        num = Math.floor(num * 100) / 100;
+        setAmount1(num.toString());
+      }
+      if (amount0 === "" && pairExists) {
+        setAmount1("");
+      }
+    } else {
+      if (quoteLiquidity === 0n) {
+        setAmount0(amount0);
+      }
+      if (quoteLiquidity && pairExists) {
+        let num = parseFloat(
+          formatUnits(quoteLiquidity, token1?.decimals ?? 18)
+        );
+        num = Math.floor(num * 100) / 100;
+        setAmount0(num.toString());
+      }
+      if (amount1 === "" && pairExists) {
+        setAmount0("");
+      }
+    }
+  }, [
+    amount0,
+    amount1,
+    pairExists,
+    quoteLiquidity,
+    selectedInput,
+    token0?.decimals,
+    token1?.decimals,
+  ]);
+
   return (
     <>
       <h2 className="text-xl">
@@ -272,13 +315,9 @@ export default function InitializePool() {
             <label htmlFor="">Asset 1</label>
           </div>
           <AssetCard
-            onValueChange={(val) => {
-              const parsedNumber = Number(val);
-              const value = !isNaN(parsedNumber) ? parsedNumber : amount0;
-              setAmount0(value);
-            }}
+            onValueChange={setAmount0}
             token={token0}
-            value={String(amount0)}
+            value={amount0}
             onFocus={() => setSelectedInput(0)}
           />
         </div>
@@ -289,21 +328,17 @@ export default function InitializePool() {
             <label htmlFor="">Asset 2</label>
           </div>
           <AssetCard
-            onValueChange={(val) => {
-              const parsedNumber = Number(val);
-              const value = !isNaN(parsedNumber) ? parsedNumber : amount1;
-              setAmount1(value);
-            }}
+            onValueChange={setAmount1}
             token={token1}
-            value={String(amount1)}
+            value={amount1}
             onFocus={() => setSelectedInput(1)}
           />
         </div>
       )}
       {!pairExists && (
         <InitPoolInfo
-          amount0={amount0}
-          amount1={amount1}
+          amount0={Number(amount0)}
+          amount1={Number(amount1)}
           token0={token0}
           token1={token1}
         />

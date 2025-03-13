@@ -36,7 +36,8 @@ export default function PoolsTable() {
 
   const { data, isLoading } = useGetPairs({});
   const prunedData = useMemo(
-    () => data.filter((p) => p.pair_address !== zeroAddress),
+    () =>
+      data.filter((p) => p.pair_address !== zeroAddress && p.total_supply > 0n),
     [data]
   );
   const lastPage = useMemo(

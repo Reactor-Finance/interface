@@ -2,27 +2,53 @@
 import Image from "next/image";
 import React from "react";
 import reactor from "@/assets/reactor.svg";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { CustomConnectButton } from "./customConnectButton";
+import { useAccount } from "wagmi";
+import usePointsAccount from "@/app/points/__hooks__/usePointsAccount";
+import { useChainModal } from "@rainbow-me/rainbowkit";
 
 export default function Header() {
+  const { isConnected } = useAccount();
+  const { openChainModal } = useChainModal();
+  const router = useRouter();
+  const { data } = usePointsAccount();
   return (
     <div className="h-[88px] px-8 items-center grid grid-cols-4">
-      <div>
+      <button
+        role="link"
+        onClick={() => {
+          if (!data?.result.invitationCode) {
+            router.push("/");
+          } else {
+            router.push("/points");
+          }
+        }}
+      >
         <Image src={reactor} alt="" />
-      </div>
+      </button>
       <div className="col-span-2">
-        <ul className="grid justify-center  grid-cols-5 place-items-center text-[14px]">
-          <NavLink href="/swap">Swap</NavLink>
-          <NavLink href="/lock">Lock</NavLink>
-          <NavLink href="/dashboard">Dashboard</NavLink>
-          <NavLink href="/liquidity">Liquidity</NavLink>
-          {/* <NavLink href="/voting">Voting</NavLink> */}
-          {/* <NavLink href="/uniswap">Faucet</NavLink> */}
-        </ul>
+        {isConnected && (
+          <ul className="grid justify-center  grid-cols-3 place-items-center text-[14px]">
+            <NavLink href="/swap">Swap</NavLink>
+            {/* <NavLink href="/lock">Lock</NavLink> */}
+            <NavLink href="/dashboard">Dashboard</NavLink>
+            <NavLink href="/liquidity">Liquidity</NavLink>
+            {/* <NavLink href="/voting">Voting</NavLink> */}
+            {/* <NavLink href="/uniswap">Faucet</NavLink> */}
+          </ul>
+        )}
       </div>
-      <div className="flex justify-end">
+      <div className="flex justify-end items-center gap-x-3">
+        {isConnected && (
+          <button
+            className="rounded-full h-6 w-6 bg-blue-400"
+            onClick={() => openChainModal?.()}
+          >
+            M
+          </button>
+        )}
         <CustomConnectButton />
       </div>
     </div>

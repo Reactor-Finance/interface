@@ -19,7 +19,7 @@ export function useGetPairs({
     address: pairHelper,
     functionName: "getAllPair",
     args: [address, limit, offset],
-    query: { enabled: true, refetchInterval: 5_000 },
+    query: { enabled: true },
   });
 
   return { data, isLoading };
