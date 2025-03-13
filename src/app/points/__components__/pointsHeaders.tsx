@@ -34,8 +34,11 @@ export default function PointsHeaders() {
   };
   return (
     <div className="mt-8 px-4 md:px-8 lg:px-16">
-      <div className=" flex flex-col md:flex-row items-center gap-y-4 md:items-stretch justify-between space-x-4">
-        <Card bg="1000" className="  rounded-lg p-4 flex-1 flex flex-col">
+      <div className=" flex flex-col md:flex-row items-center gap-y-4 md:items-stretch justify-between md:space-x-4">
+        <Card
+          bg="1000"
+          className="w-[300px] md:w-auto  rounded-lg p-4 flex-1 flex flex-col"
+        >
           <div className="grid grid-cols-3 w-full  items-start">
             <Image
               src="https://i.ibb.co/0pDryFGv/image.png"
@@ -79,7 +82,10 @@ export default function PointsHeaders() {
           </div>
         </Card>
         <WaysToEarn />
-        <Card bg="1000" className="rounded-lg  flex-1 flex flex-col">
+        <Card
+          bg="1000"
+          className="rounded-lg w-[300px] md:w-auto flex-1 flex flex-col"
+        >
           <div className="flex items-center space-x-2 mb-2">
             <svg
               width="20"
@@ -156,7 +162,10 @@ export default function PointsHeaders() {
 
 function WaysToEarn() {
   return (
-    <Card bg="1000" className="  rounded-lg p-4 flex-1 flex flex-col w-full">
+    <Card
+      bg="1000"
+      className=" w-[300px] md:w-auto  rounded-lg p-4 flex-1 flex flex-col "
+    >
       <h3 className="text-white font-semibold text-lg uppercase mb-2">
         Ways to Earn
       </h3>
