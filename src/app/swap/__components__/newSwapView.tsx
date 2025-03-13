@@ -11,7 +11,7 @@ import { useSwapSimulation } from "../__hooks__/useSwapSimulation";
 import { useQuoteSwap } from "../__hooks__/useQuoteSwap";
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
 import { TToken } from "@/lib/types";
-import { ROUTER } from "@/data/constants";
+import { ChainId, ROUTER, WETH } from "@/data/constants";
 import { formatUnits, parseUnits, zeroAddress } from "viem";
 import { useWETHExecutions } from "../__hooks__/useWETHExecutions";
 import { useGetBalance } from "@/lib/hooks/useGetBalance";
@@ -21,12 +21,13 @@ import { ArrowDown } from "lucide-react";
 import SwapCard from "./swapCard";
 import SubmitButton from "@/components/shared/submitBtn";
 import SwapDetails from "./swapDetails";
-import { useQueryClient } from "@tanstack/react-query";
-
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 export default function NewSwapView() {
   // Wagmi parameters
   const chainId = useChainId();
-
+  const {} = useMutation({
+    mutationFn: async () => {},
+  });
   // Amount in
   const [amountIn, setAmountIn] = useState("");
   const [amountOut, setAmountOut] = useState("");
@@ -35,13 +36,21 @@ export default function NewSwapView() {
   const [token1, setToken1] = useState<TToken | null>(null);
 
   // Balances
-  const { balance: token0Balance } = useGetBalance({
+  const { balance: token0Bal, etherBalance } = useGetBalance({
     tokenAddress: token0?.address ?? zeroAddress,
   });
-  const { balance: token1Balance } = useGetBalance({
+  const { balance: token1Bal } = useGetBalance({
     tokenAddress: token1?.address ?? zeroAddress,
   });
 
+  const token0Balance =
+    token0?.address === WETH[ChainId.MONAD_TESTNET]
+      ? etherBalance.value
+      : token0Bal;
+  const token1Balance =
+    token1?.address === WETH[ChainId.MONAD_TESTNET]
+      ? etherBalance.value
+      : token1Bal;
   // Modal state
   const [firstDialogOpen, setFirstDialogOpen] = useState(false);
   const [secondDialogOpen, setSecondDialogOpen] = useState(false);
@@ -101,22 +110,25 @@ export default function NewSwapView() {
   console.log({ approveWriteRequest, needsApproval });
 
   // Simulate swap
-  const { data: swapSimulation, error: swapSimulationError } =
-    useSwapSimulation({
-      amount: amountIn,
-      token0,
-      token1,
-      needsApproval,
-      minAmountOut: parseUnits(amountOut, token1?.decimals ?? 18),
-    });
-  console.log({ swapSimulation });
+  const { swapSimulation: swapSim, wrapSwapMutation } = useSwapSimulation({
+    amount: amountIn,
+    token0,
+    token1,
+    needsApproval,
+    minAmountOut: parseUnits(amountOut, token1?.decimals ?? 18),
+  });
+  const { data: swapSimulation, error: swapSimulationError } = swapSim;
   // Simulate WETH process
-  const { isIntrinsicWETHProcess, WETHProcessSimulation, isWETHToEther } =
-    useWETHExecutions({
-      amount: amountIn,
-      token0,
-      token1,
-    });
+  const {
+    needsWrap,
+    isIntrinsicWETHProcess,
+    WETHProcessSimulation,
+    isWETHToEther,
+  } = useWETHExecutions({
+    amount: amountIn,
+    token0,
+    token1,
+  });
 
   const {
     writeContract,
@@ -125,7 +137,10 @@ export default function NewSwapView() {
     error: writeError,
     reset,
   } = useWriteContract();
-  const { isSuccess, isLoading } = useWaitForTransactionReceipt({ hash });
+  const { isSuccess, isLoading: _isLoading } = useWaitForTransactionReceipt({
+    hash,
+  });
+  const isLoading = _isLoading || wrapSwapMutation.isPending;
   const { setToast } = useTransactionToastProvider();
   useEffect(() => {
     if (isSuccess && !needsApproval) {
@@ -165,6 +180,7 @@ export default function NewSwapView() {
     amountIn,
     token0,
     token1,
+    needsWrap,
     token0Balance,
     isLoading,
     simulation: !!swapSimulation?.request,
@@ -173,19 +189,14 @@ export default function NewSwapView() {
   });
 
   const onSubmit = useCallback(() => {
-    console.log("in here");
     if (isIntrinsicWETHProcess) {
       if (isWETHToEther) {
-        const req = WETHProcessSimulation?.withdrawalSimulation?.data?.request;
-        if (req) {
-          reset();
-          writeContract(req);
-        }
+        // const req = WETHProcessSimulation?.withdrawalSimulation?.data?.request;
+        wrapSwapMutation.mutate();
       } else {
         const req = WETHProcessSimulation?.depositSimulation?.data?.request;
         if (req) {
-          reset();
-          writeContract(req);
+          // wrapSwapMutation.mutate();
         }
       }
       return;
@@ -204,9 +215,8 @@ export default function NewSwapView() {
     needsApproval,
     swapSimulation,
     isWETHToEther,
-    WETHProcessSimulation?.withdrawalSimulation?.data?.request,
     WETHProcessSimulation?.depositSimulation?.data?.request,
-    reset,
+    wrapSwapMutation,
     writeContract,
   ]);
 
@@ -232,7 +242,7 @@ export default function NewSwapView() {
   if (amountIn === "" || amountIn === "") {
     stateValid = false;
   }
-  console.log({ stateValid });
+  console.log({ stateValid, needsWrap });
   useEffect(() => {
     if (writeError) {
       console.log(writeError);

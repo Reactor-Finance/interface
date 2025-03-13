@@ -10,6 +10,7 @@ interface Props {
   simulation: boolean;
   needsApproval: boolean;
   approveSimulation: boolean;
+  needsWrap: boolean;
   isLoading: boolean;
 }
 
@@ -19,6 +20,7 @@ export default function useSwapValidation({
   token0,
   token1,
   needsApproval,
+  needsWrap,
   approveSimulation,
   simulation,
   isLoading,
@@ -32,6 +34,9 @@ export default function useSwapValidation({
     }
     if (token0Balance < parseUnits(String(amountIn), token0?.decimals ?? 18)) {
       return { isValid: false, message: ErrorMessage.INSUFFICIENT_BALANCE };
+    }
+    if (needsWrap) {
+      return { isValid: true, message: null };
     }
     if (isLoading) {
       return { isValid: false, message: null };
@@ -50,6 +55,7 @@ export default function useSwapValidation({
   }, [
     amountIn,
     approveSimulation,
+    isLoading,
     needsApproval,
     simulation,
     token0,

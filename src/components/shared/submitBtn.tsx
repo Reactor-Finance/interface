@@ -10,6 +10,7 @@ export enum ButtonState {
   Fetching = "FETCHING",
   Loading = "LOADING",
   Approve = "APPROVE",
+  Wrap = "WRAP",
   Default = "DEFAULT",
 }
 interface Props extends ButtonProps {

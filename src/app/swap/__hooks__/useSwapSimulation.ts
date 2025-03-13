@@ -2,12 +2,19 @@ import * as Router from "@/lib/abis/Router";
 import { useAccount, useChainId, useSimulateContract } from "wagmi";
 import { useMemo } from "react";
 import { parseEther, parseUnits, zeroAddress } from "viem";
+import * as Weth from "@/lib/abis/WETH";
 import { ETHER, ROUTER, WETH } from "@/data/constants";
 import { TToken } from "@/lib/types";
 import { useAtomicDate } from "@/lib/hooks/useAtomicDate";
 import { useAtom } from "jotai/react";
 import { multiHopsAtom, slippageAtom, transactionDeadlineAtom } from "@/store";
-
+import { useMutation } from "@tanstack/react-query";
+import {
+  simulateContract,
+  waitForTransactionReceipt,
+  writeContract,
+} from "wagmi/actions";
+import { wagmiConfig } from "@/app/providers";
 type SwapRoute = {
   from: `0x${string}`;
   to: `0x${string}`;
@@ -74,7 +81,47 @@ export function useSwapSimulation({
         : BigInt(0),
     [token0, weth, amount]
   );
-  return useSimulateContract({
+
+  const mutate = useMutation({
+    mutationFn: async () => {
+      console.log("IN HERE");
+      const depositSimulation = await simulateContract(wagmiConfig, {
+        ...Weth,
+        address: weth,
+        functionName: "deposit",
+        value: parseEther(String(amount)),
+        args: [],
+      });
+      const hashWrap = await writeContract(
+        wagmiConfig,
+        depositSimulation.request
+      );
+      const a = await waitForTransactionReceipt(wagmiConfig, {
+        hash: hashWrap,
+      });
+      if (a.status === "reverted") return a;
+      console.log(minAmountOut, amountIn);
+      const req = await simulateContract(wagmiConfig, {
+        ...Router,
+        address: router,
+        functionName: "swap",
+        args: [
+          amountIn,
+          calculateMinOut(minAmountOut, Number(slippage)),
+          routes,
+          address ?? zeroAddress,
+          deadline,
+          true,
+        ],
+        value: msgValue,
+      });
+      console.log({ mutate });
+      const hash = await writeContract(wagmiConfig, req.request);
+      const b = waitForTransactionReceipt(wagmiConfig, { hash });
+      return b;
+    },
+  });
+  const swapSimulation = useSimulateContract({
     ...Router,
     address: router,
     functionName: "swap",
@@ -97,6 +144,10 @@ export function useSwapSimulation({
         !needsApproval,
     },
   });
+  return {
+    swapSimulation,
+    wrapSwapMutation: mutate,
+  };
 }
 
 function calculateMinOut(amount: bigint, slippagePercentage: number) {
