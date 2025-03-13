@@ -20,7 +20,7 @@ const LeaderboardSchema = z.object({ result: z.array(EntrySchema) });
 
 export type TPointsEntry = z.infer<typeof EntrySchema>;
 export default function PointsTable() {
-  const { data, error } = useQuery({
+  const { data } = useQuery({
     queryKey: ["leaderboard"],
     queryFn: async () => {
       const resp = await fetch("/api/points/leaderboard").then((r) => r.json());
