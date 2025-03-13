@@ -39,10 +39,12 @@ export default function PoolRow({
   const { quote: marketQuote0 } = useGetMarketQuote({
     tokenAddress: token0 as Address,
     value: reserve0,
+    staleTime: 1000 * 60 * 10,
   });
   const { quote: marketQuote1 } = useGetMarketQuote({
     tokenAddress: token1 as Address,
     value: reserve1,
+    staleTime: 1000 * 60 * 10,
   });
   const volumeUSD = useMemo(
     () => marketQuote0[0] + marketQuote1[0],
