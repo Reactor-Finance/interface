@@ -64,7 +64,9 @@ export default function SubmitButton({
         {(state === ButtonState.Fetching || state === ButtonState.Loading) && (
           <Spinner />
         )}
-        <span>{!validationError ? buttonText : validationError}</span>
+        <span>
+          {!validationError || isLoading ? buttonText : validationError}
+        </span>
       </div>
     </Button>
   );

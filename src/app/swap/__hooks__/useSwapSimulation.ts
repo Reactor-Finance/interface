@@ -18,12 +18,14 @@ export function useSwapSimulation({
   amount,
   token0,
   token1,
+  needsApproval,
   minAmountOut = BigInt(0),
 }: {
   amount: string;
   token0: TToken | null;
   token1: TToken | null;
   minAmountOut?: bigint;
+  needsApproval: boolean;
 }) {
   const { address } = useAccount();
   const now = useAtomicDate();
@@ -91,7 +93,8 @@ export function useSwapSimulation({
         !!token0 &&
         !!token1 &&
         amount !== null &&
-        address !== zeroAddress,
+        address !== zeroAddress &&
+        !needsApproval,
     },
   });
 }

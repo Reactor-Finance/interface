@@ -21,6 +21,7 @@ import { ArrowDown } from "lucide-react";
 import SwapCard from "./swapCard";
 import SubmitButton from "@/components/shared/submitBtn";
 import SwapDetails from "./swapDetails";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function NewSwapView() {
   // Wagmi parameters
@@ -91,12 +92,13 @@ export default function NewSwapView() {
   // Router by chain ID
   const router = useMemo(() => ROUTER[chainId], [chainId]);
   // checks allowance
-  const { approveWriteRequest, needsApproval } = useApproveWrite({
+  const { approveWriteRequest, needsApproval, allowanceKey } = useApproveWrite({
     tokenAddress: token0?.address,
     spender: router,
     amount: String(amountIn),
     decimals: token0?.decimals,
   });
+  console.log({ approveWriteRequest, needsApproval });
 
   // Simulate swap
   const { data: swapSimulation, error: swapSimulationError } =
@@ -104,6 +106,7 @@ export default function NewSwapView() {
       amount: amountIn,
       token0,
       token1,
+      needsApproval,
       minAmountOut: parseUnits(amountOut, token1?.decimals ?? 18),
     });
   console.log({ swapSimulation });
@@ -125,21 +128,32 @@ export default function NewSwapView() {
   const { isSuccess, isLoading } = useWaitForTransactionReceipt({ hash });
   const { setToast } = useTransactionToastProvider();
   useEffect(() => {
-    if (isSuccess) {
+    if (isSuccess && !needsApproval) {
       setToast({
         hash,
         actionTitle: "Swapped",
         actionDescription: "Swapped something",
       });
+    } else if (!needsApproval && isSuccess) {
+      setToast({
+        hash,
+        actionTitle: "Approve",
+        actionDescription: "",
+      });
     }
-  }, [hash, isLoading, isSuccess, setToast]);
+  }, [hash, isLoading, isSuccess, needsApproval, setToast]);
+  const queryClient = useQueryClient();
   useEffect(() => {
-    if (isSuccess) {
+    if (isSuccess && !needsApproval) {
       reset();
       setAmountIn("");
       setAmountOut("");
     }
-  }, [isSuccess, reset]);
+    if (isSuccess && needsApproval) {
+      queryClient.invalidateQueries({ queryKey: allowanceKey });
+      reset();
+    }
+  }, [allowanceKey, isSuccess, needsApproval, queryClient, reset]);
   const switchTokens = useCallback(() => {
     const t0 = token0;
     const t1 = token1;
@@ -152,8 +166,12 @@ export default function NewSwapView() {
     token0,
     token1,
     token0Balance,
+    isLoading,
     simulation: !!swapSimulation?.request,
+    approveSimulation: !!approveWriteRequest,
+    needsApproval,
   });
+
   const onSubmit = useCallback(() => {
     console.log("in here");
     if (isIntrinsicWETHProcess) {
@@ -211,7 +229,6 @@ export default function NewSwapView() {
       needsApproval,
     ]
   );
-  console.log();
   if (amountIn === "" || amountIn === "") {
     stateValid = false;
   }
