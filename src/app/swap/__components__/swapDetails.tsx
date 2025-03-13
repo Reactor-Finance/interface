@@ -1,11 +1,14 @@
 import { ChevronDown, Settings } from "lucide-react";
+import { abi } from "@/lib/abis/Oracle";
 import React, { ReactNode, useMemo, useState } from "react";
 import infoIcon from "@/assets/info.svg";
 import Tooltip from "@/components/ui/tooltip";
-import { formatUnits } from "viem";
+import { formatUnits, parseUnits } from "viem";
 import { TToken } from "@/lib/types";
 import { useAtom } from "jotai/react";
 import { settingDialogOpenAtom, slippageAtom } from "@/store";
+import { useReadContract } from "wagmi";
+import { ChainId, ORACLE } from "@/data/constants";
 interface Props {
   amountIn: bigint;
   amountOut: bigint;
@@ -18,7 +21,7 @@ export default function SwapDetails({
   token0,
   token1,
 }: Props) {
-  console.log({ amountIn, amountOut });
+  console.log({ amountIn, amountOut }, "biggie");
   const [open, setOpen] = useState(false);
   const [slippage] = useAtom(slippageAtom);
 
@@ -34,6 +37,14 @@ export default function SwapDetails({
     const min = amountOut - (amountOut * BigInt(slippage)) / 1000n;
     return { min, per };
   }, [amountIn, amountOut, slippage]);
+  const { data: token1Usd, error } = useReadContract({
+    abi,
+    address: ORACLE[ChainId.MONAD_TESTNET],
+    functionName: "getAverageValueInETH",
+    args: [token0.address, parseUnits("1", token0.decimals)],
+    chainId: ChainId.MONAD_TESTNET,
+  });
+  console.log({ token1Usd, error });
   return (
     <div className="text-[13px] border border-neutral-800 rounded-[16px] p-4 space-y-4">
       <Row title="Received Value" value="$23.44" />

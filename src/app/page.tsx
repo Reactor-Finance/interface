@@ -1,36 +1,39 @@
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card } from "@/components/ui/card";
-import PageMarginContainer from "@/components/ui/pageMarginContainer";
-import NewSwapView from "./swap/__components__/newSwapView";
-
-export default function Swap() {
+"use client";
+import bg from "@/assets/bg-img.png";
+import { Button } from "@/components/ui/button";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
+import Image from "next/image";
+import { useAccount } from "wagmi";
+import PointsAccess from "./points/__components__/pointsAccess";
+export default function Page() {
+  const { isConnected } = useAccount();
   return (
-    <PageMarginContainer>
-      <div className="mx-auto w-[440px]">
-        <div className="pb-4">
-          <div className="py-2 flex justify-between">
-            <h1 className="text-primary-400 text-[44px]">Trade</h1>
-            <div></div>
-          </div>
-          <Tabs defaultValue="swap">
-            <TabsList size="md" colors="muted" display={"grow"}>
-              <TabsTrigger display={"grow"} value="swap">
-                Swap
-              </TabsTrigger>
-              <TabsTrigger display={"grow"} value="twap">
-                TWAP
-              </TabsTrigger>
-              <TabsTrigger display={"grow"} value="limit">
-                Limit
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
-        <Card className="min-w-[380px] p-0 rounded-md">
-          {/* <SwapView /> */}
-          <NewSwapView />
-        </Card>
+    <div className="min-h-[calc(100vh-88px)] flex items-center relative justify-center">
+      <div className="absolute left-0 w-full -z-10 h-full flex justify-center items-center">
+        <Image className="w-full" src={bg} alt="bg" />
       </div>
-    </PageMarginContainer>
+      {isConnected && <PointsAccess />}
+      {!isConnected && <ConnectView />}
+    </div>
+  );
+}
+function ConnectView() {
+  const { openConnectModal } = useConnectModal();
+  return (
+    <>
+      <div className="flex flex-col mb-[88px] items-center gap-y-4 z-10">
+        <h1 className="text-[36px] leading-[40px]">Connect your wallet</h1>
+        <p className="text-neutral-400">Log In to check your ranks</p>
+        <Button
+          size="md"
+          onClick={() => {
+            openConnectModal?.();
+          }}
+          variant={"primary"}
+        >
+          Connect your wallet
+        </Button>
+      </div>
+    </>
   );
 }

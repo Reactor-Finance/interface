@@ -1,6 +1,8 @@
 "use client";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Button } from "../ui/button";
+import Image from "next/image";
+import { ChevronDown } from "lucide-react";
 export const CustomConnectButton = () => {
   return (
     <ConnectButton.Custom>
@@ -60,15 +62,32 @@ export const CustomConnectButton = () => {
               return (
                 <div style={{ display: "flex", gap: 12 }}>
                   <Button
-                    variant="outline"
-                    className="rounded-full text-white"
+                    variant="filled"
+                    className="rounded-md flex  hover:bg-neutral-1000 transition-transform text-white p-[4px] md:p-[4px] border-none bg-neutral-1000"
                     onClick={openAccountModal}
                     type="button"
                   >
-                    {account.displayName}
-                    {/* {account.displayBalance */}
-                    {/*   ? ` (${account.displayBalance})` */}
-                    {/*   : ""} */}
+                    <div className="pl-1">{account.displayBalance}</div>
+                    <div className="flex items-center hover:bg-neutral-950 bg-neutral-900 group p-1 gap-x-2 rounded-md">
+                      <div className="h-6 w-6">
+                        {!account.ensAvatar && (
+                          <div className="h-full w-full bg-blue-400 rounded-full"></div>
+                        )}
+                        {account.ensAvatar && (
+                          <Image
+                            width={24}
+                            height={24}
+                            className="w-ful h-full"
+                            src={account.ensAvatar ?? ""}
+                            alt="ENS Avatar"
+                          />
+                        )}
+                      </div>
+                      <div>{account.displayName}</div>
+                      <div className="group-hover:scale-125 transition-all">
+                        <ChevronDown />
+                      </div>
+                    </div>
                   </Button>
                 </div>
               );
