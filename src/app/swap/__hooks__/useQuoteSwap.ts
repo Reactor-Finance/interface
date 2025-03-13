@@ -12,8 +12,8 @@ export function useQuoteSwap({
   tokenOut,
   selected,
 }: {
-  amountIn: string;
-  amountOut: string;
+  amountIn: number;
+  amountOut: number;
   selected: 0 | 1;
   tokenIn: TToken | null;
   tokenOut: TToken | null;
@@ -35,14 +35,14 @@ export function useQuoteSwap({
         : tokenOut?.address,
     [tokenOut?.address, weth]
   );
-  const tokensExist = useMemo(
+  const tokensNonNull = useMemo(
     () => tokenIn !== null && tokenOut !== null,
     [tokenIn, tokenOut]
   );
   const {
-    data: [receivedAmountOut] = [BigInt(0), false],
-    error,
-    isLoading,
+    data: [receivedAmountOut, amountOutStable] = [BigInt(0), false],
+    error: receivedAmountOutError,
+    isLoading: amountOutLoading,
   } = useReadContract({
     address,
     ...TradeHelper,
@@ -53,13 +53,14 @@ export function useQuoteSwap({
       address1 ?? zeroAddress,
     ],
     query: {
-      enabled: !!amountIn && tokensExist && selected === 0 && amountIn !== "",
+      enabled: !!amountIn && tokensNonNull && selected === 0,
+      refetchInterval: 10_000,
     },
   });
   const {
     isLoading: amountInLoading,
-    data: [receivedAmountIn] = [BigInt(0), false],
-    error: e,
+    data: [receivedAmountIn, amountInStable] = [BigInt(0), false],
+    error: receivedAmountInError,
   } = useReadContract({
     address,
     ...TradeHelper,
@@ -70,10 +71,11 @@ export function useQuoteSwap({
       address1 ?? zeroAddress,
     ],
     query: {
-      enabled: !!amountOut && tokensExist && selected === 1 && amountOut !== "",
+      enabled: !!amountOut && tokensNonNull && selected === 1,
+      refetchInterval: 10_000,
     },
   });
-  console.log(e, receivedAmountIn);
+
   const isIntrinsicWETHProcess = useMemo(
     () =>
       (tokenIn?.address.toLowerCase() === weth.toLowerCase() &&
@@ -82,19 +84,35 @@ export function useQuoteSwap({
         tokenOut?.address.toLowerCase() === weth.toLowerCase()),
     [weth, tokenIn?.address, tokenOut?.address]
   );
+
   const receivedAmount = useMemo(
     () => (selected === 0 ? receivedAmountOut : receivedAmountIn),
     [selected, receivedAmountOut, receivedAmountIn]
   );
+
   const quoteAmount = useMemo(
     () =>
       isIntrinsicWETHProcess
         ? amountIn
-        : tokenOut
-          ? formatUnits(receivedAmount, tokenOut.decimals)
-          : "0",
-    [receivedAmount, amountIn, tokenOut, isIntrinsicWETHProcess]
+        : selected === 0 && tokenOut
+          ? Number(formatUnits(receivedAmount, tokenOut.decimals))
+          : selected === 1 && tokenIn
+            ? Number(formatUnits(receivedAmount, tokenIn.decimals))
+            : 0,
+    [
+      receivedAmount,
+      amountIn,
+      tokenOut,
+      isIntrinsicWETHProcess,
+      selected,
+      tokenIn,
+    ]
   );
 
-  return { quoteAmount, error, isLoading, amountInLoading };
+  return {
+    quoteAmount,
+    error: selected === 0 ? receivedAmountOutError : receivedAmountInError,
+    isLoading: selected === 0 ? amountInLoading : amountOutLoading,
+    stable: amountInStable || amountOutStable,
+  };
 }

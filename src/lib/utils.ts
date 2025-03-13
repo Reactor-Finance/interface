@@ -127,7 +127,7 @@ export function formatSmallNumber(number: number) {
 export function inputPatternMatch(s: string, decimals = 18) {
   const pattern = /^[0-9]*[.,]?[0-9]*$/;
   const decimalPattern = RegExp(`^\\d+(\\.\\d{0,${decimals}})?$`);
-  if (s === "") {
+  if (!s.trim().length) {
     return true;
   }
   if (pattern.test(s) && decimalPattern.test(s)) return true;

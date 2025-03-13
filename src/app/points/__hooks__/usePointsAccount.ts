@@ -10,6 +10,7 @@ const userInfoSchema = z.object({
     invitationCode: z.string().optional(),
   }),
 });
+
 export default function usePointsAccount() {
   const { address } = useAccount();
   return useQuery({

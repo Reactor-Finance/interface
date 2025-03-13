@@ -20,12 +20,14 @@ export function useSwapSimulation({
   token1,
   needsApproval,
   minAmountOut = BigInt(0),
+  stable = false,
 }: {
-  amount: string;
+  amount: number | null;
   token0: TToken | null;
   token1: TToken | null;
   minAmountOut?: bigint;
   needsApproval: boolean;
+  stable: boolean;
 }) {
   const { address } = useAccount();
   const now = useAtomicDate();
@@ -57,10 +59,10 @@ export function useSwapSimulation({
             {
               from: token0?.address ?? zeroAddress,
               to: token1?.address ?? zeroAddress,
-              stable: false,
+              stable,
             },
           ],
-    [multihops, token0?.address, token1?.address, weth]
+    [multihops, token0?.address, token1?.address, weth, stable]
   );
   const deadline = useMemo(() => {
     const ttl = Math.floor(now.getTime() / 1000) + Number(txDeadline) * 60;
@@ -74,13 +76,14 @@ export function useSwapSimulation({
         : BigInt(0),
     [token0, weth, amount]
   );
+
   return useSimulateContract({
     ...Router,
     address: router,
     functionName: "swap",
     args: [
       amountIn,
-      calculateMinOut(minAmountOut, Number(slippage)),
+      calculateMinOut(minAmountOut, slippage),
       routes,
       address ?? zeroAddress,
       deadline,

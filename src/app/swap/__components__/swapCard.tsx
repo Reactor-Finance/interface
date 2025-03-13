@@ -4,30 +4,38 @@ import Image from "next/image";
 import wallet from "@/assets/wallet.svg";
 import { formatNumber, inputPatternMatch } from "@/lib/utils";
 import { TToken } from "@/lib/types";
+import { useGetBalance } from "@/lib/hooks/useGetBalance";
+import { formatEther, formatUnits, zeroAddress } from "viem";
+import { useGetMarketQuote } from "@/lib/hooks/useGetMarketQuote";
+
 interface Props {
-  balance: string;
   value: string;
   token: TToken | null;
   title: string;
-  selected: boolean;
+  active: boolean;
   setValue: (value: string) => void;
-  openDialog: () => void;
-  selectPain: () => void;
+  onContainerClick: () => void;
+  onButtonClick: () => void;
 }
+
 export default function SwapCard({
-  balance,
   token,
   value,
   title,
-  selected,
-  openDialog,
-  selectPain,
+  active,
+  onContainerClick,
+  onButtonClick,
   setValue,
 }: Props) {
+  const balance = useGetBalance({ tokenAddress: token?.address });
+  const { quote } = useGetMarketQuote({
+    tokenAddress: token?.address ?? zeroAddress,
+    value: balance,
+  });
   return (
     <div
-      onClick={selectPain}
-      data-state={selected ? "active" : "inactive"}
+      onClick={onContainerClick}
+      data-state={active ? "active" : "inactive"}
       className="rounded-[16px] data-[state=active]:bg-[#303136]/90 bg-[#303136] data- border border-[#43444C] space-y-3 p-6 "
     >
       <h2 className="text-sm text-[#CCCCCC]">{title}</h2>
@@ -44,7 +52,7 @@ export default function SwapCard({
           placeholder="0"
         />
         <button
-          onClick={openDialog}
+          onClick={onButtonClick}
           data-state={token ? "active" : "inactive"}
           className="rounded-r-lg ml-8 h-14 flex items-center relative bg-[#43444C] data-[state=active]:pl-9 pr-2"
         >
@@ -69,14 +77,20 @@ export default function SwapCard({
         </button>
       </div>
       <div className="flex justify-between">
-        <span className="text-sm text-[#CCCCCC]">$0</span>
+        <span className="text-sm text-[#CCCCCC]">
+          ${formatNumber(formatEther(quote[0]))}
+        </span>
         <div className="flex gap-x-4">
           <div className="flex gap-x-1">
             <Image src={wallet} alt="Wallet" />
-            <span>{formatNumber(balance)}</span>
+            <span>
+              {formatNumber(formatUnits(balance, token?.decimals ?? 18))}
+            </span>
           </div>
           <button
-            onClick={() => setValue(balance)}
+            onClick={() =>
+              setValue(formatUnits(balance, token?.decimals ?? 18))
+            }
             className="text-sm text-neutral-300"
           >
             Max

@@ -1,6 +1,6 @@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
-import NewSwapView from "./__components__/newSwapView";
+import NewSwapView from "./__components__/swapView";
 import PageMarginContainer from "@/components/ui/pageMarginContainer";
 import SettingsDialog from "./__components__/settingsDialog";
 

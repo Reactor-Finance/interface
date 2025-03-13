@@ -3,6 +3,7 @@ import React from "react";
 import PointsRow from "./pointsRow";
 import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
+
 const EntrySchema = z.object({
   address: z.string(),
   referralId: z.string(),
@@ -14,7 +15,9 @@ const EntrySchema = z.object({
   totalPoints: z.number(),
   rank: z.number(),
 });
+
 const LeaderboardSchema = z.object({ result: z.array(EntrySchema) });
+
 export type TPointsEntry = z.infer<typeof EntrySchema>;
 export default function PointsTable() {
   const { data, error } = useQuery({
@@ -25,7 +28,6 @@ export default function PointsTable() {
       return LeaderboardSchema.parse(resp);
     },
   });
-  console.log({ data, error });
   return (
     <>
       <table className="w-full border-collapse text-left">

@@ -17,6 +17,7 @@ export default function PointsAccess() {
       setIsFilled(false);
     }
   }, [pin]);
+
   const handleKeyDown = (
     event: React.KeyboardEvent<HTMLInputElement>,
     index: number
@@ -27,14 +28,18 @@ export default function PointsAccess() {
       }
     }
   };
+
   const router = useRouter();
   const { data } = usePointsAccount();
+
   useEffect(() => {
     if (data?.result.invitationCode) {
       router.push("/points");
     }
   }, [data?.result.invitationCode, router]);
+
   const { mutateAsync } = useRegister({ inviteCode: pin.join("") });
+
   const handleSubmit = () => {
     if (isFilled) {
       mutateAsync().then(() => {
@@ -52,7 +57,7 @@ export default function PointsAccess() {
           REACTOR EARLY ACCESS
         </h1>
         <p className="text-neutral-400 text-sm">
-          [It’s opsional] Enter your invite code to access the platform and
+          [It’s optional] Enter your invite code to access the platform and
           Increase your early airdrop by 10%
         </p>
         <div className="grid py-2 grid-cols-6 gap-x-3">

@@ -8,6 +8,7 @@ import { CustomConnectButton } from "./customConnectButton";
 import { useAccount } from "wagmi";
 import usePointsAccount from "@/app/points/__hooks__/usePointsAccount";
 import { useChainModal } from "@rainbow-me/rainbowkit";
+
 export default function Header() {
   const { isConnected } = useAccount();
   const { openChainModal } = useChainModal();

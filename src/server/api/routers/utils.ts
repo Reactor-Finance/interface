@@ -5,7 +5,6 @@ export const utilsRouter = createTRPCRouter({
   test: publicProcedure
     .input(z.object({ test: z.string() }))
     .query(async ({ input }) => {
-      console.log(input.test);
       // return await executeGetBlockNumber();
     }),
 });

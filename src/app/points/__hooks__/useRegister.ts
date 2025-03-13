@@ -17,7 +17,7 @@ export default function useRegister({ inviteCode }: { inviteCode: string }) {
           "Content-Type": "application/json",
         },
       }).then((r) => r.json());
-      console.log(resp);
+
       if (resp.error) {
         throw Error(resp.error);
       }

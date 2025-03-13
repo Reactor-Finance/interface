@@ -1,11 +1,13 @@
 "use client";
 import React, { createContext, useCallback, useContext, useState } from "react";
 import { Address } from "viem";
+
 type Toast = {
   hash: Address | undefined;
   actionTitle: string | undefined;
   actionDescription: string | undefined;
 };
+
 interface State {
   toastInfo:
     | {
@@ -19,6 +21,7 @@ interface State {
 const initialState: State = {
   toastInfo: undefined,
 };
+
 interface ContextType {
   state: State;
   setToast: (toast: Toast | undefined) => void;

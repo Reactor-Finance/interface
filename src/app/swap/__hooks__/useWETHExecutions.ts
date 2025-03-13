@@ -10,7 +10,7 @@ export function useWETHExecutions({
   token1,
   amount,
 }: {
-  amount?: string;
+  amount?: number;
   token0: TToken | null;
   token1: TToken | null;
 }) {
@@ -37,6 +37,7 @@ export function useWETHExecutions({
     args: [],
     query: {
       enabled: !!token0 && !!token1 && amount !== null,
+      refetchInterval: 5_000,
     },
   });
 
@@ -47,6 +48,7 @@ export function useWETHExecutions({
     args: [parseEther(String(amount))],
     query: {
       enabled: !!token0 && !!token1 && amount !== null,
+      refetchInterval: 5_000,
     },
   });
 

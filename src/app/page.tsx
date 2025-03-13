@@ -5,6 +5,7 @@ import { useConnectModal } from "@rainbow-me/rainbowkit";
 import Image from "next/image";
 import { useAccount } from "wagmi";
 import PointsAccess from "./points/__components__/pointsAccess";
+
 export default function Page() {
   const { isConnected } = useAccount();
   return (
