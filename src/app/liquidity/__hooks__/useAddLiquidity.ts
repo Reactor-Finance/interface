@@ -1,5 +1,5 @@
 import { useAccount, useChainId, useSimulateContract } from "wagmi";
-import { formatUnits, zeroAddress } from "viem";
+import { zeroAddress } from "viem";
 import { useEffect, useMemo } from "react";
 import { ETHER, ROUTER } from "@/data/constants";
 import * as Router from "@/lib/abis/Router";
@@ -48,15 +48,19 @@ export function useAddLiquidity({
     [token0, amountBDesired, amountADesired]
   );
 
+  const isAddLiquidityETH = useMemo(
+    () =>
+      token0.toLowerCase() === ETHER.toLowerCase() ||
+      token1.toLowerCase() === ETHER.toLowerCase(),
+    [token0, token1]
+  );
   const deadline = useMemo(() => {
     const ttl = Math.floor(now.getTime() / 1000) + Number(txDeadline) * 60;
     return BigInt(ttl);
   }, [now, txDeadline]);
-  console.log(amountADesired, amountBDesired, "AMOUNTS", disabled);
   const [slippage] = useAtom(slippageAtom);
   const minOutA = amountADesired - (amountADesired * BigInt(slippage)) / 1000n;
   const minOutB = amountBDesired - (amountADesired * BigInt(slippage)) / 1000n;
-  console.log(formatUnits(minOutA, 18), formatUnits(minOutB, 6), "AMOUNTS");
   const addLiquidityETHSimulation = useSimulateContract({
     ...Router,
     address: router,
@@ -72,7 +76,7 @@ export function useAddLiquidity({
     ],
     value: msgValueLiquidityETH,
     query: {
-      enabled: address !== zeroAddress && !disabled,
+      enabled: address !== zeroAddress && !disabled && isAddLiquidityETH,
     },
   });
 
@@ -92,16 +96,9 @@ export function useAddLiquidity({
       deadline,
     ],
     query: {
-      enabled: address !== zeroAddress && !disabled,
+      enabled: address !== zeroAddress && !disabled && !isAddLiquidityETH,
     },
   });
-
-  const isAddLiquidityETH = useMemo(
-    () =>
-      token0.toLowerCase() === ETHER.toLowerCase() ||
-      token1.toLowerCase() === ETHER.toLowerCase(),
-    [token0, token1]
-  );
 
   useEffect(() => {
     if (addLiquidityETHSimulation.data || addLiquidityETHSimulation.error) {
