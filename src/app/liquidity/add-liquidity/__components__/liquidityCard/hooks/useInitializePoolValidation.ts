@@ -1,48 +1,34 @@
-import { useLiquidityCardFormProvider } from "../liquidityCardFormProvider";
+import { TToken } from "@/lib/types";
 
 import { parseUnits } from "viem";
 
 interface Props {
-  tokenDeposits: {
-    tokenOneDeposit: string;
-    tokenTwoDeposit: string;
-  };
-  isApproving: boolean;
-  isApproveSimulationValid: boolean;
-  isAddLiquiditySimulationValid: boolean;
-  isSuccess: boolean;
+  amount0: string;
+  amount1: string;
+  balance0: bigint;
+  balance1: bigint;
+  token0: TToken | undefined;
+  token1: TToken | undefined;
 }
 export default function useInitializePoolValidation({
-  isApproving,
-  isSuccess,
-  isAddLiquiditySimulationValid,
-  isApproveSimulationValid,
-  tokenDeposits,
+  amount0,
+  amount1,
+  balance0,
+  balance1,
+  token0,
+  token1,
 }: Props) {
-  const { tokenOneDeposit, tokenTwoDeposit } = tokenDeposits;
-  const {
-    tokenOneBalance,
-    tokenTwoBalance,
-    tokenTwoDecimals,
-    tokenOneDecimals,
-  } = useLiquidityCardFormProvider();
-
-  const enoughToken =
-    parseUnits(tokenOneDeposit, tokenOneDecimals ?? 0) <= tokenOneBalance &&
-    parseUnits(tokenTwoDeposit, tokenTwoDecimals ?? 0) <= tokenTwoBalance;
-  if (isSuccess) {
-    return { isValid: true, error: null };
+  if (parseUnits(amount0, token0?.decimals ?? 18) > balance0) {
+    return {
+      isValid: false,
+      errorMessage: `Insufficient ${token0?.symbol} Balance.`,
+    };
   }
-  if (isApproving) {
-    if (isApproveSimulationValid) {
-      return { isValid: true, error: null };
-    }
+  if (parseUnits(amount1, token1?.decimals ?? 18) > balance1) {
+    return {
+      isValid: false,
+      errorMessage: `Insufficient ${token1?.symbol} Balance.`,
+    };
   }
-  if (!enoughToken) {
-    return { isValid: false, error: "Insufficient balance." };
-  }
-  if (!isAddLiquiditySimulationValid) {
-    return { isValid: false, error: null };
-  }
-  return { isValid: true, error: null };
+  return { isValid: true, errorMessage: null };
 }

@@ -26,6 +26,7 @@ import DisplayFormattedNumber from "@/components/shared/displayFormattedNumber";
 import { formatNumber } from "@/lib/utils";
 import InitPoolInfo from "./initPoolInfo";
 import useWrapWrite from "@/lib/hooks/useWrapWrite";
+import useInitializePoolValidation from "./hooks/useInitializePoolValidation";
 
 const searchParamsSchema = z.object({
   token0: z.string().refine((arg) => isAddress(arg)),
@@ -275,7 +276,7 @@ export default function InitializePool() {
     }
   }, [token0, token1, token0NeedsApproval, token1NeedsApproval]);
 
-  const stateValid = useMemo(
+  let stateValid = useMemo(
     () =>
       (!!token0 &&
         !!token1 &&
@@ -301,6 +302,15 @@ export default function InitializePool() {
   const { balance } = useGetBalance({
     tokenAddress: (pair as Address) ?? zeroAddress,
   });
+  const { isValid, errorMessage } = useInitializePoolValidation({
+    amount0,
+    amount1,
+    token0,
+    token1,
+    balance0,
+    balance1,
+  });
+  stateValid = stateValid && isValid;
   const { state: buttonState } = useGetButtonStatuses({
     isLoading,
     isPending,
@@ -440,6 +450,7 @@ export default function InitializePool() {
       <SubmitButton
         state={buttonState}
         isValid={stateValid}
+        validationError={errorMessage}
         approveTokenSymbol={tokenNeedingApproval?.symbol}
         onClick={onSubmit}
       >
