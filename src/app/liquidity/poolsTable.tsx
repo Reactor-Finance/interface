@@ -1,6 +1,11 @@
 "use client";
 import { useState, useCallback, useEffect, useMemo } from "react";
-import { ChevronRight, ChevronLeft, ChevronDown } from "lucide-react";
+import {
+  ChevronRight,
+  ChevronLeft,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 import PoolRow from "./poolRow";
 import { abi } from "@/lib/abis/PairHelper";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -145,13 +150,20 @@ export default function PoolsTable() {
               <th className="flex justify-end">
                 <button
                   onClick={() => updateState({ orderTvl: !filters.orderTvl })}
-                  className="flex gap-x-1 items-center"
+                  className=" flex gap-x-1 items-center"
                 >
-                  <ChevronDown
-                    data-direction={filters.orderTvl ? "up" : "down"}
-                    className="text-white data-[direction=up]:rotate-180"
-                    size={18}
-                  />
+                  <div>
+                    <ChevronUp
+                      data-direction={filters.orderTvl ? "up" : "down"}
+                      className="text-neutral-400 data-[direction=up]:text-white"
+                      size={18}
+                    />
+                    <ChevronDown
+                      data-direction={filters.orderTvl ? "up" : "down"}
+                      className="text-neutral-400 data-[direction=down]:text-white"
+                      size={18}
+                    />
+                  </div>
                   <span>TVL</span>
                 </button>
               </th>
