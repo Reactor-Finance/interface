@@ -4,11 +4,12 @@ import React, { useState } from "react";
 import { CheckIcon } from "@radix-ui/react-icons";
 import Image from "next/image";
 import copyIcon from "@/assets/copy-icon.svg";
+import { useAccount } from "wagmi";
+import { zeroAddress } from "viem";
 
 export default function DynamicInputBox({ label }: { label: string }) {
-  const [value, setValue] = useState("");
   const [copied, setCopied] = useState(false);
-
+  const { address = zeroAddress } = useAccount();
   // Truncate long values for display
   const formatValue = (input: string) => {
     if (input.length <= 10) return input;
@@ -16,8 +17,8 @@ export default function DynamicInputBox({ label }: { label: string }) {
   };
 
   const copyToClipboard = () => {
-    if (value.trim() !== "") {
-      navigator.clipboard.writeText(value);
+    if (address.trim() !== "") {
+      navigator.clipboard.writeText(address);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
     }
@@ -29,11 +30,11 @@ export default function DynamicInputBox({ label }: { label: string }) {
       <span className="text-white text-sm opacity-70">{label}:</span>
       <div className="flex items-center gap-2 justify-between w-[130px]">
         <div className="inline-block text-white text-sm tracking-tighter">
-          {value ? formatValue(value) : "-"}
+          {address ? formatValue(address) : "-"}
         </div>
 
         {/* Action Icon */}
-        {value && (
+        {address && (
           <button
             onClick={copyToClipboard}
             className="flex items-center justify-center text-gray-400 hover:text-white w-3 h-3"
@@ -46,13 +47,13 @@ export default function DynamicInputBox({ label }: { label: string }) {
       </div>
 
       {/* Input Field */}
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        className="absolute top-0 left-0 w-full h-full opacity-0 cursor-text"
-        style={{ zIndex: 1 }}
-      />
+      {/* <input */}
+      {/*   type="text" */}
+      {/*   value={address} */}
+      {/*   onChange={(e) => setValue(e.target.value)} */}
+      {/*   className="absolute top-0 left-0 w-full h-full opacity-0 cursor-text" */}
+      {/*   style={{ zIndex: 1 }} */}
+      {/* /> */}
     </div>
   );
 }
