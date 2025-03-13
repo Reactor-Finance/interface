@@ -7,11 +7,12 @@ import { LiquidityActions, StateType } from "../types";
 import usePadLoading from "@/lib/hooks/usePadLoading";
 import Spinner from "@/components/ui/spinner";
 import Link from "next/link";
+import { zeroAddress } from "viem";
 
 export default function DashboardLiquidityTable() {
   const { data: pairs, isLoading } = useGetPairs({});
   const activePairs = useMemo(
-    () => pairs.filter((pair) => pair.account_lp_balance > 0n),
+    () => pairs.filter((pair) => pair.pair_address !== zeroAddress),
     [pairs]
   );
   const [selectedPair, setSelectedPair] = useState(activePairs[0]);
