@@ -86,7 +86,10 @@ export default function PoolRow({
       <th className="text-left pl-4 col-span-3 ">
         <div className="flex justify-between">
           <span></span>
-          <Button variant="filled" onClick={addLiquidityHandler}>
+          <Button
+            className="group-hover:bg-neutral-[#303136] hover:bg-[#43444C]"
+            onClick={addLiquidityHandler}
+          >
             <div className="flex items-center gap-x-1">
               <span>Add</span>
               {!!t0 && !!t1 && (
