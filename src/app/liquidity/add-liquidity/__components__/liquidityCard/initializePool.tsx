@@ -15,7 +15,7 @@ import { z } from "zod";
 import { useSearchParams } from "next/navigation";
 import { useCheckPair } from "@/lib/hooks/useCheckPair";
 import useApproveWrite from "@/lib/hooks/useApproveWrite";
-import { ChainId, ROUTER, WETH } from "@/data/constants";
+import { ChainId, ETHER, ROUTER, WETH } from "@/data/constants";
 import { useQuoteLiquidity } from "@/app/liquidity/__hooks__/useQuoteLiquidity";
 import { useGetTokenInfo } from "@/utils";
 import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
@@ -164,12 +164,19 @@ export default function InitializePool() {
   } = useWriteContract(); // We'll also call reset when transaction toast is closed
   const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash });
   const { setToast } = useTransactionToastProvider();
-  const { balance: balance0, balanceQueryKey: bal0Key } = useGetBalance({
+  const { balance: balance0Raw, balanceQueryKey: bal0Key } = useGetBalance({
     tokenAddress: token0?.address ?? zeroAddress,
   });
-  const { balance: balance1, balanceQueryKey: bal1Key } = useGetBalance({
+  const {
+    balance: balance1Raw,
+    etherBalance,
+    balanceQueryKey: bal1Key,
+  } = useGetBalance({
     tokenAddress: token1?.address ?? zeroAddress,
   });
+
+  const balance0 = token0?.address === ETHER ? etherBalance.value : balance0Raw;
+  const balance1 = token1?.address === ETHER ? etherBalance.value : balance1Raw;
   const { balance, balanceQueryKey: lpQueryKey } = useGetBalance({
     tokenAddress: (pair as Address) ?? zeroAddress,
   });
