@@ -170,9 +170,18 @@ export default function InitializePool() {
   const { balance: balance1, balanceQueryKey: bal1Key } = useGetBalance({
     tokenAddress: token1?.address ?? zeroAddress,
   });
+  const { balance, balanceQueryKey: lpQueryKey } = useGetBalance({
+    tokenAddress: (pair as Address) ?? zeroAddress,
+  });
   const queryClient = useQueryClient();
-
   const { pairInfo, queryKey: pairKey } = useGetPairInfo({ pair });
+  const resetAfterSwap = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: bal0Key });
+    queryClient.invalidateQueries({ queryKey: bal1Key });
+    queryClient.invalidateQueries({ queryKey: pairKey });
+    queryClient.invalidateQueries({ queryKey: lpQueryKey });
+  }, [bal0Key, bal1Key, lpQueryKey, pairKey, queryClient]);
+
   useEffect(() => {
     if (isSuccess) {
       reset();
@@ -204,27 +213,23 @@ export default function InitializePool() {
         return;
       }
       if (!token0NeedsApproval || !token1NeedsApproval) {
-        queryClient.invalidateQueries({ queryKey: bal0Key });
-        queryClient.invalidateQueries({ queryKey: bal1Key });
-        queryClient.invalidateQueries({ queryKey: pairKey });
         setToast({
           actionTitle: "Added Liquidity",
           actionDescription: "",
           hash,
         });
+        resetAfterSwap();
         setAmount0("");
         setAmount1("");
       }
     }
   }, [
-    bal0Key,
-    bal1Key,
     hash,
     isSuccess,
     needsWrap,
-    pairKey,
     queryClient,
     reset,
+    resetAfterSwap,
     resetWrap,
     setToast,
     token0AllowanceKey,
@@ -299,11 +304,9 @@ export default function InitializePool() {
       needsWrap,
     ]
   );
-  const { balance } = useGetBalance({
-    tokenAddress: (pair as Address) ?? zeroAddress,
-  });
   const { isValid, errorMessage } = useInitializePoolValidation({
     amount0,
+    needsWrap,
     amount1,
     token0,
     token1,
@@ -357,6 +360,7 @@ export default function InitializePool() {
     token0?.decimals,
     token1?.decimals,
   ]);
+  console.log({ addLiquiditySimulation });
   return (
     <>
       <h2 className="text-xl">
@@ -423,8 +427,8 @@ export default function InitializePool() {
                   <DisplayFormattedNumber
                     num={formatNumber(
                       formatUnits(
-                        pairInfo?.reserve0 ?? 0n,
-                        token0?.decimals ?? 18
+                        pairInfo?.reserve1 ?? 0n,
+                        token1?.decimals ?? 18
                       )
                     )}
                   />

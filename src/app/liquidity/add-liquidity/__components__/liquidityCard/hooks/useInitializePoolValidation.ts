@@ -9,6 +9,7 @@ interface Props {
   balance1: bigint;
   token0: TToken | undefined;
   token1: TToken | undefined;
+  needsWrap: boolean;
 }
 export default function useInitializePoolValidation({
   amount0,
@@ -17,14 +18,15 @@ export default function useInitializePoolValidation({
   balance1,
   token0,
   token1,
+  needsWrap,
 }: Props) {
-  if (parseUnits(amount0, token0?.decimals ?? 18) > balance0) {
+  if (parseUnits(amount0, token0?.decimals ?? 18) > balance0 && !needsWrap) {
     return {
       isValid: false,
       errorMessage: `Insufficient ${token0?.symbol} Balance.`,
     };
   }
-  if (parseUnits(amount1, token1?.decimals ?? 18) > balance1) {
+  if (parseUnits(amount1, token1?.decimals ?? 18) > balance1 && !needsWrap) {
     return {
       isValid: false,
       errorMessage: `Insufficient ${token1?.symbol} Balance.`,
