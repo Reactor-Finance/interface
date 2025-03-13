@@ -143,7 +143,7 @@ export default function PoolsTable() {
       <div className="pt-4 min-h-[500px]">
         <table className="w-full ">
           <thead className="text-neutral-400 text-sm text-right w-full">
-            <tr className=" grid grid-cols-11 gap-x-4 px-4">
+            <tr className=" grid grid-cols-11 items-center gap-x-4 px-4">
               <th className="col-span-4 text-left flex gap-x-4">
                 <span>Pool Name</span>
               </th>
