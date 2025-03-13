@@ -10,6 +10,7 @@ export default function PointsRow({
   totalPoints,
   rank,
 }: TPointsEntry) {
+  const boost = false;
   return (
     <tr className="border-b border-gray-800">
       <td className="py-3 text-white">{rank}</td>
@@ -25,7 +26,11 @@ export default function PointsRow({
       <td className="py-3 text-[#BBBBBB]">{referralPoints}</td>
       <td className="py-3 text-[#BBBBBB]">{tradePoints}</td>
       <td className="py-3 text-[#BBBBBB]">{lpPoints}</td>
-      <td className="py-3 px-6 text-[#836EF9]">x2.5</td>
+      {boost ? (
+        <td className="py-3 px-6 text-[#836EF9]">x2.5</td>
+      ) : (
+        <td className="py-3 px-6 ">x1</td>
+      )}
       <td className="py-3 text-[#BBBBBB]">{totalPoints}</td>
     </tr>
   );

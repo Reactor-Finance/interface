@@ -41,7 +41,7 @@ export default function PointsTable() {
             <th className="py-3">Total Points</th>
           </tr>
         </thead>
-        <tbody className="text-sm">
+        <tbody className="text-sm flex flex-col space-y-2">
           {data?.result.map((entry) => (
             <PointsRow {...entry} key={entry.rank} />
           ))}
