@@ -2,7 +2,6 @@ import { Address, erc20Abi, maxUint256, parseUnits } from "viem";
 import { useSimulateContract } from "wagmi";
 import useGetAllowance from "./useGetAllowance";
 import { ETHER } from "@/data/constants";
-import { useMemo } from "react";
 
 /**
  * Returns write data request only if the allowance is less than the amount
@@ -45,14 +44,10 @@ export default function useApproveWrite({
   //     void refetch();
   //   },
   // });
-  const needsApproval = useMemo(
-    () =>
-      (allowance ?? 0n) < parseUnits(amount, decimals) &&
-      !!tokenAddress &&
-      tokenAddress.toLowerCase() !== ETHER.toLowerCase(),
-    [allowance, amount, decimals, tokenAddress]
-  );
-
+  const needsApproval =
+    (allowance ?? 0n) < parseUnits(amount, decimals) &&
+    tokenAddress?.toLowerCase() !== ETHER.toLowerCase() &&
+    tokenAddress !== undefined;
   return {
     approveWriteRequest: data?.request,
     needsApproval,

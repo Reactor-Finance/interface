@@ -22,10 +22,6 @@ export function useGetMarketQuote({
     address: oracle,
     functionName: "getAverageValueInUSD",
     args: [tokenAddress, value],
-    query: {
-      enabled: true,
-      refetchInterval: 10_000,
-    },
   });
 
   // useWatchBlocks({

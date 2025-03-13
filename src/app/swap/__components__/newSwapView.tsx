@@ -11,9 +11,10 @@ import { useSwapSimulation } from "../__hooks__/useSwapSimulation";
 import { useQuoteSwap } from "../__hooks__/useQuoteSwap";
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
 import { TToken } from "@/lib/types";
-import { ROUTER, WETH } from "@/data/constants";
-import { parseUnits, zeroAddress } from "viem";
+import { ROUTER } from "@/data/constants";
+import { formatUnits, parseUnits, zeroAddress } from "viem";
 import { useWETHExecutions } from "../__hooks__/useWETHExecutions";
+import { useGetBalance } from "@/lib/hooks/useGetBalance";
 import useSwapValidation from "../__hooks__/useSwapValidation";
 import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
 import { ArrowDown } from "lucide-react";
@@ -26,11 +27,19 @@ export default function NewSwapView() {
   const chainId = useChainId();
 
   // Amount in
-  const [amountIn, setAmountIn] = useState(0);
-  const [amountOut, setAmountOut] = useState(0);
+  const [amountIn, setAmountIn] = useState("");
+  const [amountOut, setAmountOut] = useState("");
   // Selected tokens
   const [token0, setToken0] = useState<TToken | null>(null);
   const [token1, setToken1] = useState<TToken | null>(null);
+
+  // Balances
+  const { balance: token0Balance } = useGetBalance({
+    tokenAddress: token0?.address ?? zeroAddress,
+  });
+  const { balance: token1Balance } = useGetBalance({
+    tokenAddress: token1?.address ?? zeroAddress,
+  });
 
   // Modal state
   const [firstDialogOpen, setFirstDialogOpen] = useState(false);
@@ -42,8 +51,8 @@ export default function NewSwapView() {
   // Quote
   const {
     quoteAmount,
-    isLoading: quoteSwapLoading,
-    stable: swapStable,
+    isLoading: amountOutLoading,
+    amountInLoading,
   } = useQuoteSwap({
     amountIn,
     amountOut,
@@ -51,31 +60,36 @@ export default function NewSwapView() {
     tokenIn: token0,
     tokenOut: token1,
   });
-  const roundedQuoteAmount = useMemo(
-    () => Math.floor(quoteAmount * 100) / 100,
-    [quoteAmount]
-  );
-
   useEffect(() => {
-    if (!token0 || !token1 || quoteSwapLoading) {
+    if (!token0 || !token1) {
       return;
     }
-    switch (activePane) {
-      case 0: {
-        setAmountOut(roundedQuoteAmount);
-        break;
-      }
-      case 1: {
-        setAmountIn(roundedQuoteAmount);
-        break;
-      }
+    if (activePane === 0 && amountIn === "") {
+      setAmountOut("");
     }
-  }, [token0, token1, activePane, quoteSwapLoading, roundedQuoteAmount]);
+    if (activePane === 1 && amountOut === "") {
+      setAmountIn("");
+    }
+    if (activePane === 0 && !amountOutLoading && amountIn !== "") {
+      const rounded = Math.floor(Number(quoteAmount) * 100) / 100;
+      setAmountOut(rounded.toString());
+    } else if (activePane === 1 && !amountInLoading && amountOut !== "") {
+      const rounded = Math.floor(Number(quoteAmount) * 100) / 100;
+      setAmountIn(rounded.toString());
+    }
+  }, [
+    token0,
+    token1,
+    activePane,
+    amountIn,
+    amountInLoading,
+    amountOut,
+    amountOutLoading,
+    quoteAmount,
+  ]);
 
   // Router by chain ID
   const router = useMemo(() => ROUTER[chainId], [chainId]);
-  // WETH
-  const weth = useMemo(() => WETH[chainId], [chainId]);
   // checks allowance
   const { approveWriteRequest, needsApproval } = useApproveWrite({
     tokenAddress: token0?.address,
@@ -90,9 +104,9 @@ export default function NewSwapView() {
       amount: amountIn,
       token0,
       token1,
-      stable: swapStable,
-      minAmountOut: parseUnits(String(amountOut), token1?.decimals ?? 18),
+      minAmountOut: parseUnits(amountOut, token1?.decimals ?? 18),
     });
+  console.log({ swapSimulation });
   // Simulate WETH process
   const { isIntrinsicWETHProcess, WETHProcessSimulation, isWETHToEther } =
     useWETHExecutions({
@@ -110,6 +124,22 @@ export default function NewSwapView() {
   } = useWriteContract();
   const { isSuccess, isLoading } = useWaitForTransactionReceipt({ hash });
   const { setToast } = useTransactionToastProvider();
+  useEffect(() => {
+    if (isSuccess) {
+      setToast({
+        hash,
+        actionTitle: "Swapped",
+        actionDescription: "Swapped something",
+      });
+    }
+  }, [hash, isLoading, isSuccess, setToast]);
+  useEffect(() => {
+    if (isSuccess) {
+      reset();
+      setAmountIn("");
+      setAmountOut("");
+    }
+  }, [isSuccess, reset]);
   const switchTokens = useCallback(() => {
     const t0 = token0;
     const t1 = token1;
@@ -121,12 +151,11 @@ export default function NewSwapView() {
     amountIn,
     token0,
     token1,
-    simulation:
-      !isIntrinsicWETHProcess || !needsApproval
-        ? !!swapSimulation?.request
-        : true,
+    token0Balance,
+    simulation: !!swapSimulation?.request,
   });
   const onSubmit = useCallback(() => {
+    console.log("in here");
     if (isIntrinsicWETHProcess) {
       if (isWETHToEther) {
         const req = WETHProcessSimulation?.withdrawalSimulation?.data?.request;
@@ -168,41 +197,25 @@ export default function NewSwapView() {
     isLoading,
     needsApproval: needsApproval && !isIntrinsicWETHProcess,
   });
-  const stateValid = useMemo(
+  let stateValid = useMemo(
     () =>
-      amountIn > 0 &&
-      amountOut > 0 &&
-      (Boolean(swapSimulation?.request) ||
-        Boolean(WETHProcessSimulation.depositSimulation.data) ||
-        Boolean(WETHProcessSimulation.withdrawalSimulation.data) ||
-        Boolean(approveWriteRequest && needsApproval)),
+      Boolean(swapSimulation?.request) ||
+      Boolean(WETHProcessSimulation.depositSimulation.data) ||
+      Boolean(WETHProcessSimulation.withdrawalSimulation.data) ||
+      Boolean(approveWriteRequest && needsApproval),
     [
       swapSimulation?.request,
       WETHProcessSimulation.depositSimulation.data,
       WETHProcessSimulation.withdrawalSimulation.data,
       approveWriteRequest,
       needsApproval,
-      amountIn,
-      amountOut,
     ]
   );
-
-  useEffect(() => {
-    if (isSuccess) {
-      setToast({
-        hash,
-        actionTitle: "Swapped",
-        actionDescription: "Swapped something",
-      });
-    }
-  }, [hash, isLoading, isSuccess, setToast]);
-  useEffect(() => {
-    if (isSuccess) {
-      reset();
-      setAmountIn(0);
-      setAmountOut(0);
-    }
-  }, [isSuccess, reset]);
+  console.log();
+  if (amountIn === "" || amountIn === "") {
+    stateValid = false;
+  }
+  console.log({ stateValid });
   useEffect(() => {
     if (writeError) {
       console.log(writeError);
@@ -212,7 +225,6 @@ export default function NewSwapView() {
       console.log(swapSimulationError);
     }
   }, [writeError, swapSimulationError]);
-
   return (
     <div className="space-y-1">
       <TokensDialog
@@ -235,30 +247,24 @@ export default function NewSwapView() {
       />
       <div className="space-y-1 relative">
         <SwapCard
-          active={activePane === 0}
+          selected={activePane === 0}
           title="Sell"
-          value={String(amountIn)}
-          onContainerClick={() => setActivePane(0)}
+          value={amountIn}
+          selectPain={() => setActivePane(0)}
           token={token0}
-          onButtonClick={() => setFirstDialogOpen(true)}
-          setValue={(val) => {
-            const parsedNumber = Number(val);
-            const value = !isNaN(parsedNumber) ? parsedNumber : amountIn;
-            setAmountIn(value);
-          }}
+          openDialog={() => setFirstDialogOpen(true)}
+          balance={formatUnits(token0Balance, token0?.decimals ?? 18)}
+          setValue={setAmountIn}
         />
         <SwapCard
-          active={activePane === 1}
+          selected={activePane === 1}
           title="Buy"
           token={token1}
-          value={String(amountOut)}
-          onContainerClick={() => setActivePane(1)}
-          onButtonClick={() => setSecondDialogOpen(true)}
-          setValue={(val) => {
-            const parsedNumber = Number(val);
-            const value = !isNaN(parsedNumber) ? parsedNumber : amountOut;
-            setAmountOut(value);
-          }}
+          balance={formatUnits(token1Balance, token1?.decimals ?? 18)}
+          value={amountOut}
+          selectPain={() => setActivePane(1)}
+          openDialog={() => setSecondDialogOpen(true)}
+          setValue={setAmountOut}
         />
         <button
           onClick={switchTokens}
@@ -269,24 +275,21 @@ export default function NewSwapView() {
           </div>
         </button>
       </div>
-      {token1 && token0 && amountIn > 0 && (
-        <SwapDetails token0={token0} token1={token1} />
+      {token1 && token0 && amountIn !== "" && (
+        <SwapDetails
+          amountIn={parseUnits(amountIn, token0?.decimals ?? 18)}
+          amountOut={parseUnits(amountOut, token1?.decimals ?? 18)}
+          token0={token0}
+          token1={token1}
+        />
       )}
       <SubmitButton
         onClick={onSubmit}
         validationError={errorMessage}
         state={buttonState}
-        isValid={isValid && stateValid}
+        isValid={isValid}
       >
-        {!isIntrinsicWETHProcess ? (
-          "Swap"
-        ) : (
-          <>
-            {token0?.address.toLowerCase() === weth.toLowerCase()
-              ? "Unwrap"
-              : "Wrap"}
-          </>
-        )}
+        Swap
       </SubmitButton>
     </div>
   );

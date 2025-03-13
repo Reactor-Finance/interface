@@ -2,12 +2,11 @@
 
 import React, { useState } from "react";
 import { CheckIcon } from "@radix-ui/react-icons";
-import { useAccount } from "wagmi";
-import { zeroAddress } from "viem";
-import { CopyIcon } from "lucide-react";
+import Image from "next/image";
+import copyIcon from "@/assets/copy-icon.svg";
 
 export default function DynamicInputBox({ label }: { label: string }) {
-  const { address = zeroAddress } = useAccount();
+  const [value, setValue] = useState("");
   const [copied, setCopied] = useState(false);
 
   // Truncate long values for display
@@ -17,8 +16,8 @@ export default function DynamicInputBox({ label }: { label: string }) {
   };
 
   const copyToClipboard = () => {
-    if (address) {
-      navigator.clipboard.writeText(address);
+    if (value.trim() !== "") {
+      navigator.clipboard.writeText(value);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
     }
@@ -30,30 +29,30 @@ export default function DynamicInputBox({ label }: { label: string }) {
       <span className="text-white text-sm opacity-70">{label}:</span>
       <div className="flex items-center gap-2 justify-between w-[130px]">
         <div className="inline-block text-white text-sm tracking-tighter">
-          {address ? formatValue(address) : "-"}
+          {value ? formatValue(value) : "-"}
         </div>
 
         {/* Action Icon */}
-        {address && (
+        {value && (
           <button
             onClick={copyToClipboard}
             className="flex items-center justify-center text-gray-400 hover:text-white w-3 h-3"
             aria-label="Perform action"
             style={{ zIndex: 2 }}
           >
-            {copied ? <CheckIcon /> : <CopyIcon />}
+            {copied ? <CheckIcon /> : <Image src={copyIcon} alt="copy" />}
           </button>
         )}
       </div>
 
       {/* Input Field */}
-      {/* <input
+      <input
         type="text"
-        value={address}
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
         className="absolute top-0 left-0 w-full h-full opacity-0 cursor-text"
         style={{ zIndex: 1 }}
-        disabled
-      /> */}
+      />
     </div>
   );
 }

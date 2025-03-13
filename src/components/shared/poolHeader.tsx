@@ -1,15 +1,13 @@
 import React from "react";
 import CurrenciesOverlapIcons from "./currenciesOverlapIcons";
 import { Badge } from "../ui/badge";
-import { TPoolData, TPoolType, TToken } from "@/lib/types";
-import { useGetFeeFromFactory } from "@/lib/hooks/useGetFeeFromFactory";
+import { TPoolType, TToken } from "@/lib/types";
 
 interface Props {
   poolType: TPoolType;
   token0: TToken | undefined;
   token1: TToken | undefined;
   number?: string;
-  _data?: TPoolData;
 }
 
 export default function PoolHeader({
@@ -18,29 +16,26 @@ export default function PoolHeader({
   token1,
   number,
 }: Props) {
-  const fee = useGetFeeFromFactory(poolType === TPoolType.STABLE);
+  if (!token0 || !token1) return;
   return (
-    token0 &&
-    token1 && (
-      <div className="flex gap-x-4 items-center">
-        {number && <span>{number}</span>}
-        <div className="flex gap-x-2 items-center">
-          <CurrenciesOverlapIcons token0={token0} token1={token1} />
-          <div>
-            <h4>
-              {`${poolType === TPoolType.STABLE ? "sAMM" : "vAMM"}`}-
-              {token0.symbol}/{token1.symbol}
-            </h4>
-            <div className="space-x-1">
-              <PoolBadge poolType={poolType} />
-              <Badge colors="neutral" border="one">
-                {Number(fee) / 100}%
-              </Badge>
-            </div>
+    <div className="flex gap-x-4 items-center">
+      {number && <span>{number}</span>}
+      <div className="flex gap-x-2 items-center">
+        <CurrenciesOverlapIcons token0={token0} token1={token1} />
+        <div>
+          <h4>
+            {`${poolType === TPoolType.STABLE ? "sAMM" : "vAMM"}`}-
+            {token0.symbol}/{token1.symbol}
+          </h4>
+          <div className="space-x-1">
+            <PoolBadge poolType={poolType} />
+            <Badge colors="neutral" border="one">
+              0.3%
+            </Badge>
           </div>
         </div>
       </div>
-    )
+    </div>
   );
 }
 function PoolBadge({ poolType }: { poolType: TPoolType }) {

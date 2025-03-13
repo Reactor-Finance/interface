@@ -13,10 +13,6 @@ export function useCheckUserVeNFTs() {
     address: helper,
     functionName: "getNFTFromAddress",
     args: [address],
-    query: {
-      enabled: true,
-      refetchInterval: 4_000,
-    },
   });
 
   // useWatchBlocks({

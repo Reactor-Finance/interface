@@ -1,18 +1,20 @@
 "use client";
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { ChevronRight, ChevronLeft, ChevronDown } from "lucide-react";
 import PoolRow from "./poolRow";
+import { abi } from "@/lib/abis/PairHelper";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SearchInput from "@/components/shared/searchInput";
 import { useDebounce } from "@/lib/hooks/useDebounce";
 import PoolRowSkeleton from "./poolRowSkeleton";
-import { useGetPairs } from "@/lib/hooks/useGetPairs";
+import { useChainId, useReadContract } from "wagmi";
+import { ChainId, PAIR_HELPER } from "@/data/constants";
 import { zeroAddress } from "viem";
 
 type QueryFilters = {
   searchQuery: string;
   isStable: boolean | undefined;
-  orderByTvl: boolean;
+  orderTvl: boolean;
 };
 
 enum TabValues {
@@ -22,93 +24,98 @@ enum TabValues {
   CONCENTRATED = "concentrated",
 }
 
+const pageLength = 10;
 export default function PoolsTable() {
+  const [loadingBounced, setLoadingBounced] = useState(false);
   const [filters, setFilters] = useState<QueryFilters>({
     searchQuery: "",
     isStable: undefined,
-    orderByTvl: true,
+    orderTvl: true,
   });
   const [page, setPage] = useState(1);
-
-  const updateState = useCallback((value: Partial<QueryFilters>) => {
-    setFilters((filters) => ({ ...filters, ...value }));
-  }, []);
-
-  const { data, isLoading } = useGetPairs({});
-  const prunedData = useMemo(
-    () => data.filter((p) => p.pair_address !== zeroAddress),
-    [data]
+  const updateState = useCallback(
+    (value: Partial<QueryFilters>) => {
+      setFilters({ ...filters, ...value });
+    },
+    [filters]
   );
-  const lastPage = useMemo(
-    () => Math.ceil(prunedData.length / 20),
-    [prunedData]
-  );
+  const {} = useChainId();
+  const { data, isLoading } = useReadContract({
+    abi,
+    address: PAIR_HELPER[ChainId.MONAD_TESTNET],
+    functionName: "getAllPair",
+    args: [zeroAddress, 200n, 0n],
+  });
 
   // ** this stops react query refetching our data from server
   // until one of the filters changes
-  const { debouncedValue: filtersDebounced } = useDebounce(filters, 300);
-  const pools = useMemo(() => {
-    const { searchQuery, isStable, orderByTvl } = filtersDebounced;
-    // First filter by search query
-    let filteredPools = searchQuery.trim().length
-      ? prunedData.filter(
-          (pool) =>
-            pool.token0_symbol
-              .toLowerCase()
-              .startsWith(searchQuery.toLowerCase()) ||
-            pool.token1_symbol
-              .toLowerCase()
-              .startsWith(searchQuery.toLowerCase()) ||
-            pool.name.toLowerCase().startsWith(searchQuery.toLowerCase()) ||
-            pool.symbol.toLowerCase().startsWith(searchQuery.toLowerCase())
-        )
-      : prunedData;
-    // Filter now by stability
-    if (isStable)
-      filteredPools = filteredPools.filter((pool) => pool.stable === isStable);
-    // Sort by TVL
-    if (orderByTvl)
-      filteredPools = filteredPools.toSorted(
-        (a, b) =>
-          Number(b.reserve0 + b.reserve1) - Number(a.reserve0 + a.reserve1)
-      );
-
-    const start = (page - 1) * 20;
-    const end = page * 20;
-    return filteredPools.slice(start, end);
-  }, [filtersDebounced, page, prunedData]);
-
-  const handleTabChange = useCallback(
-    (value: TabValues) => {
-      switch (value) {
-        case TabValues.ALL: {
-          updateState({ isStable: undefined });
-          break;
-        }
-        case TabValues.STABLE: {
-          updateState({ isStable: true });
-          break;
-        }
-        case TabValues.VOLATILE: {
-          updateState({ isStable: false });
-          break;
-        }
-        case TabValues.CONCENTRATED: {
-          updateState({ isStable: undefined });
-          break;
-        }
-      }
-    },
-    [updateState]
+  const { debouncedValue: filersBounced } = useDebounce(filters, 300);
+  const poolsLength = useMemo(
+    () => data?.filter((p) => p.pair_address !== zeroAddress).length ?? 0,
+    [data]
   );
+  const newPools = useMemo(() => {
+    const result =
+      data
+        ?.filter((pair) => {
+          const { searchQuery } = filersBounced;
+          const notZeroAddr = pair.pair_address !== zeroAddress;
+          const search0 = searchQuery
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase());
+          const search1 = pair.token0_symbol
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase());
+          let versionFilter = true;
+          if (filters.isStable && filters.isStable !== undefined) {
+            versionFilter = pair.stable;
+          } else if (filters.isStable !== undefined) {
+            versionFilter = !pair.stable;
+          }
+          return notZeroAddr && search0 && search1 && versionFilter;
+        })
+        .slice(pageLength * page - pageLength, pageLength * page)
+        .sort((a, b) => Number(a.total_supply) - Number(b.total_supply)) ?? [];
+    if (filters.orderTvl) {
+      result.reverse();
+    }
+    return result;
+  }, [data, filersBounced, filters.isStable, filters.orderTvl, page]);
+  useEffect(() => {
+    newPools.forEach((p) => console.log(p.fee));
+  }, [newPools]);
+  useEffect(() => {
+    setPage(1);
+  }, [filters.searchQuery, filters.isStable]);
+  useEffect(() => {
+    if (isLoading) {
+      setLoadingBounced(true);
+    } else {
+      const timer = setTimeout(() => {
+        setLoadingBounced(false);
+      }, 400);
+
+      return () => {
+        clearTimeout(timer);
+      };
+    }
+  }, [isLoading]);
+  const handleTabChange = (value: string) => {
+    if (value === TabValues.ALL) {
+      updateState({ isStable: undefined });
+    }
+    if (value === TabValues.STABLE) {
+      updateState({ isStable: true });
+    }
+    if (value === TabValues.VOLATILE) {
+      updateState({ isStable: false });
+    }
+  };
 
   return (
     <>
       <div className="flex justify-between pt-4 items-center">
-        <Tabs
-          defaultValue="all"
-          onValueChange={(val) => handleTabChange(val as TabValues)}
-        >
+        <Tabs defaultValue="all" onValueChange={handleTabChange}>
           <TabsList>
             <TabsTrigger value={TabValues.ALL}>All</TabsTrigger>
             <TabsTrigger value={TabValues.STABLE}>Stable</TabsTrigger>
@@ -124,7 +131,7 @@ export default function PoolsTable() {
           setValue={(value) => {
             updateState({ searchQuery: value });
           }}
-        />
+        ></SearchInput>
       </div>
       <div className="pt-4 min-h-[500px]">
         <table className="w-full ">
@@ -135,13 +142,11 @@ export default function PoolsTable() {
               </th>
               <th className="flex justify-end">
                 <button
-                  onClick={() =>
-                    updateState({ orderByTvl: !filters.orderByTvl })
-                  }
+                  onClick={() => updateState({ orderTvl: !filters.orderTvl })}
                   className="flex gap-x-1 items-center"
                 >
                   <ChevronDown
-                    data-direction={filters.orderByTvl ? "up" : "down"}
+                    data-direction={filters.orderTvl ? "up" : "down"}
                     className="text-white data-[direction=up]:rotate-180"
                     size={18}
                   />
@@ -155,10 +160,10 @@ export default function PoolsTable() {
             </tr>
           </thead>
           <tbody className="gap-y-2 pt-2 flex flex-col">
-            {isLoading &&
-              Array.from({ length: 20 }, (_, i) => <PoolRowSkeleton key={i} />)}
-            {!isLoading &&
-              pools.map((pool) => (
+            {loadingBounced &&
+              Array.from({ length: 10 }, (_, i) => <PoolRowSkeleton key={i} />)}
+            {!loadingBounced &&
+              newPools?.map((pool) => (
                 <PoolRow {...pool} key={pool.pair_address} />
               ))}
           </tbody>
@@ -167,13 +172,15 @@ export default function PoolsTable() {
         <div className="pt-2  flex justify-between">
           <p className="text-[13px]">
             Page {page}{" "}
-            <span className="text-neutral-300">
-              ({prunedData.length} results)
-            </span>
+            <span className="text-neutral-300">({poolsLength} results)</span>
           </p>
           <div className="flex">
             <button
-              onClick={() => setPage((p) => p - 1)}
+              onClick={() => {
+                if (page > 1) {
+                  setPage(page - 1);
+                }
+              }}
               aria-label="Previous Page of Pools"
               disabled={page === 1}
               className="disabled:opacity-50"
@@ -181,9 +188,14 @@ export default function PoolsTable() {
               <ChevronLeft className="text-white" />
             </button>
             <button
-              onClick={() => setPage((p) => p + 1)}
+              onClick={() => {
+                if ((newPools?.length ?? 0) < pageLength) {
+                } else {
+                  setPage(page + 1);
+                }
+              }}
               aria-label="Next Page of Pools"
-              disabled={page === lastPage}
+              disabled={(newPools?.length ?? 0) < pageLength}
               className="disabled:opacity-50"
             >
               <ChevronRight className="text-white" />

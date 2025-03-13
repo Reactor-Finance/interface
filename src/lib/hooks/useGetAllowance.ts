@@ -14,10 +14,6 @@ export default function useGetAllowance({
     address: tokenAddress,
     functionName: "allowance",
     args: [address ?? "0x", spender],
-    query: {
-      enabled: Boolean(address),
-      staleTime: 1000 * 60 * 5,
-      refetchInterval: 5_000,
-    },
+    query: { enabled: Boolean(address), staleTime: 1000 * 60 * 5 },
   });
 }

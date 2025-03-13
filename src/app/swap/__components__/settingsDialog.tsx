@@ -3,19 +3,56 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import Input from "@/components/ui/input";
 import { Tabs, TabsTrigger, TabsList } from "@/components/ui/tabs";
+import { inputPatternMatch } from "@/lib/utils";
 import {
   settingDialogOpenAtom,
   slippageAtom,
   transactionDeadlineAtom,
 } from "@/store";
+import { inputPatternNumberMatch } from "@/utils";
 import { useAtom } from "jotai/react";
 import { Settings } from "lucide-react";
-import React from "react";
-
+import React, { useCallback, useEffect, useState } from "react";
+type State = {
+  slippageInput: string;
+  deadlineInput: string;
+  deadlineFocus: boolean;
+  slippageFocus: boolean;
+};
 export default function SettingsDialog() {
-  const [deadline, setTxDeadline] = useAtom(transactionDeadlineAtom);
-  const [slippage, setSlippage] = useAtom(slippageAtom);
+  const [deadline, updateDeadline] = useAtom(transactionDeadlineAtom);
+  const [slippage, updateSlippage] = useAtom(slippageAtom);
   const [dialogOpen, setDialogOpen] = useAtom(settingDialogOpenAtom);
+  const [inputState, setInputState] = useState<State>({
+    slippageInput: (slippage / 100).toString(),
+    deadlineInput: deadline.toString(),
+    deadlineFocus: false,
+    slippageFocus: false,
+  });
+  const updateState = useCallback(
+    (payload: Partial<State>) => {
+      setInputState((prevState) => ({ ...prevState, ...payload }));
+    },
+    [setInputState]
+  );
+  useEffect(() => {
+    if (dialogOpen) {
+      updateState({
+        slippageInput: (slippage / 100).toString(),
+        deadlineInput: deadline.toString(),
+      });
+    }
+  }, [deadline, dialogOpen, slippage, updateState]);
+  useEffect(() => {
+    if (!inputState.slippageFocus) {
+      updateState({ slippageInput: (slippage / 100).toString() });
+    }
+  }, [updateSlippage, slippage, inputState.slippageFocus, updateState]);
+  useEffect(() => {
+    if (!inputState.deadlineFocus) {
+      updateState({ deadlineInput: deadline.toString() });
+    }
+  }, [updateSlippage, updateState, inputState.deadlineFocus, deadline]);
   return (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <button
@@ -23,7 +60,7 @@ export default function SettingsDialog() {
         onClick={() => setDialogOpen(true)}
       >
         <div className="bg-neutral-900 rounded-full text-sm text-neutral-400 px-2 py-1">
-          {slippage}% Slippage
+          {slippage / 100}% Slippage
         </div>
         <Settings className="text-neutral-400" />
       </button>
@@ -36,7 +73,7 @@ export default function SettingsDialog() {
             <h3 className="text-sm">Slippage Tolerance</h3>
             <div className="flex gap-x-2">
               <div className="w-full">
-                <Tabs defaultValue="swap" value={String(slippage)}>
+                <Tabs defaultValue="swap" value={slippage.toString()}>
                   <TabsList
                     border={"border-1"}
                     size="sm"
@@ -44,23 +81,32 @@ export default function SettingsDialog() {
                     display={"grow"}
                   >
                     <TabsTrigger
-                      onClick={() => setSlippage(0.1)}
+                      onClick={() => {
+                        updateState({ slippageInput: "0.1" });
+                        updateSlippage(10);
+                      }}
                       display={"grow"}
-                      value="0.1"
+                      value="10"
                     >
                       0.1%
                     </TabsTrigger>
                     <TabsTrigger
-                      onClick={() => setSlippage(0.5)}
+                      onClick={() => {
+                        updateState({ slippageInput: "0.5" });
+                        updateSlippage(50);
+                      }}
                       display={"grow"}
-                      value="0.5"
+                      value="50"
                     >
                       0.5%
                     </TabsTrigger>
                     <TabsTrigger
-                      onClick={() => setSlippage(1)}
+                      onClick={() => {
+                        updateState({ slippageInput: "1" });
+                        updateSlippage(100);
+                      }}
                       display={"grow"}
-                      value="1"
+                      value="100"
                     >
                       1%
                     </TabsTrigger>
@@ -71,14 +117,20 @@ export default function SettingsDialog() {
                 <Input
                   placeholder="Custom"
                   variant="transparent"
+                  onFocus={() => updateState({ slippageFocus: true })}
+                  onBlur={() => updateState({ slippageFocus: false })}
                   onChange={(e) => {
-                    const parsedNumber = Number(e.target.value);
-                    const slippageValue = !isNaN(parsedNumber)
-                      ? parsedNumber
-                      : slippage;
-                    setSlippage(slippageValue);
+                    if (inputPatternMatch(e.target.value)) {
+                      if (Number(e.target.value) > 100) {
+                        return;
+                      }
+                      if (Number(e.target.value) > 0) {
+                        updateSlippage(Number(e.target.value) * 100);
+                      }
+                      updateState({ slippageInput: e.target.value });
+                    }
                   }}
-                  value={slippage}
+                  value={inputState.slippageInput}
                   className="w-20 bg-neutral-900/50 px-2 h-[32px]"
                 />
                 <span className="px-1">%</span>
@@ -86,21 +138,31 @@ export default function SettingsDialog() {
             </div>
           </div>
           <div className="space-y-2">
-            <h3 className="text-sm">Transaction Deadline (Minutes)</h3>
+            <h3 className="text-sm">Transaction Deadline</h3>
             <div className="bg-neutral-950 px-2 items-center flex justify-end border-neutral-900 border  rounded-md">
               <Input
+                onFocus={() => updateState({ deadlineFocus: true })}
+                onBlur={() => updateState({ deadlineFocus: false })}
                 className="w-full"
                 dir="rtl"
                 variant="transparent"
                 ring="none"
                 onChange={(e) => {
-                  const parsedNumber = Number(e.target.value);
-                  const txDeadline = !isNaN(parsedNumber)
-                    ? parsedNumber
-                    : deadline;
-                  setTxDeadline(txDeadline);
+                  console.log(e.target.value);
+                  if (inputPatternNumberMatch(e.target.value)) {
+                    console.log(e.target.value);
+                    if (Number(e.target.value) > 400) {
+                      updateState({ deadlineInput: "400" });
+                      updateDeadline(400);
+                      return;
+                    }
+                    if (Number(e.target.value) > 0) {
+                      updateDeadline(Number(e.target.value));
+                    }
+                    updateState({ deadlineInput: e.target.value });
+                  }
                 }}
-                value={deadline}
+                value={inputState.deadlineInput}
               />
               <span className="text-neutral-200">minutes</span>
             </div>

@@ -10,34 +10,31 @@ export enum ChainId {
   MONAD_TESTNET = 10143,
 }
 
-export const PAIR_FACTORY: { [key: number]: `0x${string}` } = {
-  [ChainId.MONAD_TESTNET]: "0x22595aA7f5298b49D62450DA6300882Fb3d98eBc",
-};
 export const VOTER: { [key: number]: `0x${string}` } = {
-  [ChainId.MONAD_TESTNET]: "0x8B72C1cebD63Aea76B6C5B09217A8c8889A3F6ba",
+  [ChainId.MONAD_TESTNET]: "0xf8f04e8e8152B182A904102359C66215F30c413D",
 };
 export const TRADE_HELPER: { [key: number]: `0x${string}` } = {
-  [ChainId.MONAD_TESTNET]: "0x10Bdbe470aF509Ca514A88DEc4911CC958052f1f",
+  [ChainId.MONAD_TESTNET]: "0xD59B88727680a026C572fEeD94fB81579c1c1394",
 };
 export const PAIR_HELPER: { [key: number]: `0x${string}` } = {
-  [ChainId.MONAD_TESTNET]: "0xf5164104183Fb402d8FDEc6c7BF74C1D5DeD2Ddd",
+  [ChainId.MONAD_TESTNET]: "0xcD6de9d7f6d2e105cDc4807D83839Bd1442498EB",
 };
 export const VE_NFT_HELPER: { [key: number]: `0x${string}` } = {
-  [ChainId.MONAD_TESTNET]: "0x37F979B20a59f3E2702CaE86c5a8608Ebb81776A",
+  [ChainId.MONAD_TESTNET]: "0x6485ECf484640395Eb91Fe8DF50e1110D0d4D930",
 };
 export const ROUTER: { [key: number]: `0x${string}` } = {
-  [ChainId.MONAD_TESTNET]: "0xDeA70f42A5d04Bfde45f27DB7c97563814DaB15C",
+  [ChainId.MONAD_TESTNET]: "0x0067e92EAa46701c75D77dEb970c568307B086c5",
 };
 export const WETH: { [key: number]: `0x${string}` } = {
   [ChainId.MONAD_TESTNET]: "0x760AfE86e5de5fa0Ee542fc7B7B713e1c5425701",
 };
 export const ORACLE: { [key: number]: `0x${string}` } = {
-  [ChainId.MONAD_TESTNET]: "0xAa97c394C26c122F926fEB015237C82a62A98D51",
+  [ChainId.MONAD_TESTNET]: "0x27b14220DD749343979da9ea1434d086f99f2ABB",
 };
 export const VE: { [key: number]: `0x${string}` } = {
-  [ChainId.MONAD_TESTNET]: "0xbe4e46fA5179672c0e606eE97Bf02AD47e7e1910",
+  [ChainId.MONAD_TESTNET]: "0x2203cEf33764a133138528095bd88dacF669F196",
 };
 export const RCT: { [key: number]: `0x${string}` } = {
-  [ChainId.MONAD_TESTNET]: "0x02B8FcBE1D7ff6D6652C3A332B6a7B71392B6251",
+  [ChainId.MONAD_TESTNET]: "0xE125F57EAF50C4e93B8c24c5c49D405e51D7122D",
 };
 export const ETHER = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";

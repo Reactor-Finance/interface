@@ -79,26 +79,21 @@ export function LiquidityRow({
       </td>
       <td className="flex flex-col gap-y-2 justify-center items-center">
         <Badge
-          className="inline-block px-4 py-1 text-center"
+          className="inline-block px-1 py-1 w-full"
           border="none"
           colors={isInRange ? "success" : "error"}
           size="sm"
         >
           {isInRange ? "In Range" : "Out Of Range"}
         </Badge>
-        <div className="flex items-center justify-center gap-1">
-          <Dot
-            color={isInRange ? "#4ade80" : "#f87171"}
-            width={22}
-            height={22}
-          />
+        <div className="flex items-center gap-1">
+          <Dot color={isInRange ? "#4ade80" : "#f87171"} width={8} height={8} />
           <span className="text-[10px] leading-[16px]">
             {isInRange ? "Earning emissions" : "Not earning emissions"}
           </span>
         </div>
       </td>
       <td className="text-sm">${totalMarketQuote}</td>
-      {/* <RangeColumn pair={pair_address} /> */}
       <td className="text-blue-light text-sm">{formatEther(emissions)}%</td>
       <td className="flex flex-col items-center justify-center">
         <div className="flex items-center gap-[9px]">
