@@ -28,7 +28,7 @@ export default function PointsTable() {
   console.log({ data, error });
   return (
     <>
-      <table className="w-full border-collapse text-left">
+      <table className="w-full border-collapse text-left min-w-[600px] overflow-x-scroll">
         <thead className="border-b border-gray-700 w-full  text-gray-400 text-xs uppercase">
           <tr className="grid-cols-8 grid">
             <th className="py-3">Rank</th>
