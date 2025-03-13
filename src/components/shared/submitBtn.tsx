@@ -45,7 +45,10 @@ export default function SubmitButton({
   }, [approveTokenSymbol, props.children, state]);
 
   const isLoading = useMemo(
-    () => state === ButtonState.Loading || state === ButtonState.Signing,
+    () =>
+      state === ButtonState.Loading ||
+      state === ButtonState.Signing ||
+      state === ButtonState.Fetching,
     [state]
   );
 
