@@ -44,6 +44,7 @@ export default function TransactionToast() {
         <Link
           href={`https://testnet.monadexplorer.com/tx/${state.toastInfo?.hash}`}
           className="flex gap-x-1 text-[11px] text-success-400 z-10"
+          target="_blank"
         >
           <div className="flex gap-x-2 items-center text-sm">
             <span>View in block explorer</span>
