@@ -25,7 +25,7 @@ export default function DashboardLiquidityTable() {
     dialogOpen: false,
     actionType: LiquidityActions.Stake,
   });
-  const isLoadingPadded = usePadLoading({ value: isLoading, duration: 500 });
+  const isLoadingPadded = usePadLoading({ value: isLoading, duration: 300 });
   return (
     <>
       {stateType && selectedPair && (
