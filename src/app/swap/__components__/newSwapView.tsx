@@ -44,11 +44,7 @@ export default function NewSwapView() {
   } = useGetBalance({
     tokenAddress: token0?.address ?? zeroAddress,
   });
-  const {
-    balance: token1Bal,
-
-    balanceQueryKey: key1,
-  } = useGetBalance({
+  const { balance: token1Bal, balanceQueryKey: key1 } = useGetBalance({
     tokenAddress: token1?.address ?? zeroAddress,
   });
   const queryClient = useQueryClient();
@@ -247,7 +243,6 @@ export default function NewSwapView() {
     if (writeError) {
       console.log(writeError);
     }
-
     if (swapSimulationError) {
       console.log(swapSimulationError);
     }
