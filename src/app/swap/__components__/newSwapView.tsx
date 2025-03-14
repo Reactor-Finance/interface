@@ -22,6 +22,7 @@ import SubmitButton from "@/components/shared/submitBtn";
 import SwapDetails from "./swapDetails";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import useWrapWrite from "@/lib/hooks/useWrapWrite";
+import { useDebounce } from "@/lib/hooks/useDebounce";
 export default function NewSwapView() {
   // Wagmi parameters
   const chainId = useChainId();
@@ -31,6 +32,8 @@ export default function NewSwapView() {
   // Amount in
   const [amountIn, setAmountIn] = useState("");
   const [amountOut, setAmountOut] = useState("");
+  const { debouncedValue: amountInBounced } = useDebounce(amountIn, 300);
+  const { debouncedValue: amountOutBounced } = useDebounce(amountIn, 300);
   // Selected tokens
   const [token0, setToken0] = useState<TToken | null>(null);
   const [token1, setToken1] = useState<TToken | null>(null);
@@ -70,8 +73,8 @@ export default function NewSwapView() {
     isLoading: amountOutLoading,
     amountInLoading,
   } = useQuoteSwap({
-    amountIn,
-    amountOut,
+    amountIn: amountInBounced,
+    amountOut: amountOutBounced,
     selected: activePane ?? 0,
     tokenIn: token0,
     tokenOut: token1,
@@ -110,18 +113,18 @@ export default function NewSwapView() {
   const { approveWriteRequest, needsApproval, allowanceKey } = useApproveWrite({
     tokenAddress: token0?.address,
     spender: router,
-    amount: amountIn,
+    amount: amountInBounced,
     decimals: token0?.decimals,
   });
   console.log({ approveWriteRequest, needsApproval });
 
   // Simulate swap
   const { swapSimulation: swapSim, wrapSwapMutation } = useSwapSimulation({
-    amount: amountIn,
+    amount: amountInBounced,
     token0,
     token1,
     needsApproval,
-    minAmountOut: parseUnits(amountOut, token1?.decimals ?? 18),
+    minAmountOut: parseUnits(amountOutBounced, token1?.decimals ?? 18),
   });
   const {
     data: swapSimulation,
@@ -158,7 +161,7 @@ export default function NewSwapView() {
   }, [hash, isLoading, isSuccess, needsApproval, setToast]);
 
   const { needsWrap, resetWrap, depositSimulation } = useWrapWrite({
-    amountIn,
+    amountIn: amountInBounced,
     isWmon:
       token0?.address.toLowerCase() ===
       WETH[ChainId.MONAD_TESTNET].toLowerCase(),
