@@ -106,7 +106,9 @@ export function useRemoveLiquidity({
     query: { enabled: isEth && amount > 0n },
   });
   const { writeContract, isPending, reset, data: hash } = useWriteContract();
-  const { isSuccess, isLoading } = useWaitForTransactionReceipt({ hash });
+  const { isSuccess, isLoading: isSending } = useWaitForTransactionReceipt({
+    hash,
+  });
   const { setToast } = useTransactionToastProvider();
   console.log({
     error: removeLiquiditySimulation.data?.request,
@@ -162,14 +164,14 @@ export function useRemoveLiquidity({
     setToast,
   ]);
   const loading = usePadLoading({
-    value:
-      isLoading || isEth
-        ? removeLiquidityEthSimulation.isLoading
-        : removeLiquiditySimulation.isLoading,
+    value: isEth
+      ? removeLiquidityEthSimulation.isLoading
+      : removeLiquiditySimulation.isLoading,
     duration: 300,
   });
   const { state: buttonState } = useGetButtonStatuses({
     isLoading: loading,
+    isSending: isSending,
     isPending,
     isFetching: fetchingApproval,
     needsApproval,
