@@ -42,9 +42,9 @@ export default function PointsTable() {
           </tr>
         </thead>
         <tbody className="text-sm flex flex-col space-y-2 w-full">
-          {data?.result.map((entry) => (
-            <PointsRow {...entry} key={entry.rank} />
-          ))}
+          {data?.result
+            .sort((a, b) => a.rank - b.rank)
+            .map((entry) => <PointsRow {...entry} key={entry.rank} />)}
         </tbody>
       </table>
       {(data?.result.length === 0 || !data) && (
