@@ -64,7 +64,7 @@ export default function InitializePool() {
   const [amount0, setAmount0] = useState("");
   const [amount1, setAmount1] = useState("");
   const { debouncedValue: amount0Bounced } = useDebounce(amount0, 300);
-  const { debouncedValue: amount1Bounced } = useDebounce(amount0, 300);
+  const { debouncedValue: amount1Bounced } = useDebounce(amount1, 300);
   useEffect(() => {
     // reset inputs if change pool version
     setAmount0("");
