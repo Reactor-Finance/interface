@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 
 import reactor from "@/assets/reactor.svg";
-import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "../ui/sheet";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import usePointsAccount from "@/app/points/__hooks__/usePointsAccount";
@@ -20,6 +20,7 @@ export default function SideNav() {
           <Menu className="cursor-pointer" size={30} />
         </SheetTrigger>
         <SheetContent side="left" className="border-none">
+          <SheetTitle className="opacity-0 h-0">Navigationn</SheetTitle>
           <div className="py-6 flex justify-center">
             <button
               className=""
