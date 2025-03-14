@@ -27,6 +27,7 @@ import { formatNumber } from "@/lib/utils";
 import InitPoolInfo from "./initPoolInfo";
 import useWrapWrite from "@/lib/hooks/useWrapWrite";
 import useInitializePoolValidation from "./hooks/useInitializePoolValidation";
+import { useDebounce } from "@/lib/hooks/useDebounce";
 
 const searchParamsSchema = z.object({
   token0: z.string().refine((arg) => isAddress(arg)),
@@ -62,6 +63,8 @@ export default function InitializePool() {
 
   const [amount0, setAmount0] = useState("");
   const [amount1, setAmount1] = useState("");
+  const { debouncedValue: amount0Bounced } = useDebounce(amount0, 300);
+  const { debouncedValue: amount1Bounced } = useDebounce(amount0, 300);
   useEffect(() => {
     // reset inputs if change pool version
     setAmount0("");
@@ -112,7 +115,7 @@ export default function InitializePool() {
     spender: router,
     tokenAddress: token0?.address ?? zeroAddress,
     decimals: token0?.decimals,
-    amount: String(amount0),
+    amount: amount0Bounced,
   });
 
   const {
@@ -124,20 +127,17 @@ export default function InitializePool() {
     spender: router,
     tokenAddress: token1?.address ?? zeroAddress,
     decimals: token1?.decimals,
-    amount: String(amount1),
+    amount: amount1Bounced,
   });
 
   // Amounts parsed
   const amountADesired = useMemo(
-    () => parseUnits(amount0, token0?.decimals ?? 18),
-    [amount0, token0]
+    () => parseUnits(amount0Bounced, token0?.decimals ?? 18),
+    [amount0Bounced, token0?.decimals]
   );
   const amountBDesired = useMemo(
-    () =>
-      pairExists && quoteLiquidity > BigInt(0)
-        ? quoteLiquidity
-        : parseUnits(String(amount1), token1?.decimals ?? 18),
-    [amount1, token1, pairExists, quoteLiquidity]
+    () => parseUnits(amount1Bounced, token1?.decimals ?? 18),
+    [amount1Bounced, token1?.decimals]
   );
   const {
     addLiquidityETHSimulation,
