@@ -70,7 +70,8 @@ export function LiquidityRow({
   return (
     <TableRow
       cols="7"
-      className="grid animate-in fade-in  text-center rounded-sm  items-center bg-neutral-1000 py-2 px-6"
+      mobileCols={"6"}
+      className="grid min-w-[600px] animate-in fade-in  text-center rounded-sm  items-center bg-neutral-1000 py-2 px-6"
     >
       <td className=" text-left col-span-2">
         <div className="flex items-center justify-start gap-4">
@@ -103,7 +104,9 @@ export function LiquidityRow({
       </td>
       <td className="text-sm">${totalMarketQuote}</td>
       {/* <RangeColumn pair={pair_address} /> */}
-      <td className="text-blue-light text-sm">{formatEther(emissions)}%</td>
+      <td className="text-blue-light hidden lg:block text-sm">
+        {formatEther(emissions)}%
+      </td>
       <td className="flex flex-col items-center justify-center">
         <div className="flex items-center gap-[9px]">
           <Image
