@@ -2,23 +2,26 @@ import CurrenciesOverlapIcons from "@/components/shared/currenciesOverlapIcons";
 import PoolHeader from "@/components/shared/poolHeader";
 import { Button } from "@/components/ui/button";
 import { TableRow } from "@/components/ui/table";
-import { TPoolData, TPoolType } from "@/lib/types";
+import { TPoolType } from "@/lib/types";
 import React, { useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useTokenlistContext } from "@/contexts/tokenlistContext";
 import { formatNumber } from "@/lib/utils";
-import { Address, formatEther } from "viem";
-import { useGetMarketQuote } from "@/lib/hooks/useGetMarketQuote";
+import { formatEther } from "viem";
+import { TPoolExtended } from "@/contexts/poolsTvl";
 
 export default function PoolRow({
   stable,
   token0,
   token1,
   emissions,
+  tvlInUsd,
+  feeInUsd,
+  volumeInUsd7D,
   reserve0,
   reserve1,
   ...poolData
-}: TPoolData) {
+}: TPoolExtended) {
   const router = useRouter();
   const { tokenlist } = useTokenlistContext();
   const t0 = useMemo(
@@ -34,21 +37,6 @@ export default function PoolRow({
         (token) => token.address.toLowerCase() === token1.toLowerCase()
       ),
     [tokenlist, token1]
-  );
-
-  const { quote: marketQuote0 } = useGetMarketQuote({
-    tokenAddress: token0 as Address,
-    value: reserve0,
-    staleTime: 1000 * 60 * 10,
-  });
-  const { quote: marketQuote1 } = useGetMarketQuote({
-    tokenAddress: token1 as Address,
-    value: reserve1,
-    staleTime: 1000 * 60 * 10,
-  });
-  const volumeUSD = useMemo(
-    () => marketQuote0[0] + marketQuote1[0],
-    [marketQuote0, marketQuote1]
   );
 
   const addLiquidityHandler = useCallback(() => {
@@ -77,12 +65,12 @@ export default function PoolRow({
           />
         )}
       </th>
-      <th className="">${formatNumber(formatEther(volumeUSD))}</th>
+      <th className="">${formatNumber(tvlInUsd.toString())}</th>
       <th className="text-blue-light">
         {formatNumber(formatEther(emissions))}%
       </th>
-      <th>{}</th>
-      <th>{}</th>
+      <th>${volumeInUsd7D.toString()}</th>
+      <th>${feeInUsd}</th>
       <th className="text-left pl-4 col-span-3 ">
         <div className="flex justify-between">
           <span></span>

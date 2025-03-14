@@ -17,6 +17,7 @@ import { TokenlistContextProvider } from "@/contexts/tokenlistContext";
 import { TransactionToastProvider } from "@/contexts/transactionToastProvider";
 import { Provider } from "jotai/react";
 import { store } from "@/store";
+import { PoolslistContextProvider } from "@/contexts/poolsTvl";
 
 export const wagmiConfig = getDefaultConfig({
   appName: "Reactor Finance",
@@ -49,7 +50,9 @@ export const Providers: FC<PropsWithChildren> = ({ children }) => {
                 <TransactionToastProvider>
                   <HeroUIProvider className="flex min-h-svh flex-col ">
                     {/* Header goes here */}
-                    {children}
+                    <PoolslistContextProvider>
+                      {children}
+                    </PoolslistContextProvider>
                     {/* Footer goes here */}
                   </HeroUIProvider>
                 </TransactionToastProvider>

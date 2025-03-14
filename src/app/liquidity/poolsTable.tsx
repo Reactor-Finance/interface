@@ -7,14 +7,12 @@ import {
   ChevronUp,
 } from "lucide-react";
 import PoolRow from "./poolRow";
-import { abi } from "@/lib/abis/PairHelper";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SearchInput from "@/components/shared/searchInput";
 import { useDebounce } from "@/lib/hooks/useDebounce";
 import PoolRowSkeleton from "./poolRowSkeleton";
-import { useReadContract } from "wagmi";
-import { ChainId, PAIR_HELPER } from "@/data/constants";
 import { zeroAddress } from "viem";
+import { usePoolslistContext } from "@/contexts/poolsTvl";
 
 type QueryFilters = {
   searchQuery: string;
@@ -32,6 +30,7 @@ enum TabValues {
 const pageLength = 10;
 export default function PoolsTable() {
   const [loadingBounced, setLoadingBounced] = useState(false);
+  const { pools, isLoading } = usePoolslistContext();
   const [filters, setFilters] = useState<QueryFilters>({
     searchQuery: "",
     isStable: undefined,
@@ -44,26 +43,14 @@ export default function PoolsTable() {
     },
     [filters]
   );
-  const { data, isLoading } = useReadContract({
-    abi,
-    address: PAIR_HELPER[ChainId.MONAD_TESTNET],
-    functionName: "getAllPair",
-    args: [zeroAddress, 200n, 0n],
-    query: {
-      staleTime: 1000 * 60 * 5,
-    },
-  });
-
-  // ** this stops react query refetching our data from server
-  // until one of the filters changes
   const { debouncedValue: filersBounced } = useDebounce(filters, 300);
   const poolsLength = useMemo(
-    () => data?.filter((p) => p.pair_address !== zeroAddress).length ?? 0,
-    [data]
+    () => pools?.filter((p) => p.pair_address !== zeroAddress).length ?? 0,
+    [pools]
   );
   const newPools = useMemo(() => {
     const result =
-      data
+      pools
         ?.filter((pair) => {
           const { searchQuery } = filersBounced;
           const notZeroAddr = pair.pair_address !== zeroAddress;
@@ -82,12 +69,12 @@ export default function PoolsTable() {
           return notZeroAddr && search0 && search1 && versionFilter;
         })
         .slice(pageLength * page - pageLength, pageLength * page)
-        .sort((a, b) => Number(a.total_supply) - Number(b.total_supply)) ?? [];
+        .sort((a, b) => Number(a.tvlInUsd) - Number(b.tvlInUsd)) ?? [];
     if (filters.orderTvl) {
       result.reverse();
     }
     return result;
-  }, [data, filersBounced, filters.isStable, filters.orderTvl, page]);
+  }, [filersBounced, filters.isStable, filters.orderTvl, page, pools]);
   useEffect(() => {
     newPools.forEach((p) => console.log(p.fee));
   }, [newPools]);
@@ -132,13 +119,15 @@ export default function PoolsTable() {
             {/* </TabsTrigger> */}
           </TabsList>
         </Tabs>
-        <SearchInput
-          className="bg-neutral-950 hidden md:block w-[285px]"
-          value={filters.searchQuery}
-          setValue={(value) => {
-            updateState({ searchQuery: value });
-          }}
-        ></SearchInput>
+        <div className="hidden md:block">
+          <SearchInput
+            className="bg-neutral-950   w-[285px]"
+            value={filters.searchQuery}
+            setValue={(value) => {
+              updateState({ searchQuery: value });
+            }}
+          ></SearchInput>
+        </div>
       </div>
       <div className="pt-4 min-h-[500px]">
         <table className="w-full ">
@@ -152,16 +141,16 @@ export default function PoolsTable() {
                   onClick={() => updateState({ orderTvl: !filters.orderTvl })}
                   className=" flex gap-x-1 items-center"
                 >
-                  <div>
+                  <div className="">
                     <ChevronUp
                       data-direction={filters.orderTvl ? "up" : "down"}
-                      className="text-neutral-400 data-[direction=up]:text-white"
-                      size={18}
+                      className="text-neutral-400 -mb-1 data-[direction=up]:text-white"
+                      size={16}
                     />
                     <ChevronDown
                       data-direction={filters.orderTvl ? "up" : "down"}
-                      className="text-neutral-400 data-[direction=down]:text-white"
-                      size={18}
+                      className="text-neutral-400 -mt-1 data-[direction=down]:text-white"
+                      size={16}
                     />
                   </div>
                   <span>TVL</span>

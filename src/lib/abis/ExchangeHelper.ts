@@ -1,4 +1,4 @@
-export const api = [
+export const ExchangeHelper = [
   {
     inputs: [],
     stateMutability: "nonpayable",
@@ -62,6 +62,56 @@ export const api = [
         internalType: "uint256",
         name: "",
         type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getAllFees",
+    outputs: [
+      {
+        components: [
+          {
+            internalType: "address",
+            name: "pair",
+            type: "address",
+          },
+          {
+            internalType: "uint256",
+            name: "fee",
+            type: "uint256",
+          },
+        ],
+        internalType: "struct ExchangeHelper.PairFee[]",
+        name: "pairFees",
+        type: "tuple[]",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getAllTvls",
+    outputs: [
+      {
+        components: [
+          {
+            internalType: "address",
+            name: "pair",
+            type: "address",
+          },
+          {
+            internalType: "uint256",
+            name: "tvl",
+            type: "uint256",
+          },
+        ],
+        internalType: "struct ExchangeHelper.PairTVL[]",
+        name: "pairTVLs",
+        type: "tuple[]",
       },
     ],
     stateMutability: "view",
