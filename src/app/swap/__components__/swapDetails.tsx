@@ -52,7 +52,7 @@ export default function SwapDetails({
     value: amountOut,
   });
   return (
-    <div className="text-[13px] border border-neutral-800 rounded-[16px] p-4 space-y-4">
+    <div className="text-[13px] border border-neutral-800 rounded-[16px] p-1 md:p-4 space-y-4">
       <Row title="Received Value" value={quote[1]} />
       <Row
         title="Exchange Rate"

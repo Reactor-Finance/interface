@@ -70,11 +70,11 @@ export default function SettingsDialog({
           <Settings className="text-neutral-400" />
         </button>
       )}
-      <DialogContent className="p-0 w-[400px]">
+      <DialogContent className="p-0 w-[350px] md:w-[400px]">
         <div className="pt-4 px-4">
           <DialogTitle className="text-lg">Settings</DialogTitle>
         </div>
-        <div className="border-t border-neutral-700 p-4 space-y-6 ">
+        <div className="border-t border-neutral-700 p-2 md:p-4 space-y-6 ">
           <div className="space-y-2">
             <h3 className="text-sm">Slippage Tolerance</h3>
             <div className="flex gap-x-2">

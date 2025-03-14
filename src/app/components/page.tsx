@@ -128,7 +128,7 @@ export default function Page() {
             </Badge>
           </div>
         </div>
-        <div className="w-[400px] space-y-4">
+        <div className="md:w-[400px] space-y-4">
           <Alert>
             <AlertDescription>
               <p className="text-[12px] ">
