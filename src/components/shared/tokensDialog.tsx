@@ -34,7 +34,7 @@ export default function TokensDailog({
     <Dialog open={open} onOpenChange={onOpen}>
       <DialogContent
         title="Search Tokens"
-        className="w-[440px] overflow-hidden border-none bg-neutral-1000  p-0 text-white"
+        className="md:w-[440px] overflow-hidden border-none bg-neutral-1000  p-0 text-white"
       >
         <div className="relative  h-[80vh] space-y-6 pt-4 text-white">
           <div className="space-y-6 px-6">

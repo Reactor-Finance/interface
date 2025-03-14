@@ -60,7 +60,7 @@ export default function Page() {
         Deposit Liquidity
       </Headers.GradiantHeaderOne>
       <div className="pt-6"></div>
-      <div className=" gap-x-4 grid grid-cols-2">
+      <div className=" gap-x-4 grid gap-y-2 md:grid-cols-2">
         <TokensDialog
           onTokenSelected={setToken0}
           open={token0DialogOpen}

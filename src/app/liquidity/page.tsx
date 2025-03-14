@@ -25,13 +25,13 @@ export default async function Page() {
             Stake liquidity to earn trading fees and rewards.
           </h3>
         </div>
-        <div className="grid gap-x-4 grid-cols-3 border-b border-neutral-900 pb-4">
+        <div className="grid gap-x-4 md:grid-cols-3 border-b border-neutral-900 gap-y-2 pb-4">
           <InfoCard title="Total TVL" icon={house} />
           <InfoCard title="Fees" icon={coin} />
           <InfoCard title="Volume" icon={barChart} />
         </div>
         <div className="flex justify-between items-center">
-          <h4 className="text-[13px] text-neutral-500">
+          <h4 className="text-[13px] text-neutral-500 hidden md:block">
             There are currently{" "}
             <span className="text-neutral-200">10 tokens</span> listed.{" "}
             <span className="underline text-neutral-300">View Tokens</span> or{" "}

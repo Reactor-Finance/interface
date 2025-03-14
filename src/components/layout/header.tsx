@@ -13,7 +13,7 @@ export default function Header() {
   const router = useRouter();
   const { data } = usePointsAccount();
   return (
-    <div className="h-[88px] px-8 items-center flex justify-between md:grid grid-cols-4">
+    <div className="h-[88px] px-2 md:px-8 items-center flex justify-between md:grid grid-cols-4">
       <button
         className="hidden md:block"
         role="link"

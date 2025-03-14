@@ -133,7 +133,7 @@ export default function PoolsTable() {
           </TabsList>
         </Tabs>
         <SearchInput
-          className="bg-neutral-950 w-[285px]"
+          className="bg-neutral-950 hidden md:block w-[285px]"
           value={filters.searchQuery}
           setValue={(value) => {
             updateState({ searchQuery: value });
