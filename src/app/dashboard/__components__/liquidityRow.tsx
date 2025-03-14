@@ -13,6 +13,7 @@ import { useCallback, useMemo } from "react";
 import { useGetMarketQuote } from "@/lib/hooks/useGetMarketQuote";
 import { formatNumber } from "@/lib/utils";
 import { formatEther, formatUnits } from "viem";
+import { TableRow } from "@/components/ui/table";
 
 export function LiquidityRow({
   pairInfo: {
@@ -67,7 +68,10 @@ export function LiquidityRow({
   );
 
   return (
-    <tr className="grid animate-in fade-in duration-500 text-center rounded-sm grid-cols-7 items-center bg-neutral-1000 py-2 px-6">
+    <TableRow
+      cols="7"
+      className="grid animate-in fade-in  text-center rounded-sm  items-center bg-neutral-1000 py-2 px-6"
+    >
       <td className=" text-left col-span-2">
         <div className="flex items-center justify-start gap-4">
           <PoolHeader
@@ -162,6 +166,6 @@ export function LiquidityRow({
           </DropdownMenu.Root>
         </div>
       </td>
-    </tr>
+    </TableRow>
   );
 }
