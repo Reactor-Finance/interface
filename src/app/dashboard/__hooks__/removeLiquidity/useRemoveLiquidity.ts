@@ -18,6 +18,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useRemoveLiquidityValidation } from "./useRemoveLiquidityValidation";
 import { useAtom } from "jotai/react";
 import { transactionDeadlineAtom } from "@/store";
+import usePadLoading from "@/lib/hooks/usePadLoading";
 interface Props {
   amount: bigint;
   token0: Address;
@@ -160,9 +161,15 @@ export function useRemoveLiquidity({
     reset,
     setToast,
   ]);
-
+  const loading = usePadLoading({
+    value:
+      isLoading || isEth
+        ? removeLiquidityEthSimulation.isLoading
+        : removeLiquiditySimulation.isLoading,
+    duration: 300,
+  });
   const { state: buttonState } = useGetButtonStatuses({
-    isLoading: isLoading,
+    isLoading: loading,
     isPending,
     isFetching: fetchingApproval,
     needsApproval,
