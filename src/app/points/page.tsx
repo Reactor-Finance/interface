@@ -5,7 +5,7 @@ import PointsTable from "./__components__/pointsTable";
 export default function Page() {
   return (
     <PageMarginContainer className="text-white ">
-      <div className="mt-12 text-center">
+      <div className="text-center">
         <h1 className="text-3xl font-bold text-white">Reactor Points</h1>
         <p className="text-gray-400 mt-1">Track your Reactor Points</p>
       </div>
