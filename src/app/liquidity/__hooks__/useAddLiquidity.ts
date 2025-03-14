@@ -1,7 +1,7 @@
 import { useAccount, useChainId, useSimulateContract } from "wagmi";
 import { zeroAddress } from "viem";
 import { useEffect, useMemo } from "react";
-import { ETHER, ROUTER } from "@/data/constants";
+import { ETHER, ROUTER, SLIPPAGE_ZEROS } from "@/data/constants";
 import * as Router from "@/lib/abis/Router";
 import { useAtomicDate } from "@/lib/hooks/useAtomicDate";
 import { useAtom } from "jotai/react";
@@ -59,8 +59,10 @@ export function useAddLiquidity({
     return BigInt(ttl);
   }, [now, txDeadline]);
   const [slippage] = useAtom(slippageAtom);
-  const minOutA = amountADesired - (amountADesired * BigInt(slippage)) / 1000n;
-  const minOutB = amountBDesired - (amountBDesired * BigInt(slippage)) / 1000n;
+  const minOutA =
+    amountADesired - (amountADesired * BigInt(slippage)) / SLIPPAGE_ZEROS;
+  const minOutB =
+    amountBDesired - (amountBDesired * BigInt(slippage)) / SLIPPAGE_ZEROS;
   const { ethSlippage, tokenSlippage } = useMemo(
     () =>
       token0.toLowerCase() === ETHER.toLowerCase()

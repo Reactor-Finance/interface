@@ -5,6 +5,7 @@ export const TWO_YEARS = 62208000;
 export const DAYS_14 = 60 * 60 * 24 * 14;
 export const QUOTE_REFETCH_INTERVAL = 1000 * 30;
 export const RCT_DECIMALS = 18;
+export const SLIPPAGE_ZEROS = 10000n;
 
 export enum ChainId {
   MONAD_TESTNET = 10143,

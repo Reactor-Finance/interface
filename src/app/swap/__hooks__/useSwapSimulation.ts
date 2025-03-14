@@ -3,7 +3,7 @@ import { useAccount, useChainId, useSimulateContract } from "wagmi";
 import { useMemo } from "react";
 import { parseEther, parseUnits, zeroAddress } from "viem";
 import * as Weth from "@/lib/abis/WETH";
-import { ETHER, ROUTER, WETH } from "@/data/constants";
+import { ETHER, ROUTER, SLIPPAGE_ZEROS, WETH } from "@/data/constants";
 import { TToken } from "@/lib/types";
 import { useAtomicDate } from "@/lib/hooks/useAtomicDate";
 import { useAtom } from "jotai/react";
@@ -73,12 +73,13 @@ export function useSwapSimulation({
     const ttl = Math.floor(now.getTime() / 1000) + Number(txDeadline) * 60;
     return BigInt(ttl);
   }, [now, txDeadline]);
+  const isEth = useMemo(
+    () => token0?.address.toLowerCase() === ETHER.toLowerCase(),
+    [token0?.address]
+  );
   const msgValue = useMemo(
-    () =>
-      token0?.address.toLowerCase() === ETHER.toLowerCase()
-        ? parseEther(String(amount))
-        : BigInt(0),
-    [token0, amount]
+    () => (isEth ? parseEther(String(amount)) : BigInt(0)),
+    [isEth, amount]
   );
 
   const mutate = useMutation({
@@ -105,7 +106,7 @@ export function useSwapSimulation({
         address: router,
         functionName: "swap",
         args: [
-          amountIn,
+          isEth ? BigInt(0n) : amountIn,
           calculateMinOut(minAmountOut, Number(slippage)),
           routes,
           address ?? zeroAddress,
@@ -151,7 +152,7 @@ export function useSwapSimulation({
 }
 
 function calculateMinOut(amount: bigint, slippagePercentage: number) {
-  const slippage = (amount * BigInt(slippagePercentage)) / 1000n;
+  const slippage = (amount * BigInt(slippagePercentage)) / SLIPPAGE_ZEROS;
   const minAmount = amount - slippage;
   return BigInt(minAmount);
 }
