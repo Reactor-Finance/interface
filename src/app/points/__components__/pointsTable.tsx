@@ -50,6 +50,50 @@ export default function PointsTable() {
       {(data?.result.length === 0 || !data) && (
         <div className="w-full text-center py-6">No Entries Yet.</div>
       )}
+      {data?.result.length && (
+        <div className="flex justify-between mt-4 text-sm text-gray-400">
+          <p>
+            Page 1 of 1&nbsp;|&nbsp;
+            <span className="underline cursor-pointer text-[#4F515A] text-xs">
+              (1 - {data?.result.length} results)
+            </span>
+          </p>
+          <div className="flex items-center space-x-4">
+            <button>
+              <svg
+                width="20"
+                height="20"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15.75 19.5L8.25 12l7.5-7.5"
+                />
+              </svg>
+            </button>
+            <button>
+              <svg
+                width="20"
+                height="20"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M8.25 4.5l7.5 7.5-7.5 7.5"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }

@@ -1,6 +1,5 @@
 "use client";
 import React, { useState } from "react";
-import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { useAccount } from "wagmi";
 import Input from "@/components/ui/input";
@@ -8,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Check, Copy } from "lucide-react";
 import useRegister from "../__hooks__/useRegister";
 import usePointsAccount from "../__hooks__/usePointsAccount";
+import ImageWithFallback from "@/components/shared/imageWithFallback";
 
 export default function PointsHeaders() {
   const [copied, setCopied] = useState(false);
@@ -37,21 +37,23 @@ export default function PointsHeaders() {
       <div className=" flex flex-col md:flex-row items-center gap-y-4 md:items-stretch justify-between md:space-x-4">
         <Card
           bg="1000"
-          className="w-[300px] md:w-auto  rounded-lg p-4 flex-1 flex flex-col"
+          className="w-[300px] md:w-auto  rounded-lg p-6 flex-1 flex flex-col"
         >
           <div className="grid grid-cols-3 w-full  items-start">
-            <Image
-              src="https://i.ibb.co/0pDryFGv/image.png"
-              alt="Avatar"
-              width={64}
-              height={64}
-              className="w-16 h-16 rounded-full object-cover"
-            />
+            <div className="col-span-2 flex gap-x-4">
+              <ImageWithFallback
+                src="https://i.ibb.co/0pDryFGv/image.png"
+                alt="Avatar"
+                width={64}
+                height={64}
+                className="w-16 h-16 rounded-full object-cover"
+              />
 
-            <div className="flex justify-center">
-              <h3 className="text-white text-lg font-semibold self-center">
-                My Position
-              </h3>
+              <div className="flex justify-center">
+                <h3 className="text-white text-lg font-semibold self-center">
+                  My Position
+                </h3>
+              </div>
             </div>
 
             <div className="flex flex-col items-end">
@@ -62,17 +64,20 @@ export default function PointsHeaders() {
             </div>
           </div>
 
-          <div className="mt-auto w-full grid grid-cols-3 text-center pt-4">
-            <div className="flex flex-col items-start">
+          <div className="mt-auto w-full flex justify-between text-center pt-4">
+            <div className="flex flex-col items-start ">
               <p className="text-xs text-gray-400 uppercase">BOOST</p>
-              <p className="text-[#836EF9] font-bold text-sm">x2.5</p>
+              {/* <p className="text-[#836EF9] font-bold text-sm">x2.5</p> */}
+              <p className=" font-bold text-sm">1x</p>
             </div>
-            <div className="flex flex-col items-center">
+            <div className="h-full w-[2px] bg-neutral-600"></div>
+            <div className="flex flex-col items-center ">
               <p className="text-xs text-gray-400 uppercase">REFERRAL</p>
               <p className="text-white font-bold text-sm">
                 {data?.result.countOfReferred}
               </p>
             </div>
+            <div className="h-full w-[2px] bg-neutral-600"></div>
             <div className="flex flex-col items-end">
               <p className="text-xs text-gray-400 uppercase">TOTAL POINTS</p>
               <p className="text-white font-bold text-sm">
@@ -84,7 +89,7 @@ export default function PointsHeaders() {
         <WaysToEarn />
         <Card
           bg="1000"
-          className="rounded-lg w-[300px] md:w-auto flex-1 flex flex-col"
+          className="rounded-lg w-[300px] md:w-auto p-6 flex-1 flex flex-col"
         >
           <div className="flex items-center space-x-2 mb-2">
             <svg
@@ -164,7 +169,7 @@ function WaysToEarn() {
   return (
     <Card
       bg="1000"
-      className=" w-[300px] md:w-auto  rounded-lg p-4 flex-1 flex flex-col "
+      className=" w-[300px] md:w-auto  rounded-lg p-6 flex-1 flex flex-col "
     >
       <h3 className="text-white font-semibold text-lg uppercase mb-2">
         Ways to Earn
