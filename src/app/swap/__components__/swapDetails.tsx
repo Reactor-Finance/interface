@@ -8,7 +8,7 @@ import { TToken } from "@/lib/types";
 import { useAtom } from "jotai/react";
 import { settingDialogOpenAtom, slippageAtom } from "@/store";
 import { useReadContract } from "wagmi";
-import { ChainId, ORACLE } from "@/data/constants";
+import { ChainId, ORACLE, SLIPPAGE_ZEROS } from "@/data/constants";
 import { useGetMarketQuote } from "@/lib/hooks/useGetMarketQuote";
 interface Props {
   amountIn: bigint;
@@ -34,7 +34,9 @@ export default function SwapDetails({
       return { per: 0n, min: 0n };
     }
     const per = (amountIn * zeros) / amountOut;
-    const min = amountOut - (amountOut * BigInt(slippage)) / 1000n;
+    const a = (amountOut * BigInt(slippage)) / SLIPPAGE_ZEROS;
+    console.log(slippage, "Slippage");
+    const min = amountOut - a;
     return { min, per };
   }, [amountIn, amountOut, slippage]);
   const { data: token1Usd, error } = useReadContract({
@@ -95,9 +97,9 @@ export default function SwapDetails({
             value={formatUnits(min, token0.decimals)}
             info="Info"
           />
-          <Row title="Fee" value="$23.44" info="Info" />
-          <Row title="Price Impact" value="$23.44" info="Info" />
-          <Row title="Route" value="$23.44" info="Info" />
+          {/* <Row title="Fee" value="$23.44" info="Info" /> */}
+          {/* <Row title="Price Impact" value="$23.44" info="Info" /> */}
+          {/* <Row title="Route" value="$23.44" info="Info" /> */}
         </div>
       </div>
     </div>
