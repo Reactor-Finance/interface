@@ -155,13 +155,7 @@ export default function InitializePool() {
     stable: version === "stable",
   });
 
-  const {
-    writeContract,
-    reset,
-    isPending,
-    data: hash,
-    error: writeContractError,
-  } = useWriteContract(); // We'll also call reset when transaction toast is closed
+  const { writeContract, reset, isPending, data: hash } = useWriteContract(); // We'll also call reset when transaction toast is closed
   const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash });
   const { setToast } = useTransactionToastProvider();
   const { balance: balance0Raw, balanceQueryKey: bal0Key } = useGetBalance({
@@ -468,9 +462,6 @@ export default function InitializePool() {
       >
         {needsWrap ? "Wrap" : "Add Liquidity"}
       </SubmitButton>
-      {writeContractError && (
-        <span className="text-[13px] text-red-400 pt-3 text-center"></span>
-      )}
     </>
   );
 }
