@@ -42,16 +42,24 @@ export default function SideNav() {
                 className="space-y-4 rounded-md bg-primary/40 py-2 text-lg"
               >
                 <li>
-                  <Link href="/swap">Swap</Link>
+                  <Link onClick={() => setOpen(false)} href="/swap">
+                    Swap
+                  </Link>
                 </li>
                 <li>
-                  <Link href="/points">Points</Link>
+                  <Link onClick={() => setOpen(false)} href="/points">
+                    Points
+                  </Link>
                 </li>
                 <li>
-                  <Link href="/liquidity">Liquidity</Link>
+                  <Link onClick={() => setOpen(false)} href="/liquidity">
+                    Liquidity
+                  </Link>
                 </li>
                 <li>
-                  <Link href="/dashboard">Dashboard</Link>
+                  <Link onClick={() => setOpen(false)} href="/dashboard">
+                    Dashboard
+                  </Link>
                 </li>
               </ul>
             </nav>
