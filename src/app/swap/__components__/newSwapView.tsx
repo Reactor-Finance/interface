@@ -36,13 +36,27 @@ export default function NewSwapView() {
   const [token1, setToken1] = useState<TToken | null>(null);
 
   // Balances
-  const { balance: token0Bal, etherBalance } = useGetBalance({
+  const {
+    balance: token0Bal,
+    etherBalance,
+    balanceQueryKey: key0,
+    ethQueryKey,
+  } = useGetBalance({
     tokenAddress: token0?.address ?? zeroAddress,
   });
-  const { balance: token1Bal } = useGetBalance({
+  const {
+    balance: token1Bal,
+
+    balanceQueryKey: key1,
+  } = useGetBalance({
     tokenAddress: token1?.address ?? zeroAddress,
   });
-
+  const queryClient = useQueryClient();
+  const resetSwap = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: key0 });
+    queryClient.invalidateQueries({ queryKey: key1 });
+    queryClient.invalidateQueries({ queryKey: ethQueryKey });
+  }, [ethQueryKey, key0, key1, queryClient]);
   const token0Balance =
     token0?.address === ETHER ? etherBalance.value : token0Bal;
   const token1Balance =
@@ -146,7 +160,6 @@ export default function NewSwapView() {
       });
     }
   }, [hash, isLoading, isSuccess, needsApproval, setToast]);
-  const queryClient = useQueryClient();
 
   const { needsWrap, resetWrap, depositSimulation } = useWrapWrite({
     amountIn,
@@ -154,7 +167,6 @@ export default function NewSwapView() {
       token0?.address.toLowerCase() ===
       WETH[ChainId.MONAD_TESTNET].toLowerCase(),
   });
-  console.log(needsWrap, "needsWrap");
   useEffect(() => {
     if (isSuccess && needsWrap) {
       setToast({ actionDescription: "", actionTitle: "Wrapped", hash });
@@ -162,14 +174,16 @@ export default function NewSwapView() {
       reset();
       return;
     }
-    if (isSuccess && !needsApproval && !needsWrap) {
-      reset();
-      setAmountIn("");
-      setAmountOut("");
-    }
     if (isSuccess && needsApproval) {
       queryClient.invalidateQueries({ queryKey: allowanceKey });
       reset();
+      return;
+    }
+    if (isSuccess && !needsApproval && !needsWrap) {
+      reset();
+      resetSwap();
+      setAmountIn("");
+      setAmountOut("");
     }
   }, [
     allowanceKey,
@@ -179,6 +193,7 @@ export default function NewSwapView() {
     needsWrap,
     queryClient,
     reset,
+    resetSwap,
     resetWrap,
     setToast,
   ]);
