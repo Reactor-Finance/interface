@@ -98,12 +98,12 @@ export default function PoolTabs() {
             >
               Volatile
             </TabsTrigger>
-            <TabsTrigger
-              onClick={() => tabTriggerHandle(TPoolType.CONCENTRATED)}
-              value="concentrated"
-            >
-              Concentrated
-            </TabsTrigger>
+            {/* <TabsTrigger */}
+            {/*   onClick={() => tabTriggerHandle(TPoolType.CONCENTRATED)} */}
+            {/*   value="concentrated" */}
+            {/* > */}
+            {/*   Concentrated */}
+            {/* </TabsTrigger> */}
           </TabsList>
         </Tabs>
         <button className="flex items-center">
