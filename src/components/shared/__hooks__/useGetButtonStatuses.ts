@@ -5,10 +5,12 @@ interface Props {
   isPending: boolean;
   needsApproval?: boolean | undefined;
   isFetching?: boolean | undefined;
+  isSending?: boolean;
 }
 export default function useGetButtonStatuses({
   isLoading,
   isPending,
+  isSending,
   needsApproval,
   isFetching,
 }: Props) {
@@ -28,6 +30,11 @@ export default function useGetButtonStatuses({
   if (needsApproval) {
     return {
       state: ButtonState.Approve,
+    };
+  }
+  if (isSending) {
+    return {
+      state: ButtonState.Sending,
     };
   }
   return {
