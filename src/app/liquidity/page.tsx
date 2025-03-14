@@ -26,9 +26,9 @@ export default async function Page() {
           </h3>
         </div>
         <div className="grid gap-x-4 grid-cols-3 border-b border-neutral-900 pb-4">
-          <InfoCard icon={house} />
-          <InfoCard icon={coin} />
-          <InfoCard icon={barChart} />
+          <InfoCard title="Total TVL" icon={house} />
+          <InfoCard title="Fees" icon={coin} />
+          <InfoCard title="Volume" icon={barChart} />
         </div>
         <div className="flex justify-between items-center">
           <h4 className="text-[13px] text-neutral-500">
@@ -49,13 +49,13 @@ export default async function Page() {
   );
 }
 
-function InfoCard({ icon }: { icon: StaticImageData }) {
+function InfoCard({ icon, title }: { title: string; icon: StaticImageData }) {
   return (
     <Card bg="950" className="py-[10px] px-4 rounded-lg">
       <div className="flex justify-between items-center">
         <div>
-          <h4 className="text-primary-400 text-sm">Total TVL</h4>
-          <span className="text-[16px] font-medium ">~$104,120,403.0</span>
+          <h4 className="text-primary-400 text-sm">{title}</h4>
+          <span className="text-[16px] font-medium ">N/A</span>
         </div>
         <div>
           <Image src={icon} alt="Total Value Locked Icon" />
