@@ -59,7 +59,11 @@ export default function useSwapValidation({
     if (!simulation && !isSimulationLoading) {
       return { isValid: false, message: "Error Occured" };
     }
-    return { isValid: true, message: null };
+    if (simulation) {
+      return { isValid: true, message: null };
+    }
+
+    return { isValid: false, message: null };
   }, [
     amountIn,
     approveSimulation,

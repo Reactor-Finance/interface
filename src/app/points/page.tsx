@@ -10,7 +10,7 @@ export default function Page() {
         <p className="text-gray-400 mt-1">Track your Reactor Points</p>
       </div>
       <PointsHeaders />
-      <div className="mt-12 px-4 md:px-8 lg:px-16 overflow-x-auto">
+      <div className="mt-6 bg-neutral-1000 border-neutral-950 p-4 py-2 overflow-x-auto rounded-md">
         <PointsTable />
       </div>
     </PageMarginContainer>

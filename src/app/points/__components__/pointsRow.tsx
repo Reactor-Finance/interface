@@ -12,7 +12,7 @@ export default function PointsRow({
 }: TPointsEntry) {
   const boost = false;
   return (
-    <tr className="border-b border-gray-800 grid grid-cols-3 lg:grid-cols-8 w-full">
+    <tr className=" grid grid-cols-3 lg:grid-cols-8 w-full">
       <td className="py-3 text-white">{rank}</td>
       <td className="py-3 flex items-center space-x-2">
         {/* <img */}

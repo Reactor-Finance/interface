@@ -29,7 +29,7 @@ export default function PointsTable() {
   return (
     <>
       <table className="w-full border-collapse text-left  overflow-x-scroll">
-        <thead className="border-b border-gray-700 w-full  text-gray-400 text-xs uppercase">
+        <thead className="w-full text-gray-400 text-xs uppercase">
           <tr className="lg:grid-cols-8 grid-cols-3 grid">
             <th className="py-3">Rank</th>
             <th className="py-3 ">Profile</th>
@@ -41,7 +41,7 @@ export default function PointsTable() {
             <th className="py-3">Total Points</th>
           </tr>
         </thead>
-        <tbody className="text-sm flex flex-col space-y-2 w-full">
+        <tbody className="text-sm flex flex-col space-y-2 py-2 w-full">
           {data?.result
             .sort((a, b) => a.rank - b.rank)
             .map((entry) => <PointsRow {...entry} key={entry.rank} />)}

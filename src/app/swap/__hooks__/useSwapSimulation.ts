@@ -146,7 +146,6 @@ export function useSwapSimulation({
   });
   return {
     swapSimulation,
-
     wrapSwapMutation: mutate,
   };
 }
@@ -154,5 +153,6 @@ export function useSwapSimulation({
 function calculateMinOut(amount: bigint, slippagePercentage: number) {
   const slippage = (amount * BigInt(slippagePercentage)) / SLIPPAGE_ZEROS;
   const minAmount = amount - slippage;
+  console.log(amount, minAmount, "MIN AMONT ================");
   return BigInt(minAmount);
 }
