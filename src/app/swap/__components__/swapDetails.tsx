@@ -29,13 +29,12 @@ export default function SwapDetails({
   const setDialogOpen = dialog[1];
 
   const { per, min } = useMemo(() => {
-    const zeros = 100_000_000n;
-    if (amountOut === 0n) {
+    const zeros = 10n ** 18n;
+    if (amountOut === 0n || amountIn === 0n) {
       return { per: 0n, min: 0n };
     }
-    const per = (amountIn * zeros) / amountOut;
+    const per = (amountOut * zeros) / amountIn;
     const a = (amountOut * BigInt(slippage)) / SLIPPAGE_ZEROS;
-    console.log(slippage, "Slippage");
     const min = amountOut - a;
     return { min, per };
   }, [amountIn, amountOut, slippage]);
@@ -59,7 +58,7 @@ export default function SwapDetails({
         value={
           <p>
             1 {token0.symbol} <span className="text-neutral-200">≃</span>{" "}
-            {formatUnits(per, 8)} {token1.symbol}{" "}
+            {formatUnits(per, token1.decimals)} {token1.symbol}{" "}
           </p>
         }
       />
@@ -94,7 +93,7 @@ export default function SwapDetails({
         >
           <Row
             title="Minumum Receieved"
-            value={formatUnits(min, token0.decimals)}
+            value={formatUnits(min, token1.decimals)}
             info="Info"
           />
           {/* <Row title="Fee" value="$23.44" info="Info" /> */}
