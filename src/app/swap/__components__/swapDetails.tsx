@@ -11,6 +11,7 @@ import { useGetMarketQuote } from "@/lib/hooks/useGetMarketQuote";
 import { useReadContract } from "wagmi";
 import { ExchangeHelper } from "@/lib/abis/ExchangeHelper";
 import { formatNumber } from "@/lib/utils";
+import DisplayFormattedNumber from "@/components/shared/displayFormattedNumber";
 interface Props {
   amountIn: bigint;
   amountOut: bigint;
@@ -105,7 +106,11 @@ export default function SwapDetails({
           <Row
             title="Price Impact"
             value={
-              formatNumber(formatUnits(priceImpact ?? 0n, 18) ?? "0n") + "%"
+              <DisplayFormattedNumber
+                num={
+                  formatNumber(formatUnits(priceImpact ?? 0n, 16) ?? "0n") + "%"
+                }
+              />
             }
             info="Info"
           />
