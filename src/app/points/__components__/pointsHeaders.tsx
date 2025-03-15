@@ -8,6 +8,7 @@ import { Check, Copy } from "lucide-react";
 import useRegister from "../__hooks__/useRegister";
 import usePointsAccount from "../__hooks__/usePointsAccount";
 import ImageWithFallback from "@/components/shared/imageWithFallback";
+import Link from "next/link";
 
 export default function PointsHeaders() {
   const [copied, setCopied] = useState(false);
@@ -33,7 +34,7 @@ export default function PointsHeaders() {
     mutate();
   };
   return (
-    <div className="mt-8 px-4 lg:px-8 lg:px-16">
+    <div className="mt-8 px-4 lg:px-8 ">
       <div className=" flex flex-col lg:flex-row items-center gap-y-4 lg:items-stretch justify-between lg:space-x-4">
         <Card
           bg="1000"
@@ -131,9 +132,15 @@ export default function PointsHeaders() {
                   {copied && <Check className="text-success-400" size={16} />}
                 </button>
               </div>
-              <Button size={"md"} variant={"primary"}>
-                Share on X
-              </Button>
+
+              <Link
+                href={`https://x.com/intent/tweet?text=Join%20me%20in%20earning%20points%20for%20the%20%24RCT%20airdrop%20on%20%40ReactorFi%2C%20a%20MetaDEX%20model%20that%20merges%20the%20best%20features%20of%20ve(3%2C3).%0A%0AUse%20referral%20code%20${data.result.invitationCode}%20at%20app.reactorfi.xyz%2Fpoints%20to%20get%20started!`}
+                target="_blank"
+              >
+                <Button size={"md"} variant={"primary"}>
+                  Share on X
+                </Button>
+              </Link>
             </div>
           ) : (
             <>
