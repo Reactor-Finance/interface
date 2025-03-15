@@ -3,7 +3,7 @@ import Image from "next/image";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import symbol from "@/assets/reactor-symbol.svg";
 import { Button } from "@/components/ui/button";
-import { EllipsisIcon, Dot } from "lucide-react";
+import { EllipsisIcon } from "lucide-react";
 import PoolHeader from "@/components/shared/poolHeader";
 import { TPoolType } from "@/lib/types";
 import { useGetTokenInfo } from "@/utils";
@@ -92,14 +92,17 @@ export function LiquidityRow({
           {isInRange ? "In Range" : "Out Of Range"}
         </Badge>
         <div className="flex items-center justify-center gap-1">
-          <Dot
+          <div
+            data-range={isInRange ? "yes" : "no"}
+            className="h-3 w-3 data-[range=yes]:bg-success-400 data-[range=no]:bg-error-400 rounded-full "
             color={isInRange ? "#4ade80" : "#f87171"}
-            width={22}
-            height={22}
           />
-          <span className="text-[10px] leading-[16px]">
-            {isInRange ? "Earning emissions" : "Not earning emissions"}
-          </span>
+          <div
+            data-range={isInRange ? "yes" : "no"}
+            className="text-[10px] data-[range=no]:text-neutral-500"
+          >
+            {isInRange ? "Earning emissions" : "Earning Emissions"}
+          </div>
         </div>
       </td>
       <td className="text-sm hidden lg:block">${totalMarketQuote}</td>
