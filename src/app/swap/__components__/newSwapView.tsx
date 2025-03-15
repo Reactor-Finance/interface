@@ -34,7 +34,7 @@ export default function NewSwapView() {
   const [amountIn, setAmountIn] = useState("");
   const [amountOut, setAmountOut] = useState("");
   const { debouncedValue: amountInBounced } = useDebounce(amountIn, 300);
-  const { debouncedValue: amountOutBounced } = useDebounce(amountIn, 300);
+  const { debouncedValue: amountOutBounced } = useDebounce(amountOut, 300);
   // Selected tokens
   const [token0, setToken0] = useState<TToken | null>(null);
   const [token1, setToken1] = useState<TToken | null>(null);
