@@ -1,26 +1,22 @@
 "use client";
 
-import React, { useState } from "react";
-import { CheckIcon } from "@radix-ui/react-icons";
+import React from "react";
 import Image from "next/image";
 import copyIcon from "@/assets/copy-icon.svg";
 import { useAccount } from "wagmi";
 import { zeroAddress } from "viem";
+import Link from "next/link";
 
 export default function DynamicInputBox({ label }: { label: string }) {
-  const [copied, setCopied] = useState(false);
   const { address = zeroAddress } = useAccount();
   // Truncate long values for display
   const formatValue = (input: string) => {
     if (input.length <= 10) return input;
     return `${input.slice(0, 6)}...${input.slice(-5)}`;
   };
-
   const copyToClipboard = () => {
     if (address.trim() !== "") {
       navigator.clipboard.writeText(address);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
     }
   };
 
@@ -35,14 +31,19 @@ export default function DynamicInputBox({ label }: { label: string }) {
 
         {/* Action Icon */}
         {address && (
-          <button
-            onClick={copyToClipboard}
-            className="flex items-center justify-center text-gray-400 hover:text-white w-3 h-3"
-            aria-label="Perform action"
-            style={{ zIndex: 2 }}
+          <Link
+            target="_blank"
+            href={`https://testnet.monadexplorer.com/address/${address}`}
           >
-            {copied ? <CheckIcon /> : <Image src={copyIcon} alt="copy" />}
-          </button>
+            <button
+              onClick={copyToClipboard}
+              className="flex items-center justify-center text-gray-400 hover:text-white w-3 h-3"
+              aria-label="Perform action"
+              style={{ zIndex: 2 }}
+            >
+              <Image src={copyIcon} alt="copy" />
+            </button>
+          </Link>
         )}
       </div>
 
