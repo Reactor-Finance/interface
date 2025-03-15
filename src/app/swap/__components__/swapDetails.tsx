@@ -29,15 +29,16 @@ export default function SwapDetails({
   const setDialogOpen = dialog[1];
 
   const { per, min } = useMemo(() => {
-    const zeros = 10n ** 18n;
-    if (amountOut === 0n || amountIn === 0n) {
+    if (amountOut === 0n) {
       return { per: 0n, min: 0n };
     }
-    const per = (amountOut * zeros) / amountIn;
+    const per =
+      parseFloat(formatUnits(amountOut, token1.decimals)) /
+      parseFloat(formatUnits(amountIn, token0.decimals));
     const a = (amountOut * BigInt(slippage)) / SLIPPAGE_ZEROS;
     const min = amountOut - a;
     return { min, per };
-  }, [amountIn, amountOut, slippage]);
+  }, [amountIn, amountOut, slippage, token0.decimals, token1.decimals]);
   const { data: token1Usd, error } = useReadContract({
     abi,
     address: ORACLE[ChainId.MONAD_TESTNET],
@@ -57,8 +58,8 @@ export default function SwapDetails({
         title="Exchange Rate"
         value={
           <p>
-            1 {token0.symbol} <span className="text-neutral-200">≃</span>{" "}
-            {formatUnits(per, token1.decimals)} {token1.symbol}{" "}
+            1 {token0.symbol} <span className="text-neutral-200">≃</span> {per}{" "}
+            {token1.symbol}{" "}
           </p>
         }
       />
