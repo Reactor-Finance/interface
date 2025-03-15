@@ -69,7 +69,6 @@ export default function PoolsTable() {
           }
           return notZeroAddr && search0 && search1 && versionFilter;
         })
-        .slice(pageLength * page - pageLength, pageLength * page)
         .sort((a, b) => {
           if (filters.orderBy === "tvl") {
             return Number(a.tvlInUsd) - Number(b.tvlInUsd);
@@ -81,7 +80,9 @@ export default function PoolsTable() {
             return Number(a.volumeInUsd7D) - Number(b.volumeInUsd7D);
           }
           return 0;
-        }) ?? [];
+        })
+        .slice(pageLength * page - pageLength, pageLength * page) ?? [];
+
     if (filters.orderDirection === "up") {
       result.reverse();
     }
@@ -172,7 +173,7 @@ export default function PoolsTable() {
               <th>APR</th>
               <th className="flex justify-end">
                 <OrderButton
-                  title="24h Fees"
+                  title="Fees"
                   orderBy={"fees"}
                   direction={filters.orderDirection}
                   value={filters.orderBy}

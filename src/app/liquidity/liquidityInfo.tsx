@@ -8,6 +8,8 @@ import house from "@/assets/house.svg";
 import Image, { StaticImageData } from "next/image";
 import { usePoolslistContext } from "@/contexts/poolsTvl";
 import { Card } from "@/components/ui/card";
+import { formatEther } from "viem";
+import { formatNumber } from "@/lib/utils";
 
 export default function LiquidityInfo() {
   const { totals } = usePoolslistContext();
@@ -15,17 +17,17 @@ export default function LiquidityInfo() {
     <div className="grid gap-x-4 md:grid-cols-3 border-b border-neutral-900 gap-y-2 pb-4">
       <InfoCard
         title="Total TVL"
-        value={totals?.totalTvl.toString() ?? "0"}
+        value={formatNumber(formatEther(totals?.totalTvl ?? 0n) ?? "0")}
         icon={house}
       />
       <InfoCard
         title="Fees"
-        value={totals?.totalFees.toString() ?? "0"}
+        value={formatNumber(formatEther(totals?.totalFees ?? 0n) ?? "0")}
         icon={coin}
       />
       <InfoCard
         title="Volume"
-        value={totals?.totalVolume.toString() ?? "0"}
+        value={formatNumber(formatEther(totals?.totalVolume ?? 0n) ?? "0")}
         icon={barChart}
       />
     </div>

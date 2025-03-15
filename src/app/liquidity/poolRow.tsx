@@ -65,12 +65,12 @@ export default function PoolRow({
           />
         )}
       </th>
-      <th className="">${formatNumber(tvlInUsd.toString())}</th>
+      <th className="">${formatNumber(formatEther(tvlInUsd))}</th>
       <th className="text-blue-light">
         {formatNumber(formatEther(emissions))}%
       </th>
       <th>${feeInUsd}</th>
-      <th>${volumeInUsd7D.toString()}</th>
+      <th>${formatNumber(formatEther(volumeInUsd7D))}</th>
       <th className="text-left pl-4 col-span-3 ">
         <div className="flex justify-between">
           <span></span>
