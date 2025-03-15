@@ -150,11 +150,11 @@ export default function PoolsTable() {
           ></SearchInput>
         </div>
       </div>
-      <div className="pt-4 min-h-[500px]">
-        <table className="w-full ">
+      <div className="pt-4 min-h-[500px]  overflow-x-scroll">
+        <table className="w-full min-w-[500px]">
           <thead className="text-neutral-400 text-sm text-right w-full">
-            <tr className=" grid grid-cols-11 items-center gap-x-4 px-4">
-              <th className="col-span-4 text-left flex gap-x-4">
+            <tr className=" grid grid-cols-6 lg:grid-cols-11 items-center gap-x-4 px-4">
+              <th className=" col-span-3 lg:col-span-4 text-left flex gap-x-4">
                 <span>Pool Name</span>
               </th>
               <th className="flex justify-end ">
@@ -171,8 +171,8 @@ export default function PoolsTable() {
                   }
                 />
               </th>
-              <th>APR</th>
-              <th className="flex justify-end">
+              <th className="hidden lg:block">APR</th>
+              <th className=" justify-end hidden lg:flex">
                 <OrderButton
                   title="Fees"
                   orderBy={"fees"}
@@ -200,7 +200,9 @@ export default function PoolsTable() {
                   }
                 />
               </th>
-              <th className="text-left col-span-3 pl-4">Liquidity Manager</th>
+              <th className="text-left hidden lg:block col-span-3 pl-4">
+                Liquidity Manager
+              </th>
             </tr>
           </thead>
           <tbody className="gap-y-2 pt-2 flex flex-col">
@@ -278,7 +280,7 @@ function OrderButton({
   return (
     <button className=" flex gap-x-1 items-center" onClick={handleClick}>
       <span className="hover:text-white">{title}</span>
-      <div className="">
+      <div className="hidden lg:block">
         <ChevronUp
           data-direction={selected ? direction : "none"}
           className="text-neutral-400 data-[direction=none]:text-neutral-400 -mb-1 data-[direction=up]:text-white"

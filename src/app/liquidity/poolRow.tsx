@@ -46,8 +46,8 @@ export default function PoolRow({
   }, [router, stable, t0?.address, t1?.address]);
 
   return (
-    <TableRow>
-      <th className="col-span-4 text-left">
+    <TableRow cols="11" mobileCols={"6"}>
+      <th className="lg:col-span-4  col-span-3 text-left">
         {!!t0 && !!t1 && (
           <PoolHeader
             token0={t0}
@@ -66,12 +66,12 @@ export default function PoolRow({
         )}
       </th>
       <th className="">${formatNumber(formatEther(tvlInUsd))}</th>
-      <th className="text-blue-light">
+      <th className="text-blue-light hidden lg:block">
         {formatNumber(formatEther(emissions))}%
       </th>
-      <th>${feeInUsd}</th>
+      <th className="hidden lg:block">${feeInUsd}</th>
       <th>${formatNumber(formatEther(volumeInUsd7D))}</th>
-      <th className="text-left pl-4 col-span-3 ">
+      <th className="text-left pl-4  lg:col-span-3 ">
         <div className="flex justify-between">
           <span></span>
           <Button
