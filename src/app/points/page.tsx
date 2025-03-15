@@ -1,14 +1,14 @@
 import PageMarginContainer from "@/components/ui/pageMarginContainer";
 import PointsHeaders from "./__components__/pointsHeaders";
 import PointsTable from "./__components__/pointsTable";
-import bg from "@/assets/bg-img.png";
-import Image from "next/image";
+// import bg from "@/assets/bg-img.png";
+// import Image from "next/image";
 export default function Page() {
   return (
     <>
-      <div className="absolute top-0 left-0 object-fill h-full w-screen  -z-10  flex justify-center items-center">
-        <Image className="object-cover w-full h-full" src={bg} alt="bg" />
-      </div>
+      {/* <div className="absolute top-0 left-0 object-fill h-full w-screen  -z-10  flex justify-center items-center"> */}
+      {/* <Image className="object-cover w-full h-full" src={bg} alt="bg" /> */}
+      {/* </div> */}
 
       <PageMarginContainer className="text-white ">
         <div className="text-center">
