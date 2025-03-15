@@ -269,6 +269,10 @@ export default function NewSwapView() {
       console.log(swapSimulationError);
     }
   }, [writeError, swapSimulationError]);
+  console.log(
+    { isValid, swapSimulation },
+    "IS VALID ==============================="
+  );
   return (
     <div className="space-y-1">
       <TokensDialog
