@@ -34,7 +34,7 @@ export default function PointsHeaders() {
     mutate();
   };
   return (
-    <div className="mt-8 px-4 lg:px-8 ">
+    <div className="mt-8  ">
       <div className=" flex flex-col lg:flex-row items-center gap-y-4 lg:items-stretch justify-between lg:space-x-4">
         <Card
           bg="1000"
