@@ -23,6 +23,7 @@ import SwapDetails from "./swapDetails";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import useWrapWrite from "@/lib/hooks/useWrapWrite";
 import { useDebounce } from "@/lib/hooks/useDebounce";
+import useUnwrapWrite from "@/lib/hooks/useUnwrapWrite";
 export default function NewSwapView() {
   // Wagmi parameters
   const chainId = useChainId();
@@ -166,10 +167,20 @@ export default function NewSwapView() {
       token0?.address.toLowerCase() ===
       WETH[ChainId.MONAD_TESTNET].toLowerCase(),
   });
+  const { needsUnwrap, resetUnwrap, withdrawSimulation } = useUnwrapWrite({
+    amountIn: amountInBounced,
+    isMon: token0?.address.toLowerCase() === ETHER,
+  });
   useEffect(() => {
     if (isSuccess && needsWrap) {
       setToast({ actionDescription: "", actionTitle: "Wrapped", hash });
       resetWrap();
+      reset();
+      return;
+    }
+    if (isSuccess && needsUnwrap) {
+      setToast({ actionDescription: "", actionTitle: "Unwrapped", hash });
+      resetUnwrap();
       reset();
       return;
     }
@@ -189,10 +200,12 @@ export default function NewSwapView() {
     hash,
     isSuccess,
     needsApproval,
+    needsUnwrap,
     needsWrap,
     queryClient,
     reset,
     resetSwap,
+    resetUnwrap,
     resetWrap,
     setToast,
   ]);
@@ -221,6 +234,10 @@ export default function NewSwapView() {
       writeContract(depositSimulation.data?.request);
       return;
     }
+    if (needsUnwrap && withdrawSimulation.data?.request) {
+      writeContract(withdrawSimulation.data?.request);
+      return;
+    }
     if (approveWriteRequest && needsApproval) {
       writeContract(approveWriteRequest);
       return;
@@ -231,6 +248,8 @@ export default function NewSwapView() {
   }, [
     needsWrap,
     depositSimulation.data?.request,
+    needsUnwrap,
+    withdrawSimulation.data?.request,
     approveWriteRequest,
     needsApproval,
     swapSimulation,
@@ -314,7 +333,7 @@ export default function NewSwapView() {
         state={buttonState}
         isValid={isValid}
       >
-        {!needsWrap ? "Swap" : "Wrap"}
+        {!needsWrap && !needsUnwrap ? "Swap" : "Wrap"}
       </SubmitButton>
     </div>
   );
