@@ -28,16 +28,16 @@ export default function PointsTable() {
   console.log({ data, error });
   return (
     <>
-      <table className="w-full border-collapse text-left min-w-[600px] overflow-x-scroll">
+      <table className="w-full border-collapse text-left  overflow-x-scroll">
         <thead className="border-b border-gray-700 w-full  text-gray-400 text-xs uppercase">
-          <tr className="grid-cols-8 grid">
+          <tr className="lg:grid-cols-8 grid-cols-3 grid">
             <th className="py-3">Rank</th>
-            <th className="py-3">Profile</th>
-            <th className="py-3">Referral</th>
-            <th className="py-3">Referral Points</th>
-            <th className="py-3">Trades</th>
-            <th className="py-3">LPs</th>
-            <th className="py-3 px-6">Boost</th>
+            <th className="py-3 ">Profile</th>
+            <th className="py-3 hidden lg:block">Referral</th>
+            <th className="py-3 hidden lg:block">Referral Points</th>
+            <th className="py-3 hidden lg:block">Trades</th>
+            <th className="py-3 hidden lg:block">LPs</th>
+            <th className="py-3 px-6 hidden lg:block">Boost</th>
             <th className="py-3">Total Points</th>
           </tr>
         </thead>

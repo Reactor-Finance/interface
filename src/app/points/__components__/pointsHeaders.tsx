@@ -33,11 +33,11 @@ export default function PointsHeaders() {
     mutate();
   };
   return (
-    <div className="mt-8 px-4 md:px-8 lg:px-16">
-      <div className=" flex flex-col md:flex-row items-center gap-y-4 md:items-stretch justify-between md:space-x-4">
+    <div className="mt-8 px-4 lg:px-8 lg:px-16">
+      <div className=" flex flex-col lg:flex-row items-center gap-y-4 lg:items-stretch justify-between lg:space-x-4">
         <Card
           bg="1000"
-          className="w-[300px] md:w-auto  rounded-lg p-6 flex-1 flex flex-col"
+          className="w-[300px] lg:w-auto  rounded-lg p-6 flex-1 flex flex-col"
         >
           <div className="grid grid-cols-3 w-full  items-start">
             <div className="col-span-2 flex gap-x-4">
@@ -89,7 +89,7 @@ export default function PointsHeaders() {
         <WaysToEarn />
         <Card
           bg="1000"
-          className="rounded-lg w-[300px] md:w-auto p-6 flex-1 flex flex-col"
+          className="rounded-lg w-[300px] lg:w-auto p-6 flex-1 flex flex-col"
         >
           <div className="flex items-center space-x-2 mb-2">
             <svg
@@ -169,7 +169,7 @@ function WaysToEarn() {
   return (
     <Card
       bg="1000"
-      className=" w-[300px] md:w-auto  rounded-lg p-6 flex-1 flex flex-col "
+      className=" w-[300px] lg:w-auto  rounded-lg p-6 flex-1 flex flex-col "
     >
       <h3 className="text-white font-semibold text-lg uppercase mb-2">
         Ways to Earn
