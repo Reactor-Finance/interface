@@ -33,17 +33,17 @@ export default function AvailablePoolRow({ poolType, token0, token1 }: Props) {
   });
   console.log(foundPools);
   return (
-    <Card bg="1000" className="grid py-3 grid-cols-6 text-sm">
+    <Card bg="1000" className="grid py-3 grid-cols-4 lg:grid-cols-6 text-sm">
       <div className="col-span-2">
         <PoolHeader token0={token0} token1={token1} poolType={poolType} />
       </div>
-      <div className="flex flex-col">
+      <div className=" flex-col hidden lg:flex">
         <span className="text-neutral-300">TVL</span>
         <span>
           {formatNumber(formatUnits(foundPools?.[0]?.tvlInUsd ?? 0n, 18))}
         </span>
       </div>
-      <div className="flex flex-col">
+      <div className=" flex-col hidden lg:flex">
         <span className="text-neutral-300">APR</span>
         <span className="text-primary-400">0.00%</span>
       </div>
