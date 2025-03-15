@@ -137,6 +137,7 @@ export default function PoolsTable() {
                 <span>Pool Name</span>
               </th>
               <th className="flex justify-end">
+                <span>TVL</span>
                 <button
                   onClick={() => updateState({ orderTvl: !filters.orderTvl })}
                   className=" flex gap-x-1 items-center"
@@ -153,12 +154,11 @@ export default function PoolsTable() {
                       size={16}
                     />
                   </div>
-                  <span>TVL</span>
                 </button>
               </th>
               <th>APR</th>
-              <th>Volume</th>
-              <th>Fees</th>
+              <th>24h Volume</th>
+              <th>7d Fees</th>
               <th className="text-left col-span-3 pl-4">Liquidity Manager</th>
             </tr>
           </thead>
