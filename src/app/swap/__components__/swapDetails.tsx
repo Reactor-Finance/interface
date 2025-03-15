@@ -1,14 +1,16 @@
 import { ChevronDown, Settings } from "lucide-react";
-import { abi } from "@/lib/abis/Oracle";
 import React, { ReactNode, useMemo, useState } from "react";
 import infoIcon from "@/assets/info.svg";
 import Tooltip from "@/components/ui/tooltip";
-import { formatUnits, parseUnits } from "viem";
+import { formatUnits } from "viem";
 import { TToken } from "@/lib/types";
 import { useAtom } from "jotai/react";
 import { settingDialogOpenAtom, slippageAtom } from "@/store";
+import { ChainId, EXCHANGE_HELPER, SLIPPAGE_ZEROS } from "@/data/constants";
+import { useGetMarketQuote } from "@/lib/hooks/useGetMarketQuote";
 import { useReadContract } from "wagmi";
-import { ChainId, ORACLE } from "@/data/constants";
+import { ExchangeHelper } from "@/lib/abis/ExchangeHelper";
+import { formatNumber } from "@/lib/utils";
 interface Props {
   amountIn: bigint;
   amountOut: bigint;
@@ -21,7 +23,6 @@ export default function SwapDetails({
   token0,
   token1,
 }: Props) {
-  console.log({ amountIn, amountOut }, "biggie");
   const [open, setOpen] = useState(false);
   const [slippage] = useAtom(slippageAtom);
 
@@ -29,31 +30,40 @@ export default function SwapDetails({
   const setDialogOpen = dialog[1];
 
   const { per, min } = useMemo(() => {
-    const zeros = 100_000_000n;
     if (amountOut === 0n) {
       return { per: 0n, min: 0n };
     }
-    const per = (amountIn * zeros) / amountOut;
-    const min = amountOut - (amountOut * BigInt(slippage)) / 1000n;
+    const per =
+      parseFloat(formatUnits(amountOut, token1.decimals)) /
+      parseFloat(formatUnits(amountIn, token0.decimals));
+    const a = (amountOut * BigInt(slippage)) / SLIPPAGE_ZEROS;
+    const min = amountOut - a;
     return { min, per };
-  }, [amountIn, amountOut, slippage]);
-  const { data: token1Usd, error } = useReadContract({
-    abi,
-    address: ORACLE[ChainId.MONAD_TESTNET],
-    functionName: "getAverageValueInETH",
-    args: [token0.address, parseUnits("1", token0.decimals)],
-    chainId: ChainId.MONAD_TESTNET,
+  }, [amountIn, amountOut, slippage, token0.decimals, token1.decimals]);
+  const { quote } = useGetMarketQuote({
+    tokenAddress: token0.address,
+    value: amountOut,
   });
-  console.log({ token1Usd, error });
+
+  // address tokenA,
+  // address tokenB,
+  // uint256 amountIn,
+  // bool multiHops
+  const { data: priceImpact } = useReadContract({
+    abi: ExchangeHelper,
+    address: EXCHANGE_HELPER[ChainId.MONAD_TESTNET],
+    functionName: "calculatePriceImpact",
+    args: [token0.address, token1.address, amountIn, false],
+  });
   return (
-    <div className="text-[13px] border border-neutral-800 rounded-[16px] p-4 space-y-4">
-      <Row title="Received Value" value="$23.44" />
+    <div className="text-[13px] border border-neutral-800 rounded-[16px] p-1 md:p-4 space-y-4">
+      <Row title="Received Value" value={quote[1]} />
       <Row
         title="Exchange Rate"
         value={
           <p>
-            1 {token0.symbol} <span className="text-neutral-200">≃</span>{" "}
-            {formatUnits(per, 8)} {token1.symbol}{" "}
+            1 {token0.symbol} <span className="text-neutral-200">≃</span> {per}{" "}
+            {token1.symbol}{" "}
           </p>
         }
       />
@@ -88,12 +98,18 @@ export default function SwapDetails({
         >
           <Row
             title="Minumum Receieved"
-            value={formatUnits(min, token0.decimals)}
+            value={formatUnits(min, token1.decimals)}
             info="Info"
           />
-          <Row title="Fee" value="$23.44" info="Info" />
-          <Row title="Price Impact" value="$23.44" info="Info" />
-          <Row title="Route" value="$23.44" info="Info" />
+          {/* <Row title="Fee" value="$23.44" info="Info" /> */}
+          <Row
+            title="Price Impact"
+            value={
+              formatNumber(formatUnits(priceImpact ?? 0n, 18) ?? "0n") + "%"
+            }
+            info="Info"
+          />
+          {/* <Row title="Route" value="$23.44" info="Info" /> */}
         </div>
       </div>
     </div>

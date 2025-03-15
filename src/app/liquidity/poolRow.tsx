@@ -2,17 +2,26 @@ import CurrenciesOverlapIcons from "@/components/shared/currenciesOverlapIcons";
 import PoolHeader from "@/components/shared/poolHeader";
 import { Button } from "@/components/ui/button";
 import { TableRow } from "@/components/ui/table";
-import { TPoolData, TPoolType } from "@/lib/types";
+import { TPoolType } from "@/lib/types";
 import React, { useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useTokenlistContext } from "@/contexts/tokenlistContext";
+import { formatNumber } from "@/lib/utils";
+import { formatEther } from "viem";
+import { TPoolExtended } from "@/contexts/poolsTvl";
 
 export default function PoolRow({
   stable,
   token0,
   token1,
   emissions,
-}: TPoolData) {
+  tvlInUsd,
+  feeInUsd,
+  volumeInUsd7D,
+  reserve0,
+  reserve1,
+  ...poolData
+}: TPoolExtended) {
   const router = useRouter();
   const { tokenlist } = useTokenlistContext();
   const t0 = useMemo(
@@ -37,24 +46,38 @@ export default function PoolRow({
   }, [router, stable, t0?.address, t1?.address]);
 
   return (
-    <TableRow>
-      <th className="col-span-4 text-left">
+    <TableRow cols="11" mobileCols={"6"}>
+      <th className="lg:col-span-4  col-span-3 text-left">
         {!!t0 && !!t1 && (
           <PoolHeader
             token0={t0}
             token1={t1}
             poolType={stable ? TPoolType.STABLE : TPoolType.VOLATILE}
+            _data={{
+              reserve0,
+              reserve1,
+              emissions,
+              token0,
+              token1,
+              stable,
+              ...poolData,
+            }}
           />
         )}
       </th>
-      <th className="">$5,505,444</th>
-      <th className="text-blue-light">11%</th>
-      <th>{emissions.toString()}</th>
-      <th>{}</th>
-      <th className="text-left pl-4 col-span-3 ">
+      <th className="">${formatNumber(formatEther(tvlInUsd))}</th>
+      <th className="text-blue-light hidden lg:block">
+        {formatNumber(formatEther(emissions))}%
+      </th>
+      <th className="hidden lg:block">${feeInUsd}</th>
+      <th>${formatNumber(formatEther(volumeInUsd7D))}</th>
+      <th className="text-left pl-4  lg:col-span-3 ">
         <div className="flex justify-between">
           <span></span>
-          <Button variant="filled" onClick={addLiquidityHandler}>
+          <Button
+            className="group-hover:bg-neutral-[#303136] hover:bg-[#43444C]"
+            onClick={addLiquidityHandler}
+          >
             <div className="flex items-center gap-x-1">
               <span>Add</span>
               {!!t0 && !!t1 && (

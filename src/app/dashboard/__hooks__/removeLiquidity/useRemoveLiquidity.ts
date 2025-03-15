@@ -18,6 +18,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useRemoveLiquidityValidation } from "./useRemoveLiquidityValidation";
 import { useAtom } from "jotai/react";
 import { transactionDeadlineAtom } from "@/store";
+import usePadLoading from "@/lib/hooks/usePadLoading";
 interface Props {
   amount: bigint;
   token0: Address;
@@ -66,7 +67,6 @@ export function useRemoveLiquidity({
       Number(transactionDeadlineInMinutes) * 60;
     return BigInt(ttl);
   }, [now, transactionDeadlineInMinutes]);
-  console.log({ deadline });
   const isEth =
     token0.toLowerCase() === weth.toLowerCase() ||
     token1.toLowerCase() === weth.toLowerCase();
@@ -105,7 +105,9 @@ export function useRemoveLiquidity({
     query: { enabled: isEth && amount > 0n },
   });
   const { writeContract, isPending, reset, data: hash } = useWriteContract();
-  const { isSuccess, isLoading } = useWaitForTransactionReceipt({ hash });
+  const { isSuccess, isLoading: isSending } = useWaitForTransactionReceipt({
+    hash,
+  });
   const { setToast } = useTransactionToastProvider();
   console.log({
     error: removeLiquiditySimulation.data?.request,
@@ -160,15 +162,22 @@ export function useRemoveLiquidity({
     reset,
     setToast,
   ]);
-
+  const loading = usePadLoading({
+    value: isEth
+      ? removeLiquidityEthSimulation.isLoading
+      : removeLiquiditySimulation.isLoading,
+    duration: 300,
+  });
   const { state: buttonState } = useGetButtonStatuses({
-    isLoading: isLoading,
+    isLoading: loading,
+    isSending: isSending,
     isPending,
     isFetching: fetchingApproval,
     needsApproval,
   });
   const { isValid, errorMessage } = useRemoveLiquidityValidation({
     needsApproval,
+    amountInGt0: amount > 0n,
     approvalSimulation: !!approvalSimulation,
     removeLiqsimulation: !!removeLiquiditySimulation.data,
     removeLiqEthSimulation: !!removeLiquidityEthSimulation.data,

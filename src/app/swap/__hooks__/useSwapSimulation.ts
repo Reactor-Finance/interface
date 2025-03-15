@@ -2,12 +2,19 @@ import * as Router from "@/lib/abis/Router";
 import { useAccount, useChainId, useSimulateContract } from "wagmi";
 import { useMemo } from "react";
 import { parseEther, parseUnits, zeroAddress } from "viem";
-import { ETHER, ROUTER, WETH } from "@/data/constants";
+import * as Weth from "@/lib/abis/WETH";
+import { ETHER, ROUTER, SLIPPAGE_ZEROS, WETH } from "@/data/constants";
 import { TToken } from "@/lib/types";
 import { useAtomicDate } from "@/lib/hooks/useAtomicDate";
 import { useAtom } from "jotai/react";
 import { multiHopsAtom, slippageAtom, transactionDeadlineAtom } from "@/store";
-
+import { useMutation } from "@tanstack/react-query";
+import {
+  simulateContract,
+  waitForTransactionReceipt,
+  writeContract,
+} from "wagmi/actions";
+import { wagmiConfig } from "@/app/providers";
 type SwapRoute = {
   from: `0x${string}`;
   to: `0x${string}`;
@@ -18,12 +25,14 @@ export function useSwapSimulation({
   amount,
   token0,
   token1,
+  needsApproval,
   minAmountOut = BigInt(0),
 }: {
   amount: string;
   token0: TToken | null;
   token1: TToken | null;
   minAmountOut?: bigint;
+  needsApproval: boolean;
 }) {
   const { address } = useAccount();
   const now = useAtomicDate();
@@ -64,15 +73,55 @@ export function useSwapSimulation({
     const ttl = Math.floor(now.getTime() / 1000) + Number(txDeadline) * 60;
     return BigInt(ttl);
   }, [now, txDeadline]);
-  const msgValue = useMemo(
-    () =>
-      token0?.address.toLowerCase() === weth.toLowerCase() ||
-      token0?.address.toLowerCase() === ETHER.toLowerCase()
-        ? parseEther(String(amount))
-        : BigInt(0),
-    [token0, weth, amount]
+  const isEth = useMemo(
+    () => token0?.address.toLowerCase() === ETHER.toLowerCase(),
+    [token0?.address]
   );
-  return useSimulateContract({
+  const msgValue = useMemo(
+    () => (isEth ? parseEther(String(amount)) : BigInt(0)),
+    [isEth, amount]
+  );
+
+  const mutate = useMutation({
+    mutationFn: async () => {
+      console.log("IN HERE");
+      const depositSimulation = await simulateContract(wagmiConfig, {
+        ...Weth,
+        address: weth,
+        functionName: "deposit",
+        value: parseEther(String(amount)),
+        args: [],
+      });
+      const hashWrap = await writeContract(
+        wagmiConfig,
+        depositSimulation.request
+      );
+      const a = await waitForTransactionReceipt(wagmiConfig, {
+        hash: hashWrap,
+      });
+      if (a.status === "reverted") return a;
+      console.log(minAmountOut, amountIn);
+      const req = await simulateContract(wagmiConfig, {
+        ...Router,
+        address: router,
+        functionName: "swap",
+        args: [
+          isEth ? BigInt(0n) : amountIn,
+          calculateMinOut(minAmountOut, Number(slippage)),
+          routes,
+          address ?? zeroAddress,
+          deadline,
+          true,
+        ],
+        value: msgValue,
+      });
+      console.log({ mutate });
+      const hash = await writeContract(wagmiConfig, req.request);
+      const b = waitForTransactionReceipt(wagmiConfig, { hash });
+      return b;
+    },
+  });
+  const swapSimulation = useSimulateContract({
     ...Router,
     address: router,
     functionName: "swap",
@@ -90,14 +139,20 @@ export function useSwapSimulation({
         !!address &&
         !!token0 &&
         !!token1 &&
-        amount !== null &&
-        address !== zeroAddress,
+        amount !== "" &&
+        address !== zeroAddress &&
+        !needsApproval,
     },
   });
+  return {
+    swapSimulation,
+
+    wrapSwapMutation: mutate,
+  };
 }
 
 function calculateMinOut(amount: bigint, slippagePercentage: number) {
-  const slippage = (Number(amount) * slippagePercentage) / 100;
-  const minAmount = Number(amount) - slippage;
+  const slippage = (amount * BigInt(slippagePercentage)) / SLIPPAGE_ZEROS;
+  const minAmount = amount - slippage;
   return BigInt(minAmount);
 }

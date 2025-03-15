@@ -14,7 +14,6 @@ export function useGetBalance({
       address,
       query: { enabled: !disabled },
     });
-
   const { data: balance = BigInt(0), queryKey } = useReadContract({
     address: tokenAddress,
     abi: erc20Abi,

@@ -12,7 +12,12 @@ import { zeroAddress } from "viem";
 export default function DashboardLiquidityTable() {
   const { data: pairs, isLoading } = useGetPairs({});
   const activePairs = useMemo(
-    () => pairs.filter((pair) => pair.pair_address !== zeroAddress),
+    () =>
+      pairs.filter(
+        (pair) =>
+          pair.pair_address !== zeroAddress &&
+          (pair.account_gauge_balance !== 0n || pair.account_lp_balance !== 0n)
+      ),
     [pairs]
   );
   const [selectedPair, setSelectedPair] = useState(activePairs[0]);
@@ -20,7 +25,7 @@ export default function DashboardLiquidityTable() {
     dialogOpen: false,
     actionType: LiquidityActions.Stake,
   });
-  const isLoadingPadded = usePadLoading({ value: isLoading, duration: 500 });
+  const isLoadingPadded = usePadLoading({ value: isLoading, duration: 300 });
   return (
     <>
       {stateType && selectedPair && (
@@ -38,10 +43,10 @@ export default function DashboardLiquidityTable() {
           <thead className="text-neutral-400 text-sm">
             <tr className="grid grid-cols-7 px-6 py-2 font-medium">
               <th className="col-span-2 text-left">Pool Name</th>
-              <th>Status</th>
-              <th>Value</th>
-              <th>APR</th>
-              <th>Rewards</th>
+              <th className="hidden lg:block">Status</th>
+              <th className="hidden lg:block">Value</th>
+              <th className="hidden lg:block">APR</th>
+              <th className="hidden lg:block">Rewards</th>
               <th></th>
             </tr>
           </thead>

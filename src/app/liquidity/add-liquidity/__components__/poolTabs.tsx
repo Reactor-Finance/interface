@@ -1,6 +1,9 @@
 "use client";
+import SettingsDialog from "@/app/swap/__components__/settingsDialog";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TPoolType } from "@/lib/types";
+import { settingDialogOpenAtom } from "@/store";
+import { useAtom } from "jotai";
 import { Settings } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useCallback, useEffect, useMemo } from "react";
@@ -74,33 +77,42 @@ export default function PoolTabs() {
     },
     [createQueryString, router]
   );
+
+  const dialog = useAtom(settingDialogOpenAtom);
+  const setDialogOpen = dialog[1];
   return (
-    <div className="flex gap-x-4 items-end">
-      <Tabs value={version}>
-        <TabsList colors="muted">
-          <TabsTrigger
-            onClick={() => tabTriggerHandle(TPoolType.STABLE)}
-            value="stable"
-          >
-            Stable
-          </TabsTrigger>
-          <TabsTrigger
-            onClick={() => tabTriggerHandle(TPoolType.VOLATILE)}
-            value="volatile"
-          >
-            Volatile
-          </TabsTrigger>
-          <TabsTrigger
-            onClick={() => tabTriggerHandle(TPoolType.CONCENTRATED)}
-            value="concentrated"
-          >
-            Concentrated
-          </TabsTrigger>
-        </TabsList>
-      </Tabs>
-      <button>
-        <Settings className="text-neutral-600 h-5 w-5" />
-      </button>
+    <div className="flex items-end">
+      <SettingsDialog dontShowButton></SettingsDialog>
+      <div className="flex gap-x-4 items-center">
+        <Tabs value={version}>
+          <TabsList colors="muted">
+            <TabsTrigger
+              onClick={() => tabTriggerHandle(TPoolType.STABLE)}
+              value="stable"
+            >
+              Stable
+            </TabsTrigger>
+            <TabsTrigger
+              onClick={() => tabTriggerHandle(TPoolType.VOLATILE)}
+              value="volatile"
+            >
+              Volatile
+            </TabsTrigger>
+            {/* <TabsTrigger */}
+            {/*   onClick={() => tabTriggerHandle(TPoolType.CONCENTRATED)} */}
+            {/*   value="concentrated" */}
+            {/* > */}
+            {/*   Concentrated */}
+            {/* </TabsTrigger> */}
+          </TabsList>
+        </Tabs>
+        <button className="flex items-center">
+          <Settings
+            onClick={() => setDialogOpen(true)}
+            className="text-neutral-600 h-5 w-5"
+          />
+        </button>
+      </div>
     </div>
   );
 }

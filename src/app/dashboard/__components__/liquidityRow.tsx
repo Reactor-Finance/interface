@@ -13,6 +13,7 @@ import { useCallback, useMemo } from "react";
 import { useGetMarketQuote } from "@/lib/hooks/useGetMarketQuote";
 import { formatNumber } from "@/lib/utils";
 import { formatEther, formatUnits } from "viem";
+import { TableRow } from "@/components/ui/table";
 
 export function LiquidityRow({
   pairInfo: {
@@ -67,7 +68,11 @@ export function LiquidityRow({
   );
 
   return (
-    <tr className="grid animate-in fade-in duration-500 text-center rounded-sm grid-cols-7 items-center bg-neutral-1000 py-2 px-6">
+    <TableRow
+      cols="7"
+      mobileCols={"3"}
+      className="grid animate-in fade-in  text-center rounded-sm  items-center bg-neutral-1000 py-2 px-6"
+    >
       <td className=" text-left col-span-2">
         <div className="flex items-center justify-start gap-4">
           <PoolHeader
@@ -77,25 +82,32 @@ export function LiquidityRow({
           />
         </div>
       </td>
-      <td className="flex flex-col gap-y-2 justify-center items-center">
+      <td className="flex-col gap-y-2 hidden lg:flex justify-center items-center">
         <Badge
-          className="inline-block px-1 py-1 w-full"
+          className="inline-block px-4 py-1 text-center"
           border="none"
           colors={isInRange ? "success" : "error"}
           size="sm"
         >
           {isInRange ? "In Range" : "Out Of Range"}
         </Badge>
-        <div className="flex items-center gap-1">
-          <Dot color={isInRange ? "#4ade80" : "#f87171"} width={8} height={8} />
+        <div className="flex items-center justify-center gap-1">
+          <Dot
+            color={isInRange ? "#4ade80" : "#f87171"}
+            width={22}
+            height={22}
+          />
           <span className="text-[10px] leading-[16px]">
             {isInRange ? "Earning emissions" : "Not earning emissions"}
           </span>
         </div>
       </td>
-      <td className="text-sm">${totalMarketQuote}</td>
-      <td className="text-blue-light text-sm">{formatEther(emissions)}%</td>
-      <td className="flex flex-col items-center justify-center">
+      <td className="text-sm hidden lg:block">${totalMarketQuote}</td>
+      {/* <RangeColumn pair={pair_address} /> */}
+      <td className="text-blue-light hidden lg:block text-sm">
+        {formatEther(emissions)}%
+      </td>
+      <td className="flex-col hidden lg:flex items-center justify-center">
         <div className="flex items-center gap-[9px]">
           <Image
             className="inline-block"
@@ -117,6 +129,7 @@ export function LiquidityRow({
           <Button
             disabled={account_gauge_earned === 0n}
             variant={"primary"}
+            className="disabled:group-hover:bg-neutral-900 "
             size="xs"
           >
             Claim
@@ -135,28 +148,28 @@ export function LiquidityRow({
               >
                 Increase
               </DropdownMenu.Item>
-              <DropdownMenu.Item
-                onClick={() => onItemClick(LiquidityActions.Stake)}
-                className="hover:bg-neutral-900 outline-none pl-3 py-2 pr-9 rounded-sm hover:cursor-pointer"
-              >
-                Stake
-              </DropdownMenu.Item>
+              {/* <DropdownMenu.Item */}
+              {/*   onClick={() => onItemClick(LiquidityActions.Stake)} */}
+              {/*   className="hover:bg-neutral-900 outline-none pl-3 py-2 pr-9 rounded-sm hover:cursor-pointer" */}
+              {/* > */}
+              {/*   Stake */}
+              {/* </DropdownMenu.Item> */}
               <DropdownMenu.Item
                 onClick={() => onItemClick(LiquidityActions.Withdraw)}
                 className="hover:bg-neutral-900 outline-none pl-3 py-2 pr-9 rounded-sm hover:cursor-pointer"
               >
                 Withdraw
               </DropdownMenu.Item>
-              <DropdownMenu.Item
-                onClick={() => onItemClick(LiquidityActions.Unstake)}
-                className="hover:bg-neutral-900 outline-none pl-3 py-2 pr-9 rounded-sm hover:cursor-pointer"
-              >
-                Unstake
-              </DropdownMenu.Item>
+              {/* <DropdownMenu.Item */}
+              {/*   onClick={() => onItemClick(LiquidityActions.Unstake)} */}
+              {/*   className="hover:bg-neutral-900 outline-none pl-3 py-2 pr-9 rounded-sm hover:cursor-pointer" */}
+              {/* > */}
+              {/*   Unstake */}
+              {/* </DropdownMenu.Item> */}
             </DropdownMenu.Content>
           </DropdownMenu.Root>
         </div>
       </td>
-    </tr>
+    </TableRow>
   );
 }

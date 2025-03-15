@@ -65,7 +65,7 @@ export function useQuoteSwap({
     ...TradeHelper,
     functionName: "getAmountIn",
     args: [
-      parseUnits(String(amountOut), tokenOut?.decimals ?? 18),
+      parseUnits(amountOut, tokenOut?.decimals ?? 18),
       address0 ?? zeroAddress,
       address1 ?? zeroAddress,
     ],
@@ -93,7 +93,7 @@ export function useQuoteSwap({
         : tokenOut
           ? formatUnits(receivedAmount, tokenOut.decimals)
           : "0",
-    [receivedAmount, amountIn, tokenOut, isIntrinsicWETHProcess]
+    [isIntrinsicWETHProcess, amountIn, tokenOut, receivedAmount]
   );
 
   return { quoteAmount, error, isLoading, amountInLoading };

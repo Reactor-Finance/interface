@@ -1,6 +1,5 @@
 "use client";
 import React, { useState } from "react";
-import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { useAccount } from "wagmi";
 import Input from "@/components/ui/input";
@@ -8,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Check, Copy } from "lucide-react";
 import useRegister from "../__hooks__/useRegister";
 import usePointsAccount from "../__hooks__/usePointsAccount";
+import ImageWithFallback from "@/components/shared/imageWithFallback";
+import Link from "next/link";
 
 export default function PointsHeaders() {
   const [copied, setCopied] = useState(false);
@@ -33,22 +34,27 @@ export default function PointsHeaders() {
     mutate();
   };
   return (
-    <div className="mt-8 px-4 md:px-8 lg:px-16">
-      <div className="flex items-stretch justify-between space-x-4">
-        <Card bg="1000" className="  rounded-lg p-4 flex-1 flex flex-col">
+    <div className="mt-8 px-4 lg:px-8 ">
+      <div className=" flex flex-col lg:flex-row items-center gap-y-4 lg:items-stretch justify-between lg:space-x-4">
+        <Card
+          bg="1000"
+          className="w-[300px] lg:w-auto  rounded-lg p-6 flex-1 flex flex-col"
+        >
           <div className="grid grid-cols-3 w-full  items-start">
-            <Image
-              src="https://i.ibb.co/0pDryFGv/image.png"
-              alt="Avatar"
-              width={64}
-              height={64}
-              className="w-16 h-16 rounded-full object-cover"
-            />
+            <div className="col-span-2 flex gap-x-4">
+              <ImageWithFallback
+                src="https://i.ibb.co/0pDryFGv/image.png"
+                alt="Avatar"
+                width={64}
+                height={64}
+                className="w-16 h-16 rounded-full object-cover"
+              />
 
-            <div className="flex justify-center">
-              <h3 className="text-white text-lg font-semibold self-center">
-                My Position
-              </h3>
+              <div className="flex justify-center">
+                <h3 className="text-white text-lg font-semibold self-center">
+                  My Position
+                </h3>
+              </div>
             </div>
 
             <div className="flex flex-col items-end">
@@ -59,17 +65,20 @@ export default function PointsHeaders() {
             </div>
           </div>
 
-          <div className="mt-auto w-full grid grid-cols-3 text-center pt-4">
-            <div className="flex flex-col items-start">
+          <div className="mt-auto w-full flex justify-between text-center pt-4">
+            <div className="flex flex-col items-start ">
               <p className="text-xs text-gray-400 uppercase">BOOST</p>
-              <p className="text-[#836EF9] font-bold text-sm">x2.5</p>
+              {/* <p className="text-[#836EF9] font-bold text-sm">x2.5</p> */}
+              <p className=" font-bold text-sm">1x</p>
             </div>
-            <div className="flex flex-col items-center">
+            <div className="h-full w-[2px] bg-neutral-600"></div>
+            <div className="flex flex-col items-center ">
               <p className="text-xs text-gray-400 uppercase">REFERRAL</p>
               <p className="text-white font-bold text-sm">
                 {data?.result.countOfReferred}
               </p>
             </div>
+            <div className="h-full w-[2px] bg-neutral-600"></div>
             <div className="flex flex-col items-end">
               <p className="text-xs text-gray-400 uppercase">TOTAL POINTS</p>
               <p className="text-white font-bold text-sm">
@@ -79,7 +88,10 @@ export default function PointsHeaders() {
           </div>
         </Card>
         <WaysToEarn />
-        <Card bg="1000" className="rounded-lg  flex-1 flex flex-col">
+        <Card
+          bg="1000"
+          className="rounded-lg w-[300px] lg:w-auto p-6 flex-1 flex flex-col"
+        >
           <div className="flex items-center space-x-2 mb-2">
             <svg
               width="20"
@@ -120,9 +132,15 @@ export default function PointsHeaders() {
                   {copied && <Check className="text-success-400" size={16} />}
                 </button>
               </div>
-              <Button size={"md"} variant={"primary"}>
-                Share on X
-              </Button>
+
+              <Link
+                href={`https://x.com/intent/tweet?text=Join%20me%20in%20earning%20points%20for%20the%20%24RCT%20airdrop%20on%20%40ReactorFi%2C%20a%20MetaDEX%20model%20that%20merges%20the%20best%20features%20of%20ve(3%2C3).%0A%0AUse%20referral%20code%20${data.result.invitationCode}%20at%20app.reactorfi.xyz%2Fpoints%20to%20get%20started!`}
+                target="_blank"
+              >
+                <Button size={"md"} variant={"primary"}>
+                  Share on X
+                </Button>
+              </Link>
             </div>
           ) : (
             <>
@@ -156,7 +174,10 @@ export default function PointsHeaders() {
 
 function WaysToEarn() {
   return (
-    <Card bg="1000" className="  rounded-lg p-4 flex-1 flex flex-col">
+    <Card
+      bg="1000"
+      className=" w-[300px] lg:w-auto  rounded-lg p-6 flex-1 flex flex-col "
+    >
       <h3 className="text-white font-semibold text-lg uppercase mb-2">
         Ways to Earn
       </h3>

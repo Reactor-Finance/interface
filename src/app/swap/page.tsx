@@ -7,7 +7,7 @@ import SettingsDialog from "./__components__/settingsDialog";
 export default function Swap() {
   return (
     <PageMarginContainer>
-      <div className="mx-auto w-[440px]">
+      <div className="mx-auto md:w-[440px]">
         <div className="py-4">
           <div className="py-2 flex items-end justify-between">
             <h1 className="text-primary-400 text-[44px] leading-[44px]">
@@ -33,7 +33,7 @@ export default function Swap() {
             </Tabs>
           </div>
         </div>
-        <Card className="min-w-[380px] p-0 rounded-md">
+        <Card className="md:min-w-[380px] p-0 rounded-md">
           {/* <SwapView /> */}
           <NewSwapView />
         </Card>

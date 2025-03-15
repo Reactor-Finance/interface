@@ -1,20 +1,23 @@
 "use client";
 import { useState, useCallback, useEffect, useMemo } from "react";
-import { ChevronRight, ChevronLeft, ChevronDown } from "lucide-react";
+import {
+  ChevronRight,
+  ChevronLeft,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 import PoolRow from "./poolRow";
-import { abi } from "@/lib/abis/PairHelper";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SearchInput from "@/components/shared/searchInput";
 import { useDebounce } from "@/lib/hooks/useDebounce";
 import PoolRowSkeleton from "./poolRowSkeleton";
-import { useChainId, useReadContract } from "wagmi";
-import { ChainId, PAIR_HELPER } from "@/data/constants";
 import { zeroAddress } from "viem";
-
+import { usePoolslistContext } from "@/contexts/poolsTvl";
 type QueryFilters = {
   searchQuery: string;
   isStable: boolean | undefined;
-  orderTvl: boolean;
+  orderBy: "none" | "tvl" | "fees" | "volume";
+  orderDirection: "up" | "down";
 };
 
 enum TabValues {
@@ -27,10 +30,12 @@ enum TabValues {
 const pageLength = 10;
 export default function PoolsTable() {
   const [loadingBounced, setLoadingBounced] = useState(false);
+  const { pools, isLoading } = usePoolslistContext();
   const [filters, setFilters] = useState<QueryFilters>({
     searchQuery: "",
     isStable: undefined,
-    orderTvl: true,
+    orderBy: "none",
+    orderDirection: "up",
   });
   const [page, setPage] = useState(1);
   const updateState = useCallback(
@@ -39,48 +44,58 @@ export default function PoolsTable() {
     },
     [filters]
   );
-  const {} = useChainId();
-  const { data, isLoading } = useReadContract({
-    abi,
-    address: PAIR_HELPER[ChainId.MONAD_TESTNET],
-    functionName: "getAllPair",
-    args: [zeroAddress, 200n, 0n],
-  });
-
-  // ** this stops react query refetching our data from server
-  // until one of the filters changes
   const { debouncedValue: filersBounced } = useDebounce(filters, 300);
   const poolsLength = useMemo(
-    () => data?.filter((p) => p.pair_address !== zeroAddress).length ?? 0,
-    [data]
+    () => pools?.filter((p) => p.pair_address !== zeroAddress).length ?? 0,
+    [pools]
   );
   const newPools = useMemo(() => {
-    const result =
-      data
-        ?.filter((pair) => {
-          const { searchQuery } = filersBounced;
-          const notZeroAddr = pair.pair_address !== zeroAddress;
-          const search0 = searchQuery
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase());
-          const search1 = pair.token0_symbol
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase());
-          let versionFilter = true;
-          if (filters.isStable && filters.isStable !== undefined) {
-            versionFilter = pair.stable;
-          } else if (filters.isStable !== undefined) {
-            versionFilter = !pair.stable;
-          }
-          return notZeroAddr && search0 && search1 && versionFilter;
-        })
-        .slice(pageLength * page - pageLength, pageLength * page)
-        .sort((a, b) => Number(a.total_supply) - Number(b.total_supply)) ?? [];
-    if (filters.orderTvl) {
+    let result = pools
+      ?.filter((pair) => {
+        const { searchQuery } = filersBounced;
+        const notZeroAddr = pair.pair_address !== zeroAddress;
+        const search0 = searchQuery
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase());
+        const search1 = pair.token0_symbol
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase());
+        let versionFilter = true;
+        if (filters.isStable && filters.isStable !== undefined) {
+          versionFilter = pair.stable;
+        } else if (filters.isStable !== undefined) {
+          versionFilter = !pair.stable;
+        }
+        return notZeroAddr && search0 && search1 && versionFilter;
+      })
+      .sort((a, b) => {
+        if (filters.orderBy === "tvl") {
+          return Number(a.tvlInUsd) - Number(b.tvlInUsd);
+        }
+        if (filters.orderBy === "fees") {
+          return Number(a.feeInUsd) - Number(b.feeInUsd);
+        }
+        if (filters.orderBy === "volume") {
+          return Number(a.volumeInUsd7D) - Number(b.volumeInUsd7D);
+        }
+        return 0;
+      });
+
+    if (filters.orderDirection === "up") {
       result.reverse();
     }
+
+    result =
+      result.slice(pageLength * page - pageLength, pageLength * page) ?? [];
     return result;
-  }, [data, filersBounced, filters.isStable, filters.orderTvl, page]);
+  }, [
+    filersBounced,
+    filters.isStable,
+    filters.orderBy,
+    filters.orderDirection,
+    page,
+    pools,
+  ]);
   useEffect(() => {
     newPools.forEach((p) => console.log(p.fee));
   }, [newPools]);
@@ -125,38 +140,69 @@ export default function PoolsTable() {
             {/* </TabsTrigger> */}
           </TabsList>
         </Tabs>
-        <SearchInput
-          className="bg-neutral-950 w-[285px]"
-          value={filters.searchQuery}
-          setValue={(value) => {
-            updateState({ searchQuery: value });
-          }}
-        ></SearchInput>
+        <div className="hidden md:block">
+          <SearchInput
+            className="bg-neutral-950   w-[285px]"
+            value={filters.searchQuery}
+            setValue={(value) => {
+              updateState({ searchQuery: value });
+            }}
+          ></SearchInput>
+        </div>
       </div>
-      <div className="pt-4 min-h-[500px]">
-        <table className="w-full ">
+      <div className="pt-4 min-h-[500px]  overflow-x-auto">
+        <table className="w-full min-w-[500px]">
           <thead className="text-neutral-400 text-sm text-right w-full">
-            <tr className=" grid grid-cols-11 gap-x-4 px-4">
-              <th className="col-span-4 text-left flex gap-x-4">
+            <tr className=" grid grid-cols-6 lg:grid-cols-11 items-center gap-x-4 px-4">
+              <th className=" col-span-3 lg:col-span-4 text-left flex gap-x-4">
                 <span>Pool Name</span>
               </th>
-              <th className="flex justify-end">
-                <button
-                  onClick={() => updateState({ orderTvl: !filters.orderTvl })}
-                  className="flex gap-x-1 items-center"
-                >
-                  <ChevronDown
-                    data-direction={filters.orderTvl ? "up" : "down"}
-                    className="text-white data-[direction=up]:rotate-180"
-                    size={18}
-                  />
-                  <span>TVL</span>
-                </button>
+              <th className="flex justify-end ">
+                <OrderButton
+                  title="TVL"
+                  orderBy={"tvl"}
+                  direction={filters.orderDirection}
+                  value={filters.orderBy}
+                  onClick={(a, b) =>
+                    updateState({
+                      orderDirection: a,
+                      orderBy: b,
+                    })
+                  }
+                />
               </th>
-              <th>APR</th>
-              <th>Volume</th>
-              <th>Fees</th>
-              <th className="text-left col-span-3 pl-4">Liquidity Manager</th>
+              <th className="hidden lg:block">APR</th>
+              <th className=" justify-end hidden lg:flex">
+                <OrderButton
+                  title="Fees"
+                  orderBy={"fees"}
+                  direction={filters.orderDirection}
+                  value={filters.orderBy}
+                  onClick={(a, b) =>
+                    updateState({
+                      orderDirection: a,
+                      orderBy: b,
+                    })
+                  }
+                />
+              </th>
+              <th className="flex justify-end">
+                <OrderButton
+                  title="Volume"
+                  orderBy={"volume"}
+                  direction={filters.orderDirection}
+                  value={filters.orderBy}
+                  onClick={(a, b) =>
+                    updateState({
+                      orderDirection: a,
+                      orderBy: b,
+                    })
+                  }
+                />
+              </th>
+              <th className="text-left hidden lg:block col-span-3 pl-4">
+                Liquidity Manager
+              </th>
             </tr>
           </thead>
           <tbody className="gap-y-2 pt-2 flex flex-col">
@@ -204,5 +250,50 @@ export default function PoolsTable() {
         </div>
       </div>
     </>
+  );
+}
+
+function OrderButton({
+  onClick,
+  direction,
+  title,
+  orderBy,
+  value,
+}: {
+  title: string;
+  onClick: (
+    direction: "up" | "down",
+    orderBy: "tvl" | "fees" | "volume"
+  ) => void;
+  direction: "up" | "down";
+  orderBy: "tvl" | "fees" | "volume";
+  value: "tvl" | "fees" | "volume" | "none";
+}) {
+  const handleClick = () => {
+    if (orderBy !== value) {
+      onClick("up", orderBy);
+      return;
+    }
+    onClick(direction === "up" ? "down" : "up", orderBy);
+  };
+  const selected = orderBy === value;
+  return (
+    <button className=" flex gap-x-1 items-center" onClick={handleClick}>
+      <span className="hover:text-white">{title}</span>
+      <div className="hidden lg:block">
+        <ChevronUp
+          data-direction={selected ? direction : "none"}
+          className="text-neutral-400 data-[direction=none]:text-neutral-400 -mb-1 data-[direction=up]:text-white"
+          size={16}
+          strokeWidth={3}
+        />
+        <ChevronDown
+          data-direction={selected ? direction : "none"}
+          strokeWidth={3}
+          className="text-neutral-400 -mt-1 data-[direction=none]:text-neutral-400 data-[direction=down]:text-white"
+          size={16}
+        />
+      </div>
+    </button>
   );
 }

@@ -5,20 +5,26 @@ interface Props {
   removeLiqsimulation: boolean;
   removeLiqSimulationError: string | undefined;
   isEth: boolean;
+  amountInGt0: boolean;
 }
 export function useRemoveLiquidityValidation({
   needsApproval,
+  amountInGt0,
   approvalSimulation,
   removeLiqEthSimulation,
   removeLiqsimulation,
   removeLiqSimulationError,
   isEth,
 }: Props) {
+  console.log({ needsApproval }, "HELLOOOO");
   if (needsApproval) {
     if (approvalSimulation) {
       return { isValid: true, errorMessage: "" };
     }
     return { isValid: false, errorMessage: "" };
+  }
+  if (!amountInGt0) {
+    return { isValid: false, errorMessage: null };
   }
   if (isEth) {
     if (removeLiqEthSimulation) {

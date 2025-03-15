@@ -7,15 +7,15 @@ import Link from "next/link";
 import { CustomConnectButton } from "./customConnectButton";
 import { useAccount } from "wagmi";
 import usePointsAccount from "@/app/points/__hooks__/usePointsAccount";
-import { useChainModal } from "@rainbow-me/rainbowkit";
+import SideNav from "./sideNav";
 export default function Header() {
   const { isConnected } = useAccount();
-  const { openChainModal } = useChainModal();
   const router = useRouter();
   const { data } = usePointsAccount();
   return (
-    <div className="h-[88px] px-8 items-center grid grid-cols-4">
+    <div className="h-[88px] px-2 md:px-8 items-center flex justify-between md:grid grid-cols-4">
       <button
+        className="hidden md:block"
         role="link"
         onClick={() => {
           if (!data?.result.invitationCode) {
@@ -27,27 +27,19 @@ export default function Header() {
       >
         <Image src={reactor} alt="" />
       </button>
-      <div className="col-span-2">
+      <SideNav />
+
+      <div className="col-span-2 hidden md:block">
         {isConnected && (
-          <ul className="grid justify-center  grid-cols-3 place-items-center text-[14px]">
+          <ul className="grid justify-center  grid-cols-4 place-items-center text-[14px]">
             <NavLink href="/swap">Swap</NavLink>
-            {/* <NavLink href="/lock">Lock</NavLink> */}
+            <NavLink href="/points">Points</NavLink>
             <NavLink href="/dashboard">Dashboard</NavLink>
             <NavLink href="/liquidity">Liquidity</NavLink>
-            {/* <NavLink href="/voting">Voting</NavLink> */}
-            {/* <NavLink href="/uniswap">Faucet</NavLink> */}
           </ul>
         )}
       </div>
       <div className="flex justify-end items-center gap-x-3">
-        {isConnected && (
-          <button
-            className="rounded-full h-6 w-6 bg-blue-400"
-            onClick={() => openChainModal?.()}
-          >
-            M
-          </button>
-        )}
         <CustomConnectButton />
       </div>
     </div>

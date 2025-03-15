@@ -1,9 +1,10 @@
-import { ETHER, WETH } from "@/data/constants";
+import { ChainId, ETHER, WETH } from "@/data/constants";
 import { TToken } from "@/lib/types";
 import * as Weth from "@/lib/abis/WETH";
 import { useMemo } from "react";
 import { useChainId, useSimulateContract } from "wagmi";
 import { parseEther } from "viem";
+import { useGetBalance } from "@/lib/hooks/useGetBalance";
 
 export function useWETHExecutions({
   token0,
@@ -18,12 +19,13 @@ export function useWETHExecutions({
   const weth = useMemo(() => WETH[chainId], [chainId]);
   const isIntrinsicWETHProcess = useMemo(
     () =>
-      (token0?.address.toLowerCase() === weth.toLowerCase() &&
-        token1?.address.toLowerCase() === ETHER.toLowerCase()) ||
-      (token0?.address.toLowerCase() === ETHER.toLowerCase() &&
-        token1?.address.toLowerCase() === weth.toLowerCase()),
+      token0?.address.toLowerCase() === weth.toLowerCase() ||
+      token1?.address.toLowerCase() === ETHER.toLowerCase() ||
+      token0?.address.toLowerCase() === ETHER.toLowerCase() ||
+      token1?.address.toLowerCase() === weth.toLowerCase(),
     [weth, token0?.address, token1?.address]
   );
+  console.log({ isIntrinsicWETHProcess });
   const isWETHToEther = useMemo(
     () => token0?.address === weth,
     [weth, token0?.address]
@@ -53,11 +55,22 @@ export function useWETHExecutions({
   const WETHProcessSimulation = useMemo(() => {
     return { withdrawalSimulation, depositSimulation };
   }, [withdrawalSimulation, depositSimulation]);
-
+  let needsWrap = false;
+  const { balance, balanceQueryKey } = useGetBalance({
+    tokenAddress: WETH[ChainId.MONAD_TESTNET],
+  });
+  console.log({ isWETHToEther });
+  if (isWETHToEther) {
+    if (balance < parseEther(String(amount))) {
+      needsWrap = true;
+    }
+  }
   return {
     isIntrinsicWETHProcess,
     WETHProcessSimulation,
     withdrawalSimulation,
     isWETHToEther,
+    needsWrap,
+    wethQueryKey: balanceQueryKey,
   };
 }

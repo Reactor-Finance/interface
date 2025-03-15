@@ -8,8 +8,10 @@ import Spinner from "../ui/spinner";
 export enum ButtonState {
   Signing = "SIGNING",
   Fetching = "FETCHING",
+  Sending = "SENDING",
   Loading = "LOADING",
   Approve = "APPROVE",
+  Wrap = "WRAP",
   Default = "DEFAULT",
 }
 interface Props extends ButtonProps {
@@ -34,6 +36,8 @@ export default function SubmitButton({
         return "Waiting for Signature...";
       case ButtonState.Loading:
         return "Loading...";
+      case ButtonState.Sending:
+        return "Transction Pending";
       case ButtonState.Approve:
         return "Approve " + (approveTokenSymbol ?? "");
       case ButtonState.Fetching:
@@ -44,7 +48,11 @@ export default function SubmitButton({
   }, [approveTokenSymbol, props.children, state]);
 
   const isLoading = useMemo(
-    () => state === ButtonState.Loading || state === ButtonState.Signing,
+    () =>
+      state === ButtonState.Loading ||
+      state === ButtonState.Signing ||
+      state === ButtonState.Sending ||
+      state === ButtonState.Fetching,
     [state]
   );
 
@@ -61,10 +69,12 @@ export default function SubmitButton({
       size="submit"
     >
       <div className="flex gap-x-4 justify-center items-center">
-        {(state === ButtonState.Fetching || state === ButtonState.Loading) && (
-          <Spinner />
-        )}
-        <span>{!validationError ? buttonText : validationError}</span>
+        {(state === ButtonState.Fetching ||
+          state === ButtonState.Loading ||
+          state === ButtonState.Sending) && <Spinner />}
+        <span>
+          {!validationError || isLoading ? buttonText : validationError}
+        </span>
       </div>
     </Button>
   );

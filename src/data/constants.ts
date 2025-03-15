@@ -5,11 +5,14 @@ export const TWO_YEARS = 62208000;
 export const DAYS_14 = 60 * 60 * 24 * 14;
 export const QUOTE_REFETCH_INTERVAL = 1000 * 30;
 export const RCT_DECIMALS = 18;
+export const SLIPPAGE_ZEROS = 10000n;
 
 export enum ChainId {
   MONAD_TESTNET = 10143,
 }
-
+export const PAIR_FACTORY: { [key: number]: `0x${string}` } = {
+  [ChainId.MONAD_TESTNET]: "0x22595aA7f5298b49D62450DA6300882Fb3d98eBc",
+};
 export const VOTER: { [key: number]: `0x${string}` } = {
   [ChainId.MONAD_TESTNET]: "0x8B72C1cebD63Aea76B6C5B09217A8c8889A3F6ba",
 };
@@ -32,9 +35,12 @@ export const ORACLE: { [key: number]: `0x${string}` } = {
   [ChainId.MONAD_TESTNET]: "0xAa97c394C26c122F926fEB015237C82a62A98D51",
 };
 export const VE: { [key: number]: `0x${string}` } = {
-  [ChainId.MONAD_TESTNET]: "0x753E21E1B2fE6F9567f0eC8884100BD5c7003C59",
+  [ChainId.MONAD_TESTNET]: "0xbe4e46fA5179672c0e606eE97Bf02AD47e7e1910",
 };
 export const RCT: { [key: number]: `0x${string}` } = {
   [ChainId.MONAD_TESTNET]: "0x02B8FcBE1D7ff6D6652C3A332B6a7B71392B6251",
+};
+export const EXCHANGE_HELPER: { [key: number]: `0x${string}` } = {
+  [ChainId.MONAD_TESTNET]: "0x0159f1cfE00e287f84d9d4D974Da2FEF1D6099Ac",
 };
 export const ETHER = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";

@@ -15,7 +15,7 @@ import { z } from "zod";
 import { useSearchParams } from "next/navigation";
 import { useCheckPair } from "@/lib/hooks/useCheckPair";
 import useApproveWrite from "@/lib/hooks/useApproveWrite";
-import { ROUTER } from "@/data/constants";
+import { ChainId, ETHER, ROUTER, WETH } from "@/data/constants";
 import { useQuoteLiquidity } from "@/app/liquidity/__hooks__/useQuoteLiquidity";
 import { useGetTokenInfo } from "@/utils";
 import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
@@ -25,6 +25,9 @@ import { useGetPairInfo } from "@/lib/hooks/useGetPairInfo";
 import DisplayFormattedNumber from "@/components/shared/displayFormattedNumber";
 import { formatNumber } from "@/lib/utils";
 import InitPoolInfo from "./initPoolInfo";
+import useWrapWrite from "@/lib/hooks/useWrapWrite";
+import useInitializePoolValidation from "./hooks/useInitializePoolValidation";
+import { useDebounce } from "@/lib/hooks/useDebounce";
 
 const searchParamsSchema = z.object({
   token0: z.string().refine((arg) => isAddress(arg)),
@@ -60,6 +63,8 @@ export default function InitializePool() {
 
   const [amount0, setAmount0] = useState("");
   const [amount1, setAmount1] = useState("");
+  const { debouncedValue: amount0Bounced } = useDebounce(amount0, 300);
+  const { debouncedValue: amount1Bounced } = useDebounce(amount1, 300);
   useEffect(() => {
     // reset inputs if change pool version
     setAmount0("");
@@ -86,7 +91,20 @@ export default function InitializePool() {
       token0?.decimals ?? 18
     ),
   });
-
+  // find which token is wmon
+  const wmonToken = useMemo(() => {
+    if (token0?.address === WETH[ChainId.MONAD_TESTNET]) {
+      return "token0";
+    }
+    if (token1?.address === WETH[ChainId.MONAD_TESTNET]) {
+      return "token1";
+    }
+    return "none";
+  }, [token0?.address, token1?.address]);
+  const { needsWrap, resetWrap, depositSimulation } = useWrapWrite({
+    amountIn: wmonToken === "token0" ? amount0 : amount1,
+    isWmon: wmonToken !== "none",
+  });
   // Check approval required
   const {
     approveWriteRequest: token0ApprovalWriteRequest,
@@ -97,7 +115,7 @@ export default function InitializePool() {
     spender: router,
     tokenAddress: token0?.address ?? zeroAddress,
     decimals: token0?.decimals,
-    amount: String(amount0),
+    amount: amount0Bounced,
   });
 
   const {
@@ -109,20 +127,17 @@ export default function InitializePool() {
     spender: router,
     tokenAddress: token1?.address ?? zeroAddress,
     decimals: token1?.decimals,
-    amount: String(amount1),
+    amount: amount1Bounced,
   });
 
   // Amounts parsed
   const amountADesired = useMemo(
-    () => parseUnits(amount0, token0?.decimals ?? 18),
-    [amount0, token0]
+    () => parseUnits(amount0Bounced, token0?.decimals ?? 18),
+    [amount0Bounced, token0?.decimals]
   );
   const amountBDesired = useMemo(
-    () =>
-      pairExists && quoteLiquidity > BigInt(0)
-        ? quoteLiquidity
-        : parseUnits(String(amount1), token1?.decimals ?? 18),
-    [amount1, token1, pairExists, quoteLiquidity]
+    () => parseUnits(amount1Bounced, token1?.decimals ?? 18),
+    [amount1Bounced, token1?.decimals]
   );
   const {
     addLiquidityETHSimulation,
@@ -140,27 +155,46 @@ export default function InitializePool() {
     stable: version === "stable",
   });
 
-  const {
-    writeContract,
-    reset,
-    isPending,
-    data: hash,
-    error: writeContractError,
-  } = useWriteContract(); // We'll also call reset when transaction toast is closed
+  const { writeContract, reset, isPending, data: hash } = useWriteContract(); // We'll also call reset when transaction toast is closed
   const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash });
   const { setToast } = useTransactionToastProvider();
-  const { balance: balance0, balanceQueryKey: bal0Key } = useGetBalance({
+  const { balance: balance0Raw, balanceQueryKey: bal0Key } = useGetBalance({
     tokenAddress: token0?.address ?? zeroAddress,
   });
-  const { balance: balance1, balanceQueryKey: bal1Key } = useGetBalance({
+  const {
+    balance: balance1Raw,
+    etherBalance,
+    balanceQueryKey: bal1Key,
+  } = useGetBalance({
     tokenAddress: token1?.address ?? zeroAddress,
   });
-  const queryClient = useQueryClient();
 
+  const balance0 = token0?.address === ETHER ? etherBalance.value : balance0Raw;
+  const balance1 = token1?.address === ETHER ? etherBalance.value : balance1Raw;
+  const { balance, balanceQueryKey: lpQueryKey } = useGetBalance({
+    tokenAddress: (pair as Address) ?? zeroAddress,
+  });
+  const queryClient = useQueryClient();
   const { pairInfo, queryKey: pairKey } = useGetPairInfo({ pair });
+  const resetAfterSwap = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: bal0Key });
+    queryClient.invalidateQueries({ queryKey: bal1Key });
+    queryClient.invalidateQueries({ queryKey: pairKey });
+    queryClient.invalidateQueries({ queryKey: lpQueryKey });
+  }, [bal0Key, bal1Key, lpQueryKey, pairKey, queryClient]);
+
   useEffect(() => {
     if (isSuccess) {
       reset();
+      if (needsWrap) {
+        resetWrap();
+        setToast({
+          actionTitle: "Wrapped",
+          actionDescription: "",
+          hash,
+        });
+        return;
+      }
       if (token0NeedsApproval) {
         queryClient.invalidateQueries({ queryKey: token0AllowanceKey });
         setToast({
@@ -180,26 +214,24 @@ export default function InitializePool() {
         return;
       }
       if (!token0NeedsApproval || !token1NeedsApproval) {
-        queryClient.invalidateQueries({ queryKey: bal0Key });
-        queryClient.invalidateQueries({ queryKey: bal1Key });
-        queryClient.invalidateQueries({ queryKey: pairKey });
         setToast({
           actionTitle: "Added Liquidity",
           actionDescription: "",
           hash,
         });
+        resetAfterSwap();
         setAmount0("");
         setAmount1("");
       }
     }
   }, [
-    bal0Key,
-    bal1Key,
     hash,
     isSuccess,
-    pairKey,
+    needsWrap,
     queryClient,
     reset,
+    resetAfterSwap,
+    resetWrap,
     setToast,
     token0AllowanceKey,
     token0NeedsApproval,
@@ -207,6 +239,10 @@ export default function InitializePool() {
     token1NeedsApproval,
   ]);
   const onSubmit = useCallback(() => {
+    if (needsWrap && depositSimulation.data?.request) {
+      writeContract(depositSimulation.data?.request);
+      return;
+    }
     if (token0NeedsApproval && token0ApprovalWriteRequest) {
       writeContract(token0ApprovalWriteRequest);
       return;
@@ -225,14 +261,16 @@ export default function InitializePool() {
       }
     }
   }, [
+    needsWrap,
+    depositSimulation.data?.request,
     token0NeedsApproval,
     token0ApprovalWriteRequest,
     token1NeedsApproval,
     token1ApprovalWriteRequest,
     isAddLiquidityETH,
     writeContract,
-    addLiquidityETHSimulation,
-    addLiquiditySimulation,
+    addLiquidityETHSimulation?.data?.request,
+    addLiquiditySimulation?.data?.request,
   ]);
 
   const tokenNeedingApproval = useMemo(() => {
@@ -244,38 +282,47 @@ export default function InitializePool() {
     }
   }, [token0, token1, token0NeedsApproval, token1NeedsApproval]);
 
-  const stateValid = useMemo(
+  let stateValid = useMemo(
     () =>
-      !!token0 &&
-      !!token1 &&
-      (!token0NeedsApproval && !token1NeedsApproval
-        ? (Boolean(addLiquidityETHSimulation.data?.request) ||
-            Boolean(addLiquiditySimulation.data?.request)) &&
-          amountADesired > 0n &&
-          amountBDesired > 0n
-        : true),
+      (!!token0 &&
+        !!token1 &&
+        (!token0NeedsApproval && !token1NeedsApproval
+          ? (Boolean(addLiquidityETHSimulation.data?.request) ||
+              Boolean(addLiquiditySimulation.data?.request)) &&
+            amountADesired > 0n &&
+            amountBDesired > 0n
+          : true)) ||
+      needsWrap,
     [
       token0,
       token1,
       token0NeedsApproval,
       token1NeedsApproval,
-      addLiquidityETHSimulation,
-      addLiquiditySimulation,
+      addLiquidityETHSimulation.data?.request,
+      addLiquiditySimulation.data?.request,
       amountADesired,
       amountBDesired,
+      needsWrap,
     ]
   );
-  const { balance } = useGetBalance({
-    tokenAddress: (pair as Address) ?? zeroAddress,
+  const { isValid, errorMessage } = useInitializePoolValidation({
+    amount0,
+    needsWrap,
+    amount1,
+    token0,
+    token1,
+    balance0,
+    balance1,
   });
+  stateValid = stateValid && isValid;
   const { state: buttonState } = useGetButtonStatuses({
     isLoading,
     isPending,
     isFetching: token0ApprovalFetching || token1ApprovalFetching,
     needsApproval: token0NeedsApproval || token1NeedsApproval,
   });
-  console.log(quoteLiquidity, "QUOTE LIQUIDITY ====");
   useEffect(() => {
+    if (!pairExists) return;
     if (selectedInput === "0") {
       if (quoteLiquidity === 0n) {
         setAmount1(amount0);
@@ -315,6 +362,7 @@ export default function InitializePool() {
     token0?.decimals,
     token1?.decimals,
   ]);
+  console.log({ addLiquiditySimulation });
   return (
     <>
       <h2 className="text-xl">
@@ -381,8 +429,8 @@ export default function InitializePool() {
                   <DisplayFormattedNumber
                     num={formatNumber(
                       formatUnits(
-                        pairInfo?.reserve0 ?? 0n,
-                        token0?.decimals ?? 18
+                        pairInfo?.reserve1 ?? 0n,
+                        token1?.decimals ?? 18
                       )
                     )}
                   />
@@ -408,14 +456,12 @@ export default function InitializePool() {
       <SubmitButton
         state={buttonState}
         isValid={stateValid}
+        validationError={errorMessage}
         approveTokenSymbol={tokenNeedingApproval?.symbol}
         onClick={onSubmit}
       >
-        Add Liquidity
+        {needsWrap ? "Wrap" : "Add Liquidity"}
       </SubmitButton>
-      {writeContractError && (
-        <span className="text-[13px] text-red-400 pt-3 text-center"></span>
-      )}
     </>
   );
 }

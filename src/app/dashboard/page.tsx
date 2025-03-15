@@ -5,9 +5,6 @@ import { Button } from "@/components/ui/button";
 import InnerLabelInput from "./__components__/input";
 import PageMarginContainer from "@/components/ui/pageMarginContainer";
 import DashboardLiquidityTable from "./__components__/dashboardLiquidityTable";
-import LockTable from "../lock/lockTable/lockTable";
-import ClaimAllLocks from "../lock/claimAllLocks";
-import { LockProvider } from "../lock/lockProvider";
 import Link from "next/link";
 
 export default function Dashboard() {
@@ -51,19 +48,19 @@ export default function Dashboard() {
           <DashboardLiquidityTable />
         </div>
 
-        <LockProvider>
-          <div className="flex justify-between pt-12">
-            <Headers.InfoHeaderTwo popupContent={<div></div>}>
-              Locks
-            </Headers.InfoHeaderTwo>
-
-            <ClaimAllLocks />
-          </div>
-          <div className="pt-6"></div>
-          <div>
-            <LockTable />
-          </div>
-        </LockProvider>
+        {/* <LockProvider> */}
+        {/*   <div className="flex justify-between pt-12"> */}
+        {/*     <Headers.InfoHeaderTwo popupContent={<div></div>}> */}
+        {/*       Locks */}
+        {/*     </Headers.InfoHeaderTwo> */}
+        {/**/}
+        {/*     <ClaimAllLocks /> */}
+        {/*   </div> */}
+        {/*   <div className="pt-6"></div> */}
+        {/*   <div> */}
+        {/*     <LockTable /> */}
+        {/*   </div> */}
+        {/* </LockProvider> */}
       </PageMarginContainer>
     </div>
   );
