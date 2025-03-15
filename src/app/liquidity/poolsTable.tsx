@@ -281,9 +281,11 @@ function OrderButton({
           data-direction={selected ? direction : "none"}
           className="text-neutral-400 data-[direction=none]:text-neutral-400 -mb-1 data-[direction=up]:text-white"
           size={16}
+          strokeWidth={3}
         />
         <ChevronDown
           data-direction={selected ? direction : "none"}
+          strokeWidth={3}
           className="text-neutral-400 -mt-1 data-[direction=none]:text-neutral-400 data-[direction=down]:text-white"
           size={16}
         />
