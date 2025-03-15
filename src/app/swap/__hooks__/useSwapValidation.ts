@@ -43,7 +43,7 @@ export default function useSwapValidation({
     if (needsWrap && wrapSimulation) {
       return { isValid: true, message: null };
     }
-    if (token0Balance < parseUnits(String(amountIn), token0?.decimals ?? 18)) {
+    if (token0Balance < parseUnits(amountIn, token0?.decimals ?? 18)) {
       return { isValid: false, message: ErrorMessage.INSUFFICIENT_BALANCE };
     }
     if (needsWrap) {

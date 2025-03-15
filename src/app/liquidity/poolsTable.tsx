@@ -188,7 +188,7 @@ export default function PoolsTable() {
               </th>
               <th className="flex justify-end">
                 <OrderButton
-                  title="7d Volume"
+                  title="Volume"
                   orderBy={"volume"}
                   direction={filters.orderDirection}
                   value={filters.orderBy}

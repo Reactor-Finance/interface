@@ -1,14 +1,12 @@
 import { ChevronDown, Settings } from "lucide-react";
-import { abi } from "@/lib/abis/Oracle";
 import React, { ReactNode, useMemo, useState } from "react";
 import infoIcon from "@/assets/info.svg";
 import Tooltip from "@/components/ui/tooltip";
-import { formatUnits, parseUnits } from "viem";
+import { formatUnits } from "viem";
 import { TToken } from "@/lib/types";
 import { useAtom } from "jotai/react";
 import { settingDialogOpenAtom, slippageAtom } from "@/store";
-import { useReadContract } from "wagmi";
-import { ChainId, ORACLE, SLIPPAGE_ZEROS } from "@/data/constants";
+import { SLIPPAGE_ZEROS } from "@/data/constants";
 import { useGetMarketQuote } from "@/lib/hooks/useGetMarketQuote";
 interface Props {
   amountIn: bigint;
@@ -39,14 +37,6 @@ export default function SwapDetails({
     const min = amountOut - a;
     return { min, per };
   }, [amountIn, amountOut, slippage, token0.decimals, token1.decimals]);
-  const { data: token1Usd, error } = useReadContract({
-    abi,
-    address: ORACLE[ChainId.MONAD_TESTNET],
-    functionName: "getAverageValueInETH",
-    args: [token0.address, parseUnits("1", token0.decimals)],
-    chainId: ChainId.MONAD_TESTNET,
-  });
-  console.log({ token1Usd, error });
   const { quote } = useGetMarketQuote({
     tokenAddress: token0.address,
     value: amountOut,
