@@ -71,7 +71,9 @@ export const CustomConnectButton = () => {
                     <div className="flex items-center hover:bg-neutral-950 bg-neutral-900 group p-1 gap-x-2 rounded-md">
                       <div className="h-6 w-6">
                         {!account.ensAvatar && (
-                          <div className="h-full w-full bg-blue-400 rounded-full"></div>
+                          <div className="h-full text-[10px] items-center flex justify-center w-full bg-neutral-1000 rounded-full">
+                            ?
+                          </div>
                         )}
                         {account.ensAvatar && (
                           <Image
