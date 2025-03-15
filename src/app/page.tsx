@@ -25,7 +25,9 @@ function ConnectView() {
         <h1 className=" text-[22px] leading-[26px] lg:text-[36px] lg:leading-[40px]">
           Connect your wallet
         </h1>
-        <p className="text-neutral-400">Log In to check your ranks</p>
+        <p className="text-neutral-400 text-sm lg:text-[16px]">
+          Log In to check your ranks
+        </p>
         <Button
           size="md"
           onClick={() => {

@@ -90,7 +90,7 @@ export default function PointsAccess() {
           <span>Already registered?</span>
           <button
             onClick={() => openAccountModal?.()}
-            className="text-primary-400"
+            className=" text-[12px] lg:text-[16px] text-primary-400"
           >
             Log in with your wallet.
           </button>
