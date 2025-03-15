@@ -24,12 +24,14 @@ export const poolsRouter = createTRPCRouter({
     });
     const poolWithDetails = pools
       .map((pool) => {
-        const randomInt = Math.floor(Math.random() * 100);
+        const randomIntA = Math.floor(Math.random() * 100);
+        const randomIntB = Math.floor(Math.random() * 100);
+        const randomIntC = Math.floor(Math.random() * 100);
         return {
           ...pool,
-          feeInUsd: BigInt(randomInt),
-          tvlInUsd: BigInt(randomInt),
-          volumeInUsd7D: BigInt(randomInt),
+          feeInUsd: BigInt(randomIntA),
+          tvlInUsd: BigInt(randomIntB),
+          volumeInUsd7D: BigInt(randomIntC),
         };
       })
       .filter(
