@@ -18,12 +18,22 @@ import { TransactionToastProvider } from "@/contexts/transactionToastProvider";
 import { Provider } from "jotai/react";
 import { store } from "@/store";
 import { PoolslistContextProvider } from "@/contexts/poolsTvl";
-import { metaMaskWallet, phantomWallet } from "@rainbow-me/rainbowkit/wallets";
+import {
+  metaMaskWallet,
+  phantomWallet,
+  walletConnectWallet,
+  injectedWallet,
+} from "@rainbow-me/rainbowkit/wallets";
 const connectors = connectorsForWallets(
   [
     {
       groupName: "Recommended",
-      wallets: [phantomWallet, metaMaskWallet],
+      wallets: [
+        phantomWallet,
+        metaMaskWallet,
+        walletConnectWallet,
+        injectedWallet,
+      ],
     },
   ],
   {
