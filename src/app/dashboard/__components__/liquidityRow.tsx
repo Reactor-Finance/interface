@@ -129,6 +129,7 @@ export function LiquidityRow({
           <Button
             disabled={account_gauge_earned === 0n}
             variant={"primary"}
+            className="disabled:group-hover:bg-neutral-900 "
             size="xs"
           >
             Claim
