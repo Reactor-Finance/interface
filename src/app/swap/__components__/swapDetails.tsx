@@ -6,8 +6,11 @@ import { formatUnits } from "viem";
 import { TToken } from "@/lib/types";
 import { useAtom } from "jotai/react";
 import { settingDialogOpenAtom, slippageAtom } from "@/store";
-import { SLIPPAGE_ZEROS } from "@/data/constants";
+import { ChainId, EXCHANGE_HELPER, SLIPPAGE_ZEROS } from "@/data/constants";
 import { useGetMarketQuote } from "@/lib/hooks/useGetMarketQuote";
+import { useReadContract } from "wagmi";
+import { ExchangeHelper } from "@/lib/abis/ExchangeHelper";
+import { formatNumber } from "@/lib/utils";
 interface Props {
   amountIn: bigint;
   amountOut: bigint;
@@ -40,6 +43,17 @@ export default function SwapDetails({
   const { quote } = useGetMarketQuote({
     tokenAddress: token0.address,
     value: amountOut,
+  });
+
+  // address tokenA,
+  // address tokenB,
+  // uint256 amountIn,
+  // bool multiHops
+  const { data: priceImpact } = useReadContract({
+    abi: ExchangeHelper,
+    address: EXCHANGE_HELPER[ChainId.MONAD_TESTNET],
+    functionName: "calculatePriceImpact",
+    args: [token0.address, token1.address, amountIn, false],
   });
   return (
     <div className="text-[13px] border border-neutral-800 rounded-[16px] p-1 md:p-4 space-y-4">
@@ -88,7 +102,13 @@ export default function SwapDetails({
             info="Info"
           />
           {/* <Row title="Fee" value="$23.44" info="Info" /> */}
-          {/* <Row title="Price Impact" value="$23.44" info="Info" /> */}
+          <Row
+            title="Price Impact"
+            value={
+              formatNumber(formatUnits(priceImpact ?? 0n, 18) ?? "0n") + "%"
+            }
+            info="Info"
+          />
           {/* <Row title="Route" value="$23.44" info="Info" /> */}
         </div>
       </div>
