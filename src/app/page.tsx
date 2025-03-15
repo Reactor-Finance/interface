@@ -8,9 +8,9 @@ import PointsAccess from "./points/__components__/pointsAccess";
 export default function Page() {
   const { isConnected } = useAccount();
   return (
-    <div className="min-h-[calc(100vh-88px)] flex items-center  justify-center">
-      <div className="absolute top-0 left-0 w-full -z-10 h-screen flex justify-center items-center">
-        <Image className=" h-full" src={bg} alt="bg" />
+    <div className="min-h-[calc(100vh-88px)] flex items-center justify-center">
+      <div className="absolute top-0 left-0 object-fill h-full w-screen  -z-10  flex justify-center items-center">
+        <Image className="object-cover w-full h-full" src={bg} alt="bg" />
       </div>
       {isConnected && <PointsAccess />}
       {!isConnected && <ConnectView />}
