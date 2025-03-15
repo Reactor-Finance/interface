@@ -50,42 +50,43 @@ export default function PoolsTable() {
     [pools]
   );
   const newPools = useMemo(() => {
-    const result =
-      pools
-        ?.filter((pair) => {
-          const { searchQuery } = filersBounced;
-          const notZeroAddr = pair.pair_address !== zeroAddress;
-          const search0 = searchQuery
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase());
-          const search1 = pair.token0_symbol
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase());
-          let versionFilter = true;
-          if (filters.isStable && filters.isStable !== undefined) {
-            versionFilter = pair.stable;
-          } else if (filters.isStable !== undefined) {
-            versionFilter = !pair.stable;
-          }
-          return notZeroAddr && search0 && search1 && versionFilter;
-        })
-        .sort((a, b) => {
-          if (filters.orderBy === "tvl") {
-            return Number(a.tvlInUsd) - Number(b.tvlInUsd);
-          }
-          if (filters.orderBy === "fees") {
-            return Number(a.feeInUsd) - Number(b.feeInUsd);
-          }
-          if (filters.orderBy === "volume") {
-            return Number(a.volumeInUsd7D) - Number(b.volumeInUsd7D);
-          }
-          return 0;
-        })
-        .slice(pageLength * page - pageLength, pageLength * page) ?? [];
+    let result = pools
+      ?.filter((pair) => {
+        const { searchQuery } = filersBounced;
+        const notZeroAddr = pair.pair_address !== zeroAddress;
+        const search0 = searchQuery
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase());
+        const search1 = pair.token0_symbol
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase());
+        let versionFilter = true;
+        if (filters.isStable && filters.isStable !== undefined) {
+          versionFilter = pair.stable;
+        } else if (filters.isStable !== undefined) {
+          versionFilter = !pair.stable;
+        }
+        return notZeroAddr && search0 && search1 && versionFilter;
+      })
+      .sort((a, b) => {
+        if (filters.orderBy === "tvl") {
+          return Number(a.tvlInUsd) - Number(b.tvlInUsd);
+        }
+        if (filters.orderBy === "fees") {
+          return Number(a.feeInUsd) - Number(b.feeInUsd);
+        }
+        if (filters.orderBy === "volume") {
+          return Number(a.volumeInUsd7D) - Number(b.volumeInUsd7D);
+        }
+        return 0;
+      });
 
     if (filters.orderDirection === "up") {
       result.reverse();
     }
+
+    result =
+      result.slice(pageLength * page - pageLength, pageLength * page) ?? [];
     return result;
   }, [
     filersBounced,
