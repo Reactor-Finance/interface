@@ -19,7 +19,7 @@ export default {
       },
       padding: { xs: "4px", xxs: "8px", sm: "12px" },
       colors: {
-        background: "hsl(var(--background))",
+        background: "#0E0F10",
         foreground: "hsl(var(--foreground))",
 
         card: {
