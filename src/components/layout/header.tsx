@@ -21,7 +21,7 @@ export default function Header() {
           if (!data?.result.invitationCode) {
             router.push("/");
           } else {
-            router.push("/points");
+            router.push("/swap");
           }
         }}
       >
