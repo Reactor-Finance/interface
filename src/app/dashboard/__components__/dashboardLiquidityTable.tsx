@@ -43,10 +43,10 @@ export default function DashboardLiquidityTable() {
           <thead className="text-neutral-400 text-sm">
             <tr className="grid grid-cols-7 px-6 py-2 font-medium">
               <th className="col-span-2 text-left">Pool Name</th>
-              <th>Status</th>
-              <th>Value</th>
-              <th>APR</th>
-              <th>Rewards</th>
+              <th className="hidden lg:block">Status</th>
+              <th className="hidden lg:block">Value</th>
+              <th className="hidden lg:block">APR</th>
+              <th className="hidden lg:block">Rewards</th>
               <th></th>
             </tr>
           </thead>

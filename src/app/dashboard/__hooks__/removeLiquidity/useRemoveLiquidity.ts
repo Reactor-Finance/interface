@@ -67,7 +67,6 @@ export function useRemoveLiquidity({
       Number(transactionDeadlineInMinutes) * 60;
     return BigInt(ttl);
   }, [now, transactionDeadlineInMinutes]);
-  console.log({ deadline });
   const isEth =
     token0.toLowerCase() === weth.toLowerCase() ||
     token1.toLowerCase() === weth.toLowerCase();
