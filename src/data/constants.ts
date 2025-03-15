@@ -41,6 +41,6 @@ export const RCT: { [key: number]: `0x${string}` } = {
   [ChainId.MONAD_TESTNET]: "0x02B8FcBE1D7ff6D6652C3A332B6a7B71392B6251",
 };
 export const EXCHANGE_HELPER: { [key: number]: `0x${string}` } = {
-  [ChainId.MONAD_TESTNET]: "0x55be46eE2cd0623952b4AAAB8F03736cBCe1Af94",
+  [ChainId.MONAD_TESTNET]: "0x0159f1cfE00e287f84d9d4D974Da2FEF1D6099Ac",
 };
 export const ETHER = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
