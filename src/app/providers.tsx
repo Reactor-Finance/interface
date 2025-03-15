@@ -3,14 +3,14 @@
 import "@rainbow-me/rainbowkit/styles.css";
 import {
   RainbowKitProvider,
+  connectorsForWallets,
   darkTheme,
-  getDefaultConfig,
 } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { monadTestnet } from "wagmi/chains";
 import { hashFn } from "@wagmi/core/query";
 import { FC, PropsWithChildren } from "react";
-import { http, WagmiProvider } from "wagmi";
+import { createConfig, http, WagmiProvider } from "wagmi";
 import { HeroUIProvider } from "@heroui/react";
 import { TRPCReactProvider } from "@/trpc/react";
 import { TokenlistContextProvider } from "@/contexts/tokenlistContext";
@@ -18,17 +18,28 @@ import { TransactionToastProvider } from "@/contexts/transactionToastProvider";
 import { Provider } from "jotai/react";
 import { store } from "@/store";
 import { PoolslistContextProvider } from "@/contexts/poolsTvl";
+import { metaMaskWallet, phantomWallet } from "@rainbow-me/rainbowkit/wallets";
+const connectors = connectorsForWallets(
+  [
+    {
+      groupName: "Recommended",
+      wallets: [phantomWallet, metaMaskWallet],
+    },
+  ],
+  {
+    appName: "ReactorFi",
+    projectId: "75ec6bc09b1280c146d750fbb7aae68a",
+  }
+);
 
-export const wagmiConfig = getDefaultConfig({
-  appName: "Reactor Finance",
-  projectId: "75ec6bc09b1280c146d750fbb7aae68a",
+export const wagmiConfig = createConfig({
+  connectors,
   ssr: true,
   chains: [monadTestnet],
   transports: {
     [monadTestnet.id]: http("https://testnet-rpc.monad.xyz"),
   },
 });
-
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -44,7 +55,7 @@ export const Providers: FC<PropsWithChildren> = ({ children }) => {
     <Provider store={store}>
       <WagmiProvider config={wagmiConfig}>
         <QueryClientProvider client={queryClient}>
-          <RainbowKitProvider theme={darkTheme()}>
+          <RainbowKitProvider modalSize="compact" theme={darkTheme()}>
             <TRPCReactProvider>
               <TokenlistContextProvider>
                 <TransactionToastProvider>
