@@ -4,6 +4,10 @@ import Image from "next/image";
 import wallet from "@/assets/wallet.svg";
 import { formatNumber, inputPatternMatch } from "@/lib/utils";
 import { TToken } from "@/lib/types";
+import { useGetMarketQuote } from "@/lib/hooks/useGetMarketQuote";
+import { formatUnits, parseUnits, zeroAddress } from "viem";
+import DisplayFormattedNumber from "@/components/shared/displayFormattedNumber";
+import { useDebounce } from "@/lib/hooks/useDebounce";
 interface Props {
   balance: string;
   value: string;
@@ -24,6 +28,11 @@ export default function SwapCard({
   selectPain,
   setValue,
 }: Props) {
+  const debouncedValue = useDebounce(value, 300);
+  const { quote } = useGetMarketQuote({
+    tokenAddress: token?.address ?? zeroAddress,
+    value: parseUnits(debouncedValue.debouncedValue, token?.decimals ?? 18),
+  });
   return (
     <div
       onClick={selectPain}
@@ -69,7 +78,12 @@ export default function SwapCard({
         </button>
       </div>
       <div className="flex justify-between">
-        <span className="text-sm text-[#CCCCCC]">$0</span>
+        <span className="text-sm text-[#CCCCCC]">
+          $
+          <DisplayFormattedNumber
+            num={formatNumber(formatUnits(quote[0], token?.decimals ?? 18))}
+          />
+        </span>
         <div className="flex gap-x-4">
           <div className="flex gap-x-1">
             <Image src={wallet} alt="Wallet" />
