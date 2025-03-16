@@ -70,7 +70,7 @@ export function LiquidityRow({
   return (
     <TableRow
       cols="7"
-      mobileCols={"3"}
+      mobileCols={"7"}
       className="grid animate-in fade-in  text-center rounded-sm  items-center bg-neutral-1000 py-2 px-6"
     >
       <td className=" text-left col-span-2">
@@ -82,7 +82,7 @@ export function LiquidityRow({
           />
         </div>
       </td>
-      <td className="flex-col gap-y-1 hidden lg:flex justify-center items-center">
+      <td className="flex-col gap-y-1 flex justify-center items-center">
         <Badge
           className="inline-block px-4 h-fit py-[6px] text-center"
           border="none"
@@ -105,12 +105,12 @@ export function LiquidityRow({
           </div>
         </div>
       </td>
-      <td className="text-sm hidden lg:block">${totalMarketQuote}</td>
+      <td className="text-sm block">${totalMarketQuote}</td>
       {/* <RangeColumn pair={pair_address} /> */}
-      <td className="text-blue-light hidden lg:block text-sm">
+      <td className="text-blue-light block text-sm">
         {formatEther(emissions)}%
       </td>
-      <td className="flex-col hidden lg:flex items-center justify-center">
+      <td className="flex-col flex items-center justify-center">
         <div className="flex items-center gap-[9px]">
           <Image
             className="inline-block"

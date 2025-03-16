@@ -150,7 +150,7 @@ export default function PoolsTable() {
           ></SearchInput>
         </div>
       </div>
-      <div className="pt-4 min-h-[500px]  overflow-x-auto">
+      <div className="pt-4 min-h-[500px]  overflow-x-auto scroll-container">
         <table className="w-full min-w-[500px]">
           <thead className="text-neutral-400 text-sm text-right w-full">
             <tr className=" grid grid-cols-6 lg:grid-cols-11 items-center gap-x-4 px-4">

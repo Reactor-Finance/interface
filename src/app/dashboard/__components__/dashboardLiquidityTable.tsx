@@ -48,32 +48,34 @@ export default function DashboardLiquidityTable() {
         />
       )}
       {!isLoadingPadded && activePairs.length > 0 && (
-        <table className="w-full pt-6 mx-auto">
-          <caption className="h-0 opacity-0">Pools Table</caption>
-          <thead className="text-neutral-400 text-sm">
-            <tr className="grid grid-cols-7 px-6 py-2 font-medium">
-              <th className="col-span-2 text-left">Pool Name</th>
-              <th className="hidden lg:block">Status</th>
-              <th className="hidden lg:block">Value</th>
-              <th className="hidden lg:block">APR</th>
-              <th className="hidden lg:block">Rewards</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody className="flex flex-col space-y-2 min-h-[52px]">
-            {!isLoadingPadded &&
-              activePairs.map((pair) => (
-                <LiquidityRow
-                  key={pair.pair_address}
-                  pairInfo={pair}
-                  onItemClick={(actionType) => {
-                    setSelectedPair(pair);
-                    setStateType({ actionType, dialogOpen: true });
-                  }}
-                />
-              ))}
-          </tbody>
-        </table>
+        <div className="overflow-x-auto scroll-container">
+          <table className="w-full min-w-[1000px] pt-6 mx-auto">
+            <caption className="h-0 opacity-0">Pools Table</caption>
+            <thead className="text-neutral-400 text-sm">
+              <tr className="grid grid-cols-7 px-6 py-2 font-medium">
+                <th className="col-span-2 text-left">Pool Name</th>
+                <th className=" ">Status</th>
+                <th className=" ">Value</th>
+                <th className=" ">APR</th>
+                <th className=" ">Rewards</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody className="flex flex-col space-y-2 min-h-[52px]">
+              {!isLoadingPadded &&
+                activePairs.map((pair) => (
+                  <LiquidityRow
+                    key={pair.pair_address}
+                    pairInfo={pair}
+                    onItemClick={(actionType) => {
+                      setSelectedPair(pair);
+                      setStateType({ actionType, dialogOpen: true });
+                    }}
+                  />
+                ))}
+            </tbody>
+          </table>
+        </div>
       )}
       {isLoadingPadded && (
         <div className=" w-full  h-[52px] flex items-center justify-center">

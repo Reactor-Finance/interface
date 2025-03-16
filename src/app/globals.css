@@ -9,14 +9,40 @@ body {
   scrollbar-gutter: stable;
   font-family: Arial, Helvetica, sans-serif;
 }
+/* Scrollbar for Webkit browsers (Chrome, Edge, Safari) */
+.scroll-container {
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #888 hsl(210 7%, 6%); /* Firefox */
+}
+
+/* For WebKit browsers */
+.scroll-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.scroll-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
 .scrollbar {
   scrollbar-width: thin; /* For Firefox */
   scrollbar-color: #333333 transparent; /* For Firefox */
 }
 
 .scrollbar::-webkit-scrollbar {
-  width: 8px; /* Width of the scrollbar */
-  height: 8px; /* Height of the scrollbar */
+  width: 12px; /* Width of the scrollbar */
+  height: 12px; /* Height of the scrollbar */
 }
 
 .scrollbar::-webkit-scrollbar-thumb {
