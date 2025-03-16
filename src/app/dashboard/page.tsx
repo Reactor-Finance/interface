@@ -15,7 +15,7 @@ export default function Dashboard() {
           Dashboard
         </Headers.GradiantHeaderOne>
         <div className="pt-4"></div>
-        <div className="flex gap-3">
+        <div className="flex flex-col md:flex-row gap-3">
           {/* input part goes here */}
           <InnerLabelInput label="Account" />
 
