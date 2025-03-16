@@ -70,7 +70,8 @@ export default function NewSwapView() {
 
   // Quote
   const {
-    quoteAmount,
+    quoteAmountIn,
+    quoteAmountOut,
     isLoading: amountOutLoading,
     amountInLoading,
   } = useQuoteSwap({
@@ -91,10 +92,10 @@ export default function NewSwapView() {
       setAmountIn("");
     }
     if (activePane === 0 && !amountOutLoading && amountIn !== "") {
-      const rounded = Math.floor(Number(quoteAmount) * 100) / 100;
+      const rounded = Math.floor(Number(quoteAmountOut) * 100) / 100;
       setAmountOut(rounded.toString());
     } else if (activePane === 1 && !amountInLoading && amountOut !== "") {
-      const rounded = Math.floor(Number(quoteAmount) * 100) / 100;
+      const rounded = Math.floor(Number(quoteAmountIn) * 100) / 100;
       setAmountIn(rounded.toString());
     }
   }, [
@@ -105,7 +106,8 @@ export default function NewSwapView() {
     amountInLoading,
     amountOut,
     amountOutLoading,
-    quoteAmount,
+    quoteAmountOut,
+    quoteAmountIn,
   ]);
 
   // Router by chain ID

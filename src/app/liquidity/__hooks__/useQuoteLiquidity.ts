@@ -6,11 +6,15 @@ import { zeroAddress } from "viem";
 export function useQuoteLiquidity({
   token0,
   token1,
+  token0Decimals,
+  token1Decimals,
   stable,
   amountIn,
 }: {
   token0: `0x${string}`;
   token1: `0x${string}`;
+  token0Decimals: number;
+  token1Decimals: number;
   stable: boolean;
   amountIn: bigint;
 }) {
@@ -25,9 +29,23 @@ export function useQuoteLiquidity({
         : [pairInfo.reserve1, pairInfo.reserve0];
 
     console.log({ token0, token1, amountIn, pairInfo });
-    return amountIn > 0n && reserveB > 0n && reserveA > 0n
-      ? (amountIn * reserveB) / reserveA
-      : BigInt(0);
-  }, [pair, pairExists, pairInfo, token0, token1, amountIn]);
+    let amount =
+      amountIn > 0n && reserveB > 0n && reserveA > 0n
+        ? (amountIn * reserveB) / reserveA
+        : BigInt(0);
+    const decimalDiff = token0Decimals - token1Decimals;
+    console.log(decimalDiff, amount, "DECIMALLL ============");
+    amount = amount / BigInt(10) ** BigInt(Math.abs(decimalDiff));
+    return amount / BigInt(10) ** BigInt(Math.abs(decimalDiff));
+  }, [
+    pair,
+    pairExists,
+    pairInfo,
+    token0,
+    token1,
+    amountIn,
+    token0Decimals,
+    token1Decimals,
+  ]);
   return amountOut;
 }

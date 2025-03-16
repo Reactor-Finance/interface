@@ -85,6 +85,14 @@ export default function InitializePool() {
   const quoteLiquidity = useQuoteLiquidity({
     token0: (selectedInput === "0" ? t0 : t1) ?? zeroAddress,
     token1: (selectedInput === "0" ? t1 : t0) ?? zeroAddress,
+    token0Decimals:
+      selectedInput === "0"
+        ? (token0?.decimals ?? 18)
+        : (token1?.decimals ?? 18),
+    token1Decimals:
+      selectedInput === "0"
+        ? (token1?.decimals ?? 18)
+        : (token0?.decimals ?? 18),
     stable: version === "stable",
     amountIn: parseUnits(
       selectedInput === "0" ? amount0 : amount1,

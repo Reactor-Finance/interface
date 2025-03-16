@@ -1,6 +1,6 @@
 import { useChainId, useReadContract } from "wagmi";
 import * as TradeHelper from "@/lib/abis/TradeHelper";
-import { formatUnits, parseUnits, zeroAddress } from "viem";
+import { parseUnits, zeroAddress } from "viem";
 import { useMemo } from "react";
 import { TToken } from "@/lib/types";
 import { ETHER, TRADE_HELPER, WETH } from "@/data/constants";
@@ -59,7 +59,6 @@ export function useQuoteSwap({
   const {
     isLoading: amountInLoading,
     data: [receivedAmountIn] = [BigInt(0), false],
-    error: e,
   } = useReadContract({
     address,
     ...TradeHelper,
@@ -73,28 +72,21 @@ export function useQuoteSwap({
       enabled: !!amountOut && tokensExist && selected === 1 && amountOut !== "",
     },
   });
-  console.log(e, receivedAmountIn);
-  const isIntrinsicWETHProcess = useMemo(
-    () =>
-      (tokenIn?.address.toLowerCase() === weth.toLowerCase() &&
-        tokenOut?.address.toLowerCase() === ETHER.toLowerCase()) ||
-      (tokenIn?.address.toLowerCase() === ETHER.toLowerCase() &&
-        tokenOut?.address.toLowerCase() === weth.toLowerCase()),
-    [weth, tokenIn?.address, tokenOut?.address]
-  );
-  const receivedAmount = useMemo(
-    () => (selected === 0 ? receivedAmountOut : receivedAmountIn),
-    [selected, receivedAmountOut, receivedAmountIn]
-  );
-  const quoteAmount = useMemo(
-    () =>
-      isIntrinsicWETHProcess
-        ? amountIn
-        : tokenOut
-          ? formatUnits(receivedAmount, tokenOut.decimals)
-          : "0",
-    [isIntrinsicWETHProcess, amountIn, tokenOut, receivedAmount]
+  // const isIntrinsicWETHProcess = useMemo(
+  //   () =>
+  //     (tokenIn?.address.toLowerCase() === weth.toLowerCase() &&
+  //       tokenOut?.address.toLowerCase() === ETHER.toLowerCase()) ||
+  //     (tokenIn?.address.toLowerCase() === ETHER.toLowerCase() &&
+  //       tokenOut?.address.toLowerCase() === weth.toLowerCase()),
+  //   [weth, tokenIn?.address, tokenOut?.address]
+  // );
+  const { quoteAmountIn, quoteAmountOut } = useMemo(
+    () => ({
+      quoteAmountIn: receivedAmountIn,
+      quoteAmountOut: receivedAmountOut,
+    }),
+    [receivedAmountOut, receivedAmountIn]
   );
 
-  return { quoteAmount, error, isLoading, amountInLoading };
+  return { quoteAmountIn, quoteAmountOut, error, isLoading, amountInLoading };
 }

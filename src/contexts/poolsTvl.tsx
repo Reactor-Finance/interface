@@ -17,7 +17,7 @@ const PoolslistContext = createContext<PoolslistContextType>({
   isLoading: false,
   totals: undefined,
 });
-function wmonToMon(addr: Address) {
+export function wmonToMon(addr: Address) {
   if (addr.toLowerCase() === WETH[ChainId.MONAD_TESTNET].toLowerCase()) {
     return ETHER.toLowerCase() as Address;
   } else {
