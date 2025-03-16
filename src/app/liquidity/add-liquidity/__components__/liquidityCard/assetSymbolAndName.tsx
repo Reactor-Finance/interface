@@ -1,5 +1,6 @@
 import ImageWithFallback from "@/components/shared/imageWithFallback";
 import { useTokenlistContext } from "@/contexts/tokenlistContext";
+import { checkMon } from "@/lib/checkMon";
 import { TAddress } from "@/lib/types";
 import { useMemo } from "react";
 
@@ -29,7 +30,7 @@ export default function AssetSymbolAndName({
         src={token.logoURI}
         alt={token.symbol}
       />
-      <span className="text-[13px]">{token.symbol}</span>
+      <span className="text-[13px]">{checkMon(token.symbol)}</span>
     </div>
   );
 }

@@ -109,7 +109,7 @@ function TokenItem({
         />
         <div>
           <div>
-            <span>{token.symbol}</span>
+            <span>{checkMon(token.symbol)}</span>
           </div>
           <div>
             <span className="text-gray-400 text-sm">{token.name}</span>

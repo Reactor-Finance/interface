@@ -5,6 +5,7 @@ import { ChevronDown } from "lucide-react";
 import ImageWithFallback from "./imageWithFallback";
 import { inputPatternNumberMatch } from "@/utils";
 import { TToken } from "@/lib/types";
+import { checkMon } from "@/lib/checkMon";
 
 /**
  * Must Wrap in Form Field
@@ -84,7 +85,7 @@ function CurrencySelect({
               className="h-6 w-6 rounded-full"
               alt="alt"
             />
-            {token.symbol}
+            {checkMon(token.symbol)}
           </>
         )}
         {token === null && (

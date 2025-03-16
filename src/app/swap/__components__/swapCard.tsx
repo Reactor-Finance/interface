@@ -4,6 +4,7 @@ import Image from "next/image";
 import wallet from "@/assets/wallet.svg";
 import { formatNumber, inputPatternMatch } from "@/lib/utils";
 import { TToken } from "@/lib/types";
+import { checkMon } from "@/lib/checkMon";
 interface Props {
   balance: string;
   value: string;
@@ -50,7 +51,7 @@ export default function SwapCard({
         >
           <div className="flex items-center z-10 gap-x-2 cursor-pointer">
             <span className="z-10 text-[16px] text-nowrap ">
-              {token ? token.symbol : "Select"}
+              {token ? checkMon(token.symbol) : "Select"}
             </span>
             <ChevronDown />
           </div>

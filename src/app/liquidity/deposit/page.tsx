@@ -13,6 +13,7 @@ import { zeroAddress } from "viem";
 import { useCheckPair } from "@/lib/hooks/useCheckPair";
 import { ETHER, WETH } from "@/data/constants";
 import { useChainId } from "wagmi";
+import { checkMon } from "@/lib/checkMon";
 
 export default function Page() {
   const [token0DialogOpen, setOpenToken0Dialog] = useState(false);
@@ -153,7 +154,7 @@ function SearchTokensTrigger({
     >
       {token ? (
         <div className="flex gap-x-2 items-center">
-          <span>{token.symbol}</span>
+          <span>{checkMon(token.symbol)}</span>
           <ImageWithFallback
             width={24}
             height={24}

@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
-import { useAccount } from "wagmi";
+import { useAccount, useEnsAvatar } from "wagmi";
 import Input from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Check, Copy } from "lucide-react";
@@ -33,6 +33,7 @@ export default function PointsHeaders() {
     }
     mutate();
   };
+  const { data: avatar } = useEnsAvatar();
   return (
     <div className="mt-8  ">
       <div className=" flex flex-col lg:flex-row items-center gap-y-4 lg:items-stretch justify-between lg:space-x-4">
@@ -42,14 +43,20 @@ export default function PointsHeaders() {
         >
           <div className="grid grid-cols-3 w-full  items-start">
             <div className="col-span-2 flex gap-x-4">
-              <ImageWithFallback
-                src="https://i.ibb.co/0pDryFGv/image.png"
-                alt="Avatar"
-                width={64}
-                height={64}
-                className="w-16 h-16 rounded-full object-cover"
-              />
-
+              {avatar && (
+                <ImageWithFallback
+                  src={avatar ?? ""}
+                  alt="Avatar"
+                  width={64}
+                  height={64}
+                  className="w-16 h-16 rounded-full object-cover"
+                />
+              )}
+              {!avatar && (
+                <div className="h-16 w-16 rounded-full bg-neutral-1000 flex items-center justify-center">
+                  <span>?</span>
+                </div>
+              )}
               <div className="flex justify-center">
                 <h3 className="text-white text-lg font-semibold self-center">
                   My Position
