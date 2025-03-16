@@ -38,7 +38,6 @@ export const PoolslistContextProvider: React.FC<{ children: ReactNode }> = ({
         token1: wmonToMon(p.token1),
       };
     }) ?? [];
-  console.log(mPools);
   return (
     <PoolslistContext.Provider
       value={{

@@ -80,6 +80,9 @@ export function useQuoteSwap({
   //       tokenOut?.address.toLowerCase() === weth.toLowerCase()),
   //   [weth, tokenIn?.address, tokenOut?.address]
   // );
+
+  console.log(parseUnits(amountOut, tokenOut?.decimals ?? 18));
+  console.log({ receivedAmountIn, receivedAmountOut });
   const { quoteAmountIn, quoteAmountOut } = useMemo(
     () => ({
       quoteAmountIn: receivedAmountIn,

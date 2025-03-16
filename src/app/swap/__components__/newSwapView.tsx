@@ -12,7 +12,7 @@ import { useQuoteSwap } from "../__hooks__/useQuoteSwap";
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
 import { TToken } from "@/lib/types";
 import { ChainId, ETHER, ROUTER, WETH } from "@/data/constants";
-import { formatUnits, parseUnits, zeroAddress } from "viem";
+import { formatUnits, maxUint256, parseUnits, zeroAddress } from "viem";
 import { useGetBalance } from "@/lib/hooks/useGetBalance";
 import useSwapValidation from "../__hooks__/useSwapValidation";
 import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
@@ -92,9 +92,16 @@ export default function NewSwapView() {
       setAmountIn("");
     }
     if (activePane === 0 && !amountOutLoading && amountIn !== "") {
+      console.log({ quoteAmountOut }, "-=-=-=-=-=-=-=-");
       const rounded = Math.floor(Number(quoteAmountOut) * 100) / 100;
+      if (quoteAmountOut === maxUint256) {
+        return;
+      }
       setAmountOut(rounded.toString());
     } else if (activePane === 1 && !amountInLoading && amountOut !== "") {
+      if (quoteAmountIn === maxUint256) {
+        return;
+      }
       const rounded = Math.floor(Number(quoteAmountIn) * 100) / 100;
       setAmountIn(rounded.toString());
     }
@@ -119,7 +126,6 @@ export default function NewSwapView() {
     amount: amountInBounced,
     decimals: token0?.decimals,
   });
-  console.log({ approveWriteRequest, needsApproval });
 
   // Simulate swap
   const { swapSimulation: swapSim, wrapSwapMutation } = useSwapSimulation({
@@ -218,6 +224,7 @@ export default function NewSwapView() {
     setToken0(t1);
     setToken1(t0);
   }, [token0, token1]);
+  console.log(amountIn, amountOut, "AMOUNTS ===============================");
   const { isValid, message: errorMessage } = useSwapValidation({
     amountIn,
     token0,
@@ -271,10 +278,6 @@ export default function NewSwapView() {
       console.log(swapSimulationError);
     }
   }, [writeError, swapSimulationError]);
-  console.log(
-    { isValid, swapSimulation },
-    "IS VALID ==============================="
-  );
   return (
     <div className="space-y-1">
       <TokensDialog

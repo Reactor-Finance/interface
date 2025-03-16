@@ -16,7 +16,6 @@ export default function useWrapWrite({ amountIn, isWmon }: Props) {
     }
   );
   const amount = parseEther(amountIn);
-  console.log({ amount, etherBalance, balance });
   let needsWrap = useMemo(() => {
     if (!isWmon) return false;
     if (balance < parseEther(amountIn)) {
