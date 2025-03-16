@@ -2,6 +2,7 @@ import PoolHeader from "@/components/shared/poolHeader";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { usePoolslistContext } from "@/contexts/poolsTvl";
+import { ChainId, WETH } from "@/data/constants";
 import { TPoolType, TToken } from "@/lib/types";
 import { formatNumber } from "@/lib/utils";
 import Link from "next/link";
@@ -14,21 +15,57 @@ interface Props {
   token1: TToken;
 }
 
+function checkMonAddr(addr: string) {
+  if (
+    addr.toLowerCase() ===
+    "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE".toLowerCase()
+  ) {
+    return WETH[ChainId.MONAD_TESTNET];
+  } else {
+    return addr;
+  }
+}
 export default function AvailablePoolRow({ poolType, token0, token1 }: Props) {
   const { pools } = usePoolslistContext();
   const isStable = poolType === TPoolType["STABLE"];
   const foundPools = pools.filter((pool) => {
+    console.log({
+      token0: checkMonAddr(token0.address),
+      token1: checkMonAddr(token1.address),
+      pToken0: checkMonAddr(pool.token0),
+      pToken1: checkMonAddr(pool.token1),
+      symbol0: token0.symbol,
+      symbol1: token1.symbol,
+      pSymbol0: pool.token0_symbol,
+      pSymbol1: pool.token1_symbol,
+      pool: pool.tvlInUsd,
+      bool:
+        checkMonAddr(pool.token0.toLowerCase()) ===
+          checkMonAddr(token0.address.toLowerCase()) &&
+        checkMonAddr(pool.token1.toLowerCase()) ===
+          checkMonAddr(token1.address.toLowerCase()),
+
+      bool2:
+        checkMonAddr(pool.token0.toLowerCase()) ===
+          checkMonAddr(token1.address.toLowerCase()) &&
+        checkMonAddr(pool.token1.toLowerCase()) ===
+          checkMonAddr(token0.address.toLowerCase()),
+    });
     if (
-      pool.token0.toLowerCase() === token0.address.toLowerCase() &&
-      pool.token1.toLowerCase() === token1.address.toLowerCase()
+      checkMonAddr(pool.token0.toLowerCase()) ===
+        checkMonAddr(token0.address.toLowerCase()) &&
+      checkMonAddr(pool.token1.toLowerCase()) ===
+        checkMonAddr(token1.address.toLowerCase())
     ) {
-      if (pool.stable === isStable) return pool;
+      if (pool.stable === isStable) return true;
     }
     if (
-      pool.token0.toLowerCase() === token1.address.toLowerCase() &&
-      pool.token1.toLowerCase() === token0.address.toLowerCase()
+      checkMonAddr(pool.token0.toLowerCase()) ===
+        checkMonAddr(token1.address.toLowerCase()) &&
+      checkMonAddr(pool.token1.toLowerCase()) ===
+        checkMonAddr(token0.address.toLowerCase())
     ) {
-      if (pool.stable === isStable) return pool;
+      if (pool.stable === isStable) return true;
     }
   });
   console.log(foundPools);

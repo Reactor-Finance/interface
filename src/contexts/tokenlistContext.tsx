@@ -35,8 +35,9 @@ export const TokenlistContextProvider: React.FC<{ children: ReactNode }> = ({
   } = api.tokens.getTokens.useQuery({ chainId });
   const filteredTokenlist = tokenlist.filter(
     (token) =>
-      token.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      token.symbol.toLowerCase().includes(searchQuery.toLowerCase())
+      token.name.toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
+      token.symbol.toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
+      token.address.toLowerCase().includes(searchQuery.toLowerCase().trim())
   );
   return (
     <TokenlistContext.Provider
