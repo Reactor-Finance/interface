@@ -8,16 +8,25 @@ import usePadLoading from "@/lib/hooks/usePadLoading";
 import Spinner from "@/components/ui/spinner";
 import Link from "next/link";
 import { zeroAddress } from "viem";
+import { wmonToMon } from "@/contexts/poolsTvl";
 
 export default function DashboardLiquidityTable() {
   const { data: pairs, isLoading } = useGetPairs({});
   const activePairs = useMemo(
     () =>
-      pairs.filter(
-        (pair) =>
-          pair.pair_address !== zeroAddress &&
-          (pair.account_gauge_balance !== 0n || pair.account_lp_balance !== 0n)
-      ),
+      pairs
+        .filter(
+          (pair) =>
+            pair.pair_address !== zeroAddress &&
+            (pair.account_gauge_balance !== 0n ||
+              pair.account_lp_balance !== 0n)
+        )
+        .map((pair) => ({
+          ...pair,
+
+          token0: wmonToMon(pair.token0),
+          token1: wmonToMon(pair.token1),
+        })),
     [pairs]
   );
   const [selectedPair, setSelectedPair] = useState(activePairs[0]);
