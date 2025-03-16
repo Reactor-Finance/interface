@@ -42,7 +42,7 @@ export default function SwapDetails({
     return { min, per };
   }, [amountIn, amountOut, slippage, token0.decimals, token1.decimals]);
   const { quote } = useGetMarketQuote({
-    tokenAddress: token0.address,
+    tokenAddress: token1.address,
     value: amountOut,
   });
 
@@ -58,7 +58,7 @@ export default function SwapDetails({
   });
   return (
     <div className="text-[13px] border border-neutral-800 rounded-[16px] p-1 md:p-4 space-y-4">
-      <Row title="Received Value" value={quote[1]} />
+      <Row title="Received Value" value={`$${quote[1]}`} />
       <Row
         title="Exchange Rate"
         value={
