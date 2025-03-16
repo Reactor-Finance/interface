@@ -38,10 +38,10 @@ export default function PointsAccess() {
   const handleSubmit = () => {
     if (isFilled) {
       mutateAsync().then(() => {
-        router.push("/points");
+        router.push("/swap");
       });
     } else {
-      router.push("/points");
+      router.push("/swap");
     }
   };
   const { openAccountModal } = useAccountModal();

@@ -28,7 +28,7 @@ export default function SwapCard({
     <div
       onClick={selectPain}
       data-state={selected ? "active" : "inactive"}
-      className="rounded-[16px] data-[state=active]:bg-[#303136]/90 bg-[#303136] data- border border-[#43444C] space-y-3 p-6 "
+      className="rounded-[8px] data-[state=active]:bg-[#303136]/90 bg-[#303136] data- border border-[#43444C] space-y-3 p-6 "
     >
       <h2 className="text-sm text-[#CCCCCC]">{title}</h2>
       <div className="flex items-center gap-x-4 ">
