@@ -3,7 +3,6 @@ import CurrenciesOverlapIcons from "./currenciesOverlapIcons";
 import { Badge } from "../ui/badge";
 import { TPoolData, TPoolType, TToken } from "@/lib/types";
 import { useGetFeeFromFactory } from "@/lib/hooks/useGetFeeFromFactory";
-import { checkMon } from "@/lib/checkMon";
 
 interface Props {
   poolType: TPoolType;
@@ -30,7 +29,7 @@ export default function PoolHeader({
           <div>
             <h4>
               {`${poolType === TPoolType.STABLE ? "sAMM" : "vAMM"}`}-
-              {checkMon(token0.symbol)}/{checkMon(token1.symbol)}
+              {token0.symbol}/{token1.symbol}
             </h4>
             <div className="space-x-1">
               <PoolBadge poolType={poolType} />

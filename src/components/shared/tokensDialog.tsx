@@ -9,7 +9,6 @@ import SearchInput from "@/components/shared/searchInput";
 import ImageWithFallback from "@/components/shared/imageWithFallback";
 import { TToken } from "@/lib/types";
 import { useTokenlistContext } from "@/contexts/tokenlistContext";
-import { checkMon } from "@/lib/checkMon";
 // import { useGetBalance } from "@/lib/hooks/useGetBalance";
 // import { useGetMarketQuote } from "@/lib/hooks/useGetMarketQuote";
 
@@ -110,7 +109,7 @@ function TokenItem({
         />
         <div>
           <div>
-            <span>{checkMon(token.symbol)}</span>
+            <span>{token.symbol}</span>
           </div>
           <div>
             <span className="text-gray-400 text-sm">{token.name}</span>
