@@ -169,8 +169,15 @@ export default function InitializePool() {
     tokenAddress: token1?.address ?? zeroAddress,
   });
 
-  const balance0 = token0?.address === ETHER ? etherBalance.value : balance0Raw;
-  const balance1 = token1?.address === ETHER ? etherBalance.value : balance1Raw;
+  const balance0 =
+    token0?.address.toLowerCase() === ETHER.toLowerCase()
+      ? etherBalance.value
+      : balance0Raw;
+  const balance1 =
+    token1?.address.toLowerCase() === ETHER.toLowerCase()
+      ? etherBalance.value
+      : balance1Raw;
+
   const { balance, balanceQueryKey: lpQueryKey } = useGetBalance({
     tokenAddress: (pair as Address) ?? zeroAddress,
   });
@@ -343,10 +350,14 @@ export default function InitializePool() {
         setAmount0(amount0);
       }
       if (quoteLiquidity && pairExists) {
+        console.log(quoteLiquidity);
         let num = parseFloat(
           formatUnits(quoteLiquidity, token1?.decimals ?? 18)
         );
+        console.log(num, "NM========");
+
         num = Math.floor(num * 100) / 100;
+
         setAmount0(num.toString());
       }
       if (amount1 === "" && pairExists) {

@@ -85,7 +85,7 @@ export function useRemoveLiquidity({
       address,
       deadline, //deadline
     ],
-    query: { enabled: !isEth && amount > 0n },
+    query: { enabled: !isEth && amount > 0n, retry: 3 },
   });
 
   const removeLiquidityEthSimulation = useSimulateContract({
@@ -102,7 +102,7 @@ export function useRemoveLiquidity({
       deadline, //deadline
       true, //withFeeOnTransferTokens
     ],
-    query: { enabled: isEth && amount > 0n },
+    query: { enabled: isEth && amount > 0n, retry: 3 },
   });
   const { writeContract, isPending, reset, data: hash } = useWriteContract();
   const { isSuccess, isLoading: isSending } = useWaitForTransactionReceipt({
@@ -174,6 +174,10 @@ export function useRemoveLiquidity({
     isPending,
     isFetching: fetchingApproval,
     needsApproval,
+  });
+  console.log({
+    removeLiquiditySimulation,
+    removeLiquidityEthSimulation,
   });
   const { isValid, errorMessage } = useRemoveLiquidityValidation({
     needsApproval,

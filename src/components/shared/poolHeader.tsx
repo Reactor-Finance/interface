@@ -19,6 +19,7 @@ export default function PoolHeader({
   number,
 }: Props) {
   const fee = useGetFeeFromFactory(poolType === TPoolType.STABLE);
+  console.log(token0, token1);
   return (
     token0 &&
     token1 && (

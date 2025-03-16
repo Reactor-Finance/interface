@@ -29,28 +29,6 @@ export default function AvailablePoolRow({ poolType, token0, token1 }: Props) {
   const { pools } = usePoolslistContext();
   const isStable = poolType === TPoolType["STABLE"];
   const foundPools = pools.filter((pool) => {
-    console.log({
-      token0: checkMonAddr(token0.address),
-      token1: checkMonAddr(token1.address),
-      pToken0: checkMonAddr(pool.token0),
-      pToken1: checkMonAddr(pool.token1),
-      symbol0: token0.symbol,
-      symbol1: token1.symbol,
-      pSymbol0: pool.token0_symbol,
-      pSymbol1: pool.token1_symbol,
-      pool: pool.tvlInUsd,
-      bool:
-        checkMonAddr(pool.token0.toLowerCase()) ===
-          checkMonAddr(token0.address.toLowerCase()) &&
-        checkMonAddr(pool.token1.toLowerCase()) ===
-          checkMonAddr(token1.address.toLowerCase()),
-
-      bool2:
-        checkMonAddr(pool.token0.toLowerCase()) ===
-          checkMonAddr(token1.address.toLowerCase()) &&
-        checkMonAddr(pool.token1.toLowerCase()) ===
-          checkMonAddr(token0.address.toLowerCase()),
-    });
     if (
       checkMonAddr(pool.token0.toLowerCase()) ===
         checkMonAddr(token0.address.toLowerCase()) &&
