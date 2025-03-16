@@ -52,11 +52,6 @@ export default function PointsHeaders() {
                   className="w-16 h-16 rounded-full object-cover"
                 />
               )}
-              {!avatar && (
-                <div className="h-16 w-16 rounded-full bg-neutral-950 flex items-center justify-center">
-                  <span>?</span>
-                </div>
-              )}
               <div className="flex justify-center">
                 <h3 className="text-white text-lg font-semibold self-center">
                   My Position
