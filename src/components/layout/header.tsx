@@ -13,9 +13,9 @@ export default function Header() {
   const router = useRouter();
   const { data } = usePointsAccount();
   return (
-    <div className="h-[88px] px-2 md:px-8 items-center flex justify-between md:grid grid-cols-4">
+    <div className="h-[88px] px-2 lg:px-8 items-center flex justify-between lg:grid grid-cols-4">
       <button
-        className="hidden md:block"
+        className="hidden lg:block"
         role="link"
         onClick={() => {
           if (!data?.result.invitationCode) {
@@ -29,7 +29,7 @@ export default function Header() {
       </button>
       <SideNav />
 
-      <div className="col-span-2 hidden md:block">
+      <div className="col-span-2 hidden lg:block">
         {isConnected && (
           <ul className="grid justify-center  grid-cols-4 place-items-center text-[14px]">
             <NavLink href="/swap">Swap</NavLink>

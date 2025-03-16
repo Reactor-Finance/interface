@@ -14,7 +14,7 @@ export default function SideNav() {
   const [openModal, setOpen] = useState(false);
   const { data } = usePointsAccount();
   return (
-    <div className="flex items-center text-white md:hidden">
+    <div className="flex items-center text-white lg:hidden">
       <Sheet open={openModal} onOpenChange={setOpen}>
         <SheetTrigger>
           <Menu className="cursor-pointer" size={30} />
