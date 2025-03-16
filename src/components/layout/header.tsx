@@ -33,9 +33,9 @@ export default function Header() {
         {isConnected && (
           <ul className="grid justify-center  grid-cols-4 place-items-center text-[14px]">
             <NavLink href="/swap">Swap</NavLink>
-            <NavLink href="/points">Points</NavLink>
-            <NavLink href="/dashboard">Dashboard</NavLink>
             <NavLink href="/liquidity">Liquidity</NavLink>
+            <NavLink href="/dashboard">Dashboard</NavLink>
+            <NavLink href="/points">Points</NavLink>
           </ul>
         )}
       </div>
