@@ -106,11 +106,14 @@ export default function SwapDetails({
           <Row
             title="Price Impact"
             value={
-              <DisplayFormattedNumber
-                num={
-                  formatNumber(formatUnits(priceImpact ?? 0n, 16) ?? "0n") + "%"
-                }
-              />
+              <div>
+                <DisplayFormattedNumber
+                  num={
+                    formatNumber(formatUnits(priceImpact ?? 0n, 16) ?? "0n") +
+                    "%"
+                  }
+                />
+              </div>
             }
             info="Info"
           />
