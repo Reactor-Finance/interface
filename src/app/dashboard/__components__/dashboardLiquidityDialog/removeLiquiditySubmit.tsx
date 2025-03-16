@@ -31,8 +31,9 @@ export default function RemoveLiquiditySubmit({
     tokenAddress: pairInfo.pair_address,
     spender: router,
     amount: String(amount),
-    decimals: Number(pairInfo.decimals),
+    decimals: Number(pairInfo.token1_decimals),
   });
+  console.log(needsApproval, "NEEDS APPROVAL", amount);
   const removeLiquidity = useRemoveLiquidity({
     token0: pairInfo.token0,
     token1: pairInfo.token1,

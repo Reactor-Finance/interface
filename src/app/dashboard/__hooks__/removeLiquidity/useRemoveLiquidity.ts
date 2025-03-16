@@ -85,7 +85,7 @@ export function useRemoveLiquidity({
       address,
       deadline, //deadline
     ],
-    query: { enabled: !isEth && amount > 0n, retry: 3 },
+    query: { enabled: !isEth && amount > 0n && !needsApproval, retry: 3 },
   });
 
   const removeLiquidityEthSimulation = useSimulateContract({
@@ -102,7 +102,7 @@ export function useRemoveLiquidity({
       deadline, //deadline
       true, //withFeeOnTransferTokens
     ],
-    query: { enabled: isEth && amount > 0n, retry: 3 },
+    query: { enabled: isEth && amount > 0n && needsApproval, retry: 3 },
   });
   const { writeContract, isPending, reset, data: hash } = useWriteContract();
   const { isSuccess, isLoading: isSending } = useWaitForTransactionReceipt({
