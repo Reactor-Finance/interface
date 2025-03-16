@@ -93,7 +93,8 @@ export default function NewSwapView() {
     }
     if (activePane === 0 && !amountOutLoading && amountIn !== "") {
       console.log({ quoteAmountOut }, "-=-=-=-=-=-=-=-");
-      const rounded = Math.floor(Number(quoteAmountOut) * 100) / 100;
+      const q = formatUnits(quoteAmountOut, token1?.decimals ?? 18);
+      const rounded = Math.floor(Number(q) * 100) / 100;
       if (quoteAmountOut === maxUint256) {
         return;
       }
@@ -102,7 +103,8 @@ export default function NewSwapView() {
       if (quoteAmountIn === maxUint256) {
         return;
       }
-      const rounded = Math.floor(Number(quoteAmountIn) * 100) / 100;
+      const q = formatUnits(quoteAmountIn, token0?.decimals ?? 18);
+      const rounded = Math.floor(Number(q) * 100) / 100;
       setAmountIn(rounded.toString());
     }
   }, [
