@@ -8,7 +8,7 @@ import usePadLoading from "@/lib/hooks/usePadLoading";
 import Spinner from "@/components/ui/spinner";
 import Link from "next/link";
 import { zeroAddress } from "viem";
-import { wmonToMon } from "@/contexts/poolsTvl";
+import { wmonToMon } from "@/lib/utils";
 
 export default function DashboardLiquidityTable() {
   const { data: pairs, isLoading } = useGetPairs({});

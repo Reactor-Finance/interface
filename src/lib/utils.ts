@@ -1,7 +1,16 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import numeral from "numeral";
+import { ChainId, ETHER, WETH } from "@/data/constants";
+import { Address } from "viem";
 
+export function wmonToMon(addr: Address) {
+  if (addr.toLowerCase() === WETH[ChainId.MONAD_TESTNET].toLowerCase()) {
+    return ETHER.toLowerCase() as Address;
+  } else {
+    return addr;
+  }
+}
 export const enum ErrorCodes {
   InsufficientBalance = "Insufficient balance",
   EnterAmount = "Enter amount",
