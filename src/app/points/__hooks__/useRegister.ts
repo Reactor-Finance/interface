@@ -1,14 +1,21 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAccount } from "wagmi";
+import { useAccount, useSignMessage } from "wagmi";
 
 export default function useRegister({ inviteCode }: { inviteCode: string }) {
+  const { signMessageAsync } = useSignMessage();
   const { address } = useAccount();
   const queryClient = useQueryClient();
   const mutate = useMutation({
     mutationFn: async () => {
+      if (!address) throw Error("No address");
+      // add wagmi signature
+      const signature = await signMessageAsync({
+        account: address,
+        message: "adog",
+      });
       const payload = {
         invitationCode: inviteCode,
-        address,
+        signature,
       };
       const resp = await fetch("/api/points/user/register", {
         method: "POST",
