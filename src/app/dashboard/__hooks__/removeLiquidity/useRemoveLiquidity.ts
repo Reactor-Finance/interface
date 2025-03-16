@@ -107,9 +107,6 @@ export function useRemoveLiquidity({
     hash,
   });
   const { setToast } = useTransactionToastProvider();
-  console.log({
-    error: removeLiquiditySimulation.data?.request,
-  });
   const onSubmit = () => {
     if (needsApproval) {
       if (approvalSimulation) {

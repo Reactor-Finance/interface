@@ -1,12 +1,10 @@
 import React from "react";
-import { useChainId, useReadContract } from "wagmi";
-import { abi } from "@/lib/abis/Router";
-import { ROUTER } from "@/data/constants";
-import { formatUnits, zeroAddress } from "viem";
+import { formatUnits } from "viem";
 import { TPair } from "../../types";
 import { TToken } from "@/lib/types";
 import usePadLoading from "@/lib/hooks/usePadLoading";
 import { StatRow } from "./statRow";
+import useQuoteRemoveLiquidity from "../../__hooks__/removeLiquidity/useQuoteRemoveLiquidity";
 interface Props {
   amount: bigint;
   pairInfo: TPair;
@@ -21,23 +19,24 @@ export default function WithdrawStats({
   percent,
   pairInfo,
 }: Props) {
-  const chainId = useChainId();
-  const {
-    data,
-    isLoading: quoteLoading,
-    queryKey,
-  } = useReadContract({
-    abi,
-    address: ROUTER[chainId],
-    functionName: "quoteRemoveLiquidity",
-    args: [
-      pairInfo.token0 ?? zeroAddress,
-      pairInfo.token1 ?? zeroAddress,
-      pairInfo?.stable,
-      amount,
-    ],
+  const { data, isLoading: quoteLoading } = useQuoteRemoveLiquidity({
+    token0: pairInfo.token0,
+    token1: pairInfo.token1,
+    isStable: pairInfo.stable,
+    amount,
+    disabled: false,
   });
-  console.log({ queryKey }, "quoteRemoveLiq queryKey!!");
+  // const { isLoading: quoteLoading, queryKey } = useReadContract({
+  //   abi,
+  //   address: ROUTER[chainId],
+  //   functionName: "quoteRemoveLiquidity",
+  //   args: [
+  //     pairInfo.token0 ?? zeroAddress,
+  //     pairInfo.token1 ?? zeroAddress,
+  //     pairInfo?.stable,
+  //     amount,
+  //   ],
+  // });
   const isLoading = usePadLoading({ value: quoteLoading, duration: 400 });
   if (!token0 || !token1) return;
   return (
