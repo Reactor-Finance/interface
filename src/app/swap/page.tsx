@@ -3,10 +3,12 @@ import { Card } from "@/components/ui/card";
 import NewSwapView from "./__components__/newSwapView";
 import PageMarginContainer from "@/components/ui/pageMarginContainer";
 import SettingsDialog from "./__components__/settingsDialog";
+import Annoucement from "@/components/layout/annoucement";
 
 export default function Swap() {
   return (
     <PageMarginContainer>
+      <Annoucement />
       <div className="mx-auto md:w-[440px]">
         <div className="py-4">
           <div className="py-2 flex items-end justify-between">

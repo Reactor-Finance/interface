@@ -82,9 +82,9 @@ export function LiquidityRow({
           />
         </div>
       </td>
-      <td className="flex-col gap-y-2 hidden lg:flex justify-center items-center">
+      <td className="flex-col gap-y-1 hidden lg:flex justify-center items-center">
         <Badge
-          className="inline-block px-4 py-1 text-center"
+          className="inline-block px-4 h-fit py-[6px] text-center"
           border="none"
           colors={isInRange ? "success" : "error"}
           size="sm"
@@ -94,7 +94,7 @@ export function LiquidityRow({
         <div className="flex items-center justify-center gap-1">
           <div
             data-range={isInRange ? "yes" : "no"}
-            className="h-3 w-3 data-[range=yes]:bg-success-400 data-[range=no]:bg-error-400 rounded-full "
+            className="h-2 w-2 data-[range=yes]:bg-success-400 data-[range=no]:bg-error-400 rounded-full "
             color={isInRange ? "#4ade80" : "#f87171"}
           />
           <div
