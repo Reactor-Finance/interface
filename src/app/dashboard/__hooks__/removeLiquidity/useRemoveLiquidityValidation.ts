@@ -16,7 +16,6 @@ export function useRemoveLiquidityValidation({
   removeLiqSimulationError,
   isEth,
 }: Props) {
-  console.log({ needsApproval }, "HELLOOOO");
   if (needsApproval) {
     if (approvalSimulation) {
       return { isValid: true, errorMessage: "" };

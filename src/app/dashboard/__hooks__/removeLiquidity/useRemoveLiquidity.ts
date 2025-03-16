@@ -1,6 +1,6 @@
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
 import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
-import { ROUTER, WETH } from "@/data/constants";
+import { ETHER, ROUTER } from "@/data/constants";
 import * as Router from "@/lib/abis/Router";
 import { useAtomicDate } from "@/lib/hooks/useAtomicDate";
 import { useEffect, useMemo } from "react";
@@ -50,15 +50,14 @@ export function useRemoveLiquidity({
   const now = useAtomicDate();
   const [transactionDeadlineInMinutes] = useAtom(transactionDeadlineAtom);
   const router = useMemo(() => ROUTER[chainId], [chainId]);
-  const weth = useMemo(() => WETH[chainId], [chainId]);
   const nonETHToken = useMemo(
     () =>
-      weth.toLowerCase() === token0.toLowerCase()
+      ETHER.toLowerCase() === token0.toLowerCase()
         ? token1
-        : weth.toLowerCase() === token1.toLowerCase()
+        : ETHER.toLowerCase() === token1.toLowerCase()
           ? token0
           : zeroAddress,
-    [weth, token0, token1]
+    [token0, token1]
   );
 
   const deadline = useMemo(() => {
@@ -68,9 +67,8 @@ export function useRemoveLiquidity({
     return BigInt(ttl);
   }, [now, transactionDeadlineInMinutes]);
   const isEth =
-    token0.toLowerCase() === weth.toLowerCase() ||
-    token1.toLowerCase() === weth.toLowerCase();
-
+    token0.toLowerCase() === ETHER.toLowerCase() ||
+    token1.toLowerCase() === ETHER.toLowerCase();
   const removeLiquiditySimulation = useSimulateContract({
     ...Router,
     address: router,
@@ -102,7 +100,7 @@ export function useRemoveLiquidity({
       deadline, //deadline
       true, //withFeeOnTransferTokens
     ],
-    query: { enabled: isEth && amount > 0n && needsApproval, retry: 3 },
+    query: { enabled: isEth && amount > 0n && !needsApproval, retry: 3 },
   });
   const { writeContract, isPending, reset, data: hash } = useWriteContract();
   const { isSuccess, isLoading: isSending } = useWaitForTransactionReceipt({

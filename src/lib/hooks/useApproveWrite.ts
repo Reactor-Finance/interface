@@ -39,12 +39,6 @@ export default function useApproveWrite({
     args: [spender, maxUint256],
   });
 
-  // useWatchBlocks({
-  //   onBlock: () => {
-  //     void refetch();
-  //   },
-  // });
-
   const needsApproval =
     (allowance ?? 0n) < parseUnits(amount ?? "0", decimals) &&
     tokenAddress?.toLowerCase() !== ETHER.toLowerCase() &&

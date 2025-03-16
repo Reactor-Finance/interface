@@ -29,6 +29,7 @@ export default function DashboardLiquidityTable() {
         })),
     [pairs]
   );
+  console.log(activePairs, "ACTIVE PAIRS");
   const [selectedPair, setSelectedPair] = useState(activePairs[0]);
   const [stateType, setStateType] = useState<StateType>({
     dialogOpen: false,

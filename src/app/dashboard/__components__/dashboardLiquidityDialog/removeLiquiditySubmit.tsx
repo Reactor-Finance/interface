@@ -33,7 +33,7 @@ export default function RemoveLiquiditySubmit({
     amount: String(amount),
     decimals: Number(pairInfo.token1_decimals),
   });
-  console.log(needsApproval, "NEEDS APPROVAL", amount);
+  console.log({ needsApproval, amount });
   const removeLiquidity = useRemoveLiquidity({
     token0: pairInfo.token0,
     token1: pairInfo.token1,

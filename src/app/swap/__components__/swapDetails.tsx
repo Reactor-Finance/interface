@@ -45,7 +45,7 @@ export default function SwapDetails({
     tokenAddress: token1.address,
     value: amountOut,
   });
-
+  console.log(quote, "====== QUOTE =====");
   // address tokenA,
   // address tokenB,
   // uint256 amountIn,
