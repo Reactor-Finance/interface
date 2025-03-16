@@ -10,7 +10,7 @@ export default function Annoucement() {
   const [open, setOpen] = useAtom(annoucementModal);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent removeClose className=" w-[450px]">
+      <DialogContent removeClose className=" lg:w-[450px]">
         <div className="absolute right-0 top-0">
           <Image src={lucide} alt="lucide" />
         </div>
