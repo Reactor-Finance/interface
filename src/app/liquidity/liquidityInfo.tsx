@@ -16,7 +16,7 @@ export default function LiquidityInfo() {
   return (
     <div className="grid gap-x-4 md:grid-cols-3 border-b border-neutral-900 gap-y-2 pb-4">
       <InfoCard
-        title="Total TVL"
+        title="TVL"
         value={formatNumber(formatEther(totals?.totalTvl ?? 0n) ?? "0")}
         icon={house}
       />
