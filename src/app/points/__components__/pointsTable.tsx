@@ -33,7 +33,7 @@ export default function PointsTable() {
           <tr className="lg:grid-cols-8 grid-cols-4 grid">
             <th className="py-3">Rank</th>
             <th className="py-3 col-span-2 lg:col-span-1">Profile</th>
-            <th className="py-3 hidden lg:block">Referral</th>
+            <th className="py-3 hidden lg:block">Referrals</th>
             <th className="py-3 hidden lg:block">Referral Points</th>
             <th className="py-3 hidden lg:block">Trades</th>
             <th className="py-3 hidden lg:block">LPs</th>

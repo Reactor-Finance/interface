@@ -7,7 +7,7 @@ export default function PointsRow({
   address,
   referralPoints,
   tradePoints,
-  referralId,
+  referrals,
   lpPoints,
   totalPoints,
   rank,
@@ -22,7 +22,7 @@ export default function PointsRow({
           {shortenAddress(address)}
         </span>
       </td>
-      <td className="py-3 text-[#BBBBBB] hidden lg:block">{referralId}</td>
+      <td className="py-3 text-[#BBBBBB] hidden lg:block">{referrals}</td>
       <td className="py-3 text-[#BBBBBB] hidden lg:block">
         <DisplayFormattedNumber num={formatNumber(referralPoints)} />
       </td>
