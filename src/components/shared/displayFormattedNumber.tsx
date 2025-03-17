@@ -3,9 +3,10 @@ import { useMemo } from "react";
 
 export default function DisplayFormattedNumber({
   num,
+  formatNum,
 }: {
   num: string | number;
-  formatNumber?: boolean;
+  formatNum?: boolean;
 }) {
   let number = useMemo(() => {
     if (typeof num === "number") {
@@ -14,9 +15,6 @@ export default function DisplayFormattedNumber({
       return num;
     }
   }, [num]);
-  if (formatNumber) {
-    number = formatNumber(number);
-  }
   const { sig, exp } = useMemo(() => {
     if (number.includes("v")) {
       const split = number.split("v")[1];
@@ -25,8 +23,15 @@ export default function DisplayFormattedNumber({
     }
     return { sig: "0", exp: 0 };
   }, [number]);
+
+  if (formatNum) {
+    number = formatNumber(number);
+    if (!num.toString().includes("v")) {
+      return number;
+    }
+  }
   if (!number.includes("v")) {
-    return num;
+    return number;
   }
   return (
     <>

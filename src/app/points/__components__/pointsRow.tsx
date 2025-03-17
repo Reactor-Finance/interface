@@ -18,11 +18,6 @@ export default function PointsRow({
     <tr className=" grid grid-cols-4 lg:grid-cols-8 w-full">
       <td className="py-3 text-white">{rank}</td>
       <td className="py-3 flex items-center col-span-2 md:col-span-1 space-x-2">
-        {/* <img */}
-        {/*   src="https://i.ibb.co/0pDryFGv/image.png" */}
-        {/*   alt="avatar" */}
-        {/*   className="w-6 h-6 rounded-full object-cover" */}
-        {/* /> */}
         <span className="text-white col-span-2 lg:col-span-1">
           {shortenAddress(address)}
         </span>
@@ -43,7 +38,7 @@ export default function PointsRow({
         <td className="py-3 px-6 hidden lg:block">x1</td>
       )}
       <td className="py-3 text-[#BBBBBB]">
-        <DisplayFormattedNumber formatNumber num={totalPoints} />
+        <DisplayFormattedNumber formatNum num={totalPoints} />
       </td>
     </tr>
   );
