@@ -51,8 +51,7 @@ export default function SubmitButton({
     () =>
       state === ButtonState.Loading ||
       state === ButtonState.Signing ||
-      state === ButtonState.Sending ||
-      state === ButtonState.Fetching,
+      state === ButtonState.Sending,
     [state]
   );
 
@@ -64,7 +63,7 @@ export default function SubmitButton({
     <Button
       {...props}
       data-pending={isLoading ? "true" : "false"}
-      disabled={isLoading || !isValid}
+      disabled={isLoading || !isValid || state === ButtonState.Fetching}
       variant="primary"
       size="submit"
     >
