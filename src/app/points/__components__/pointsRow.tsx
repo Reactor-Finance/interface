@@ -12,6 +12,7 @@ export default function PointsRow({
   totalPoints,
   rank,
 }: TPointsEntry) {
+  console.log(formatNumber(lpPoints), "====----+++======= LP POINTS");
   const boost = false;
   return (
     <tr className=" grid grid-cols-4 lg:grid-cols-8 w-full">

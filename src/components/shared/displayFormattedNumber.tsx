@@ -26,7 +26,7 @@ export default function DisplayFormattedNumber({
     return { sig: "0", exp: 0 };
   }, [number]);
   if (!number.includes("v")) {
-    return number;
+    return num;
   }
   return (
     <>
