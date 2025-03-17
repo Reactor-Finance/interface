@@ -35,7 +35,7 @@ const searchParamsSchema = z.object({
   version: z.enum(["stable", "concentrated", "volatile"]),
 });
 
-export default function InitializePool() {
+export default function AddLiquidityCard() {
   // Wagmi parameters
   const chainId = useChainId();
   const [selectedInput, setSelectedInput] = useState<"0" | "1">("0");

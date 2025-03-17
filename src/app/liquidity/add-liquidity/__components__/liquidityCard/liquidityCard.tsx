@@ -2,9 +2,9 @@
 import { Card } from "@/components/ui/card";
 import React, { useMemo } from "react";
 import { useSearchParams } from "next/navigation";
-import InitializePool from "./initializePool";
 import { z } from "zod";
 import { isAddress } from "viem";
+import AddLiquidityCard from "./addLiquidityCard";
 
 const searchParamsSchema = z.object({
   token0: z.string().refine((arg) => isAddress(arg)),
@@ -28,10 +28,9 @@ export default function LiquidityCard() {
           token1: undefined,
         };
   }, [params]);
-  console.log("HELLO");
   return !token0 || !token1 ? undefined : (
     <Card border="900" bg="1000" className="p-4 space-y-4 w-[440px] rounded-md">
-      <InitializePool />
+      <AddLiquidityCard />
     </Card>
   );
 }
