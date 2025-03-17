@@ -81,7 +81,7 @@ export default function SwapCard({
         <span className="text-sm text-[#CCCCCC]">
           $
           <DisplayFormattedNumber
-            num={formatNumber(formatUnits(quote[0], token?.decimals ?? 18))}
+            num={formatNumber(formatUnits(quote[0], 18))}
           />
         </span>
         <div className="flex gap-x-4">
