@@ -45,12 +45,11 @@ export default function SwapDetails({
     tokenAddress: token1.address,
     value: amountOut,
   });
-  console.log(quote, "====== QUOTE =====");
   // address tokenA,
   // address tokenB,
   // uint256 amountIn,
   // bool multiHops
-  const { data: priceImpact } = useReadContract({
+  const { data: priceImpact = BigInt(0) } = useReadContract({
     abi: ExchangeHelper,
     address: EXCHANGE_HELPER[ChainId.MONAD_TESTNET],
     functionName: "calculatePriceImpact",
@@ -58,7 +57,7 @@ export default function SwapDetails({
   });
   return (
     <div className="text-[13px] border border-neutral-800 rounded-[16px] p-1 md:p-4 space-y-4">
-      <Row title="Received Value" value={`$${quote[1]}`} />
+      <Row title="Received Value" value={`$${formatUnits(quote[0], 18)}`} />
       <Row
         title="Exchange Rate"
         value={
@@ -108,10 +107,7 @@ export default function SwapDetails({
             value={
               <div>
                 <DisplayFormattedNumber
-                  num={
-                    formatNumber(formatUnits(priceImpact ?? 0n, 16) ?? "0n") +
-                    "%"
-                  }
+                  num={formatNumber(formatUnits(priceImpact, 16) ?? "0n") + "%"}
                 />
               </div>
             }
