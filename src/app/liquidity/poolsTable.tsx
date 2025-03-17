@@ -214,39 +214,39 @@ export default function PoolsTable() {
               ))}
           </tbody>
         </table>
+      </div>
 
-        <div className="pt-2  flex justify-between">
-          <p className="text-[13px]">
-            Page {page}{" "}
-            <span className="text-neutral-300">({poolsLength} results)</span>
-          </p>
-          <div className="flex">
-            <button
-              onClick={() => {
-                if (page > 1) {
-                  setPage(page - 1);
-                }
-              }}
-              aria-label="Previous Page of Pools"
-              disabled={page === 1}
-              className="disabled:opacity-50"
-            >
-              <ChevronLeft className="text-white" />
-            </button>
-            <button
-              onClick={() => {
-                if ((newPools?.length ?? 0) < pageLength) {
-                } else {
-                  setPage(page + 1);
-                }
-              }}
-              aria-label="Next Page of Pools"
-              disabled={(newPools?.length ?? 0) < pageLength}
-              className="disabled:opacity-50"
-            >
-              <ChevronRight className="text-white" />
-            </button>
-          </div>
+      <div className="py-2  flex justify-between">
+        <p className="text-[13px]">
+          Page {page}{" "}
+          <span className="text-neutral-300">({poolsLength} results)</span>
+        </p>
+        <div className="flex">
+          <button
+            onClick={() => {
+              if (page > 1) {
+                setPage(page - 1);
+              }
+            }}
+            aria-label="Previous Page of Pools"
+            disabled={page === 1}
+            className="disabled:opacity-50"
+          >
+            <ChevronLeft className="text-white" />
+          </button>
+          <button
+            onClick={() => {
+              if ((newPools?.length ?? 0) < pageLength) {
+              } else {
+                setPage(page + 1);
+              }
+            }}
+            aria-label="Next Page of Pools"
+            disabled={(newPools?.length ?? 0) < pageLength}
+            className="disabled:opacity-50"
+          >
+            <ChevronRight className="text-white" />
+          </button>
         </div>
       </div>
     </>
