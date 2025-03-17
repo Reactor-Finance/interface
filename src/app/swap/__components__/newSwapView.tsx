@@ -74,6 +74,8 @@ export default function NewSwapView() {
     quoteAmountOut,
     isLoading: amountOutLoading,
     amountInLoading,
+    stableIn,
+    stableOut,
   } = useQuoteSwap({
     amountIn: amountInBounced,
     amountOut: amountOutBounced,
@@ -81,6 +83,7 @@ export default function NewSwapView() {
     tokenIn: token0,
     tokenOut: token1,
   });
+  const stable = activePane === 0 ? stableOut : stableIn;
   useEffect(() => {
     if (!token0 || !token1) {
       return;
@@ -134,6 +137,7 @@ export default function NewSwapView() {
     amount: amountInBounced,
     token0,
     token1,
+    stable,
     needsApproval,
     minAmountOut: parseUnits(amountOutBounced, token1?.decimals ?? 18),
   });

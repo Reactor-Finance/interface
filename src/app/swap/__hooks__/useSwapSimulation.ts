@@ -27,8 +27,10 @@ export function useSwapSimulation({
   token1,
   needsApproval,
   minAmountOut = BigInt(0),
+  stable,
 }: {
   amount: string;
+  stable: boolean;
   token0: TToken | null;
   token1: TToken | null;
   minAmountOut?: bigint;
@@ -57,17 +59,17 @@ export function useSwapSimulation({
       token0?.address.toLowerCase() !== ETHER.toLowerCase() &&
       token1?.address.toLowerCase() !== ETHER.toLowerCase()
         ? [
-            { from: token0?.address ?? zeroAddress, to: weth, stable: false },
-            { from: weth, to: token1?.address ?? zeroAddress, stable: false },
+            { from: token0?.address ?? zeroAddress, to: weth, stable },
+            { from: weth, to: token1?.address ?? zeroAddress, stable },
           ]
         : [
             {
               from: token0?.address ?? zeroAddress,
               to: token1?.address ?? zeroAddress,
-              stable: false,
+              stable,
             },
           ],
-    [multihops, token0?.address, token1?.address, weth]
+    [multihops, stable, token0?.address, token1?.address, weth]
   );
   const deadline = useMemo(() => {
     const ttl = Math.floor(now.getTime() / 1000) + Number(txDeadline) * 60;

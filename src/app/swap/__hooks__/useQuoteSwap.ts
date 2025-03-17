@@ -40,7 +40,7 @@ export function useQuoteSwap({
     [tokenIn, tokenOut]
   );
   const {
-    data: [receivedAmountOut] = [BigInt(0), false],
+    data: [receivedAmountOut, stableOut] = [BigInt(0), false],
     error,
     isLoading,
   } = useReadContract({
@@ -58,7 +58,7 @@ export function useQuoteSwap({
   });
   const {
     isLoading: amountInLoading,
-    data: [receivedAmountIn] = [BigInt(0), false],
+    data: [receivedAmountIn, stableIn] = [BigInt(0), false],
   } = useReadContract({
     address,
     ...TradeHelper,
@@ -72,6 +72,7 @@ export function useQuoteSwap({
       enabled: !!amountOut && tokensExist && selected === 1 && amountOut !== "",
     },
   });
+
   // const isIntrinsicWETHProcess = useMemo(
   //   () =>
   //     (tokenIn?.address.toLowerCase() === weth.toLowerCase() &&
@@ -91,5 +92,13 @@ export function useQuoteSwap({
     [receivedAmountOut, receivedAmountIn]
   );
 
-  return { quoteAmountIn, quoteAmountOut, error, isLoading, amountInLoading };
+  return {
+    quoteAmountIn,
+    quoteAmountOut,
+    stableIn,
+    stableOut,
+    error,
+    isLoading,
+    amountInLoading,
+  };
 }
