@@ -31,7 +31,7 @@ export default function SwapCard({
   const debouncedValue = useDebounce(value, 300);
   const { quote } = useGetMarketQuote({
     tokenAddress: token?.address ?? zeroAddress,
-    value: parseUnits(debouncedValue.debouncedValue, token?.decimals ?? 18),
+    value: parseUnits(debouncedValue.debouncedValue, 18),
   });
   return (
     <div
