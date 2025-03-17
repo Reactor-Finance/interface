@@ -31,7 +31,7 @@ export default function PointsAccess() {
   const { data } = usePointsAccount();
   useEffect(() => {
     if (data?.result.invitationCode) {
-      router.push("/points");
+      router.push("/swap");
     }
   }, [data?.result.invitationCode, router]);
   const { mutateAsync } = useRegister({ inviteCode: pin.join("") });
