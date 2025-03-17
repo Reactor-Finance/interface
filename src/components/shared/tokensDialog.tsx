@@ -34,7 +34,7 @@ export default function TokensDailog({
     <Dialog open={open} onOpenChange={onOpen}>
       <DialogContent
         title="Search Tokens"
-        className="md:w-[440px] overflow-hidden border-none bg-neutral-1000  p-0 text-white"
+        className="md:w-[440px] mx-0 md:mx-[4px] w-[98vw] overflow-hidden border-none bg-neutral-1000  p-0 text-white"
       >
         <div className="relative  h-[80vh] space-y-6 pt-4 text-white">
           <div className="space-y-6 px-6">
@@ -67,7 +67,7 @@ export default function TokensDailog({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-x-2">
                 <Image src={verified} alt="verified icon" />
-                <span className="font-geistMono text-sm text-gray-300">
+                <span className="font-geistMono text-[12px] md:text-sm text-gray-300">
                   Only show verified tokens
                 </span>
                 <Image src={info} alt="info" />
