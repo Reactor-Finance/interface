@@ -52,7 +52,7 @@ export default function PointsAccess() {
           REACTOR EARLY ACCESS
         </h1>
         <p className="text-neutral-400 text-sm">
-          [It’s opsional] Enter your invite code to access the platform and
+          [It’s optional] Enter your invite code to access the platform and
           Increase your early airdrop by 10%
         </p>
         <div className="grid py-2 grid-cols-6 gap-x-3">

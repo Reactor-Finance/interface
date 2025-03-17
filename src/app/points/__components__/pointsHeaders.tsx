@@ -9,6 +9,7 @@ import useRegister from "../__hooks__/useRegister";
 import usePointsAccount from "../__hooks__/usePointsAccount";
 import ImageWithFallback from "@/components/shared/imageWithFallback";
 import Link from "next/link";
+import { formatNumber } from "@/lib/utils";
 
 export default function PointsHeaders() {
   const [copied, setCopied] = useState(false);
@@ -84,7 +85,7 @@ export default function PointsHeaders() {
             <div className="flex flex-col items-end">
               <p className="text-xs text-gray-400 uppercase">TOTAL POINTS</p>
               <p className="text-white font-bold text-sm">
-                {data?.result.totalPoints}
+                {formatNumber(data?.result.totalPoints ?? 0)}
               </p>
             </div>
           </div>
