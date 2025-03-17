@@ -1,16 +1,32 @@
+import { formatNumber } from "@/lib/utils";
 import { useMemo } from "react";
 
-export default function DisplayFormattedNumber({ num }: { num: string }) {
+export default function DisplayFormattedNumber({
+  num,
+}: {
+  num: string | number;
+  formatNumber?: boolean;
+}) {
+  let number = useMemo(() => {
+    if (typeof num === "number") {
+      return num.toString();
+    } else {
+      return num;
+    }
+  }, [num]);
+  if (formatNumber) {
+    number = formatNumber(number);
+  }
   const { sig, exp } = useMemo(() => {
-    if (num.includes("v")) {
-      const split = num.split("v")[1];
+    if (number.includes("v")) {
+      const split = number.split("v")[1];
       if (!split) return { sig: "0", exp: 0 };
       return { sig: split.slice(1, split.length), exp: split[0] };
     }
     return { sig: "0", exp: 0 };
-  }, [num]);
-  if (!num.includes("v")) {
-    return num;
+  }, [number]);
+  if (!number.includes("v")) {
+    return number;
   }
   return (
     <>

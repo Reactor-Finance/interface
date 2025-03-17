@@ -39,7 +39,9 @@ export default function PointsRow({
       ) : (
         <td className="py-3 px-6 hidden lg:block">x1</td>
       )}
-      <td className="py-3 text-[#BBBBBB]">{totalPoints}</td>
+      <td className="py-3 text-[#BBBBBB]">
+        <DisplayFormattedNumber formatNumber num={totalPoints} />
+      </td>
     </tr>
   );
 }
