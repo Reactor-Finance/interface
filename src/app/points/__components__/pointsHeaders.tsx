@@ -248,7 +248,7 @@ function WaysToEarn() {
             />
           </svg>
 
-          <span>Refer + friends</span>
+          <span>Refer friends</span>
         </li>
       </ul>
       <div className="mt-auto"></div>
