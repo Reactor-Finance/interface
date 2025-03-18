@@ -12,6 +12,9 @@ import { useTokenlistContext } from "@/contexts/tokenlistContext";
 import { useReadContracts } from "wagmi";
 import { Address, erc20Abi, getAddress } from "viem";
 import { ChainId } from "@/data/constants";
+import { Button } from "../ui/button";
+import { importedTokensAtom } from "@/store";
+import { useAtom } from "jotai";
 // import { useGetBalance } from "@/lib/hooks/useGetBalance";
 // import { useGetMarketQuote } from "@/lib/hooks/useGetMarketQuote";
 
@@ -74,6 +77,7 @@ export default function TokensDailog({
         logoURI: "",
         decimals: decimals.result,
         chainId: ChainId.MONAD_TESTNET,
+        import: true,
       };
     } catch {
       return undefined;
@@ -151,10 +155,18 @@ function TokenItem({
   // need backend endpoint that returns portfolio of token bals
   // instead of querying each token
   // const balance = useGetBalance({ tokenAddress: token.address });
+
+  const [importedTokens, setImportedTokens] = useAtom(importedTokensAtom);
+  console.log(token.logoURI, "LOGO");
   return (
-    <button
-      type="button"
-      onClick={() => selectToken(token)}
+    <div
+      role="button"
+      onClick={() => {
+        if (token.import) {
+          setImportedTokens([...importedTokens, { ...token, import: false }]);
+        }
+        selectToken(token);
+      }}
       className="mb-2 hover:bg-neutral-900 transition-colors flex w-full text-left justify-between rounded-md bg-neutral-950 px-4 py-2"
     >
       <div className="flex items-center gap-x-2">
@@ -177,10 +189,17 @@ function TokenItem({
           </div>
         </div>
       </div>
-      <div className="flex flex-col items-end font-geistMono">
+      <div className="flex flex-col justify-center items-center font-geistMono">
         {/* <div> */}
         {/*   <span>{formatNumber(formatUnits(0n, token.decimals))}</span> */}
         {/* </div> */}
+        <div className="flex items-center">
+          {token.import && (
+            <Button role="banner" variant={"primary"} size={"sm"}>
+              Import
+            </Button>
+          )}
+        </div>
         <div>
           {/* {quoteLoading ? ( */}
           {/*   <Spinner /> */}
@@ -191,6 +210,6 @@ function TokenItem({
           {/* )} */}
         </div>
       </div>
-    </button>
+    </div>
   );
 }

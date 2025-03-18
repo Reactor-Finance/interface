@@ -1,7 +1,9 @@
 "use client";
 
 import { TToken } from "@/lib/types";
+import { importedTokensAtom } from "@/store";
 import { api } from "@/trpc/react";
+import { useAtom } from "jotai";
 import React, { createContext, ReactNode, useContext, useState } from "react";
 import { useChainId } from "wagmi";
 
@@ -27,13 +29,14 @@ export const TokenlistContextProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const chainId = useChainId();
+  const [importedTokens] = useAtom(importedTokensAtom);
   const [searchQuery, setSearchQuery] = useState("");
   const {
     data: tokenlist = [],
     isLoading: loading,
     error,
   } = api.tokens.getTokens.useQuery({ chainId });
-  const filteredTokenlist = tokenlist.filter(
+  const filteredTokenlist = [...tokenlist, ...importedTokens].filter(
     (token) =>
       token.name.toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
       token.symbol.toLowerCase().includes(searchQuery.toLowerCase().trim()) ||

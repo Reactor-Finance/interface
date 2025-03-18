@@ -49,6 +49,7 @@ export const TokenlistSchema = z.array(
         .int()
         .max(2 ** 8),
       chainId: z.number().int(),
+      import: z.optional(z.boolean()),
     })
     .strict()
 );

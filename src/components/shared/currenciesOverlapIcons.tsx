@@ -34,7 +34,7 @@ export default function CurrenciesOverlapIcons({
         alt={token0.symbol}
         avatar={{
           letter: token0.symbol[0].toUpperCase(),
-          styles: cn(variants({ size, className: "z-10 " })),
+          styles: cn(variants({ size })),
         }}
       />
       <ImageWithFallback
