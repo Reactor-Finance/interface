@@ -17,12 +17,14 @@ export default function useApproveWrite({
   tokenAddress,
   amount,
   decimals = 18,
+  disabled,
 }: {
   tokenAddress: Address | undefined;
   spender: Address;
   // token: TToken | null;
   amount: string;
   decimals?: number;
+  disabled?: boolean;
 }) {
   const {
     data: allowance,
@@ -31,12 +33,16 @@ export default function useApproveWrite({
   } = useGetAllowance({
     tokenAddress,
     spender,
+    disabled,
   });
   const { data } = useSimulateContract({
     abi: erc20Abi,
     address: tokenAddress,
     functionName: "approve",
     args: [spender, maxUint256],
+    query: {
+      enabled: !disabled,
+    },
   });
 
   const needsApproval =

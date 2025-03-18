@@ -112,6 +112,7 @@ export default function AddLiquidityCard() {
   const { needsWrap, resetWrap, depositSimulation } = useWrapWrite({
     amountIn: wmonToken === "token0" ? amount0 : amount1,
     isWmon: wmonToken !== "none",
+    disabled: wmonToken === "token0" ? amount0 === "" : amount1 === "",
   });
   // Check approval required
   const {
@@ -124,6 +125,7 @@ export default function AddLiquidityCard() {
     tokenAddress: token0?.address ?? zeroAddress,
     decimals: token0?.decimals,
     amount: amount0Bounced,
+    disabled: amount0 === "",
   });
 
   const {
@@ -136,6 +138,7 @@ export default function AddLiquidityCard() {
     tokenAddress: token1?.address ?? zeroAddress,
     decimals: token1?.decimals,
     amount: amount1Bounced,
+    disabled: amount1 === "",
   });
 
   // Amounts parsed
@@ -330,7 +333,16 @@ export default function AddLiquidityCard() {
     balance0,
     balance1,
   });
+
   stateValid = stateValid && isValid;
+  console.log(
+    {
+      isFetching: token0ApprovalFetching || token1ApprovalFetching,
+      isLoading,
+      isPending,
+    },
+    "=========================================================="
+  );
   const { state: buttonState } = useGetButtonStatuses({
     isLoading,
     isPending,
