@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import useRegister from "../__hooks__/useRegister";
 import usePointsAccount from "../__hooks__/usePointsAccount";
@@ -9,6 +9,25 @@ export default function PointsAccess() {
   const [pin, setPin] = useState(["", "", "", "", "", ""]);
   const [selected, setSelected] = useState(0);
   const [isFilled, setIsFilled] = useState(false);
+  const searchParams = useSearchParams();
+  const code = searchParams.get("code");
+  useEffect(() => {
+    if (!code) return;
+    if (code.length > 6) return;
+    code
+      ?.trim()
+      .split("")
+      .forEach((char, i) => {
+        if (i <= 5) {
+          setPin((prev) => {
+            const newArr = [...prev];
+            newArr[i] = char;
+            return newArr;
+          });
+        }
+      });
+  }, [code]);
+
   // hook that checks if all pin are filled
   useEffect(() => {
     if (pin.every((p) => p !== "")) {
