@@ -43,10 +43,8 @@ const ImageWithFallback = (props: Props) => {
   }, [src]);
   const imgProps = { ...rest };
   fallbackImageUrl = unknownImg as string | StaticImageData;
-  delete imgProps.fallbackImageUrl;
-  delete imgProps.avatar;
 
-  if (!imgSrc && props.avatar) {
+  if (imgSrc === fallbackImageUrl && props.avatar) {
     return (
       <div
         className={
@@ -54,10 +52,14 @@ const ImageWithFallback = (props: Props) => {
           props.avatar.styles
         }
       >
-        <span className={" " + props.avatar.letterStyles}>F</span>
+        <span className={" " + props.avatar.letterStyles}>
+          {props.avatar.letter}
+        </span>
       </div>
     );
   }
+  delete imgProps.fallbackImageUrl;
+  delete imgProps.avatar;
   if (imgSrc) {
     return (
       // eslint-disable-next-line jsx-a11y/alt-text
