@@ -61,6 +61,23 @@ export default function PointsAccess() {
               setSelection={setSelected}
               onKeyDown={(e) => handleKeyDown(e, i)}
               index={i}
+              onPaste={(e) => {
+                console.log(e);
+                e.clipboardData
+                  .getData("text")
+                  .trim()
+                  .split("")
+
+                  .forEach((char, i) => {
+                    if (i <= 5) {
+                      setPin((prev) => {
+                        const newArr = [...prev];
+                        newArr[i] = char;
+                        return newArr;
+                      });
+                    }
+                  });
+              }}
               selected={selected}
               value={pin[i]}
               onChange={(e) => {
@@ -104,6 +121,7 @@ interface PinInputProps {
   setSelection: (index: number) => void;
   onChange: (value: string) => void;
   onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  onPaste: (e: React.ClipboardEvent<HTMLInputElement>) => void;
   selected: number;
   index: number;
 }
@@ -113,6 +131,7 @@ const PinInput = ({
   onKeyDown,
   setSelection,
   onChange,
+  onPaste,
   selected,
 }: PinInputProps) => {
   const ref = useRef<HTMLInputElement>(null);
@@ -129,6 +148,7 @@ const PinInput = ({
         onFocus={() => setSelection(index)}
         onKeyDown={onKeyDown}
         ref={ref}
+        onPaste={onPaste}
         onChange={(e) => {
           onChange(e.target.value);
         }}
