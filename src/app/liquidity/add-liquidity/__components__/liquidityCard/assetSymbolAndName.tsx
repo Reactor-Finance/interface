@@ -1,21 +1,8 @@
 import ImageWithFallback from "@/components/shared/imageWithFallback";
-import { useTokenlistContext } from "@/contexts/tokenlistContext";
-import { TAddress } from "@/lib/types";
+import { TToken } from "@/lib/types";
 import { useMemo } from "react";
 
-export default function AssetSymbolAndName({
-  tokenAddress,
-}: {
-  tokenAddress: TAddress;
-}) {
-  const { tokenlist } = useTokenlistContext();
-  const token = useMemo(
-    () =>
-      tokenlist.find(
-        (t) => t.address.toLowerCase() === tokenAddress.toLowerCase()
-      ),
-    [tokenlist, tokenAddress]
-  );
+export default function AssetSymbolAndName({ token }: { token: TToken }) {
   const isRCT = useMemo(() => token?.symbol === "RCT", [token]);
   return !token ? undefined : (
     <div
@@ -28,6 +15,15 @@ export default function AssetSymbolAndName({
         className="h-6 w-6 rounded-full"
         src={token.logoURI}
         alt={token.symbol}
+        avatar={
+          !token.logoURI
+            ? {
+                letter: token.symbol[0].toUpperCase(),
+                styles: "h-6 w-6",
+                letterStyles: "text-[10px] leading-[10px]",
+              }
+            : undefined
+        }
       />
       <span className="text-[13px]">{token.symbol}</span>
     </div>

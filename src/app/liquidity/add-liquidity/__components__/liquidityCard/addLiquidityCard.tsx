@@ -12,7 +12,7 @@ import SubmitButton from "@/components/shared/submitBtn";
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
 import { Address, formatUnits, isAddress, parseUnits, zeroAddress } from "viem";
 import { z } from "zod";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCheckPair } from "@/lib/hooks/useCheckPair";
 import useApproveWrite from "@/lib/hooks/useApproveWrite";
 import { ChainId, ETHER, ROUTER, WETH } from "@/data/constants";
@@ -28,6 +28,7 @@ import InitPoolInfo from "./initPoolInfo";
 import useWrapWrite from "@/lib/hooks/useWrapWrite";
 import useInitializePoolValidation from "./hooks/useInitializePoolValidation";
 import { useDebounce } from "@/lib/hooks/useDebounce";
+import useGetToken from "@/lib/hooks/useGetToken";
 
 const searchParamsSchema = z.object({
   token0: z.string().refine((arg) => isAddress(arg)),
@@ -58,9 +59,36 @@ export default function AddLiquidityCard() {
   }, [params]);
 
   // Tokens
-  const token0 = useGetTokenInfo(t0 ?? "0x");
-  const token1 = useGetTokenInfo(t1 ?? "0x");
-
+  let token0 = useGetTokenInfo(t0 ?? "0x");
+  let token1 = useGetTokenInfo(t1 ?? "0x");
+  const routerNav = useRouter();
+  // If token is not in our token list
+  // Fetch info from token contract
+  // =====
+  const { isFetched: fetched0, foundToken: foundToken0 } = useGetToken({
+    address: t0,
+    disabled: !!token0,
+  });
+  const { isFetched: fetched1, foundToken: foundToken1 } = useGetToken({
+    address: t1,
+    disabled: !!token1,
+  });
+  if (!token0 && foundToken0) {
+    token0 = foundToken0;
+  }
+  if (!token1 && foundToken1) {
+    token1 = foundToken1;
+  }
+  useEffect(() => {
+    if (!foundToken0 && fetched0 && !token0) {
+      routerNav.push("/");
+    }
+    if (!foundToken1 && fetched1 && !token1) {
+      routerNav.push("/");
+    }
+  }, [fetched0, fetched1, foundToken0, foundToken1, routerNav, token0, token1]);
+  console.log({ foundToken0, foundToken1, token0, token1 });
+  // =====
   const [amount0, setAmount0] = useState("");
   const [amount1, setAmount1] = useState("");
   const { debouncedValue: amount0Bounced } = useDebounce(amount0, 300);
@@ -335,20 +363,14 @@ export default function AddLiquidityCard() {
   });
 
   stateValid = stateValid && isValid;
-  console.log(
-    {
-      isFetching: token0ApprovalFetching || token1ApprovalFetching,
-      isLoading,
-      isPending,
-    },
-    "=========================================================="
-  );
+
   const { state: buttonState } = useGetButtonStatuses({
     isLoading,
     isPending,
     isFetching: token0ApprovalFetching || token1ApprovalFetching,
     needsApproval: token0NeedsApproval || token1NeedsApproval,
   });
+  // logic to set quote amounts to inputs
   useEffect(() => {
     if (!pairExists) return;
     if (selectedInput === "0") {
@@ -375,10 +397,7 @@ export default function AddLiquidityCard() {
         let num = parseFloat(
           formatUnits(quoteLiquidity, token1?.decimals ?? 18)
         );
-        console.log(num, "NM========");
-
         num = Math.floor(num * 100) / 100;
-
         setAmount0(num.toString());
       }
       if (amount1 === "" && pairExists) {
