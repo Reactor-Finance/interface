@@ -11,7 +11,7 @@ export default function useRegister({ inviteCode }: { inviteCode: string }) {
       // add wagmi signature
       const signature = await signMessageAsync({
         account: address,
-        message: "adog",
+        message: `I am verifying my participation in the Reactor Points campaign using the referral code: ${inviteCode}.`,
       });
       const payload = {
         invitationCode: inviteCode,
