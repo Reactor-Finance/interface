@@ -49,7 +49,7 @@ const ImageWithFallback = (props: Props) => {
       setImgSrc(fallbackImageUrl);
     }
   }, [fallbackImageUrl, imgSrc, src]);
-  if (!src && props.avatar) {
+  if ((!src || imgSrc === fallbackImageUrl) && props.avatar) {
     return (
       <div
         className={
