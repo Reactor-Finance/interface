@@ -28,6 +28,7 @@ interface Props {
   avatar?: {
     styles?: string;
     letter?: string;
+    letterStyles?: string;
   };
 }
 
@@ -49,11 +50,11 @@ const ImageWithFallback = (props: Props) => {
     return (
       <div
         className={
-          "rounded-full flex items-center justify-center border-primary-400 text-[16px] leading-[16px] border bg-primary-400/20 h-10 w-10 " +
+          "rounded-full flex items-center justify-center border-primary-400 text-[14px] leading-[14px] border bg-primary-400/20 h-10 w-10 " +
           props.avatar.styles
         }
       >
-        <span className="text-[14px] leading-[14px]">F</span>
+        <span className={" " + props.avatar.letterStyles}>F</span>
       </div>
     );
   }
