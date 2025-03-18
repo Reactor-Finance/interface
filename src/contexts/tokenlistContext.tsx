@@ -4,7 +4,13 @@ import { TToken } from "@/lib/types";
 import { importedTokensAtom } from "@/store";
 import { api } from "@/trpc/react";
 import { useAtom } from "jotai";
-import React, { createContext, ReactNode, useContext, useState } from "react";
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useMemo,
+  useState,
+} from "react";
 import { useChainId } from "wagmi";
 
 interface TokenlistContextType {
@@ -36,12 +42,18 @@ export const TokenlistContextProvider: React.FC<{ children: ReactNode }> = ({
     isLoading: loading,
     error,
   } = api.tokens.getTokens.useQuery({ chainId });
-  const filteredTokenlist = [...tokenlist, ...importedTokens].filter(
-    (token) =>
-      token.name.toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
-      token.symbol.toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
-      token.address.toLowerCase().includes(searchQuery.toLowerCase().trim())
-  );
+  const filteredTokenlist = useMemo(() => {
+    const tokens = [...tokenlist].filter(
+      (token) =>
+        token.name.toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
+        token.symbol.toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
+        token.address.toLowerCase().includes(searchQuery.toLowerCase().trim())
+    );
+    const importedList = importedTokens.filter(
+      (token) => !tokens.find((t) => t.address === token.address)
+    );
+    return [...tokens, ...importedList];
+  }, [importedTokens, searchQuery, tokenlist]);
   return (
     <TokenlistContext.Provider
       value={{
