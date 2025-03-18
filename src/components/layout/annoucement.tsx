@@ -2,14 +2,18 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import lucide from "@/assets/lucide.png";
 import { annoucementModal } from "@/store";
 import { useAtom } from "jotai";
 export default function Annoucement() {
   const [open, setOpen] = useAtom(annoucementModal);
+  const [dialogOpen, setDialogOpen] = useState(open);
+  useEffect(() => {
+    setOpen(false);
+  }, [dialogOpen, setOpen]);
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DialogContent removeClose className=" lg:w-[450px]">
         <div className="absolute right-0 top-0">
           <Image src={lucide} alt="lucide" />
