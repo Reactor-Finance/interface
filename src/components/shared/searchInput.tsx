@@ -29,7 +29,7 @@ export default function SearchInput({ value, setValue, className }: Props) {
         onChange={(e) => setValue?.(e.target.value)}
         value={value}
         className="w-full  placeholder:text-sm bg-transparent placeholder:text-neutral-400 focus:outline-none"
-        placeholder="Search by name or symbol"
+        placeholder="Search by name, symbol or address"
       />
       {value !== "" && (
         <button onClick={() => setValue?.("")}>

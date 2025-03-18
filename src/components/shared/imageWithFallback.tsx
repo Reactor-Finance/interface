@@ -25,6 +25,10 @@ interface Props {
   lazyRoot?: string | undefined;
   className?: string | undefined;
   fallbackImageUrl?: string | StaticImageData;
+  avatar?: {
+    styles?: string;
+    letter?: string;
+  };
 }
 
 const ImageWithFallback = (props: Props) => {
@@ -39,6 +43,20 @@ const ImageWithFallback = (props: Props) => {
   const imgProps = { ...rest };
   fallbackImageUrl = unknownImg as string | StaticImageData;
   delete imgProps.fallbackImageUrl;
+  delete imgProps.avatar;
+
+  if (!imgSrc && props.avatar) {
+    return (
+      <div
+        className={
+          "rounded-full flex items-center justify-center border-primary-400 text-[16px] leading-[16px] border bg-primary-400/20 h-10 w-10 " +
+          props.avatar.styles
+        }
+      >
+        <span className="text-[14px] leading-[14px]">F</span>
+      </div>
+    );
+  }
   if (imgSrc) {
     return (
       // eslint-disable-next-line jsx-a11y/alt-text

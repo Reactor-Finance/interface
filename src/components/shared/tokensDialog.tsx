@@ -1,5 +1,5 @@
 import Image from "next/image";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import verified from "@/assets/verified.svg";
 import info from "@/assets/info.svg";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -9,6 +9,9 @@ import SearchInput from "@/components/shared/searchInput";
 import ImageWithFallback from "@/components/shared/imageWithFallback";
 import { TToken } from "@/lib/types";
 import { useTokenlistContext } from "@/contexts/tokenlistContext";
+import { useReadContracts } from "wagmi";
+import { Address, erc20Abi, getAddress } from "viem";
+import { ChainId } from "@/data/constants";
 // import { useGetBalance } from "@/lib/hooks/useGetBalance";
 // import { useGetMarketQuote } from "@/lib/hooks/useGetMarketQuote";
 
@@ -27,9 +30,60 @@ export default function TokensDailog({
   useEffect(() => {
     // reset search after leaving dialog
     if (!open) {
-      setSearchQuery("");
+      setTimeout(() => setSearchQuery(""), 300);
     }
   }, [open, setSearchQuery]);
+  const { data, error, isFetching } = useReadContracts({
+    contracts: [
+      {
+        abi: erc20Abi,
+        functionName: "decimals",
+        address: searchQuery as Address,
+      },
+      {
+        abi: erc20Abi,
+        functionName: "symbol",
+        address: searchQuery as Address,
+      },
+      {
+        abi: erc20Abi,
+        address: searchQuery as Address,
+        functionName: "name",
+      },
+    ],
+    query: {
+      enabled: searchQuery.length === 42,
+    },
+  });
+  console.log(
+    { data, searchQuery, error, isFetching },
+    searchQuery.length,
+    searchQuery.length === 42,
+    "DATA"
+  );
+  const foundToken = useMemo(() => {
+    if (!data) return;
+    const [decimals, symbol, name] = data;
+    if (!decimals.result || !symbol.result || !name.result) return;
+    try {
+      const address = getAddress(searchQuery);
+      return {
+        symbol: symbol.result,
+        name: name.result,
+        address,
+        logoURI: "",
+        decimals: decimals.result,
+        chainId: ChainId.MONAD_TESTNET,
+      };
+    } catch {
+      return undefined;
+    }
+  }, [data, searchQuery]);
+  const filteredListEdited = useMemo(() => {
+    if (foundToken) return [...filteredList, foundToken];
+    else return filteredList;
+  }, [filteredList, foundToken]);
+  console.log(filteredListEdited);
   return (
     <Dialog open={open} onOpenChange={onOpen}>
       <DialogContent
@@ -43,10 +97,10 @@ export default function TokensDailog({
           </div>
           <div className="relative z-0 h-[calc(100%-179px)] border-t border-gray-600  ">
             <h2 className="py-3 text-[14px] text-[#999999] pl-6">
-              Tokens ({filteredList.length})
+              Tokens ({filteredListEdited.length})
             </h2>
             <div className=" h-[calc(100%-22px)] space-y-2 scrollbar overflow-y-auto pb-2 px-2">
-              {filteredList
+              {filteredListEdited
                 .filter((token) => !selectedTokens.includes(token.address))
                 .map((token) => {
                   return (
@@ -105,7 +159,10 @@ function TokenItem({
           src={token.logoURI}
           width={40}
           height={40}
-          alt=""
+          avatar={{
+            letter: token.symbol[0].toUpperCase(),
+          }}
+          alt={token.symbol}
         />
         <div>
           <div>
