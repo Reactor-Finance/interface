@@ -8,8 +8,9 @@ import { useQueryClient } from "@tanstack/react-query";
 interface Props {
   amountIn: string;
   isWmon: boolean;
+  disabled?: boolean;
 }
-export default function useWrapWrite({ amountIn, isWmon }: Props) {
+export default function useWrapWrite({ amountIn, isWmon, disabled }: Props) {
   const { balance, etherBalance, ethQueryKey, balanceQueryKey } = useGetBalance(
     {
       tokenAddress: WETH[ChainId.MONAD_TESTNET],
@@ -37,7 +38,7 @@ export default function useWrapWrite({ amountIn, isWmon }: Props) {
     functionName: "deposit",
     value: wrapAmount,
     query: {
-      enabled: needsWrap,
+      enabled: needsWrap && !disabled,
     },
   });
   const queryClient = useQueryClient();

@@ -47,7 +47,7 @@ export default function AssetCard({
             }}
           />
         </div>
-        <AssetSymbolAndName tokenAddress={token.address} />
+        <AssetSymbolAndName token={token} />
       </div>
       <div className="flex justify-between text-[13px]">
         <span className="pl-1">-</span>

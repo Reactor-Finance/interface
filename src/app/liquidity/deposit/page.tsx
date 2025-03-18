@@ -160,6 +160,15 @@ function SearchTokensTrigger({
             className="rounded-full h-5 w-5"
             src={token.logoURI}
             alt={token.symbol}
+            avatar={
+              !token.logoURI
+                ? {
+                    letter: token.symbol[0].toUpperCase(),
+                    styles: "h-5 w-5",
+                    letterStyles: "text-[10px] leading-[10px]",
+                  }
+                : undefined
+            }
           />
         </div>
       ) : (
