@@ -41,7 +41,9 @@ export const TokenlistSchema = z.array(
       name: z.string(),
       symbol: z.string(),
       address: z.string().refine((arg) => isAddress(arg)),
-      logoURI: z.union([z.string().url().min(1), z.string().base64().min(1)]),
+      logoURI: z.nullable(
+        z.union([z.string().url().min(1), z.string().base64().min(1)])
+      ),
       decimals: z
         .number()
         .int()

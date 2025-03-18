@@ -8,6 +8,7 @@ import { useGetMarketQuote } from "@/lib/hooks/useGetMarketQuote";
 import { formatUnits, parseUnits, zeroAddress } from "viem";
 import DisplayFormattedNumber from "@/components/shared/displayFormattedNumber";
 import { useDebounce } from "@/lib/hooks/useDebounce";
+import ImageWithFallback from "@/components/shared/imageWithFallback";
 interface Props {
   balance: string;
   value: string;
@@ -65,12 +66,13 @@ export default function SwapCard({
           </div>
           <div className="h-11 w-11  absolute rounded-full z-10 -left-4">
             {token && (
-              <Image
+              <ImageWithFallback
                 width={50}
                 height={50}
                 className="w-full h-full rounded-full"
                 src={token.logoURI}
                 alt={token.name}
+                avatar={{ letter: token.symbol[0].toUpperCase() }}
               />
             )}
           </div>

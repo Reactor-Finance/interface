@@ -7,7 +7,7 @@ import unknownImg from "@/assets/question-mark.svg";
 // Todo
 // Extend image props
 interface Props {
-  src: string | StaticImageData;
+  src: string | StaticImageData | null;
   alt: string;
   width?: number | `${number}` | undefined;
   height?: number | `${number}` | undefined;
@@ -34,9 +34,9 @@ interface Props {
 const ImageWithFallback = (props: Props) => {
   let { fallbackImageUrl } = props;
   const { src, ...rest } = props;
-  const [imgSrc, setImgSrc] = useState<string | StaticImageData | undefined>(
-    undefined
-  );
+  const [imgSrc, setImgSrc] = useState<
+    string | StaticImageData | undefined | null
+  >(undefined);
   useEffect(() => {
     setImgSrc(src);
   }, [src]);
@@ -73,7 +73,7 @@ const ImageWithFallback = (props: Props) => {
     // eslint-disable-next-line jsx-a11y/alt-text
     <Image
       {...rest}
-      src={src}
+      src={src ?? "ah dog"}
       onError={() => {
         setImgSrc(fallbackImageUrl);
       }}

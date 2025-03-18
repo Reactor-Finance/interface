@@ -80,9 +80,15 @@ export default function TokensDailog({
     }
   }, [data, searchQuery]);
   const filteredListEdited = useMemo(() => {
-    if (foundToken) return [...filteredList, foundToken];
-    else return filteredList;
-  }, [filteredList, foundToken]);
+    if (foundToken)
+      return [...filteredList, foundToken].filter(
+        (token) => !selectedTokens.includes(token.address)
+      );
+    else
+      return filteredList.filter(
+        (token) => !selectedTokens.includes(token.address)
+      );
+  }, [filteredList, foundToken, selectedTokens]);
   console.log(filteredListEdited);
   return (
     <Dialog open={open} onOpenChange={onOpen}>
@@ -100,20 +106,18 @@ export default function TokensDailog({
               Tokens ({filteredListEdited.length})
             </h2>
             <div className=" h-[calc(100%-22px)] space-y-2 scrollbar overflow-y-auto pb-2 px-2">
-              {filteredListEdited
-                .filter((token) => !selectedTokens.includes(token.address))
-                .map((token) => {
-                  return (
-                    <TokenItem
-                      token={token}
-                      selectToken={(token) => {
-                        onTokenSelected(token);
-                        if (onOpen) onOpen(false);
-                      }}
-                      key={token.address}
-                    />
-                  );
-                })}
+              {filteredListEdited.map((token) => {
+                return (
+                  <TokenItem
+                    token={token}
+                    selectToken={(token) => {
+                      onTokenSelected(token);
+                      if (onOpen) onOpen(false);
+                    }}
+                    key={token.address}
+                  />
+                );
+              })}
             </div>
           </div>
 
