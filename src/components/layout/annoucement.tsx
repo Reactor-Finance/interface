@@ -28,7 +28,7 @@ export default function Annoucement() {
           We appreciate your patience.
         </p>
         <Button
-          onClick={() => setOpen(false)}
+          onClick={() => setDialogOpen(false)}
           variant={"primary"}
           size="submit"
         >
