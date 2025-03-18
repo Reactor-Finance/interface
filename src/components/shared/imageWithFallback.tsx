@@ -44,6 +44,11 @@ const ImageWithFallback = (props: Props) => {
   const imgProps = { ...rest };
   fallbackImageUrl = unknownImg as string | StaticImageData;
 
+  useEffect(() => {
+    if (!imgSrc && !src) {
+      setImgSrc(fallbackImageUrl);
+    }
+  }, [fallbackImageUrl, imgSrc, src]);
   if (imgSrc === fallbackImageUrl && props.avatar) {
     return (
       <div
@@ -58,25 +63,30 @@ const ImageWithFallback = (props: Props) => {
       </div>
     );
   }
+
   delete imgProps.fallbackImageUrl;
   delete imgProps.avatar;
   if (imgSrc) {
+    console.log("imgSrc", imgSrc);
     return (
       // eslint-disable-next-line jsx-a11y/alt-text
       <Image
         {...rest}
-        src={imgSrc}
+        src={imgSrc ?? "ah dog"}
         onError={() => {
           setImgSrc(fallbackImageUrl);
         }}
       />
     );
   }
+  if (!src) {
+    return;
+  }
   return (
     // eslint-disable-next-line jsx-a11y/alt-text
     <Image
       {...rest}
-      src={src ?? "ah dog"}
+      src={src ?? "url"}
       onError={() => {
         setImgSrc(fallbackImageUrl);
       }}
