@@ -32,7 +32,10 @@ export default function CurrenciesOverlapIcons({
         height={35}
         src={token0.logoURI}
         alt={token0.symbol}
-        avatar={{ letter: token0.symbol[0].toUpperCase(), styles: "h-8 w-8" }}
+        avatar={{
+          letter: token0.symbol[0].toUpperCase(),
+          styles: cn(variants({ size, className: "z-10 text-[8px]" })),
+        }}
       />
       <ImageWithFallback
         data-a="a"
@@ -41,7 +44,10 @@ export default function CurrenciesOverlapIcons({
         height={35}
         src={token1.logoURI}
         alt={token1.symbol}
-        avatar={{ letter: token1.symbol[0].toUpperCase(), styles: "h-8 w-8" }}
+        avatar={{
+          letter: token1.symbol[0].toUpperCase(),
+          styles: cn(variants({ size, className: "z-10 text-[8px]" })),
+        }}
       />
     </div>
   );
