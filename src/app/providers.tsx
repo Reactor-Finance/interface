@@ -15,8 +15,6 @@ import { HeroUIProvider } from "@heroui/react";
 import { TRPCReactProvider } from "@/trpc/react";
 import { TokenlistContextProvider } from "@/contexts/tokenlistContext";
 import { TransactionToastProvider } from "@/contexts/transactionToastProvider";
-import { Provider } from "jotai/react";
-import { store } from "@/store";
 import { PoolslistContextProvider } from "@/contexts/poolsTvl";
 import {
   metaMaskWallet,
@@ -62,26 +60,24 @@ const queryClient = new QueryClient({
 
 export const Providers: FC<PropsWithChildren> = ({ children }) => {
   return (
-    <Provider store={store}>
-      <WagmiProvider config={wagmiConfig}>
-        <QueryClientProvider client={queryClient}>
-          <RainbowKitProvider modalSize="compact" theme={darkTheme()}>
-            <TRPCReactProvider>
-              <TokenlistContextProvider>
-                <TransactionToastProvider>
-                  <HeroUIProvider className="flex min-h-svh flex-col ">
-                    {/* Header goes here */}
-                    <PoolslistContextProvider>
-                      {children}
-                    </PoolslistContextProvider>
-                    {/* Footer goes here */}
-                  </HeroUIProvider>
-                </TransactionToastProvider>
-              </TokenlistContextProvider>
-            </TRPCReactProvider>
-          </RainbowKitProvider>
-        </QueryClientProvider>
-      </WagmiProvider>
-    </Provider>
+    <WagmiProvider config={wagmiConfig}>
+      <QueryClientProvider client={queryClient}>
+        <RainbowKitProvider modalSize="compact" theme={darkTheme()}>
+          <TRPCReactProvider>
+            <TokenlistContextProvider>
+              <TransactionToastProvider>
+                <HeroUIProvider className="flex min-h-svh flex-col ">
+                  {/* Header goes here */}
+                  <PoolslistContextProvider>
+                    {children}
+                  </PoolslistContextProvider>
+                  {/* Footer goes here */}
+                </HeroUIProvider>
+              </TransactionToastProvider>
+            </TokenlistContextProvider>
+          </TRPCReactProvider>
+        </RainbowKitProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 };
