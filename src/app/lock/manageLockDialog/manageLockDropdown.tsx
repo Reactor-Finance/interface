@@ -45,7 +45,11 @@ export default function ManageLockDropdown({
                   selectedLockToken.decimals
                 )
               )}{" "}
-              RCT locked for {lockPeriod(selectedLockToken.lockEnd)} days{" "}
+              RCT
+              <span className="text-[12px]">
+                {" "}
+                locked for {lockPeriod(selectedLockToken.lockEnd)} days{" "}
+              </span>
             </span>
           </>
         ) : (
@@ -59,7 +63,10 @@ export default function ManageLockDropdown({
             Lock #{token.id.toString()}{" "}
             <span className="text-neutral-200 text-sm">
               {formatNumber(formatUnits(token.amount, token.decimals))} RCT
-              locked for {lockPeriod(token.lockEnd)} days{" "}
+              <span className="text-[12px]">
+                {" "}
+                locked for {lockPeriod(token.lockEnd)} days{" "}
+              </span>
             </span>
           </LockDropdown.Item>
         ))}
