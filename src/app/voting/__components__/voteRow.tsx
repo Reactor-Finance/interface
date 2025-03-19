@@ -8,18 +8,19 @@ interface Props {
   id: string;
 }
 export default function VoteRow({ id }: Props) {
-  const { setVote, totalPercent, selectedVotesForVRCT } = useVoteProvider();
+  const { updateSelectedVeNFTPools, totalPercent, selectedVeNFTPools } =
+    useVoteProvider();
   const value = useMemo(() => {
-    if (!selectedVotesForVRCT) return "";
-    const selectedValue = selectedVotesForVRCT[id];
+    if (!selectedVeNFTPools) return "";
+    const selectedValue = selectedVeNFTPools[id];
     return selectedValue ? selectedValue.toString() : "";
-  }, [id, selectedVotesForVRCT]);
+  }, [id, selectedVeNFTPools]);
   const percentLeft = useMemo(() => {
     const valuePercent = isFinite(parseFloat(value)) ? parseFloat(value) : 0;
     return 100 - (totalPercent - valuePercent);
   }, [totalPercent, value]);
   const handleMaxClick = () => {
-    setVote({ [id]: percentLeft });
+    updateSelectedVeNFTPools({ [id]: percentLeft });
   };
   return (
     <TableRow cols="10" className="z-10">
@@ -51,39 +52,41 @@ export default function VoteRow({ id }: Props) {
       <td>131331</td>
       <td>131331</td>
       <td>
-        <div className="bg-neutral-800 justify-between rounded-md p-2 flex gap-x-2">
-          <div className="flex gap-x-1">
-            <input
-              placeholder="0"
-              value={value}
-              onChange={(e) => {
-                if (inputPatternMatch(e.target.value)) {
-                  let newValue = "";
-                  if (parseFloat(e.target.value) < 0) {
-                    return;
+        <div className="flex justify-end">
+          <div className="bg-neutral-950 transition-colors group-hover:bg-neutral-900 justify-between rounded-md p-2 flex gap-x-4">
+            <div className="flex gap-x-1">
+              <input
+                placeholder="0"
+                value={value}
+                onChange={(e) => {
+                  if (inputPatternMatch(e.target.value)) {
+                    let newValue = "";
+                    if (parseFloat(e.target.value) < 0) {
+                      return;
+                    }
+                    if (parseFloat(e.target.value) > percentLeft) {
+                      newValue = `${percentLeft}`;
+                    } else {
+                      newValue = e.target.value;
+                    }
+                    if (isFinite(parseFloat(newValue))) {
+                      updateSelectedVeNFTPools({ [id]: parseFloat(newValue) });
+                    } else {
+                      updateSelectedVeNFTPools({ [id]: 0 });
+                    }
                   }
-                  if (parseFloat(e.target.value) > percentLeft) {
-                    newValue = `${percentLeft}`;
-                  } else {
-                    newValue = e.target.value;
-                  }
-                  if (isFinite(parseFloat(newValue))) {
-                    setVote({ [id]: parseFloat(newValue) });
-                  } else {
-                    setVote({ [id]: 0 });
-                  }
-                }
-              }}
-              className="w-[30px] focus:ring-transparent transition-all  bg-transparent"
-            />
-            <span className="text-neutral-400">%</span>
+                }}
+                className="w-[30px] focus:ring-transparent transition-all  bg-transparent"
+              />
+              <span className="text-neutral-400">%</span>
+            </div>
+            <button
+              onClick={handleMaxClick}
+              className="text-primary-400 disabled:text-neutral-500"
+            >
+              Max
+            </button>
           </div>
-          <button
-            onClick={handleMaxClick}
-            className="text-primary-400 disabled:text-neutral-500"
-          >
-            Max
-          </button>
         </div>
       </td>
     </TableRow>

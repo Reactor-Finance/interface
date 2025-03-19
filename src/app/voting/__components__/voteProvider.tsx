@@ -8,13 +8,15 @@ import React, {
   useState,
 } from "react";
 interface VoteProviderType {
-  selectedVRCT: TLockToken | undefined;
+  selectedVeNFT: TLockToken | undefined;
   setSelectedVRCT: React.Dispatch<React.SetStateAction<TLockToken | undefined>>;
-  selectedVotes: { [id: string]: { [id: string]: number } };
-  selectedVotesForVRCT: { [id: string]: number } | undefined;
-  selectedVotesAmount: number;
-  totalPercent: number;
-  setVote: (vote: { [id: string]: number }) => void;
+  // {  [ve_nft_Id]: {[poolId]: 22%, [poolId]: 33%}, etc...}
+  veNFTsAndPoolsMap: { [id: string]: { [id: string]: number } }; // All VeNfts and there selected pools
+  // the selected veNFTs selected pools  {[poolId]: 22%, [poolId]: 33%}
+  selectedVeNFTPools: { [id: string]: number } | undefined;
+  selectedVeNFTPoolsAmount: number;
+  totalPercent: number; // for selected veNFTsPools
+  updateSelectedVeNFTPools: (vote: { [id: string]: number }) => void;
 }
 
 const LiquidityContext = createContext<VoteProviderType | undefined>(undefined);
@@ -23,15 +25,16 @@ interface Props {
 }
 
 export const VoteProvider = ({ children }: Props) => {
-  const [selectedVotes, setSelectedVotes] = useState<{
+  const [veNFTsAndPoolsMap, setSelectedVotes] = useState<{
     [id: string]: { [id: string]: number };
   }>({});
-  const [selectedVRCT, setSelectedVRCT] = useState<TLockToken>();
-  const selectedVotesAmount = useMemo(() => {
+  const [selectedVeNFT, setSelectedVRCT] = useState<TLockToken>();
+  const selectedVeNFTPoolsAmount = useMemo(() => {
+    // total amount of pools with atleast > 0 percent
     let result = 0;
-    if (!selectedVRCT) return 0;
-    if (!selectedVotes[selectedVRCT?.id.toString()]) return 0;
-    Object.values(selectedVotes[selectedVRCT?.id.toString()]).forEach(
+    if (!selectedVeNFT) return 0;
+    if (!veNFTsAndPoolsMap[selectedVeNFT?.id.toString()]) return 0;
+    Object.values(veNFTsAndPoolsMap[selectedVeNFT?.id.toString()]).forEach(
       (value) => {
         if (value > 0) {
           result++;
@@ -39,39 +42,57 @@ export const VoteProvider = ({ children }: Props) => {
       }
     );
     return result;
-  }, [selectedVRCT, selectedVotes]);
+  }, [selectedVeNFT, veNFTsAndPoolsMap]);
+  // total percent for ONLY selected veNFT's Pools
   const totalPercent = useMemo(() => {
-    if (!selectedVRCT) return 0;
-    if (!selectedVotes[selectedVRCT.id.toString()]) return 0;
-    return Object.values(selectedVotes[selectedVRCT.id.toString()]).reduce(
+    if (!selectedVeNFT) return 0;
+    if (!veNFTsAndPoolsMap[selectedVeNFT.id.toString()]) return 0;
+    return Object.values(veNFTsAndPoolsMap[selectedVeNFT.id.toString()]).reduce(
       (acc, curr) => acc + curr,
       0
     );
-  }, [selectedVRCT, selectedVotes]);
-  const setVote = useCallback(
+  }, [selectedVeNFT, veNFTsAndPoolsMap]);
+
+  // set a pool(s) for ONLY for selected veNFT
+  const setPool = useCallback(
     (vote: { [id: string]: number }) => {
-      if (!selectedVRCT) return;
+      if (!selectedVeNFT) return;
       const newVotes = {
-        ...selectedVotes[selectedVRCT?.id.toString()],
+        ...veNFTsAndPoolsMap[selectedVeNFT?.id.toString()],
         ...vote,
       };
+      Object.keys(newVotes).forEach((key) => {
+        if (newVotes[key] === 0) {
+          delete newVotes[key];
+        }
+      });
+      const allVotesEqZero = Object.values(newVotes).every(
+        (value) => value === 0
+      );
+      if (allVotesEqZero) {
+        // remove record if all votes are eq than 0
+        const newObj = { ...veNFTsAndPoolsMap };
+        delete newObj[selectedVeNFT.id.toString()];
+        setSelectedVotes(newObj);
+        return;
+      }
       setSelectedVotes({
-        ...selectedVotes,
-        [selectedVRCT.id.toString()]: newVotes,
+        ...veNFTsAndPoolsMap,
+        [selectedVeNFT.id.toString()]: newVotes,
       });
     },
-    [selectedVRCT, selectedVotes]
+    [selectedVeNFT, veNFTsAndPoolsMap]
   );
   return (
     <LiquidityContext.Provider
       value={{
-        selectedVotes,
-        selectedVotesForVRCT:
-          selectedVotes[selectedVRCT?.id.toString() ?? "-1"],
+        veNFTsAndPoolsMap,
+        selectedVeNFTPools:
+          veNFTsAndPoolsMap[selectedVeNFT?.id.toString() ?? "-1"],
         setSelectedVRCT,
-        selectedVRCT,
-        selectedVotesAmount,
-        setVote,
+        selectedVeNFTPoolsAmount,
+        selectedVeNFT,
+        updateSelectedVeNFTPools: setPool,
         totalPercent,
       }}
     >

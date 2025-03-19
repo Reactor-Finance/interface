@@ -6,11 +6,12 @@ import VoteDialog from "./voteDialog";
 import { useAccount } from "wagmi";
 
 export default function VotePower() {
-  const { totalPercent, selectedVotesAmount, selectedVRCT } = useVoteProvider();
+  const { totalPercent, selectedVeNFTPoolsAmount, selectedVeNFT } =
+    useVoteProvider();
   const [open, setOpen] = useState(false);
   const { address } = useAccount();
   if (!address) return null;
-  if (!selectedVRCT) return;
+  if (!selectedVeNFT) return;
   return (
     <>
       <VoteDialog setOpen={setOpen} open={open} />
@@ -21,7 +22,7 @@ export default function VotePower() {
             <span className="text-blue-light">{totalPercent} %</span>
           </span>
           <div className="bg-purple-400/10 text-purple-400 h-7 w-7 flex justify-center items-center rounded-full">
-            {selectedVotesAmount}
+            {selectedVeNFTPoolsAmount}
           </div>
         </div>
         <Button

@@ -6,12 +6,12 @@ import { useVoteProvider } from "./voteProvider";
 
 export default function VoteDropdown() {
   const { lockTokens } = useVeNFTsProvider();
-  const { setSelectedVRCT, selectedVRCT } = useVoteProvider();
+  const { setSelectedVRCT, selectedVeNFT } = useVoteProvider();
   return (
     <div>
       {/* TODO: rename ManageLockDropdown */}
       <ManageLockDropdown
-        selectedLockToken={selectedVRCT}
+        selectedLockToken={selectedVeNFT}
         onTokenSelected={function (token?: TLockToken): void {
           setSelectedVRCT(token);
         }}
