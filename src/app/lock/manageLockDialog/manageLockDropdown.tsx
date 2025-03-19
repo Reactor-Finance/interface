@@ -2,9 +2,9 @@ import React, { useCallback } from "react";
 import LockDropdown from "../lockDropdown";
 import { formatUnits } from "viem";
 import { formatNumber } from "@/lib/utils";
-import { useCheckUserVeNFTs } from "@/lib/hooks/useCheckUserVeNFTs";
 import { TLockToken } from "../types";
 import { useAtomicDate } from "@/lib/hooks/useAtomicDate";
+import { useLockProvider } from "../lockProvider";
 
 export default function ManageLockDropdown({
   selectedLockToken,
@@ -13,7 +13,7 @@ export default function ManageLockDropdown({
   selectedLockToken: TLockToken;
   onTokenSelected: (token?: TLockToken) => void;
 }) {
-  const lockTokens = useCheckUserVeNFTs();
+  const { lockTokens } = useLockProvider();
   const now = useAtomicDate();
 
   const lockPeriod = useCallback(

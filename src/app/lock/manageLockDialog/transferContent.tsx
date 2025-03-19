@@ -20,7 +20,7 @@ export default function TransferContent({
 }: {
   selectedLockToken: TLockToken;
 }) {
-  const [toAddress, setToAddress] = React.useState<string>(zeroAddress);
+  const [toAddress, setToAddress] = React.useState<string>("");
   const { address = zeroAddress } = useAccount();
   const chainId = useChainId();
   const ve = useMemo(() => VE[chainId], [chainId]);

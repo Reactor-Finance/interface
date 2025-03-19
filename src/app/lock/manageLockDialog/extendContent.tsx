@@ -13,6 +13,7 @@ import { TLockToken } from "../types";
 import * as Ve from "@/lib/abis/Ve";
 import { VE } from "@/data/constants";
 import { useAtomicDate } from "@/lib/hooks/useAtomicDate";
+import { useDebounce } from "@/lib/hooks/useDebounce";
 
 // Local constants
 const YEARS_2 = 62208000;
@@ -31,12 +32,12 @@ export default function ExtendContent({
   const { isLoading } = useWaitForTransactionReceipt({
     hash,
   });
-
+  const { debouncedValue: durationDe } = useDebounce(duration, 250);
   const { data: increaseUnlockTimeSimulation } = useSimulateContract({
     ...Ve,
     address: ve,
     functionName: "increase_unlock_time",
-    args: [selectedLockToken.id, BigInt(duration)],
+    args: [selectedLockToken.id, BigInt(durationDe)],
   });
 
   const onSubmit = useCallback(() => {

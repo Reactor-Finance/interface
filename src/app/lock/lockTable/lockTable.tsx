@@ -2,13 +2,13 @@
 import React, { useState } from "react";
 import ManageLockDialog from "../manageLockDialog/manageLockDialog";
 import LockRow from "./lockRow";
-import { useCheckUserVeNFTs } from "@/lib/hooks/useCheckUserVeNFTs";
 import { TLockToken } from "../types";
+import { useLockProvider } from "../lockProvider";
 
 export default function LockTable() {
   const [manageDialogOpen, setManageDialogOpen] = useState(false);
   const [selectedLockToken, setSelectedLockToken] = useState<TLockToken>();
-  const lockTokens = useCheckUserVeNFTs();
+  const { lockTokens } = useLockProvider();
   return (
     <>
       <ManageLockDialog

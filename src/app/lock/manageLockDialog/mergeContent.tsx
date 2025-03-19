@@ -10,17 +10,17 @@ import LockDropdown from "../lockDropdown";
 import SubmitButton from "@/components/shared/submitBtn";
 import usePadLoading from "@/lib/hooks/usePadLoading";
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
-import { useCheckUserVeNFTs } from "@/lib/hooks/useCheckUserVeNFTs";
 import { TLockToken } from "../types";
 import * as Ve from "@/lib/abis/Ve";
 import { VE } from "@/data/constants";
+import { useLockProvider } from "../lockProvider";
 
 export default function MergeContent({
   selectedLockToken,
 }: {
   selectedLockToken: TLockToken;
 }) {
-  const lockTokens = useCheckUserVeNFTs();
+  const { lockTokens } = useLockProvider();
   const [selectedLockToken0, setSelectedLockToken0] = useState<TLockToken>();
   const chainId = useChainId();
   const ve = useMemo(() => VE[chainId], [chainId]);

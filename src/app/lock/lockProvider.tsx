@@ -1,5 +1,5 @@
 "use client";
-import { Contracts } from "@/lib/contracts";
+import { useCheckUserVeNFTs } from "@/lib/hooks/useCheckUserVeNFTs";
 import React, {
   createContext,
   useContext,
@@ -7,7 +7,7 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { useAccount, useReadContract } from "wagmi";
+import { useAccount } from "wagmi";
 export type TLockToken = {
   decimals: number;
   voted: boolean;
@@ -42,18 +42,11 @@ interface Props {
 
 export const LockProvider = ({ children }: Props) => {
   const { address } = useAccount();
-  const { data: tokens, queryKey } = useReadContract({
-    ...Contracts.veNFTHelper,
-    functionName: "getNFTFromAddress",
-    args: [address ?? "0x"],
-    query: {
-      enabled: Boolean(address),
-    },
-  });
+  const { data: locks, queryKey } = useCheckUserVeNFTs();
   const [selectedTokenId, setSelectedTokenId] = useState<string>("");
   const selectedLockToken = useMemo(() => {
-    return tokens?.find((token) => token.id.toString() === selectedTokenId);
-  }, [selectedTokenId, tokens]);
+    return locks?.find((token) => token.id.toString() === selectedTokenId);
+  }, [locks, selectedTokenId]);
   useEffect(() => {
     if (address) {
       setSelectedTokenId("");
@@ -66,7 +59,7 @@ export const LockProvider = ({ children }: Props) => {
         setSelectedTokenId,
         selectedTokenId,
         queryKey,
-        lockTokens: tokens ?? [],
+        lockTokens: locks ?? [],
       }}
     >
       {children}

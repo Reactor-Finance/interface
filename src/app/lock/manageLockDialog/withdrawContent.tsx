@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { Alert } from "@/components/ui/alert";
 import {
   useChainId,
@@ -11,6 +11,8 @@ import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStat
 import { TLockToken } from "../types";
 import * as Ve from "@/lib/abis/Ve";
 import { VE } from "@/data/constants";
+import { useLockProvider } from "../lockProvider";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function WithdrawContent({
   selectedLockToken,
@@ -26,10 +28,17 @@ export default function WithdrawContent({
     args: [selectedLockToken.id],
   });
   const { writeContract, reset, isPending, data: hash } = useWriteContract();
-  const { isLoading } = useWaitForTransactionReceipt({
+  const { isSuccess, isLoading } = useWaitForTransactionReceipt({
     hash,
   });
-
+  const { queryKey } = useLockProvider();
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    if (isSuccess) {
+      queryClient.invalidateQueries({ queryKey });
+      reset();
+    }
+  }, [isSuccess, queryClient, queryKey, reset]);
   const onSubmit = useCallback(() => {
     if (withdrawSimulation) {
       reset();
