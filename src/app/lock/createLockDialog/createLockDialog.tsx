@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import RctInput from "../rctInput";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -20,6 +20,7 @@ import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStat
 import { useGetBalance } from "@/lib/hooks/useGetBalance";
 import { formatNumber } from "@/lib/utils";
 import { useAtomicDate } from "@/lib/hooks/useAtomicDate";
+import { useQueryClient } from "@tanstack/react-query";
 
 // Local constants
 const YEARS_2 = 62208000;
@@ -35,10 +36,9 @@ export default function CreateLockDialog() {
   const [open, setOpen] = useState(false);
   const rctBalance = useGetBalance({ tokenAddress: rct });
   const { writeContract, reset, data: hash, isPending } = useWriteContract();
-  const { isLoading } = useWaitForTransactionReceipt({
+  const { isLoading, isSuccess } = useWaitForTransactionReceipt({
     hash,
   });
-
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const parsedNumber = Number(e.target.value);
@@ -48,20 +48,38 @@ export default function CreateLockDialog() {
     [amount, setAmount]
   );
 
-  const { approveWriteRequest, needsApproval, isFetching } = useApproveWrite({
-    spender: ve,
-    tokenAddress: rct, //rct address
-    amount: String(amount),
-    decimals: RCT_DECIMALS,
-  });
-
+  const { resetApproval, approveWriteRequest, needsApproval, isFetching } =
+    useApproveWrite({
+      spender: ve,
+      tokenAddress: rct, //rct address
+      amount: String(amount),
+      decimals: RCT_DECIMALS,
+    });
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    if (isSuccess && needsApproval) {
+      reset();
+      resetApproval();
+    }
+    if (isSuccess && !needsApproval) {
+      queryClient.invalidateQueries({ queryKey: rctBalance.balanceQueryKey });
+      reset();
+    }
+  }, [
+    isSuccess,
+    needsApproval,
+    queryClient,
+    rctBalance.balanceQueryKey,
+    reset,
+    resetApproval,
+  ]);
   const { data: createLockSimulation } = useSimulateCreateLock({
     value: parseUnits(String(amount), RCT_DECIMALS),
     duration: BigInt(duration),
   });
 
   const onSubmit = useCallback(() => {
-    if (approveWriteRequest) {
+    if (needsApproval && approveWriteRequest) {
       reset(); // Reset state first
       writeContract(approveWriteRequest);
       return;
@@ -69,7 +87,13 @@ export default function CreateLockDialog() {
     if (createLockSimulation) {
       writeContract(createLockSimulation.request);
     }
-  }, [approveWriteRequest, reset, writeContract, createLockSimulation]);
+  }, [
+    needsApproval,
+    approveWriteRequest,
+    createLockSimulation,
+    reset,
+    writeContract,
+  ]);
 
   const { state } = useGetButtonStatuses({
     isLoading,
