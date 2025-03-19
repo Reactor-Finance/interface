@@ -7,7 +7,9 @@ import React, {
   useState,
 } from "react";
 interface VoteProviderType {
-  selectedVotes: { [id: string]: number };
+  selectedVRCT: string;
+  selectedVotes: { [id: string]: { [id: string]: number } };
+  selectedVotesForVRCT: { [id: string]: number };
   selectedVotesAmount: number;
   totalPercent: number;
   setVote: (vote: { [id: string]: number }) => void;
@@ -19,31 +21,44 @@ interface Props {
 }
 
 export const VoteProvider = ({ children }: Props) => {
-  const [selectedVotes, setSelectedVotes] = useState<{ [id: string]: number }>(
-    {}
-  );
+  const [selectedVotes, setSelectedVotes] = useState<{
+    [id: string]: { [id: string]: number };
+  }>({});
+  const [selectedVRCT] = useState("0");
   const selectedVotesAmount = useMemo(() => {
     let result = 0;
-    Object.values(selectedVotes).forEach((value) => {
+    if (!selectedVotes[selectedVRCT]) return 0;
+    Object.values(selectedVotes[selectedVRCT]).forEach((value) => {
       if (value > 0) {
         result++;
       }
     });
     return result;
-  }, [selectedVotes]);
+  }, [selectedVRCT, selectedVotes]);
   const totalPercent = useMemo(() => {
-    return Object.values(selectedVotes).reduce((acc, curr) => acc + curr, 0);
-  }, [selectedVotes]);
+    if (!selectedVotes[selectedVRCT]) return 0;
+    return Object.values(selectedVotes[selectedVRCT]).reduce(
+      (acc, curr) => acc + curr,
+      0
+    );
+  }, [selectedVRCT, selectedVotes]);
   const setVote = useCallback(
     (vote: { [id: string]: number }) => {
-      const newVotes = { ...selectedVotes, ...vote };
-      setSelectedVotes(newVotes);
+      const newVotes = { ...selectedVotes[selectedVRCT], ...vote };
+      setSelectedVotes({ ...selectedVotes, [selectedVRCT]: newVotes });
     },
-    [selectedVotes]
+    [selectedVRCT, selectedVotes]
   );
   return (
     <LiquidityContext.Provider
-      value={{ selectedVotes, selectedVotesAmount, setVote, totalPercent }}
+      value={{
+        selectedVotes,
+        selectedVotesForVRCT: selectedVotes[selectedVRCT],
+        selectedVRCT,
+        selectedVotesAmount,
+        setVote,
+        totalPercent,
+      }}
     >
       {children}
     </LiquidityContext.Provider>
