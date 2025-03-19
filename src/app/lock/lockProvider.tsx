@@ -1,7 +1,9 @@
 "use client";
 import { useCheckUserVeNFTs } from "@/lib/hooks/useCheckUserVeNFTs";
+import { useQueryClient } from "@tanstack/react-query";
 import React, {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -30,6 +32,7 @@ export type TLockToken = {
 interface LockProviderType {
   lockTokens: readonly TLockToken[];
   selectedLockToken: TLockToken | undefined;
+  reset: () => void;
   selectedTokenId: string;
   setSelectedTokenId: React.Dispatch<React.SetStateAction<string>>;
   queryKey: readonly unknown[];
@@ -52,9 +55,15 @@ export const LockProvider = ({ children }: Props) => {
       setSelectedTokenId("");
     }
   }, [address]);
+  const queryClient = useQueryClient();
+  const reset = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey });
+  }, [queryClient, queryKey]);
+
   return (
     <LiquidityContext.Provider
       value={{
+        reset,
         selectedLockToken,
         setSelectedTokenId,
         selectedTokenId,

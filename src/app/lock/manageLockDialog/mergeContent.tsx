@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert } from "@/components/ui/alert";
 import {
   useChainId,
@@ -20,7 +20,7 @@ export default function MergeContent({
 }: {
   selectedLockToken: TLockToken;
 }) {
-  const { lockTokens } = useLockProvider();
+  const { lockTokens, reset: resetLocks } = useLockProvider();
   const [selectedLockToken0, setSelectedLockToken0] = useState<TLockToken>();
   const chainId = useChainId();
   const ve = useMemo(() => VE[chainId], [chainId]);
@@ -33,8 +33,15 @@ export default function MergeContent({
       enabled: Boolean(selectedLockToken) && Boolean(selectedLockToken0),
     },
   });
-  const { writeContract, isPending, data: hash } = useWriteContract();
-  const { isLoading } = useWaitForTransactionReceipt({ hash });
+  const { writeContract, reset, isPending, data: hash } = useWriteContract();
+  const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash });
+  useEffect(() => {
+    if (isSuccess) {
+      reset();
+      resetLocks();
+    }
+  }, [isSuccess, reset, resetLocks]);
+
   const onSubmit = useCallback(() => {
     if (mergeSimulation?.request) {
       writeContract(mergeSimulation.request);

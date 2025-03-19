@@ -17,6 +17,8 @@ import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStat
 import { useGetBalance } from "@/lib/hooks/useGetBalance";
 import * as Ve from "@/lib/abis/Ve";
 import { TLockToken } from "../types";
+import { useLockProvider } from "../lockProvider";
+import { useEffect } from "react";
 
 // Local constants
 
@@ -31,10 +33,17 @@ export default function IncreaseContent({
   const [amount, setAmount] = React.useState(0);
   const rctBalance = useGetBalance({ tokenAddress: rct });
   const { writeContract, reset, data: hash, isPending } = useWriteContract();
-  const { isLoading } = useWaitForTransactionReceipt({
+  const { isSuccess, isLoading } = useWaitForTransactionReceipt({
     hash,
   });
 
+  const { reset: resetLocks } = useLockProvider();
+  useEffect(() => {
+    if (isSuccess) {
+      reset();
+      resetLocks();
+    }
+  }, [isSuccess, reset, resetLocks]);
   const handleInputChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const parsedNumber = Number(e.target.value);
