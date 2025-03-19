@@ -6,10 +6,11 @@ import VoteDialog from "./voteDialog";
 import { useAccount } from "wagmi";
 
 export default function VotePower() {
-  const { totalPercent, selectedVotesAmount } = useVoteProvider();
+  const { totalPercent, selectedVotesAmount, selectedVRCT } = useVoteProvider();
   const [open, setOpen] = useState(false);
   const { address } = useAccount();
   if (!address) return null;
+  if (!selectedVRCT) return;
   return (
     <>
       <VoteDialog setOpen={setOpen} open={open} />

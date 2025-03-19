@@ -73,7 +73,7 @@ export default function Page() {
           </div>
         </div>
         <div className="pt-4"></div>
-        <div className="relative">
+        <div className="">
           <VotePower />
           <VoteTable />
         </div>
