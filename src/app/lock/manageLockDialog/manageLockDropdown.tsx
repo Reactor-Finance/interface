@@ -52,9 +52,7 @@ export default function ManageLockDropdown({
               </span>
             </span>
           </>
-        ) : (
-          <div>Select a lock</div>
-        )}
+        ) : undefined}
       </LockDropdown.Trigger>
 
       <LockDropdown.SelectList>
