@@ -1,14 +1,13 @@
 "use client";
 import SearchInput from "@/components/shared/searchInput";
-import VrctDropdown from "@/components/shared/vrctDropdown";
 import Headers from "@/components/ui/headers";
 import PageMarginContainer from "@/components/ui/pageMarginContainer";
-import { SelectItem } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import React from "react";
 import VoteTable from "./__components__/voteTable";
 import { VoteProvider } from "./__components__/voteProvider";
 import VotePower from "./__components__/votePower";
+import VoteDropdown from "./__components__/voteDropdown";
 
 export default function Page() {
   return (
@@ -68,10 +67,8 @@ export default function Page() {
                 }}
               ></SearchInput>
             </div>
-            <div className="w-[300px]">
-              <VrctDropdown placeholder="Select your veRCT">
-                <SelectItem value="hello">Hello</SelectItem>
-              </VrctDropdown>
+            <div className="w-[380px]">
+              <VoteDropdown />
             </div>
           </div>
         </div>
