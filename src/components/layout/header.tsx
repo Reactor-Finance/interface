@@ -37,6 +37,7 @@ export default function Header() {
             <NavLink href="/voting">Vote</NavLink>
             <NavLink href="/dashboard">Dashboard</NavLink>
             <NavLink href="/points">Points</NavLink>
+            <NavLink href="/lock">Lock</NavLink>
           </ul>
         )}
       </div>

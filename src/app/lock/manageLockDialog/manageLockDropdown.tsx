@@ -2,18 +2,18 @@ import React, { useCallback } from "react";
 import LockDropdown from "../lockDropdown";
 import { formatUnits } from "viem";
 import { formatNumber } from "@/lib/utils";
-import { useCheckUserVeNFTs } from "@/lib/hooks/useCheckUserVeNFTs";
 import { TLockToken } from "../types";
 import { useAtomicDate } from "@/lib/hooks/useAtomicDate";
 
 export default function ManageLockDropdown({
   selectedLockToken,
   onTokenSelected,
+  lockTokens,
 }: {
-  selectedLockToken: TLockToken;
+  selectedLockToken: TLockToken | undefined;
   onTokenSelected: (token?: TLockToken) => void;
+  lockTokens: readonly TLockToken[];
 }) {
-  const lockTokens = useCheckUserVeNFTs();
   const now = useAtomicDate();
 
   const lockPeriod = useCallback(
@@ -35,7 +35,22 @@ export default function ManageLockDropdown({
       value={selectedLockToken?.id.toString()}
     >
       <LockDropdown.Trigger>
-        Lock #{selectedLockToken?.id.toString()}
+        {selectedLockToken ? (
+          <>
+            Lock #{selectedLockToken?.id.toString()}{" "}
+            <span className="text-neutral-200 text-sm">
+              {formatNumber(
+                formatUnits(
+                  selectedLockToken.amount,
+                  selectedLockToken.decimals
+                )
+              )}{" "}
+              RCT locked for {lockPeriod(selectedLockToken.lockEnd)} days{" "}
+            </span>
+          </>
+        ) : (
+          <div>Select a lock</div>
+        )}
       </LockDropdown.Trigger>
 
       <LockDropdown.SelectList>
