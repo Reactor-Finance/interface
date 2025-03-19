@@ -37,7 +37,7 @@ export default function ManageLockDialog({
           if (!isOpen && reset) reset();
         }}
       >
-        <DialogContent position="static">
+        <DialogContent position="static" className="max-w-[520px]">
           <DialogTitle className="text-lg">
             Manage your <span className="text-primary-400">lock</span>
           </DialogTitle>
