@@ -31,9 +31,10 @@ export default function Header() {
 
       <div className="col-span-2 hidden lg:block">
         {isConnected && (
-          <ul className="grid justify-center  grid-cols-4 place-items-center text-[14px]">
+          <ul className="grid justify-center  grid-cols-5 place-items-center text-[14px]">
             <NavLink href="/swap">Swap</NavLink>
             <NavLink href="/liquidity">Liquidity</NavLink>
+            <NavLink href="/voting">Vote</NavLink>
             <NavLink href="/dashboard">Dashboard</NavLink>
             <NavLink href="/points">Points</NavLink>
           </ul>
