@@ -1,4 +1,5 @@
 "use client";
+import { TLockToken } from "@/app/lock/types";
 import React, {
   createContext,
   useCallback,
@@ -7,9 +8,10 @@ import React, {
   useState,
 } from "react";
 interface VoteProviderType {
-  selectedVRCT: string;
+  selectedVRCT: TLockToken | undefined;
+  setSelectedVRCT: React.Dispatch<React.SetStateAction<TLockToken | undefined>>;
   selectedVotes: { [id: string]: { [id: string]: number } };
-  selectedVotesForVRCT: { [id: string]: number };
+  selectedVotesForVRCT: { [id: string]: number } | undefined;
   selectedVotesAmount: number;
   totalPercent: number;
   setVote: (vote: { [id: string]: number }) => void;
@@ -24,28 +26,39 @@ export const VoteProvider = ({ children }: Props) => {
   const [selectedVotes, setSelectedVotes] = useState<{
     [id: string]: { [id: string]: number };
   }>({});
-  const [selectedVRCT] = useState("0");
+  const [selectedVRCT, setSelectedVRCT] = useState<TLockToken>();
   const selectedVotesAmount = useMemo(() => {
     let result = 0;
-    if (!selectedVotes[selectedVRCT]) return 0;
-    Object.values(selectedVotes[selectedVRCT]).forEach((value) => {
-      if (value > 0) {
-        result++;
+    if (!selectedVRCT) return 0;
+    if (!selectedVotes[selectedVRCT?.id.toString()]) return 0;
+    Object.values(selectedVotes[selectedVRCT?.id.toString()]).forEach(
+      (value) => {
+        if (value > 0) {
+          result++;
+        }
       }
-    });
+    );
     return result;
   }, [selectedVRCT, selectedVotes]);
   const totalPercent = useMemo(() => {
-    if (!selectedVotes[selectedVRCT]) return 0;
-    return Object.values(selectedVotes[selectedVRCT]).reduce(
+    if (!selectedVRCT) return 0;
+    if (!selectedVotes[selectedVRCT.id.toString()]) return 0;
+    return Object.values(selectedVotes[selectedVRCT.id.toString()]).reduce(
       (acc, curr) => acc + curr,
       0
     );
   }, [selectedVRCT, selectedVotes]);
   const setVote = useCallback(
     (vote: { [id: string]: number }) => {
-      const newVotes = { ...selectedVotes[selectedVRCT], ...vote };
-      setSelectedVotes({ ...selectedVotes, [selectedVRCT]: newVotes });
+      if (!selectedVRCT) return;
+      const newVotes = {
+        ...selectedVotes[selectedVRCT?.id.toString()],
+        ...vote,
+      };
+      setSelectedVotes({
+        ...selectedVotes,
+        [selectedVRCT.id.toString()]: newVotes,
+      });
     },
     [selectedVRCT, selectedVotes]
   );
@@ -53,7 +66,9 @@ export const VoteProvider = ({ children }: Props) => {
     <LiquidityContext.Provider
       value={{
         selectedVotes,
-        selectedVotesForVRCT: selectedVotes[selectedVRCT],
+        selectedVotesForVRCT:
+          selectedVotes[selectedVRCT?.id.toString() ?? "-1"],
+        setSelectedVRCT,
         selectedVRCT,
         selectedVotesAmount,
         setVote,
