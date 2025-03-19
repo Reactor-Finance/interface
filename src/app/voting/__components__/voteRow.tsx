@@ -1,21 +1,24 @@
 import PoolHeader from "@/components/shared/poolHeader";
 import { TableRow } from "@/components/ui/table";
 import { TPoolType } from "@/lib/types";
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { useVoteProvider } from "./voteProvider";
 import { inputPatternMatch } from "@/lib/utils";
 interface Props {
   id: string;
 }
 export default function VoteRow({ id }: Props) {
-  const [value, setValue] = useState("");
-  const { setVote, totalPercent } = useVoteProvider();
+  const { setVote, totalPercent, selectedVotesForVRCT } = useVoteProvider();
+  const value = useMemo(() => {
+    if (!selectedVotesForVRCT) return "";
+    const selectedValue = selectedVotesForVRCT[id];
+    return selectedValue ? selectedValue.toString() : "";
+  }, [id, selectedVotesForVRCT]);
   const percentLeft = useMemo(() => {
     const valuePercent = isFinite(parseFloat(value)) ? parseFloat(value) : 0;
     return 100 - (totalPercent - valuePercent);
   }, [totalPercent, value]);
   const handleMaxClick = () => {
-    setValue(`${percentLeft}`);
     setVote({ [id]: percentLeft });
   };
   return (
@@ -64,7 +67,6 @@ export default function VoteRow({ id }: Props) {
                   } else {
                     newValue = e.target.value;
                   }
-                  setValue(newValue);
                   if (isFinite(parseFloat(newValue))) {
                     setVote({ [id]: parseFloat(newValue) });
                   } else {
