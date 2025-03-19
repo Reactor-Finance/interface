@@ -10,7 +10,7 @@ import MergeContent from "./mergeContent";
 import WithdrawContent from "./withdrawContent";
 import ManageLockDropdown from "./manageLockDropdown";
 import { TLockToken } from "../types";
-import { useLockProvider } from "../lockProvider";
+import { useVeNFTsProvider } from "@/contexts/veNFTsProvider";
 
 interface Props {
   open: boolean;
@@ -27,7 +27,7 @@ export default function ManageLockDialog({
   reset,
   onDropdownChange,
 }: Props) {
-  const { lockTokens } = useLockProvider();
+  const { lockTokens } = useVeNFTsProvider();
   return (
     <div>
       <Dialog

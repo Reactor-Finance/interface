@@ -10,7 +10,7 @@ import React, {
   useState,
 } from "react";
 import { useAccount } from "wagmi";
-export type TLockToken = {
+export type TVeNFTsToken = {
   decimals: number;
   voted: boolean;
   attachments: bigint;
@@ -29,25 +29,27 @@ export type TLockToken = {
   tokenSymbol: string;
   tokenDecimals: bigint;
 };
-interface LockProviderType {
-  lockTokens: readonly TLockToken[];
-  selectedLockToken: TLockToken | undefined;
+interface VeNFTsProviderType {
+  lockTokens: readonly TVeNFTsToken[];
+  selectedVeNFTsToken: TVeNFTsToken | undefined;
   reset: () => void;
   selectedTokenId: string;
   setSelectedTokenId: React.Dispatch<React.SetStateAction<string>>;
   queryKey: readonly unknown[];
 }
 
-const LiquidityContext = createContext<LockProviderType | undefined>(undefined);
+const LiquidityContext = createContext<VeNFTsProviderType | undefined>(
+  undefined
+);
 interface Props {
   children: React.ReactNode;
 }
 
-export const LockProvider = ({ children }: Props) => {
+export const VeNFTsProvider = ({ children }: Props) => {
   const { address } = useAccount();
   const { data: locks, queryKey } = useCheckUserVeNFTs();
   const [selectedTokenId, setSelectedTokenId] = useState<string>("");
-  const selectedLockToken = useMemo(() => {
+  const selectedVeNFTsToken = useMemo(() => {
     return locks?.find((token) => token.id.toString() === selectedTokenId);
   }, [locks, selectedTokenId]);
   useEffect(() => {
@@ -64,7 +66,7 @@ export const LockProvider = ({ children }: Props) => {
     <LiquidityContext.Provider
       value={{
         reset,
-        selectedLockToken,
+        selectedVeNFTsToken,
         setSelectedTokenId,
         selectedTokenId,
         queryKey,
@@ -77,10 +79,10 @@ export const LockProvider = ({ children }: Props) => {
 };
 
 // Custom hook to use the context
-export const useLockProvider = () => {
+export const useVeNFTsProvider = () => {
   const context = useContext(LiquidityContext);
   if (!context) {
-    throw new Error("useLockProvider must be used within a LockProvider");
+    throw new Error("useVeNFTsProvider must be used within a VeNFTsProvider");
   }
   return context;
 };

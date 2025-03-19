@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert } from "@/components/ui/alert";
 import { Slider } from "@/components/ui/slider";
 import {
@@ -14,6 +14,7 @@ import * as Ve from "@/lib/abis/Ve";
 import { VE } from "@/data/constants";
 import { useAtomicDate } from "@/lib/hooks/useAtomicDate";
 import { useDebounce } from "@/lib/hooks/useDebounce";
+import { useVeNFTsProvider } from "@/contexts/veNFTsProvider";
 
 // Local constants
 const YEARS_2 = 62208000;
@@ -28,10 +29,17 @@ export default function ExtendContent({
   const now = useAtomicDate();
   const ve = useMemo(() => VE[chainId], [chainId]); // Escrow
   const [duration, setDuration] = useState(DAYS_14);
-  const { writeContract, isPending, data: hash } = useWriteContract();
-  const { isLoading } = useWaitForTransactionReceipt({
+  const { writeContract, reset, isPending, data: hash } = useWriteContract();
+  const { isLoading, isSuccess } = useWaitForTransactionReceipt({
     hash,
   });
+  const { reset: resetVeNFTs } = useVeNFTsProvider();
+  useEffect(() => {
+    if (isSuccess) {
+      reset();
+      resetVeNFTs();
+    }
+  }, [isSuccess, reset, resetVeNFTs]);
   const { debouncedValue: durationDe } = useDebounce(duration, 250);
   const { data: increaseUnlockTimeSimulation } = useSimulateContract({
     ...Ve,

@@ -11,8 +11,8 @@ import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStat
 import { TLockToken } from "../types";
 import * as Ve from "@/lib/abis/Ve";
 import { VE } from "@/data/constants";
-import { useLockProvider } from "../lockProvider";
 import { useQueryClient } from "@tanstack/react-query";
+import { useVeNFTsProvider } from "@/contexts/veNFTsProvider";
 
 export default function WithdrawContent({
   selectedLockToken,
@@ -31,7 +31,7 @@ export default function WithdrawContent({
   const { isSuccess, isLoading } = useWaitForTransactionReceipt({
     hash,
   });
-  const { queryKey } = useLockProvider();
+  const { queryKey } = useVeNFTsProvider();
   const queryClient = useQueryClient();
   useEffect(() => {
     if (isSuccess) {

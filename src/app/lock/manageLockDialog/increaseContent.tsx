@@ -17,8 +17,8 @@ import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStat
 import { useGetBalance } from "@/lib/hooks/useGetBalance";
 import * as Ve from "@/lib/abis/Ve";
 import { TLockToken } from "../types";
-import { useLockProvider } from "../lockProvider";
 import { useEffect } from "react";
+import { useVeNFTsProvider } from "@/contexts/veNFTsProvider";
 
 // Local constants
 
@@ -37,13 +37,13 @@ export default function IncreaseContent({
     hash,
   });
 
-  const { reset: resetLocks } = useLockProvider();
+  const { reset: resetVeNFTs } = useVeNFTsProvider();
   useEffect(() => {
     if (isSuccess) {
       reset();
-      resetLocks();
+      resetVeNFTs();
     }
-  }, [isSuccess, reset, resetLocks]);
+  }, [isSuccess, reset, resetVeNFTs]);
   const handleInputChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const parsedNumber = Number(e.target.value);

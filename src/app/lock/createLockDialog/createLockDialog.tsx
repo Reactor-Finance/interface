@@ -21,7 +21,7 @@ import { useGetBalance } from "@/lib/hooks/useGetBalance";
 import { formatNumber } from "@/lib/utils";
 import { useAtomicDate } from "@/lib/hooks/useAtomicDate";
 import { useQueryClient } from "@tanstack/react-query";
-import { useLockProvider } from "../lockProvider";
+import { useVeNFTsProvider } from "@/contexts/veNFTsProvider";
 
 // Local constants
 const YEARS_2 = 62208000;
@@ -35,7 +35,7 @@ export default function CreateLockDialog() {
   const [amount, setAmount] = useState(0);
   const [duration, setDuration] = useState(DAYS_14);
   const [open, setOpen] = useState(false);
-  const { queryKey: locksQueryKey } = useLockProvider();
+  const { queryKey: locksQueryKey } = useVeNFTsProvider();
   const rctBalance = useGetBalance({ tokenAddress: rct });
   const { writeContract, reset, data: hash, isPending } = useWriteContract();
   const { isLoading, isSuccess } = useWaitForTransactionReceipt({

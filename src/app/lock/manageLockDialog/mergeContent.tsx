@@ -12,15 +12,15 @@ import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStat
 import { TLockToken } from "../types";
 import * as Ve from "@/lib/abis/Ve";
 import { VE } from "@/data/constants";
-import { useLockProvider } from "../lockProvider";
 import ManageLockDropdown from "./manageLockDropdown";
+import { useVeNFTsProvider } from "@/contexts/veNFTsProvider";
 
 export default function MergeContent({
   selectedLockToken,
 }: {
   selectedLockToken: TLockToken;
 }) {
-  const { lockTokens, reset: resetLocks } = useLockProvider();
+  const { lockTokens, reset: resetLocks } = useVeNFTsProvider();
   const [selectedLockToken0, setSelectedLockToken0] = useState<TLockToken>();
   const chainId = useChainId();
   const ve = useMemo(() => VE[chainId], [chainId]);

@@ -14,7 +14,7 @@ import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStat
 import * as Ve from "@/lib/abis/Ve";
 import { VE } from "@/data/constants";
 import { TLockToken } from "../types";
-import { useLockProvider } from "../lockProvider";
+import { useVeNFTsProvider } from "@/contexts/veNFTsProvider";
 
 export default function TransferContent({
   selectedLockToken,
@@ -39,7 +39,7 @@ export default function TransferContent({
   });
   const { writeContract, data: hash, reset, isPending } = useWriteContract();
   const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash });
-  const { reset: resetLocks } = useLockProvider();
+  const { reset: resetLocks } = useVeNFTsProvider();
   useEffect(() => {
     if (isSuccess) {
       reset();
