@@ -57,6 +57,9 @@ export default function LockRow({
           {formatNumber(formatUnits(token.amount, Number(token.decimals)))} RCT
         </span>
       </td>
+      <td>
+        <span className="text-blue-light">10%</span>
+      </td>
       <td className="">
         {formatNumber(formatUnits(token.rebase_amount, RCT_DECIMALS))}
       </td>
@@ -77,7 +80,7 @@ export default function LockRow({
       </td>
       <td>
         <div className="flex gap-x-4 justify-end">
-          <Button variant={"primary"} size="xs">
+          <Button variant={"primary"} size="sm">
             Claim
           </Button>
           <Button
@@ -86,7 +89,7 @@ export default function LockRow({
               setOpenModal(true);
             }}
             variant={"outline"}
-            size="xs"
+            size="sm"
           >
             Manage
           </Button>

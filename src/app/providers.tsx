@@ -11,7 +11,6 @@ import { monadTestnet } from "wagmi/chains";
 import { hashFn } from "@wagmi/core/query";
 import { FC, PropsWithChildren } from "react";
 import { createConfig, http, WagmiProvider } from "wagmi";
-import { HeroUIProvider } from "@heroui/react";
 import { TRPCReactProvider } from "@/trpc/react";
 import { TokenlistContextProvider } from "@/contexts/tokenlistContext";
 import { TransactionToastProvider } from "@/contexts/transactionToastProvider";
@@ -22,6 +21,7 @@ import {
   walletConnectWallet,
   injectedWallet,
 } from "@rainbow-me/rainbowkit/wallets";
+import { VeNFTsProvider } from "@/contexts/veNFTsProvider";
 const connectors = connectorsForWallets(
   [
     {
@@ -65,15 +65,15 @@ export const Providers: FC<PropsWithChildren> = ({ children }) => {
         <RainbowKitProvider modalSize="compact" theme={darkTheme()}>
           <TRPCReactProvider>
             <TokenlistContextProvider>
-              <TransactionToastProvider>
-                <HeroUIProvider className="flex min-h-svh flex-col ">
+              <VeNFTsProvider>
+                <TransactionToastProvider>
                   {/* Header goes here */}
                   <PoolslistContextProvider>
                     {children}
                   </PoolslistContextProvider>
                   {/* Footer goes here */}
-                </HeroUIProvider>
-              </TransactionToastProvider>
+                </TransactionToastProvider>
+              </VeNFTsProvider>
             </TokenlistContextProvider>
           </TRPCReactProvider>
         </RainbowKitProvider>

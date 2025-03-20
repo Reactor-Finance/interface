@@ -1,14 +1,16 @@
 "use client";
-import { Contracts } from "@/lib/contracts";
+import { useCheckUserVeNFTs } from "@/lib/hooks/useCheckUserVeNFTs";
+import { useQueryClient } from "@tanstack/react-query";
 import React, {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
   useState,
 } from "react";
-import { useAccount, useReadContract } from "wagmi";
-export type TLockToken = {
+import { useAccount } from "wagmi";
+export type TVeNFTsToken = {
   decimals: number;
   voted: boolean;
   attachments: bigint;
@@ -27,46 +29,48 @@ export type TLockToken = {
   tokenSymbol: string;
   tokenDecimals: bigint;
 };
-interface LockProviderType {
-  lockTokens: readonly TLockToken[];
-  selectedLockToken: TLockToken | undefined;
+interface VeNFTsProviderType {
+  lockTokens: readonly TVeNFTsToken[];
+  selectedVeNFTsToken: TVeNFTsToken | undefined;
+  reset: () => void;
   selectedTokenId: string;
   setSelectedTokenId: React.Dispatch<React.SetStateAction<string>>;
   queryKey: readonly unknown[];
 }
 
-const LiquidityContext = createContext<LockProviderType | undefined>(undefined);
+const LiquidityContext = createContext<VeNFTsProviderType | undefined>(
+  undefined
+);
 interface Props {
   children: React.ReactNode;
 }
 
-export const LockProvider = ({ children }: Props) => {
+export const VeNFTsProvider = ({ children }: Props) => {
   const { address } = useAccount();
-  const { data: tokens, queryKey } = useReadContract({
-    ...Contracts.veNFTHelper,
-    functionName: "getNFTFromAddress",
-    args: [address ?? "0x"],
-    query: {
-      enabled: Boolean(address),
-    },
-  });
+  const { data: locks, queryKey } = useCheckUserVeNFTs();
   const [selectedTokenId, setSelectedTokenId] = useState<string>("");
-  const selectedLockToken = useMemo(() => {
-    return tokens?.find((token) => token.id.toString() === selectedTokenId);
-  }, [selectedTokenId, tokens]);
+  const selectedVeNFTsToken = useMemo(() => {
+    return locks?.find((token) => token.id.toString() === selectedTokenId);
+  }, [locks, selectedTokenId]);
   useEffect(() => {
     if (address) {
       setSelectedTokenId("");
     }
   }, [address]);
+  const queryClient = useQueryClient();
+  const reset = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey });
+  }, [queryClient, queryKey]);
+
   return (
     <LiquidityContext.Provider
       value={{
-        selectedLockToken,
+        reset,
+        selectedVeNFTsToken,
         setSelectedTokenId,
         selectedTokenId,
         queryKey,
-        lockTokens: tokens ?? [],
+        lockTokens: locks ?? [],
       }}
     >
       {children}
@@ -75,10 +79,10 @@ export const LockProvider = ({ children }: Props) => {
 };
 
 // Custom hook to use the context
-export const useLockProvider = () => {
+export const useVeNFTsProvider = () => {
   const context = useContext(LiquidityContext);
   if (!context) {
-    throw new Error("useLockProvider must be used within a LockProvider");
+    throw new Error("useVeNFTsProvider must be used within a VeNFTsProvider");
   }
   return context;
 };

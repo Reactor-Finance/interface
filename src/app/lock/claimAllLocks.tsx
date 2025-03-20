@@ -2,10 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Contracts } from "@/lib/contracts";
 import React, { useMemo } from "react";
 import { useAccount, useSimulateContract, useWriteContract } from "wagmi";
-import { useLockProvider } from "./lockProvider";
+import { useVeNFTsProvider } from "@/contexts/veNFTsProvider";
 
 export default function ClaimAllLocks() {
-  const { lockTokens } = useLockProvider();
+  const { lockTokens } = useVeNFTsProvider();
   const tokenIds = useMemo(
     () => lockTokens.map((token) => token.id),
     [lockTokens]

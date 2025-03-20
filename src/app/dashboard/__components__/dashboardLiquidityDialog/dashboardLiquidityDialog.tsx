@@ -114,7 +114,7 @@ export default function DashboardLiquidityDialog({
   console.log({ data });
   return (
     <Dialog open={state.dialogOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="p-0">
+      <DialogContent className="p-0 max-w-[520px]">
         <div>
           {header}
 

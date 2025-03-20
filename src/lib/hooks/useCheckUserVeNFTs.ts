@@ -8,12 +8,13 @@ export function useCheckUserVeNFTs() {
   const { address = zeroAddress } = useAccount();
   const chainId = useChainId();
   const helper = useMemo(() => VE_NFT_HELPER[chainId], [chainId]);
-  const { data = [], error } = useReadContract({
+  const locks = useReadContract({
     ...veNFTHelper,
     address: helper,
     functionName: "getNFTFromAddress",
     args: [address],
   });
+  const { error } = locks;
 
   // useWatchBlocks({
   //   onBlock: () => {
@@ -25,5 +26,5 @@ export function useCheckUserVeNFTs() {
     if (error) console.error(error);
   }, [error]);
 
-  return data;
+  return locks;
 }

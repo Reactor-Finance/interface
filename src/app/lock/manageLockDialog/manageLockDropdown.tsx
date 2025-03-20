@@ -2,18 +2,18 @@ import React, { useCallback } from "react";
 import LockDropdown from "../lockDropdown";
 import { formatUnits } from "viem";
 import { formatNumber } from "@/lib/utils";
-import { useCheckUserVeNFTs } from "@/lib/hooks/useCheckUserVeNFTs";
 import { TLockToken } from "../types";
 import { useAtomicDate } from "@/lib/hooks/useAtomicDate";
 
 export default function ManageLockDropdown({
   selectedLockToken,
   onTokenSelected,
+  lockTokens,
 }: {
-  selectedLockToken: TLockToken;
+  selectedLockToken: TLockToken | undefined;
   onTokenSelected: (token?: TLockToken) => void;
+  lockTokens: readonly TLockToken[];
 }) {
-  const lockTokens = useCheckUserVeNFTs();
   const now = useAtomicDate();
 
   const lockPeriod = useCallback(
@@ -35,7 +35,24 @@ export default function ManageLockDropdown({
       value={selectedLockToken?.id.toString()}
     >
       <LockDropdown.Trigger>
-        Lock #{selectedLockToken?.id.toString()}
+        {selectedLockToken ? (
+          <>
+            Lock #{selectedLockToken?.id.toString()}{" "}
+            <span className="text-neutral-200 text-sm">
+              {formatNumber(
+                formatUnits(
+                  selectedLockToken.amount,
+                  selectedLockToken.decimals
+                )
+              )}{" "}
+              RCT
+              <span className="text-[12px]">
+                {" "}
+                locked for {lockPeriod(selectedLockToken.lockEnd)} days{" "}
+              </span>
+            </span>
+          </>
+        ) : undefined}
       </LockDropdown.Trigger>
 
       <LockDropdown.SelectList>
@@ -44,7 +61,10 @@ export default function ManageLockDropdown({
             Lock #{token.id.toString()}{" "}
             <span className="text-neutral-200 text-sm">
               {formatNumber(formatUnits(token.amount, token.decimals))} RCT
-              locked for {lockPeriod(token.lockEnd)} days{" "}
+              <span className="text-[12px]">
+                {" "}
+                locked for {lockPeriod(token.lockEnd)} days{" "}
+              </span>
             </span>
           </LockDropdown.Item>
         ))}

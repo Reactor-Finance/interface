@@ -10,6 +10,7 @@ import MergeContent from "./mergeContent";
 import WithdrawContent from "./withdrawContent";
 import ManageLockDropdown from "./manageLockDropdown";
 import { TLockToken } from "../types";
+import { useVeNFTsProvider } from "@/contexts/veNFTsProvider";
 
 interface Props {
   open: boolean;
@@ -26,6 +27,7 @@ export default function ManageLockDialog({
   reset,
   onDropdownChange,
 }: Props) {
+  const { lockTokens } = useVeNFTsProvider();
   return (
     <div>
       <Dialog
@@ -35,7 +37,7 @@ export default function ManageLockDialog({
           if (!isOpen && reset) reset();
         }}
       >
-        <DialogContent position="static">
+        <DialogContent position="static" className="max-w-[520px]">
           <DialogTitle className="text-lg">
             Manage your <span className="text-primary-400">lock</span>
           </DialogTitle>
@@ -86,6 +88,7 @@ export default function ManageLockDialog({
               </TabsList>
               <div className="py-4">
                 <ManageLockDropdown
+                  lockTokens={lockTokens}
                   selectedLockToken={selectedToken}
                   onTokenSelected={onDropdownChange}
                 />

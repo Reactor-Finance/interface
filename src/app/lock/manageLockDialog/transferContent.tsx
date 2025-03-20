@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { Alert } from "@/components/ui/alert";
 import {
@@ -14,13 +14,14 @@ import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStat
 import * as Ve from "@/lib/abis/Ve";
 import { VE } from "@/data/constants";
 import { TLockToken } from "../types";
+import { useVeNFTsProvider } from "@/contexts/veNFTsProvider";
 
 export default function TransferContent({
   selectedLockToken,
 }: {
   selectedLockToken: TLockToken;
 }) {
-  const [toAddress, setToAddress] = React.useState<string>(zeroAddress);
+  const [toAddress, setToAddress] = React.useState<string>("");
   const { address = zeroAddress } = useAccount();
   const chainId = useChainId();
   const ve = useMemo(() => VE[chainId], [chainId]);
@@ -37,7 +38,14 @@ export default function TransferContent({
     },
   });
   const { writeContract, data: hash, reset, isPending } = useWriteContract();
-  const { isLoading } = useWaitForTransactionReceipt({ hash });
+  const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash });
+  const { reset: resetLocks } = useVeNFTsProvider();
+  useEffect(() => {
+    if (isSuccess) {
+      reset();
+      resetLocks();
+    }
+  }, [isSuccess, reset, resetLocks]);
   const onSubmit = useCallback(() => {
     if (transferSimulation) {
       reset();
