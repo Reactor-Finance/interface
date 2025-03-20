@@ -18,15 +18,15 @@ export default function VoteDialog({ open, setOpen }: Props) {
   console.log({ veNFTsAndPoolsMap });
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTitle className="opacity-0 h-0">Vote Dialog</DialogTitle>
-      <DialogContent removeClose className="w-[1400px] ">
+      <DialogTitle className="opacity-0 h-0 ">Vote Dialog</DialogTitle>
+      <DialogContent removeClose className="w-[1400px] px-2">
         <button
           onClick={() => setOpen?.(false)}
           className="flex items-center rounded-full h-8 w-8 absolute bg-neutral-950  -right-3 -top-3 justify-center"
         >
           <X size={16} />
         </button>
-        <div className="max-h-[50svh] scroll-container overflow-y-scroll pr-2">
+        <div className="max-h-[50svh] scroll-container space-y-4 overflow-y-auto px-2">
           {Object.keys(veNFTsAndPoolsMap).map((s) => {
             return (
               <Row nftId={s} key={s} selectedVotes={veNFTsAndPoolsMap[s]} />
@@ -97,7 +97,7 @@ function PoolRow({ poolId, veNftId }: { poolId: string; veNftId: string }) {
     return 100 - (totalPercent - valuePercent);
   }, [totalPercent, value]);
   return (
-    <div className="py-8">
+    <div className="pt-8">
       <div className="grid grid-cols-6  text-sm">
         <div className="relative">
           <button className="flex items-center rounded-full h-6 w-6 absolute bg-neutral-950  -right-2 -top-2 justify-center">
