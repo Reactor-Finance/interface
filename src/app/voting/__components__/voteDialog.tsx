@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { TPoolType } from "@/lib/types";
 import { X } from "lucide-react";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { formatUnits } from "viem";
 import { useVoteProvider } from "./voteProvider";
 import { inputPatternMatch } from "@/lib/utils";
@@ -16,6 +16,11 @@ interface Props {
 export default function VoteDialog({ open, setOpen }: Props) {
   const { veNFTsAndPoolsMap } = useVoteProvider();
   console.log({ veNFTsAndPoolsMap });
+  useEffect(() => {
+    if (!Object.keys(veNFTsAndPoolsMap).length) {
+      setOpen?.(false);
+    }
+  }, [setOpen, veNFTsAndPoolsMap]);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTitle className="opacity-0 h-0 ">Vote Dialog</DialogTitle>
