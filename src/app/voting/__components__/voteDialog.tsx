@@ -88,7 +88,7 @@ function Row({
 }
 
 function PoolRow({ poolId, veNftId }: { poolId: string; veNftId: string }) {
-  const { veNFTsAndPoolsMap, totalPercent, setAmountForPool } =
+  const { veNFTsAndPoolsMap, removePool, totalPercent, setAmountForPool } =
     useVoteProvider();
   const value = veNFTsAndPoolsMap[veNftId][poolId];
 
@@ -100,7 +100,12 @@ function PoolRow({ poolId, veNftId }: { poolId: string; veNftId: string }) {
     <div className="pt-8">
       <div className="grid grid-cols-6  text-sm">
         <div className="relative">
-          <button className="flex items-center rounded-full h-6 w-6 absolute bg-neutral-950  -right-2 -top-2 justify-center">
+          <button
+            onClick={() => {
+              removePool({ veNftId, poolId });
+            }}
+            className="flex items-center rounded-full h-6 w-6 absolute bg-neutral-950  -right-2 -top-2 justify-center"
+          >
             <X size={16} />
           </button>
           <PoolHeader
