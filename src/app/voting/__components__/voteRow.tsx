@@ -1,27 +1,47 @@
 import PoolHeader from "@/components/shared/poolHeader";
 import { TableRow } from "@/components/ui/table";
 import { TPoolType } from "@/lib/types";
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { useVoteProvider } from "./voteProvider";
 import { inputPatternMatch } from "@/lib/utils";
 interface Props {
-  id: string;
+  poolId: string;
 }
-export default function VoteRow({ id }: Props) {
-  const { updateSelectedVeNFTPools, totalPercent, selectedVeNFTPools } =
-    useVoteProvider();
+export default function VoteRow({ poolId }: Props) {
+  const {
+    setAmountForPool,
+    selectedVeNFT,
+    totalPercent,
+    selectedVeNFTPools,
+    removePool,
+  } = useVoteProvider();
+  const row = selectedVeNFTPools?.[poolId];
   const value = useMemo(() => {
-    if (!selectedVeNFTPools) return "";
-    const selectedValue = selectedVeNFTPools[id];
-    return selectedValue ? selectedValue.toString() : "";
-  }, [id, selectedVeNFTPools]);
+    return row ? row.toString() : "";
+  }, [row]);
   const percentLeft = useMemo(() => {
     const valuePercent = isFinite(parseFloat(value)) ? parseFloat(value) : 0;
     return 100 - (totalPercent - valuePercent);
   }, [totalPercent, value]);
   const handleMaxClick = () => {
-    updateSelectedVeNFTPools({ [id]: percentLeft });
+    if (!selectedVeNFT) return;
+    setAmountForPool({
+      veNftId: selectedVeNFT?.id.toString(),
+      poolId,
+      amount: percentLeft,
+    });
   };
+  const setValue = useCallback(
+    ({ amount }: { amount: number }) => {
+      if (!selectedVeNFT) return;
+      setAmountForPool({
+        veNftId: selectedVeNFT?.id.toString(),
+        poolId,
+        amount,
+      });
+    },
+    [poolId, selectedVeNFT, setAmountForPool]
+  );
   return (
     <TableRow cols="10" className="z-10">
       <td className="col-span-3">
@@ -45,7 +65,7 @@ export default function VoteRow({ id }: Props) {
           }}
         />
       </td>
-      <td className="text-right">{id}</td>
+      <td className="text-right">{poolId}</td>
       <td>11.22%</td>
       <td>~43,279.55</td>
       <td>131331</td>
@@ -70,9 +90,14 @@ export default function VoteRow({ id }: Props) {
                       newValue = e.target.value;
                     }
                     if (isFinite(parseFloat(newValue))) {
-                      updateSelectedVeNFTPools({ [id]: parseFloat(newValue) });
+                      console.log(newValue);
+                      setValue({ amount: parseFloat(newValue) });
                     } else {
-                      updateSelectedVeNFTPools({ [id]: 0 });
+                      if (!selectedVeNFT) return;
+                      removePool({
+                        veNftId: selectedVeNFT?.id.toString(),
+                        poolId,
+                      });
                     }
                   }
                 }}

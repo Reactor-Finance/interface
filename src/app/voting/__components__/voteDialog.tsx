@@ -5,28 +5,36 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { TPoolType } from "@/lib/types";
 import { X } from "lucide-react";
-import React from "react";
+import React, { useMemo } from "react";
 import { formatUnits } from "viem";
 import { useVoteProvider } from "./voteProvider";
+import { inputPatternMatch } from "@/lib/utils";
 interface Props {
   open?: boolean;
   setOpen?: (b: boolean) => void;
 }
 export default function VoteDialog({ open, setOpen }: Props) {
   const { veNFTsAndPoolsMap } = useVoteProvider();
+  console.log({ veNFTsAndPoolsMap });
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTitle className="opacity-0 h-0">Vote Dialog</DialogTitle>
       <DialogContent className="w-[1400px]">
         {Object.keys(veNFTsAndPoolsMap).map((s) => {
-          return <Row key={s} selectedVotes={veNFTsAndPoolsMap[s]} />;
+          return <Row nftId={s} key={s} selectedVotes={veNFTsAndPoolsMap[s]} />;
         })}
       </DialogContent>
     </Dialog>
   );
 }
 
-function Row({ selectedVotes }: { selectedVotes: { [id: string]: number } }) {
+function Row({
+  selectedVotes,
+  nftId,
+}: {
+  nftId: string;
+  selectedVotes: { [id: string]: number };
+}) {
   return (
     <div>
       <div className="bg-neutral-950 text-sm grid grid-cols-8  items-center  px-6 py-2 rounded-md">
@@ -62,14 +70,22 @@ function Row({ selectedVotes }: { selectedVotes: { [id: string]: number } }) {
           <Button variant="primary">Vote</Button>
         </div>
       </div>
-      {Object.values(selectedVotes).map((s) => {
-        return <PoolRow key={s} />;
+      {Object.keys(selectedVotes).map((s) => {
+        return <PoolRow key={s} veNftId={nftId} poolId={s} />;
       })}
     </div>
   );
 }
 
-function PoolRow() {
+function PoolRow({ poolId, veNftId }: { poolId: string; veNftId: string }) {
+  const { veNFTsAndPoolsMap, totalPercent, setAmountForPool } =
+    useVoteProvider();
+  const value = veNFTsAndPoolsMap[veNftId][poolId];
+
+  const percentLeft = useMemo(() => {
+    const valuePercent = isFinite(value) ? value : 0;
+    return 100 - (totalPercent - valuePercent);
+  }, [totalPercent, value]);
   return (
     <div className="py-8">
       <div className="grid grid-cols-6  text-sm">
@@ -126,6 +142,33 @@ function PoolRow() {
             <div className="flex gap-x-1">
               <input
                 placeholder="0"
+                value={value}
+                onChange={(e) => {
+                  if (inputPatternMatch(e.target.value)) {
+                    let newValue = "";
+                    if (parseFloat(e.target.value) < 0) {
+                      return;
+                    }
+                    if (parseFloat(e.target.value) > percentLeft) {
+                      newValue = `${0}`;
+                    } else {
+                      newValue = e.target.value;
+                    }
+                    if (isFinite(parseFloat(newValue))) {
+                      setAmountForPool({
+                        amount: parseFloat(newValue),
+                        veNftId,
+                        poolId,
+                      });
+                    } else {
+                      setAmountForPool({
+                        amount: 0,
+                        veNftId,
+                        poolId,
+                      });
+                    }
+                  }
+                }}
                 className="w-[30px] focus:ring-transparent transition-all  bg-transparent"
               />
               <span className="text-neutral-400">%</span>

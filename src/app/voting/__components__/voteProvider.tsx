@@ -16,7 +16,22 @@ interface VoteProviderType {
   selectedVeNFTPools: { [id: string]: number } | undefined;
   selectedVeNFTPoolsAmount: number;
   totalPercent: number; // for selected veNFTsPools
-  updateSelectedVeNFTPools: (vote: { [id: string]: number }) => void;
+  removePool: ({
+    veNftId,
+    poolId,
+  }: {
+    veNftId: string;
+    poolId: string;
+  }) => void;
+  setAmountForPool: ({
+    veNftId,
+    poolId,
+    amount,
+  }: {
+    veNftId: string;
+    poolId: string;
+    amount: number;
+  }) => void;
 }
 
 const LiquidityContext = createContext<VoteProviderType | undefined>(undefined);
@@ -25,7 +40,7 @@ interface Props {
 }
 
 export const VoteProvider = ({ children }: Props) => {
-  const [veNFTsAndPoolsMap, setSelectedVotes] = useState<{
+  const [veNFTsAndPoolsMap, setNFTsAndPoolsMap] = useState<{
     [id: string]: { [id: string]: number };
   }>({});
   const [selectedVeNFT, setSelectedVRCT] = useState<TLockToken>();
@@ -54,34 +69,44 @@ export const VoteProvider = ({ children }: Props) => {
   }, [selectedVeNFT, veNFTsAndPoolsMap]);
 
   // set a pool(s) for ONLY for selected veNFT
-  const setPool = useCallback(
-    (vote: { [id: string]: number }) => {
-      if (!selectedVeNFT) return;
-      const newVotes = {
-        ...veNFTsAndPoolsMap[selectedVeNFT?.id.toString()],
-        ...vote,
-      };
-      Object.keys(newVotes).forEach((key) => {
-        if (newVotes[key] === 0) {
-          delete newVotes[key];
-        }
-      });
-      const allVotesEqZero = Object.values(newVotes).every(
-        (value) => value === 0
-      );
-      if (allVotesEqZero) {
-        // remove record if all votes are eq than 0
-        const newObj = { ...veNFTsAndPoolsMap };
-        delete newObj[selectedVeNFT.id.toString()];
-        setSelectedVotes(newObj);
+  const removePool = useCallback(
+    ({ veNftId, poolId }: { veNftId: string; poolId: string }) => {
+      const newObj = { ...veNFTsAndPoolsMap };
+      delete newObj[veNftId][poolId];
+      // if no pools left for this veNftId, remove it from the map
+      if (!Object.keys(newObj[veNftId]).length) {
+        delete newObj[veNftId];
+        setNFTsAndPoolsMap(newObj);
         return;
       }
-      setSelectedVotes({
-        ...veNFTsAndPoolsMap,
-        [selectedVeNFT.id.toString()]: newVotes,
-      });
+      setNFTsAndPoolsMap(newObj);
     },
-    [selectedVeNFT, veNFTsAndPoolsMap]
+    [veNFTsAndPoolsMap]
+  );
+
+  const setAmountForPool = useCallback(
+    ({
+      veNftId,
+      poolId,
+      amount,
+    }: {
+      veNftId: string;
+      poolId: string;
+      amount: number;
+    }) => {
+      console.log({ veNftId, poolId });
+      const newObj = { ...veNFTsAndPoolsMap };
+      if (!newObj[veNftId]) {
+        newObj[veNftId] = {
+          [poolId]: amount,
+        };
+      } else {
+        newObj[veNftId][poolId] = amount;
+      }
+      console.log({ newObj });
+      setNFTsAndPoolsMap(newObj);
+    },
+    [veNFTsAndPoolsMap]
   );
   return (
     <LiquidityContext.Provider
@@ -89,10 +114,11 @@ export const VoteProvider = ({ children }: Props) => {
         veNFTsAndPoolsMap,
         selectedVeNFTPools:
           veNFTsAndPoolsMap[selectedVeNFT?.id.toString() ?? "-1"],
+        setAmountForPool,
         setSelectedVRCT,
         selectedVeNFTPoolsAmount,
         selectedVeNFT,
-        updateSelectedVeNFTPools: setPool,
+        removePool,
         totalPercent,
       }}
     >

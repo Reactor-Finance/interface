@@ -18,9 +18,9 @@ export default function VoteTable() {
         </tr>
       </thead>
       <TableBody>
-        <VoteRow id="1" />
-        <VoteRow id="2" />
-        <VoteRow id="3" />
+        <VoteRow poolId="1" />
+        <VoteRow poolId="2" />
+        <VoteRow poolId="3" />
       </TableBody>
     </table>
   );
