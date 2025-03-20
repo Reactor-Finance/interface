@@ -26,7 +26,7 @@ export default function VoteDialog({ open, setOpen }: Props) {
         >
           <X size={16} />
         </button>
-        <div className="max-h-[50svh] scroll-container space-y-4 overflow-y-auto px-2 py-2">
+        <div className="max-h-[70svh] scroll-container space-y-4 overflow-y-auto px-2 py-2">
           {Object.keys(veNFTsAndPoolsMap).map((s) => {
             return (
               <Row nftId={s} key={s} selectedVotes={veNFTsAndPoolsMap[s]} />
