@@ -16,6 +16,7 @@ interface VoteProviderType {
   selectedVeNFTPools: { [id: string]: number } | undefined;
   selectedVeNFTPoolsAmount: number;
   totalPercent: number; // for selected veNFTsPools
+  resetVeNFTsAndPoolsMap: () => void;
   removePool: ({
     veNftId,
     poolId,
@@ -67,7 +68,6 @@ export const VoteProvider = ({ children }: Props) => {
       0
     );
   }, [selectedVeNFT, veNFTsAndPoolsMap]);
-
   // set a pool(s) for ONLY for selected veNFT
   const removePool = useCallback(
     ({ veNftId, poolId }: { veNftId: string; poolId: string }) => {
@@ -83,6 +83,10 @@ export const VoteProvider = ({ children }: Props) => {
     },
     [veNFTsAndPoolsMap]
   );
+
+  const resetVeNFTsAndPoolsMap = useCallback(() => {
+    setNFTsAndPoolsMap({});
+  }, []);
 
   const setAmountForPool = useCallback(
     ({
@@ -115,6 +119,8 @@ export const VoteProvider = ({ children }: Props) => {
         selectedVeNFTPools:
           veNFTsAndPoolsMap[selectedVeNFT?.id.toString() ?? "-1"],
         setAmountForPool,
+        resetVeNFTsAndPoolsMap,
+
         setSelectedVRCT,
         selectedVeNFTPoolsAmount,
         selectedVeNFT,

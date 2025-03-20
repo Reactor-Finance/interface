@@ -6,7 +6,12 @@ import VoteDialog from "./voteDialog";
 import { useAccount } from "wagmi";
 
 export default function VotePower() {
-  const { totalPercent, veNFTsAndPoolsMap, selectedVeNFT } = useVoteProvider();
+  const {
+    totalPercent,
+    resetVeNFTsAndPoolsMap,
+    veNFTsAndPoolsMap,
+    selectedVeNFT,
+  } = useVoteProvider();
   const amount = useMemo(() => {
     // loop veNFTsAndPoolsMap
     let amt = 0;
@@ -26,7 +31,7 @@ export default function VotePower() {
   return (
     <>
       <VoteDialog setOpen={setOpen} open={open} />
-      <div className="py-3 z-20 px-6 flex justify-between gap-x-10 w-[460px] fixed rounded-md bottom-8 border border-neutral-950 -translate-x-1/2 left-1/2 items-center bg-neutral-1000">
+      <div className="py-3 z-20 px-6 flex justify-between gap-x-10 w-[520px] fixed rounded-md bottom-8 border border-neutral-950 -translate-x-1/2 left-1/2 items-center bg-neutral-1000">
         <div className="flex gap-x-1 items-center">
           <div>Voting power used: </div>
           <div className="text-blue-light flex">
@@ -37,14 +42,19 @@ export default function VotePower() {
             {amount}
           </div>
         </div>
-        <Button
-          onClick={() => setOpen(true)}
-          variant="primary"
-          size="md"
-          disabled={amount <= 0}
-        >
-          Vote
-        </Button>
+        <div className="flex gap-x-3">
+          <Button
+            onClick={() => setOpen(true)}
+            variant="primary"
+            size="md"
+            disabled={amount <= 0}
+          >
+            Vote
+          </Button>
+          <button onClick={resetVeNFTsAndPoolsMap} className="text-primary-400">
+            Reset
+          </button>
+        </div>
       </div>
     </>
   );
