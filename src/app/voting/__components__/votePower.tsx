@@ -1,13 +1,24 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useVoteProvider } from "./voteProvider";
 import VoteDialog from "./voteDialog";
 import { useAccount } from "wagmi";
 
 export default function VotePower() {
-  const { totalPercent, selectedVeNFTPoolsAmount, selectedVeNFT } =
-    useVoteProvider();
+  const { totalPercent, veNFTsAndPoolsMap, selectedVeNFT } = useVoteProvider();
+  const amount = useMemo(() => {
+    // loop veNFTsAndPoolsMap
+    let amt = 0;
+    for (const veNFT in veNFTsAndPoolsMap) {
+      // loop pools
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      for (const _pool in veNFTsAndPoolsMap[veNFT]) {
+        amt++;
+      }
+    }
+    return amt;
+  }, [veNFTsAndPoolsMap]);
   const [open, setOpen] = useState(false);
   const { address } = useAccount();
   if (!address) return null;
@@ -22,13 +33,13 @@ export default function VotePower() {
             <span className="text-blue-light">{totalPercent} %</span>
           </span>
           <div className="bg-purple-400/10 text-purple-400 h-7 w-7 flex justify-center items-center rounded-full">
-            {selectedVeNFTPoolsAmount}
+            {amount}
           </div>
         </div>
         <Button
           onClick={() => setOpen(true)}
           variant="primary"
-          disabled={totalPercent <= 0}
+          disabled={amount <= 0}
         >
           Vote
         </Button>
