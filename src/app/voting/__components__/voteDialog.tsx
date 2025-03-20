@@ -19,7 +19,13 @@ export default function VoteDialog({ open, setOpen }: Props) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTitle className="opacity-0 h-0">Vote Dialog</DialogTitle>
-      <DialogContent className="w-[1400px]">
+      <DialogContent removeClose className="w-[1400px] ">
+        <button
+          onClick={() => setOpen?.(false)}
+          className="flex items-center rounded-full h-8 w-8 absolute bg-neutral-950  -right-3 -top-3 justify-center"
+        >
+          <X size={16} />
+        </button>
         {Object.keys(veNFTsAndPoolsMap).map((s) => {
           return <Row nftId={s} key={s} selectedVotes={veNFTsAndPoolsMap[s]} />;
         })}
