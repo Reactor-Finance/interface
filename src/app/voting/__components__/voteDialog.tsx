@@ -202,10 +202,10 @@ function PoolRow({ poolId, veNftId }: { poolId: string; veNftId: string }) {
       <div className="flex justify-end">
         <div className="flex gap-x-2">
           <Button size="sm">0%</Button>
-          <Button size="sm">0%</Button>
-          <Button size="sm">0%</Button>
-          <Button size="sm">0%</Button>
-          <Button size="sm">0%</Button>
+          <Button size="sm">25%</Button>
+          <Button size="sm">50%</Button>
+          <Button size="sm">75%</Button>
+          <Button size="sm">100%</Button>
         </div>
       </div>
     </div>
