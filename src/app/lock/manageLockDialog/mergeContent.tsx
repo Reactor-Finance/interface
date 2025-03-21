@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert } from "@/components/ui/alert";
 import {
   useChainId,
@@ -6,21 +6,21 @@ import {
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
-import LockDropdown from "../lockDropdown";
 import SubmitButton from "@/components/shared/submitBtn";
 import usePadLoading from "@/lib/hooks/usePadLoading";
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
-import { useCheckUserVeNFTs } from "@/lib/hooks/useCheckUserVeNFTs";
 import { TLockToken } from "../types";
 import * as Ve from "@/lib/abis/Ve";
 import { VE } from "@/data/constants";
+import ManageLockDropdown from "./manageLockDropdown";
+import { useVeNFTsProvider } from "@/contexts/veNFTsProvider";
 
 export default function MergeContent({
   selectedLockToken,
 }: {
   selectedLockToken: TLockToken;
 }) {
-  const lockTokens = useCheckUserVeNFTs();
+  const { lockTokens, reset: resetLocks } = useVeNFTsProvider();
   const [selectedLockToken0, setSelectedLockToken0] = useState<TLockToken>();
   const chainId = useChainId();
   const ve = useMemo(() => VE[chainId], [chainId]);
@@ -33,8 +33,15 @@ export default function MergeContent({
       enabled: Boolean(selectedLockToken) && Boolean(selectedLockToken0),
     },
   });
-  const { writeContract, isPending, data: hash } = useWriteContract();
-  const { isLoading } = useWaitForTransactionReceipt({ hash });
+  const { writeContract, reset, isPending, data: hash } = useWriteContract();
+  const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash });
+  useEffect(() => {
+    if (isSuccess) {
+      reset();
+      resetLocks();
+    }
+  }, [isSuccess, reset, resetLocks]);
+
   const onSubmit = useCallback(() => {
     if (mergeSimulation?.request) {
       writeContract(mergeSimulation.request);
@@ -54,34 +61,19 @@ export default function MergeContent({
   return (
     <div className="space-y-4 pt-4">
       <h2>Merge with</h2>
-      <LockDropdown.Root
-        value={selectedLockToken0?.id.toString()}
-        onValueChange={(value) =>
+      <ManageLockDropdown
+        lockTokens={lockTokens.filter(
+          (token) =>
+            token.id !== selectedLockToken0?.id &&
+            token.id !== selectedLockToken.id
+        )}
+        onTokenSelected={(value) => {
           setSelectedLockToken0(
-            lockTokens.find((lock) => lock.id === BigInt(value))
-          )
-        }
-      >
-        <LockDropdown.Trigger>
-          Lock #{selectedLockToken0?.id.toString()}
-        </LockDropdown.Trigger>
-        <LockDropdown.SelectList>
-          {lockTokens
-            .filter(
-              (token) =>
-                token.id !== selectedLockToken0?.id &&
-                token.id !== selectedLockToken.id
-            )
-            .map((lockToken) => (
-              <LockDropdown.Item
-                value={lockToken.id.toString()}
-                key={lockToken.id.toString()}
-              >
-                Lock #{lockToken.id.toString()}
-              </LockDropdown.Item>
-            ))}
-        </LockDropdown.SelectList>
-      </LockDropdown.Root>
+            lockTokens.find((lock) => lock.id === value?.id)
+          );
+        }}
+        selectedLockToken={selectedLockToken0}
+      />
       <div className="p-3 bg-neutral-950 border border-neutral-900/80 rounded-sm ">
         <h2>Estimates</h2>
       </div>

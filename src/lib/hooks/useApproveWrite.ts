@@ -2,6 +2,8 @@ import { Address, erc20Abi, maxUint256, parseUnits } from "viem";
 import { useSimulateContract } from "wagmi";
 import useGetAllowance from "./useGetAllowance";
 import { ETHER } from "@/data/constants";
+import { useQueryClient } from "@tanstack/react-query";
+import { useCallback } from "react";
 
 /**
  * Returns write data request only if the allowance is less than the amount
@@ -49,10 +51,15 @@ export default function useApproveWrite({
     (allowance ?? 0n) < parseUnits(amount ?? "0", decimals) &&
     tokenAddress?.toLowerCase() !== ETHER.toLowerCase() &&
     tokenAddress !== undefined;
+  const queryClient = useQueryClient();
+  const resetApproval = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey });
+  }, [queryClient, queryKey]);
   return {
     approveWriteRequest: data?.request,
     needsApproval,
     allowanceKey: queryKey,
     isFetching: isLoading, // refactor this naming
+    resetApproval,
   };
 }
