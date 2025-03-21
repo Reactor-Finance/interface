@@ -129,7 +129,7 @@ export default function CreateLockDialog() {
       >
         Create Lock
       </Button>
-      <DialogContent className="space-y-2">
+      <DialogContent className="space-y-2 max-w-[520px]">
         <DialogTitle className="text-lg">
           Create <span className="text-primary-400">lock</span>
         </DialogTitle>
