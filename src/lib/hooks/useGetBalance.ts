@@ -25,6 +25,7 @@ export function useGetBalance({
       query: { enabled: !disabled },
     });
 
+  // No need to return bothe balances separately. Just return based on token address
   return useMemo(
     () =>
       tokenAddress?.toLowerCase() === ETHER.toLowerCase()

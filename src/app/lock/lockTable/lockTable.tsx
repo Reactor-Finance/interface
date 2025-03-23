@@ -2,13 +2,13 @@
 import React, { useState } from "react";
 import ManageLockDialog from "../manageLockDialog/manageLockDialog";
 import LockRow from "./lockRow";
-import { useCheckUserVeNFTs } from "@/lib/hooks/useCheckUserVeNFTs";
 import { TLockToken } from "../types";
+import { useVeNFTsProvider } from "@/contexts/veNFTsProvider";
 
 export default function LockTable() {
   const [manageDialogOpen, setManageDialogOpen] = useState(false);
   const [selectedLockToken, setSelectedLockToken] = useState<TLockToken>();
-  const lockTokens = useCheckUserVeNFTs();
+  const { lockTokens } = useVeNFTsProvider();
   return (
     <>
       <ManageLockDialog
@@ -25,6 +25,7 @@ export default function LockTable() {
             <tr className="grid grid-cols-8 px-6 py-2 font-medium">
               <th className="col-span-2 text-left">Lock ID</th>
               <th>Voting Power</th>
+              <th>APR</th>
               <th>Rewards</th>
               <th>Unlock Date</th>
               <th>Status</th>
@@ -35,16 +36,16 @@ export default function LockTable() {
 
         <tbody className="flex flex-col gap-y-2">
           {!lockTokens.length && (
-            <tr className="rounded-sm items-center bg-neutral-1000 py-2 px-6">
+            <tr className="rounded-sm items-center bg-neutral-1000 py-4 px-4">
               <td>
-                <p className="text-sm text-neutral-500 px-6">
+                <p className="text-sm text-neutral-400">
                   To receive incentives and fees, you need to create a lock and
                   vote with it.
                 </p>
               </td>
             </tr>
           )}
-          {lockTokens.map((lock) => (
+          {lockTokens?.map((lock) => (
             <LockRow
               key={lock.id.toString()}
               token={lock}

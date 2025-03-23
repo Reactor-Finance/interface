@@ -1,7 +1,9 @@
 "use client";
 
 import { TToken } from "@/lib/types";
+import { importedTokensAtom } from "@/store";
 import { api } from "@/trpc/react";
+import { useAtom } from "jotai";
 import React, {
   createContext,
   ReactNode,
@@ -33,24 +35,25 @@ export const TokenlistContextProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const chainId = useChainId();
+  const [importedTokens] = useAtom(importedTokensAtom);
   const [searchQuery, setSearchQuery] = useState("");
   const {
     data: tokenlist = [],
     isLoading: loading,
     error,
   } = api.tokens.getTokens.useQuery({ chainId });
-
-  const filteredTokenlist = useMemo(
-    () =>
-      tokenlist.filter(
-        (token) =>
-          token.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          token.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          token.address.toLowerCase().startsWith(searchQuery.toLowerCase())
-      ),
-    [tokenlist, searchQuery]
-  );
-
+  const filteredTokenlist = useMemo(() => {
+    const tokens = [...tokenlist].filter(
+      (token) =>
+        token.name.toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
+        token.symbol.toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
+        token.address.toLowerCase().includes(searchQuery.toLowerCase().trim())
+    );
+    const importedList = importedTokens.filter(
+      (token) => !tokens.find((t) => t.address === token.address)
+    );
+    return [...tokens, ...importedList];
+  }, [importedTokens, searchQuery, tokenlist]);
   return (
     <TokenlistContext.Provider
       value={{

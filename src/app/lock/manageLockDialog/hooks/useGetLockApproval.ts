@@ -1,13 +1,13 @@
 import { Contracts } from "@/lib/contracts";
 import { useReadContract } from "wagmi";
-import { useLockProvider } from "../../lockProvider";
+import { useVeNFTsProvider } from "@/contexts/veNFTsProvider";
 
 export default function useGetLockApproval() {
-  const { selectedLockToken } = useLockProvider();
+  const { selectedVeNFTsToken } = useVeNFTsProvider();
   const { data, queryKey } = useReadContract({
     ...Contracts.VotingEscrow,
     functionName: "getApproved",
-    args: [selectedLockToken?.id ?? 0n],
+    args: [selectedVeNFTsToken?.id ?? 0n],
   });
   return { data, queryKey };
 }

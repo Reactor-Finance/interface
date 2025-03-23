@@ -1,7 +1,16 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import numeral from "numeral";
+import { ChainId, ETHER, WETH } from "@/data/constants";
+import { Address } from "viem";
 
+export function wmonToMon(addr: Address) {
+  if (addr.toLowerCase() === WETH[ChainId.MONAD_TESTNET].toLowerCase()) {
+    return ETHER.toLowerCase() as Address;
+  } else {
+    return addr;
+  }
+}
 export const enum ErrorCodes {
   InsufficientBalance = "Insufficient balance",
   EnterAmount = "Enter amount",
@@ -59,9 +68,10 @@ export function formatNumber(number: number | string, decimals = 3): string {
     ).toString();
   }
   if (n < 0.001) {
-    const factor = Math.pow(10, 10);
-    const roundedDown = Math.floor(n * factor) / factor;
-    return roundedDown.toExponential();
+    return formatSmallNumber(n);
+    // const factor = Math.pow(10, 10);
+    // const roundedDown = Math.floor(n * factor) / factor;
+    // return roundedDown.toExponential();
   }
   if (n > 999) {
     const num = numeral(n);
@@ -84,6 +94,40 @@ export function formatNumber(number: number | string, decimals = 3): string {
   }
 
   return n.toString();
+}
+export function formatSmallNumber(number: number) {
+  const num = number.toString();
+  console.log(num, "NUM");
+  if (num.includes("e")) {
+    console.log("e", num);
+    // number is in scientific notation
+    const sige = parseInt(num.split("e")[1] ?? "0");
+    const nums = parseInt(
+      num.split("e")[0]?.replace(".", "").slice(0, 3) ?? "0"
+    );
+
+    console.log({ sige }, parseInt(num.split("e")[0] ?? "0"));
+    const result = "0.0" + `v${Math.abs(sige).toString()}` + nums;
+    console.log({ result });
+    return result;
+  }
+  const decimalPart = num.split(".")[1];
+  if (decimalPart === undefined) {
+    return "0";
+  }
+  let zeros = 0;
+  for (const i of decimalPart) {
+    if (i === "0") {
+      zeros++;
+    }
+    if (i !== "0") {
+      break;
+    }
+  }
+  const sig = decimalPart.slice(zeros, zeros + 3);
+  console.log({ sig, zeros, decimalPart });
+  const result = "0.0" + `v${zeros.toString()}` + sig;
+  return result;
 }
 /**
  * inputPatternMatch

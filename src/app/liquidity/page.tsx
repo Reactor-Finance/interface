@@ -2,22 +2,11 @@ import React from "react";
 import Headers from "@/components/ui/headers";
 import PageMarginContainer from "@/components/ui/pageMarginContainer";
 import { Card } from "@/components/ui/card";
-import barChart from "@/assets/bar-chart.svg";
-import coin from "@/assets/coin.svg";
-import house from "@/assets/house.svg";
-import Image, { StaticImageData } from "next/image";
 import { Button } from "@/components/ui/button";
 import PoolsTable from "./poolsTable";
-import { api } from "@/trpc/server";
-import { TPools } from "@/server/queries/pools/getPools";
+import LiquidityInfo from "./liquidityInfo";
 
 export default async function Page() {
-  let initialPools: TPools | undefined;
-  try {
-    initialPools = await api.pool.getPools({});
-  } catch {
-    console.error("error fetching pools");
-  }
   return (
     <PageMarginContainer>
       <Headers.GradiantHeaderOne colorOne="#A0055D" colorTwo="#836EF9">
@@ -33,13 +22,9 @@ export default async function Page() {
             Stake liquidity to earn trading fees and rewards.
           </h3>
         </div>
-        <div className="grid gap-x-4 grid-cols-3 border-b border-neutral-900 pb-4">
-          <InfoCard icon={house} />
-          <InfoCard icon={coin} />
-          <InfoCard icon={barChart} />
-        </div>
+        <LiquidityInfo />
         <div className="flex justify-between items-center">
-          <h4 className="text-[13px] text-neutral-500">
+          <h4 className="text-[13px] text-neutral-500 hidden md:block">
             There are currently{" "}
             <span className="text-neutral-200">10 tokens</span> listed.{" "}
             <span className="underline text-neutral-300">View Tokens</span> or{" "}
@@ -52,23 +37,7 @@ export default async function Page() {
       </Card>
       <div className="pt-12"></div>
       <h2 className="text-2xl">Pools</h2>
-      <PoolsTable initialPools={initialPools} />
+      <PoolsTable />
     </PageMarginContainer>
-  );
-}
-
-function InfoCard({ icon }: { icon: StaticImageData }) {
-  return (
-    <Card bg="950" className="py-[10px] px-4 rounded-lg">
-      <div className="flex justify-between items-center">
-        <div>
-          <h4 className="text-primary-400 text-sm">Total TVL</h4>
-          <span className="text-[16px] font-medium ">~$104,120,403.0</span>
-        </div>
-        <div>
-          <Image src={icon} alt="Total Value Locked Icon" />
-        </div>
-      </div>
-    </Card>
   );
 }

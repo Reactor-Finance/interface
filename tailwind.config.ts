@@ -11,7 +11,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        geistMono: ["var(--font-geist-mono)"],
+        jetbrainsMono: ["var(--font-jetbrains-mono)"],
       },
       margin: {},
       gridTemplateColumns: {
@@ -19,7 +19,7 @@ export default {
       },
       padding: { xs: "4px", xxs: "8px", sm: "12px" },
       colors: {
-        background: "hsl(var(--background))",
+        background: "#0E0F10",
         foreground: "hsl(var(--foreground))",
 
         card: {

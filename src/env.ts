@@ -9,6 +9,7 @@ export const env = createEnv({
   server: {
     SUBGRAPH_URL: z.string(),
     GITHUB_TOKEN: z.string(),
+    RPC_URL: z.string(),
     ASSETS_REPO_SLUG: z.string(),
   },
 
@@ -26,6 +27,7 @@ export const env = createEnv({
    * middlewares) or client-side so we need to destruct manually.
    */
   runtimeEnv: {
+    RPC_URL: process.env.RPC_URL,
     NEXT_PUBLIC_CONTRACTS: process.env.NEXT_PUBLIC_CONTRACTS,
     SUBGRAPH_URL: process.env.SUBGRAPH_URL,
     ASSETS_REPO_SLUG: process.env.ASSETS_REPO_SLUG,

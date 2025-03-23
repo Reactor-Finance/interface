@@ -4,9 +4,10 @@ import { useMemo } from "react";
 import { parseEther, parseUnits, zeroAddress } from "viem";
 import { ETHER, ROUTER, WETH } from "@/data/constants";
 import { TToken } from "@/lib/types";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
 import { useAtomicDate } from "@/lib/hooks/useAtomicDate";
+import { useAtom } from "jotai/react";
+import { multiHopsAtom, slippageAtom, transactionDeadlineAtom } from "@/store";
+import { convertETHToWETHIfApplicable } from "@/utils";
 
 type SwapRoute = {
   from: `0x${string}`;
@@ -18,20 +19,25 @@ export function useSwapSimulation({
   amount,
   token0,
   token1,
+  needsApproval,
   minAmountOut = BigInt(0),
+  stable = false,
 }: {
-  amount: string;
+  amount: number | null;
   token0: TToken | null;
   token1: TToken | null;
   minAmountOut?: bigint;
+  needsApproval: boolean;
+  stable: boolean;
 }) {
   const { address } = useAccount();
   const now = useAtomicDate();
   const chainId = useChainId();
   const router = useMemo(() => ROUTER[chainId], [chainId]);
   const weth = useMemo(() => WETH[chainId], [chainId]);
-  const { slippage, transactionDeadlineInMinutes, multihopsEnabled } =
-    useSelector((state: RootState) => state.settings);
+  const [txDeadline] = useAtom(transactionDeadlineAtom);
+  const [slippage] = useAtom(slippageAtom);
+  const [multihops] = useAtom(multiHopsAtom);
   const amountIn = useMemo(
     () =>
       amount !== null && token0 !== null && token1 !== null
@@ -41,7 +47,7 @@ export function useSwapSimulation({
   );
   const routes: SwapRoute[] = useMemo(
     () =>
-      multihopsEnabled &&
+      multihops &&
       token0?.address.toLowerCase() !== weth.toLowerCase() &&
       token1?.address.toLowerCase() !== weth.toLowerCase() &&
       token0?.address.toLowerCase() !== ETHER.toLowerCase() &&
@@ -53,17 +59,16 @@ export function useSwapSimulation({
         : [
             {
               from: token0?.address ?? zeroAddress,
-              to: token1?.address ?? zeroAddress,
-              stable: false,
+              to: convertETHToWETHIfApplicable(token1?.address ?? zeroAddress),
+              stable,
             },
           ],
-    [token0, token1, weth, multihopsEnabled]
+    [multihops, token0?.address, token1?.address, weth, stable]
   );
   const deadline = useMemo(() => {
-    const ttl =
-      Math.floor(now.getTime() / 1000) + transactionDeadlineInMinutes * 60;
+    const ttl = Math.floor(now.getTime() / 1000) + Number(txDeadline) * 60;
     return BigInt(ttl);
-  }, [now, transactionDeadlineInMinutes]);
+  }, [now, txDeadline]);
   const msgValue = useMemo(
     () =>
       token0?.address.toLowerCase() === weth.toLowerCase() ||
@@ -72,6 +77,7 @@ export function useSwapSimulation({
         : BigInt(0),
     [token0, weth, amount]
   );
+
   return useSimulateContract({
     ...Router,
     address: router,
@@ -91,7 +97,8 @@ export function useSwapSimulation({
         !!token0 &&
         !!token1 &&
         amount !== null &&
-        address !== zeroAddress,
+        address !== zeroAddress &&
+        !needsApproval,
     },
   });
 }

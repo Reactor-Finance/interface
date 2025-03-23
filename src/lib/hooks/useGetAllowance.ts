@@ -4,9 +4,11 @@ import { useAccount, useReadContract } from "wagmi";
 export default function useGetAllowance({
   tokenAddress,
   spender,
+  disabled,
 }: {
   tokenAddress: Address | undefined;
   spender: Address;
+  disabled?: boolean;
 }) {
   const { address } = useAccount();
   return useReadContract({
@@ -14,6 +16,6 @@ export default function useGetAllowance({
     address: tokenAddress,
     functionName: "allowance",
     args: [address ?? "0x", spender],
-    query: { enabled: Boolean(address), staleTime: 1000 * 60 * 5 },
+    query: { enabled: !disabled && Boolean(address), staleTime: 1000 * 60 * 5 },
   });
 }

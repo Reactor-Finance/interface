@@ -2,27 +2,46 @@
 import Image from "next/image";
 import React from "react";
 import reactor from "@/assets/reactor.svg";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { CustomConnectButton } from "./customConnectButton";
-
+import { useAccount } from "wagmi";
+import usePointsAccount from "@/app/points/__hooks__/usePointsAccount";
+import SideNav from "./sideNav";
 export default function Header() {
+  const { isConnected } = useAccount();
+  const router = useRouter();
+  const { data } = usePointsAccount();
   return (
-    <div className="h-[88px] px-8 items-center grid grid-cols-4">
-      <div>
+    <div className="h-[88px] px-2 lg:px-8 items-center flex justify-between lg:grid grid-cols-4">
+      <button
+        className="hidden lg:block"
+        role="link"
+        onClick={() => {
+          if (!data?.result.invitationCode) {
+            router.push("/");
+          } else {
+            router.push("/swap");
+          }
+        }}
+      >
         <Image src={reactor} alt="" />
+      </button>
+      <SideNav />
+
+      <div className="col-span-2 hidden lg:block">
+        {isConnected && (
+          <ul className="grid justify-center  grid-cols-6 place-items-center text-[14px]">
+            <NavLink href="/swap">Swap</NavLink>
+            <NavLink href="/liquidity">Liquidity</NavLink>
+            <NavLink href="/lock">Lock</NavLink>
+            <NavLink href="/voting">Vote</NavLink>
+            <NavLink href="/dashboard">Dashboard</NavLink>
+            <NavLink href="/points">Points</NavLink>
+          </ul>
+        )}
       </div>
-      <div className="col-span-2">
-        <ul className="grid justify-center  grid-cols-6 place-items-center text-[13px]">
-          <NavLink href="/swap">Swap</NavLink>
-          <NavLink href="/lock">Lock</NavLink>
-          <NavLink href="/dashboard">Dashboard</NavLink>
-          <NavLink href="/liquidity">Liquidity</NavLink>
-          <NavLink href="/voting">Voting</NavLink>
-          <NavLink href="/uniswap">Faucet</NavLink>
-        </ul>
-      </div>
-      <div className="flex justify-end">
+      <div className="flex justify-end items-center gap-x-3">
         <CustomConnectButton />
       </div>
     </div>

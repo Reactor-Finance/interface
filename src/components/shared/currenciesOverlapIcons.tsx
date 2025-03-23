@@ -7,8 +7,8 @@ import { cn } from "@/lib/utils";
 const variants = cva("rounded-full", {
   variants: {
     size: {
-      sm: "h-4 w-4  data-[a=a]:-ml-1",
-      md: "h-8 w-8 data-[a=a]:-ml-2",
+      sm: "h-4 w-4  data-[a=a]:-ml-1 text-[8px]",
+      md: "h-8 w-8 data-[a=a]:-ml-2 text-[11px]",
     },
   },
   defaultVariants: { size: "md" },
@@ -32,6 +32,10 @@ export default function CurrenciesOverlapIcons({
         height={35}
         src={token0.logoURI}
         alt={token0.symbol}
+        avatar={{
+          letter: token0.symbol[0].toUpperCase(),
+          styles: cn(variants({ size })),
+        }}
       />
       <ImageWithFallback
         data-a="a"
@@ -40,6 +44,10 @@ export default function CurrenciesOverlapIcons({
         height={35}
         src={token1.logoURI}
         alt={token1.symbol}
+        avatar={{
+          letter: token1.symbol[0].toUpperCase(),
+          styles: cn(variants({ size, className: "z-10 " })),
+        }}
       />
     </div>
   );

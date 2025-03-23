@@ -12,12 +12,15 @@ export default function SearchInput({ value, setValue, className }: Props) {
     <div
       data-focused={isFocused ? "focused" : "not-focused"}
       className={
-        "flex gap-x-3 bg-neutral-900 h-[42px] rounded-md p-2 outline-1 data-[focused=focused]:outline data-[focused=focused]:outline-white " +
+        "flex gap-x-2 bg-neutral-950 h-[42px] rounded-md p-2 outline-1 data-[focused=focused]:outline data-[focused=focused]:outline-white " +
         className
       }
     >
       <div className="flex items-center">
-        <Search className="text-gray-400 h-5 w-5" />
+        <Search
+          data-focused={isFocused ? "focused" : "not-focused"}
+          className="data-[focused=focused]:text-white text-neutral-400 h-5 w-5"
+        />
       </div>
       <input
         onFocus={() => setIsFocused(true)}
@@ -25,8 +28,8 @@ export default function SearchInput({ value, setValue, className }: Props) {
         type="text"
         onChange={(e) => setValue?.(e.target.value)}
         value={value}
-        className="w-full  placeholder:text-sm bg-transparent font-geistMono placeholder:text-neutral-500 focus:outline-none"
-        placeholder="Search by name or symbol"
+        className="w-full  placeholder:text-[12px] bg-transparent placeholder:text-neutral-400 focus:outline-none"
+        placeholder="Search by name, symbol or address"
       />
       {value !== "" && (
         <button onClick={() => setValue?.("")}>

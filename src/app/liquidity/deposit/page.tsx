@@ -60,7 +60,7 @@ export default function Page() {
         Deposit Liquidity
       </Headers.GradiantHeaderOne>
       <div className="pt-6"></div>
-      <div className=" gap-x-4 grid grid-cols-2">
+      <div className=" gap-x-4 grid gap-y-2 md:grid-cols-2">
         <TokensDialog
           onTokenSelected={setToken0}
           open={token0DialogOpen}
@@ -89,7 +89,7 @@ export default function Page() {
         </Card>
       </div>
       <div className="pt-6">
-        <Alert className="items-center" colors="muted">
+        <Alert border="mutedOne" className="items-center" colors="muted">
           Start by selecting the tokens. The liquidity pools available for
           deposit will show up next.
         </Alert>
@@ -160,6 +160,15 @@ function SearchTokensTrigger({
             className="rounded-full h-5 w-5"
             src={token.logoURI}
             alt={token.symbol}
+            avatar={
+              !token.logoURI
+                ? {
+                    letter: token.symbol[0].toUpperCase(),
+                    styles: "h-5 w-5",
+                    letterStyles: "text-[10px] leading-[10px]",
+                  }
+                : undefined
+            }
           />
         </div>
       ) : (

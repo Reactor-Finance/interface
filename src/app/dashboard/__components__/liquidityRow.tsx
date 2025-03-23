@@ -3,54 +3,17 @@ import Image from "next/image";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import symbol from "@/assets/reactor-symbol.svg";
 import { Button } from "@/components/ui/button";
-import { EllipsisIcon, Dot } from "lucide-react";
+import { EllipsisIcon } from "lucide-react";
 import PoolHeader from "@/components/shared/poolHeader";
 import { TPoolType } from "@/lib/types";
 import { useGetTokenInfo } from "@/utils";
 import { useRouter } from "next/navigation";
-import { useGetPairs } from "@/lib/hooks/useGetPairs";
-import { LiquidityActions } from "../types";
-import { Fragment, useCallback, useMemo } from "react";
+import { LiquidityActions, TPair } from "../types";
+import { useCallback, useMemo } from "react";
 import { useGetMarketQuote } from "@/lib/hooks/useGetMarketQuote";
 import { formatNumber } from "@/lib/utils";
-import { Address, formatEther, formatUnits } from "viem";
-import { useGetPairBribe } from "@/lib/hooks/useGetPairBribe";
-import ImageWithFallback from "@/components/shared/imageWithFallback";
-
-type ElementType<T extends readonly object[]> = T[number];
-
-function RangeColumn({ pair }: { pair: Address }) {
-  const pairBribes = useGetPairBribe({ pair, limit: 10n });
-  return (
-    <td className="flex flex-col gap-y-2 justify-center items-center">
-      {pairBribes.map((pairBribe, index0) => (
-        <Fragment key={index0}>
-          {pairBribe.bribes.map((bribe, index1) => {
-            const tokenInfo = useGetTokenInfo(bribe.token);
-            const { quote: marketQuote } = useGetMarketQuote({
-              tokenAddress: bribe.token,
-              value: bribe.amount,
-            });
-            return (
-              <div
-                key={index1}
-                className="flex justify-start gap-x-1 w-full items-start"
-              >
-                <ImageWithFallback
-                  src={tokenInfo?.logoURI ?? ""}
-                  alt={tokenInfo?.symbol ?? ""}
-                />
-                <span className="text-sm">
-                  ${formatNumber(formatEther(marketQuote[0]))}
-                </span>
-              </div>
-            );
-          })}
-        </Fragment>
-      ))}
-    </td>
-  );
-}
+import { formatEther, formatUnits } from "viem";
+import { TableRow } from "@/components/ui/table";
 
 export function LiquidityRow({
   pairInfo: {
@@ -62,11 +25,10 @@ export function LiquidityRow({
     emissions,
     account_gauge_earned,
     emissions_token,
-    pair_address,
   },
   onItemClick,
 }: {
-  pairInfo: ElementType<ReturnType<typeof useGetPairs>>;
+  pairInfo: TPair;
   onItemClick: (action: LiquidityActions) => void;
 }) {
   const router = useRouter();
@@ -106,8 +68,12 @@ export function LiquidityRow({
   );
 
   return (
-    <tr className="text-center rounded-sm bg-neutral-1000 py-2 px-6 w-full">
-      <td className="bg-neutral-1000 text-left col-span-2">
+    <TableRow
+      cols="7"
+      mobileCols={"7"}
+      className="grid animate-in fade-in  text-center rounded-sm  items-center bg-neutral-1000 py-2 px-6"
+    >
+      <td className=" text-left col-span-2">
         <div className="flex items-center justify-start gap-4">
           <PoolHeader
             token0={token0}
@@ -116,9 +82,9 @@ export function LiquidityRow({
           />
         </div>
       </td>
-      <td className="flex flex-col gap-y-2 justify-center items-center">
+      <td className="flex-col gap-y-1 flex justify-center items-center">
         <Badge
-          className="inline-block px-4 py-1 text-center"
+          className="inline-block px-4 h-fit py-[6px] text-center"
           border="none"
           colors={isInRange ? "success" : "error"}
           size="sm"
@@ -126,20 +92,25 @@ export function LiquidityRow({
           {isInRange ? "In Range" : "Out Of Range"}
         </Badge>
         <div className="flex items-center justify-center gap-1">
-          <Dot
+          <div
+            data-range={isInRange ? "yes" : "no"}
+            className="h-2 w-2 data-[range=yes]:bg-success-400 data-[range=no]:bg-error-400 rounded-full "
             color={isInRange ? "#4ade80" : "#f87171"}
-            width={22}
-            height={22}
           />
-          <span className="text-[10px] leading-[16px]">
-            {isInRange ? "Earning emissions" : "Not earning emissions"}
-          </span>
+          <div
+            data-range={isInRange ? "yes" : "no"}
+            className="text-[10px] data-[range=no]:text-neutral-500"
+          >
+            {isInRange ? "Earning emissions" : "Earning Emissions"}
+          </div>
         </div>
       </td>
-      <td className="text-sm">${totalMarketQuote}</td>
-      <RangeColumn pair={pair_address} />
-      <td className="text-blue-light text-sm">{formatEther(emissions)}%</td>
-      <td className="flex flex-col items-center justify-center">
+      <td className="text-sm block">${totalMarketQuote}</td>
+      {/* <RangeColumn pair={pair_address} /> */}
+      <td className="text-blue-light block text-sm">
+        {formatEther(emissions)}%
+      </td>
+      <td className="flex-col flex items-center justify-center">
         <div className="flex items-center gap-[9px]">
           <Image
             className="inline-block"
@@ -158,7 +129,12 @@ export function LiquidityRow({
       </td>
       <td>
         <div className="flex gap-x-2 justify-end">
-          <Button variant={"primary"} size="xs">
+          <Button
+            disabled={account_gauge_earned === 0n}
+            variant={"primary"}
+            className="disabled:group-hover:bg-neutral-900 "
+            size="xs"
+          >
             Claim
           </Button>
           <DropdownMenu.Root>
@@ -175,28 +151,28 @@ export function LiquidityRow({
               >
                 Increase
               </DropdownMenu.Item>
-              <DropdownMenu.Item
-                onClick={() => onItemClick(LiquidityActions.Stake)}
-                className="hover:bg-neutral-900 outline-none pl-3 py-2 pr-9 rounded-sm hover:cursor-pointer"
-              >
-                Stake
-              </DropdownMenu.Item>
+              {/* <DropdownMenu.Item */}
+              {/*   onClick={() => onItemClick(LiquidityActions.Stake)} */}
+              {/*   className="hover:bg-neutral-900 outline-none pl-3 py-2 pr-9 rounded-sm hover:cursor-pointer" */}
+              {/* > */}
+              {/*   Stake */}
+              {/* </DropdownMenu.Item> */}
               <DropdownMenu.Item
                 onClick={() => onItemClick(LiquidityActions.Withdraw)}
                 className="hover:bg-neutral-900 outline-none pl-3 py-2 pr-9 rounded-sm hover:cursor-pointer"
               >
                 Withdraw
               </DropdownMenu.Item>
-              <DropdownMenu.Item
-                onClick={() => onItemClick(LiquidityActions.Unstake)}
-                className="hover:bg-neutral-900 outline-none pl-3 py-2 pr-9 rounded-sm hover:cursor-pointer"
-              >
-                Unstake
-              </DropdownMenu.Item>
+              {/* <DropdownMenu.Item */}
+              {/*   onClick={() => onItemClick(LiquidityActions.Unstake)} */}
+              {/*   className="hover:bg-neutral-900 outline-none pl-3 py-2 pr-9 rounded-sm hover:cursor-pointer" */}
+              {/* > */}
+              {/*   Unstake */}
+              {/* </DropdownMenu.Item> */}
             </DropdownMenu.Content>
           </DropdownMenu.Root>
         </div>
       </td>
-    </tr>
+    </TableRow>
   );
 }

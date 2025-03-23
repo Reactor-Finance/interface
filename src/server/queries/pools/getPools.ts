@@ -65,7 +65,7 @@ const getPools = (filter: Filter) => {
 
   const grp = gql`
     query${tokenDef}{
-      pairs(${whereClause} first:10, ${Boolean(filter.skip) ? "skip:$skip" : ""} ) {
+      pairs(${whereClause} first:200, ${Boolean(filter.skip) ? "skip:$skip" : ""} ) {
         id
         totalSupply
         volumeUSD

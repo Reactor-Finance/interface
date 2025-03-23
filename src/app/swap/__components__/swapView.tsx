@@ -1,21 +1,25 @@
 "use client";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import SwapIconBorder from "@/components/shared/swapIconBorder";
 import TokensDialog from "@/components/shared/tokensDialog";
-import CurrencyInput from "@/components/shared/currencyInput";
 import useApproveWrite from "@/lib/hooks/useApproveWrite";
-import { useChainId, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import {
+  useChainId,
+  useWaitForTransactionReceipt,
+  useWriteContract,
+} from "wagmi";
 import { useSwapSimulation } from "../__hooks__/useSwapSimulation";
-import SubmitButton from "@/components/shared/submitBtn";
 import { useQuoteSwap } from "../__hooks__/useQuoteSwap";
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
 import { TToken } from "@/lib/types";
-import { ROUTER } from "@/data/constants";
-import { formatUnits, parseUnits, zeroAddress } from "viem";
+import { ROUTER, WETH } from "@/data/constants";
+import { parseUnits, zeroAddress } from "viem";
 import { useWETHExecutions } from "../__hooks__/useWETHExecutions";
-import { useGetBalance } from "@/lib/hooks/useGetBalance";
-import { formatNumber } from "@/lib/utils";
 import useSwapValidation from "../__hooks__/useSwapValidation";
+import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
+import { ArrowDown } from "lucide-react";
+import SwapCard from "./swapCard";
+import SubmitButton from "@/components/shared/submitBtn";
+import SwapDetails from "./swapDetails";
 import { useQueryClient } from "@tanstack/react-query";
 
 export default function SwapView() {
@@ -24,40 +28,57 @@ export default function SwapView() {
 
   // Amount in
   const [amountIn, setAmountIn] = useState("");
+  const [amountOut, setAmountOut] = useState("");
   // Selected tokens
   const [token0, setToken0] = useState<TToken | null>(null);
   const [token1, setToken1] = useState<TToken | null>(null);
-
-  // Balances
-  const { balance: token0Balance, queryKey: token0BalanceQueryKey } =
-    useGetBalance({
-      tokenAddress: token0?.address ?? zeroAddress,
-      disabled: false,
-    });
-  const { balance: token1Balance, queryKey: token1BalanceQueryKey } =
-    useGetBalance({
-      tokenAddress: token1?.address ?? zeroAddress,
-      disabled: false,
-    });
 
   // Modal state
   const [firstDialogOpen, setFirstDialogOpen] = useState(false);
   const [secondDialogOpen, setSecondDialogOpen] = useState(false);
 
   // Active input pane
-  const [activePane, setActivePane] = useState<0 | 1 | null>(null);
+  const [activePane, setActivePane] = useState<0 | 1>(0);
 
   // Quote
-  const { amountOut } = useQuoteSwap({
-    amountIn,
+  const {
+    quoteAmount,
+    isLoading: quoteSwapLoading,
+    stable: swapStable,
+  } = useQuoteSwap({
+    amountIn: Number(amountIn),
+    amountOut: Number(amountOut),
+    selected: activePane ?? 0,
     tokenIn: token0,
     tokenOut: token1,
   });
+  const roundedQuoteAmount = useMemo(
+    () => Math.floor(quoteAmount * 100) / 100,
+    [quoteAmount]
+  );
+
+  useEffect(() => {
+    if (!token0 || !token1 || quoteSwapLoading) {
+      return;
+    }
+    switch (activePane) {
+      case 0: {
+        setAmountOut(String(roundedQuoteAmount));
+        break;
+      }
+      case 1: {
+        setAmountIn(String(roundedQuoteAmount));
+        break;
+      }
+    }
+  }, [token0, token1, activePane, quoteSwapLoading, roundedQuoteAmount]);
 
   // Router by chain ID
   const router = useMemo(() => ROUTER[chainId], [chainId]);
+  // WETH
+  const weth = useMemo(() => WETH[chainId], [chainId]);
   // checks allowance
-  const { approveWriteRequest, needsApproval } = useApproveWrite({
+  const { approveWriteRequest, needsApproval, allowanceKey } = useApproveWrite({
     tokenAddress: token0?.address,
     spender: router,
     amount: String(amountIn),
@@ -67,16 +88,17 @@ export default function SwapView() {
   // Simulate swap
   const { data: swapSimulation, error: swapSimulationError } =
     useSwapSimulation({
-      amount: amountIn,
+      amount: Number(amountIn),
       token0,
       token1,
+      needsApproval,
       minAmountOut: parseUnits(amountOut, token1?.decimals ?? 18),
+      stable: swapStable,
     });
-
   // Simulate WETH process
   const { isIntrinsicWETHProcess, WETHProcessSimulation, isWETHToEther } =
     useWETHExecutions({
-      amount: amountIn,
+      amount: Number(amountIn),
       token0,
       token1,
     });
@@ -88,7 +110,38 @@ export default function SwapView() {
     error: writeError,
     reset,
   } = useWriteContract();
-  const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash });
+  const { isSuccess, isLoading } = useWaitForTransactionReceipt({ hash });
+  const { setToast } = useTransactionToastProvider();
+
+  useEffect(() => {
+    if (isSuccess && !needsApproval) {
+      setToast({
+        hash,
+        actionTitle: "Swapped",
+        actionDescription: "Swapped something",
+      });
+    } else if (!needsApproval && isSuccess) {
+      setToast({
+        hash,
+        actionTitle: "Approve",
+        actionDescription: "",
+      });
+    }
+  }, [hash, isLoading, isSuccess, needsApproval, setToast]);
+
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    if (isSuccess && !needsApproval) {
+      reset();
+      setAmountIn("");
+      setAmountOut("");
+    }
+    if (isSuccess && needsApproval) {
+      queryClient.invalidateQueries({ queryKey: allowanceKey });
+      reset();
+    }
+  }, [allowanceKey, isSuccess, needsApproval, queryClient, reset]);
+
   const switchTokens = useCallback(() => {
     const t0 = token0;
     const t1 = token1;
@@ -96,12 +149,17 @@ export default function SwapView() {
     setToken0(t1);
     setToken1(t0);
   }, [token0, token1]);
+
   const { isValid, message: errorMessage } = useSwapValidation({
-    amountIn,
+    amountIn: Number(amountIn),
     token0,
     token1,
-    token0Balance,
+    isLoading,
+    simulation: !!swapSimulation?.request,
+    approveSimulation: !!approveWriteRequest,
+    needsApproval,
   });
+
   const onSubmit = useCallback(() => {
     if (isIntrinsicWETHProcess) {
       if (isWETHToEther) {
@@ -121,12 +179,10 @@ export default function SwapView() {
     }
 
     if (approveWriteRequest && needsApproval) {
-      reset();
       writeContract(approveWriteRequest);
       return;
     }
     if (swapSimulation) {
-      reset();
       writeContract(swapSimulation.request);
     }
   }, [
@@ -146,33 +202,37 @@ export default function SwapView() {
     isLoading,
     needsApproval: needsApproval && !isIntrinsicWETHProcess,
   });
-  let stateValid = useMemo(
+  const stateValid = useMemo(
     () =>
+      Number(amountIn) > 0 &&
+      Number(amountOut) > 0 &&
       (Boolean(swapSimulation?.request) ||
         Boolean(WETHProcessSimulation.depositSimulation.data) ||
         Boolean(WETHProcessSimulation.withdrawalSimulation.data) ||
-        Boolean(approveWriteRequest && needsApproval)) &&
-      !isNaN(Number(amountIn)),
+        Boolean(approveWriteRequest && needsApproval)),
     [
       swapSimulation?.request,
       WETHProcessSimulation.depositSimulation.data,
       WETHProcessSimulation.withdrawalSimulation.data,
       approveWriteRequest,
       needsApproval,
+      amountIn,
+      amountOut,
     ]
   );
 
-  const queryClient = useQueryClient();
-
   useEffect(() => {
-    if (isSuccess) {
-      queryClient.invalidateQueries({ queryKey: token0BalanceQueryKey });
-      queryClient.invalidateQueries({ queryKey: token1BalanceQueryKey });
+    if (writeError) {
+      console.log(writeError);
     }
-  }, [isSuccess, queryClient, token0BalanceQueryKey, token1BalanceQueryKey]);
+
+    if (swapSimulationError) {
+      console.log(swapSimulationError);
+    }
+  }, [writeError, swapSimulationError]);
 
   return (
-    <div className="relative space-y-2">
+    <div className="space-y-1">
       <TokensDialog
         open={firstDialogOpen}
         onOpen={setFirstDialogOpen}
@@ -191,81 +251,60 @@ export default function SwapView() {
           token1?.address ?? zeroAddress,
         ]}
       />
-      <InputPane active={activePane === 0} onClick={() => setActivePane(0)}>
-        <CurrencyInput.Root
+      <div className="space-y-1 relative">
+        <SwapCard
+          active={activePane === 0}
           title="Sell"
-          estimate={formatNumber(
-            formatUnits(token0Balance, token0?.decimals ?? 18)
-          )}
-        >
-          <CurrencyInput.CurrencySelect
-            onClick={() => setFirstDialogOpen(true)}
-            token={token0}
-          />
-          <CurrencyInput.NumberInput
-            onChangeValue={(value: string) => setAmountIn(value)}
-            value={amountIn}
-            disabled={false}
-            decimals={10}
-          />
-        </CurrencyInput.Root>
-      </InputPane>
-      <SwapIconBorder swapIconClick={switchTokens} />
-      <InputPane active={activePane === 1} onClick={() => setActivePane(1)}>
-        <CurrencyInput.Root
+          value={String(amountIn)}
+          onContainerClick={() => setActivePane(0)}
+          token={token0}
+          onButtonClick={() => setFirstDialogOpen(true)}
+          setValue={setAmountIn}
+          isSuccessful={isSuccess}
+        />
+        <SwapCard
+          active={activePane === 1}
           title="Buy"
-          estimate={formatNumber(
-            formatUnits(token1Balance, token1?.decimals ?? 18)
-          )}
+          token={token1}
+          value={amountOut}
+          onContainerClick={() => setActivePane(1)}
+          onButtonClick={() => setSecondDialogOpen(true)}
+          setValue={setAmountOut}
+          isSuccessful={isSuccess}
+        />
+        <button
+          onClick={switchTokens}
+          className="h-14 flex items-center justify-center rounded-full w-14 bg-black absolute left-1/2 top-1/2 -translate-y-[calc(50%+4px)] -translate-x-1/2"
         >
-          <CurrencyInput.CurrencySelect
-            onClick={() => setSecondDialogOpen(true)}
-            token={token1}
-          />
-          <CurrencyInput.NumberInput
-            value={amountOut}
-            disabled={true}
-            decimals={10}
-          />
-        </CurrencyInput.Root>
-      </InputPane>
-
-      <div className="pt-2">
-        <SubmitButton
-          state={buttonState}
-          isValid={stateValid && isValid}
-          validationError={errorMessage}
-          disabled={!stateValid}
-          approveTokenSymbol={token0?.symbol}
-          onClick={onSubmit}
-        >
-          {isIntrinsicWETHProcess
-            ? isWETHToEther
-              ? "Unwrap"
-              : "Wrap"
-            : "Swap"}
-        </SubmitButton>
+          <div className="h-12 w-12 rounded-full bg-neutral-1000 flex items-center justify-center">
+            <ArrowDown className="text-neutral-300" size={18} />
+          </div>
+        </button>
       </div>
-    </div>
-  );
-}
-
-function InputPane({
-  children,
-  onClick,
-  active,
-}: {
-  children: React.ReactNode;
-  onClick: () => void;
-  active: boolean;
-}) {
-  return (
-    <div
-      data-state={active ? "active" : "inactive"}
-      onClick={onClick}
-      className="rounded-xl bg-neutral-1000 cursor-pointer data-[state=active]:bg-neutral-1050  py-6 px-4"
-    >
-      {children}
+      {token1 && token0 && Number(amountIn) > 0 && (
+        <SwapDetails
+          token0={token0}
+          token1={token1}
+          amountIn={parseUnits(amountIn, token0.decimals ?? 18)}
+          amountOut={parseUnits(amountOut, token1.decimals ?? 18)}
+        />
+      )}
+      <SubmitButton
+        onClick={onSubmit}
+        validationError={errorMessage}
+        state={buttonState}
+        isValid={isValid && stateValid}
+      >
+        {!isIntrinsicWETHProcess ? (
+          "Swap"
+        ) : (
+          <>
+            {token0?.address.toLowerCase() === weth.toLowerCase()
+              ? "Unwrap"
+              : "Wrap"}
+          </>
+        )}
+      </SubmitButton>
     </div>
   );
 }

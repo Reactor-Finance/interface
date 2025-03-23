@@ -12,7 +12,7 @@ export default function PoolRowSkeleton() {
       <Skele />
       <Skele />
       <Skele />
-      <th className="text-left col-span-3 flex justify-end">
+      <th className="text-left col-span-3 pl-4 flex justify-end">
         <div className="h-6  rounded-md w-full bg-neutral-800 animate-pulse"></div>
       </th>
     </TableRow>

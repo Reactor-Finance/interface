@@ -1,8 +1,15 @@
-import { TRADE_HELPER } from "@/data/constants";
+import { ChainId, ETHER, TRADE_HELPER, WETH } from "@/data/constants";
 import { useMemo } from "react";
 import { useChainId, useReadContract } from "wagmi";
 import * as TradeHelper from "../abis/TradeHelper";
-import { zeroAddress } from "viem";
+import { Address, zeroAddress } from "viem";
+const monToWmon = (addr: Address) => {
+  if (addr.toLowerCase() === ETHER.toLowerCase()) {
+    return WETH[ChainId.MONAD_TESTNET].toLowerCase() as Address;
+  } else {
+    return addr;
+  }
+};
 
 export function useCheckPair({
   token0,
@@ -23,7 +30,7 @@ export function useCheckPair({
     ...TradeHelper,
     address: tradeHelper,
     functionName: "pairFor",
-    args: [token0, token1, stable],
+    args: [monToWmon(token0), monToWmon(token1), stable],
   });
   // why do we need to refetch here?
   // useWatchBlocks({
