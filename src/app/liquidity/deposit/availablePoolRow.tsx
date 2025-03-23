@@ -2,12 +2,13 @@ import PoolHeader from "@/components/shared/poolHeader";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { usePoolslistContext } from "@/contexts/pairsProvider";
-import { ChainId, WETH } from "@/data/constants";
 import { TPoolType, TToken } from "@/lib/types";
 import { formatNumber } from "@/lib/utils";
+import { convertETHToWETHIfApplicable } from "@/utils";
 import Link from "next/link";
-import React from "react";
+import React, { useMemo } from "react";
 import { formatUnits } from "viem";
+import { useChainId } from "wagmi";
 
 interface Props {
   poolType: TPoolType;
@@ -15,38 +16,27 @@ interface Props {
   token1: TToken;
 }
 
-function checkMonAddr(addr: string) {
-  if (
-    addr.toLowerCase() ===
-    "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE".toLowerCase()
-  ) {
-    return WETH[ChainId.MONAD_TESTNET];
-  } else {
-    return addr;
-  }
-}
 export default function AvailablePoolRow({ poolType, token0, token1 }: Props) {
+  const chainId = useChainId();
   const { pools } = usePoolslistContext();
-  const isStable = poolType === TPoolType["STABLE"];
-  const foundPools = pools.filter((pool) => {
-    if (
-      checkMonAddr(pool.token0.toLowerCase()) ===
-        checkMonAddr(token0.address.toLowerCase()) &&
-      checkMonAddr(pool.token1.toLowerCase()) ===
-        checkMonAddr(token1.address.toLowerCase())
-    ) {
-      if (pool.stable === isStable) return true;
-    }
-    if (
-      checkMonAddr(pool.token0.toLowerCase()) ===
-        checkMonAddr(token1.address.toLowerCase()) &&
-      checkMonAddr(pool.token1.toLowerCase()) ===
-        checkMonAddr(token0.address.toLowerCase())
-    ) {
-      if (pool.stable === isStable) return true;
-    }
-  });
-  console.log(foundPools);
+  const isStable = useMemo(() => poolType === TPoolType["STABLE"], [poolType]);
+  const foundPool = useMemo(
+    () =>
+      pools.find((pool) => {
+        return (
+          ((convertETHToWETHIfApplicable(pool.token0, chainId) ===
+            convertETHToWETHIfApplicable(token0.address, chainId) &&
+            convertETHToWETHIfApplicable(pool.token1, chainId) ===
+              convertETHToWETHIfApplicable(token1.address, chainId)) ||
+            (convertETHToWETHIfApplicable(pool.token1, chainId) ===
+              convertETHToWETHIfApplicable(token0.address, chainId) &&
+              convertETHToWETHIfApplicable(pool.token0, chainId) ===
+                convertETHToWETHIfApplicable(token1.address, chainId))) &&
+          pool.stable === isStable
+        );
+      }),
+    [pools, isStable, token0.address, token1.address]
+  );
   return (
     <Card bg="1000" className="grid py-3 grid-cols-4 lg:grid-cols-6 text-sm">
       <div className="col-span-2">
@@ -54,18 +44,18 @@ export default function AvailablePoolRow({ poolType, token0, token1 }: Props) {
       </div>
       <div className=" flex-col hidden lg:flex">
         <span className="text-neutral-300">TVL</span>
-        <span>
-          {formatNumber(formatUnits(foundPools?.[0]?.tvlInUsd ?? 0n, 18))}
-        </span>
+        <span>{formatNumber(formatUnits(foundPool?.tvl ?? 0n, 18))}</span>
       </div>
       <div className=" flex-col hidden lg:flex">
         <span className="text-neutral-300">APR</span>
-        <span className="text-primary-400">0.00%</span>
+        <span className="text-primary-400">
+          {formatUnits(foundPool?.emissions ?? 0n, 18)}%
+        </span>
       </div>
       <div className="flex flex-col">
         <span className="text-neutral-300">Volume</span>
         <span className="text-primary-400">
-          {formatNumber(formatUnits(foundPools?.[0]?.volumeInUsd7D ?? 0n, 18))}
+          {formatNumber(formatUnits(foundPool?.volume24hr ?? 0n, 18))}
         </span>
       </div>
       <div className="flex justify-end items-center">
