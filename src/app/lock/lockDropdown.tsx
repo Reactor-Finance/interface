@@ -20,12 +20,10 @@ function Root(props: SelectProps) {
   return <Select {...props} />;
 }
 function Trigger({ children, ...props }: SelectTriggerProps) {
-  console.log({ children }, "CHILDREn");
   return (
     <SelectTrigger {...props}>
       <div className="flex justify-center items-center gap-x-2 ">
         <Image src={symbl} width={24} height={24} alt="Reactor Ticker" />
-        {!children && <p>Select your veNFT</p>}
         <SelectValue>{children}</SelectValue>
       </div>
     </SelectTrigger>
