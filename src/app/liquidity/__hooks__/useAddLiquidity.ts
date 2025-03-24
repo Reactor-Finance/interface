@@ -35,7 +35,7 @@ export function useAddLiquidity({
   );
   const amountDesiredLiquidityETH = useMemo(
     () =>
-      token0.toLowerCase() !== ETHER.toLowerCase()
+      token0.toLowerCase() === ETHER.toLowerCase()
         ? amountADesired
         : amountBDesired,
     [token0, amountADesired, amountBDesired]
@@ -70,6 +70,23 @@ export function useAddLiquidity({
         : { ethSlippage: minOutB, tokenSlippage: minOutA },
     [token0, minOutA, minOutB]
   );
+
+  // address token,
+  // bool stable,
+  // uint amountTokenDesired,
+  // uint amountTokenMin,
+  // uint amountETHMin,
+  // address to,
+  // uint deadline
+  console.log({
+    liquidityETHNonETHToken,
+    stable,
+    amountDesiredLiquidityETH,
+    tokenSlippage, //minOutB
+    ethSlippage, //minOutA
+    address,
+    deadline,
+  });
   const addLiquidityETHSimulation = useSimulateContract({
     ...Router,
     address: router,
