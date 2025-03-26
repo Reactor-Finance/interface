@@ -86,6 +86,8 @@ export function useAddLiquidity({
     ethSlippage, //minOutA
     address,
     deadline,
+    isAddLiquidityETH,
+    msgValueLiquidityETH,
   });
   const addLiquidityETHSimulation = useSimulateContract({
     ...Router,
@@ -95,7 +97,7 @@ export function useAddLiquidity({
       liquidityETHNonETHToken,
       stable,
       amountDesiredLiquidityETH,
-      tokenSlippage, //minOutB
+      0n, //minOutB
       ethSlippage, //minOutA
       address,
       deadline,

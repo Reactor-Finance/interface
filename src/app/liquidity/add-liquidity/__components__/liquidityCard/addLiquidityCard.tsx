@@ -113,18 +113,13 @@ export default function AddLiquidityCard() {
   const quoteLiquidity = useQuoteLiquidity({
     token0: (selectedInput === "0" ? t0 : t1) ?? zeroAddress,
     token1: (selectedInput === "0" ? t1 : t0) ?? zeroAddress,
-    token0Decimals:
-      selectedInput === "0"
-        ? (token0?.decimals ?? 18)
-        : (token1?.decimals ?? 18),
-    token1Decimals:
-      selectedInput === "0"
-        ? (token1?.decimals ?? 18)
-        : (token0?.decimals ?? 18),
+    token0Decimals: token0?.decimals ?? 18,
+    token1Decimals: token1?.decimals ?? 18,
     stable: version === "stable",
+    quoting: selectedInput === "0" ? "in" : "out",
     amountIn: parseUnits(
       selectedInput === "0" ? amount0 : amount1,
-      token0?.decimals ?? 18
+      selectedInput === "0" ? (token0?.decimals ?? 0) : (token1?.decimals ?? 0)
     ),
   });
   // find which token is wmon
@@ -379,10 +374,7 @@ export default function AddLiquidityCard() {
         return;
       }
       if (quoteLiquidity && pairExists) {
-        let num = parseFloat(
-          formatUnits(quoteLiquidity, token1?.decimals ?? 18)
-        );
-        num = Math.floor(num * 100) / 100;
+        const num = formatUnits(quoteLiquidity, token1?.decimals ?? 18);
         setAmount1(num.toString());
       }
       if (amount0 === "" && pairExists) {
@@ -394,11 +386,8 @@ export default function AddLiquidityCard() {
       }
       if (quoteLiquidity && pairExists) {
         console.log(quoteLiquidity);
-        let num = parseFloat(
-          formatUnits(quoteLiquidity, token1?.decimals ?? 18)
-        );
-        num = Math.floor(num * 100) / 100;
-        setAmount0(num.toString());
+        const num = formatUnits(quoteLiquidity, token0?.decimals ?? 18);
+        setAmount0(num);
       }
       if (amount1 === "" && pairExists) {
         setAmount0("");

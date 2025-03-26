@@ -20,13 +20,13 @@ export default function useInitializePoolValidation({
   token1,
   needsWrap,
 }: Props) {
-  if (parseUnits(amount0, token0?.decimals ?? 18) > balance0 && !needsWrap) {
+  if (parseUnits(amount0, token0?.decimals ?? 0) > balance0 && !needsWrap) {
     return {
       isValid: false,
       errorMessage: `Insufficient ${token0?.symbol} Balance.`,
     };
   }
-  if (parseUnits(amount1, token1?.decimals ?? 18) > balance1 && !needsWrap) {
+  if (parseUnits(amount1, token1?.decimals ?? 0) > balance1 && !needsWrap) {
     return {
       isValid: false,
       errorMessage: `Insufficient ${token1?.symbol} Balance.`,
