@@ -1,20 +1,22 @@
 import ManageLockDropdown from "@/app/lock/manageLockDialog/manageLockDropdown";
-import { TLockToken } from "@/app/lock/types";
 import { useVeNFTsProvider } from "@/contexts/veNFTsProvider";
-import React from "react";
-import { useVoteProvider } from "./voteProvider";
+import React, { useMemo } from "react";
+import { useVoteProvider } from "../__contexts__/voteProvider";
 
 export default function VoteDropdown() {
   const { lockTokens } = useVeNFTsProvider();
-  const { setSelectedVRCT, selectedVeNFT } = useVoteProvider();
+  const { setSelectedVeNFT, selectedVeNFT } = useVoteProvider();
+  const selectedLockToken = useMemo(
+    () =>
+      lockTokens.find((token) => String(token.id) === String(selectedVeNFT)),
+    [selectedVeNFT]
+  );
   return (
     <div>
       {/* TODO: rename ManageLockDropdown */}
       <ManageLockDropdown
-        selectedLockToken={selectedVeNFT}
-        onTokenSelected={function (token?: TLockToken): void {
-          setSelectedVRCT(token);
-        }}
+        selectedLockToken={selectedLockToken}
+        onTokenSelected={(lock) => setSelectedVeNFT(lock?.id)}
         lockTokens={lockTokens}
       ></ManageLockDropdown>
     </div>

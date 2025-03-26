@@ -5,7 +5,7 @@ import EstimatesHeader from "@/app/lock/estimateHeader";
 import PoolHeader from "@/components/shared/poolHeader";
 import { TPoolType } from "@/lib/types";
 import SubmitButton from "@/components/shared/submitBtn";
-import { useGetTokenInfo } from "@/utils";
+import { convertETHToWETHIfApplicable, useGetTokenInfo } from "@/utils";
 import { useGetHeader } from "./dialogHeaders";
 import { useRemoveLiquidity } from "../../__hooks__/useRemoveLiquidity";
 import { zeroAddress } from "viem";
@@ -32,12 +32,14 @@ interface Props {
   state: StateType;
   pairInfo: ElementType<ReturnType<typeof useGetPairs>>;
   onOpenChange: (isOpen: boolean) => void;
+  onTransactionCompleted?: () => any;
 }
 
 export default function DashboardLiquidityDialog({
   state,
   pairInfo,
   onOpenChange,
+  onTransactionCompleted,
 }: Props) {
   const header = useGetHeader({ state });
   const chainId = useChainId();
@@ -66,8 +68,8 @@ export default function DashboardLiquidityDialog({
   });
   const { removeLiquidityEthSimulation, removeLiquiditySimulation } =
     useRemoveLiquidity({
-      token0: pairInfo.token0,
-      token1: pairInfo.token1,
+      token0: convertETHToWETHIfApplicable(pairInfo.token0, chainId),
+      token1: convertETHToWETHIfApplicable(pairInfo.token1, chainId),
       isStable: pairInfo.stable,
       amount,
     });
@@ -76,6 +78,7 @@ export default function DashboardLiquidityDialog({
     needsApproval: routerNeedsApproval,
     approveWriteRequest: routerApprovalWriteRequest,
     isFetching: routerApprovalFetching,
+    resetApproval: resetRouterApproval,
   } = useApproveWrite({
     tokenAddress: pairInfo.pair_address,
     spender: router,
@@ -86,13 +89,20 @@ export default function DashboardLiquidityDialog({
     needsApproval: gaugeNeedsApproval,
     approveWriteRequest: gaugeApprovalWriteRequest,
     isFetching: gaugeApprovalFetching,
+    resetApproval: resetGaugeApproval,
   } = useApproveWrite({
     tokenAddress: pairInfo.pair_address,
     spender: pairInfo.gauge,
     amount: String(amount),
     decimals: Number(pairInfo.decimals),
   });
-  const { writeContract, reset, data: hash, isPending } = useWriteContract();
+  const {
+    writeContract,
+    reset,
+    data: hash,
+    isPending,
+    isSuccess: writeSuccess,
+  } = useWriteContract();
   const { isLoading } = useWaitForTransactionReceipt({
     hash,
   });
@@ -220,6 +230,8 @@ export default function DashboardLiquidityDialog({
         break;
       }
     }
+
+    if (onTransactionCompleted) onTransactionCompleted();
   }, [
     state.actionType,
     writeContract,
@@ -235,6 +247,7 @@ export default function DashboardLiquidityDialog({
     createGaugeSimulation,
     pairInfo.gauge,
     isWETHPair,
+    onTransactionCompleted,
   ]);
 
   const buttonChild = useMemo(() => {
@@ -279,9 +292,16 @@ export default function DashboardLiquidityDialog({
       );
     }
   }, [removeLiquidityEthSimulation, removeLiquiditySimulation]);
+
+  useEffect(() => {
+    if (writeSuccess) {
+      resetRouterApproval();
+      resetGaugeApproval();
+    }
+  }, [writeSuccess, resetRouterApproval, resetGaugeApproval]);
   return (
     <Dialog open={state.dialogOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="p-0">
+      <DialogContent className="p-0 max-w-[520px]">
         <div>
           {header}
 

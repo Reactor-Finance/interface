@@ -3,7 +3,7 @@ import { useSimulateContract } from "wagmi";
 import useGetAllowance from "./useGetAllowance";
 import { ETHER } from "@/data/constants";
 import { useQueryClient } from "@tanstack/react-query";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 /**
  * Returns write data request only if the allowance is less than the amount
@@ -47,10 +47,13 @@ export default function useApproveWrite({
     },
   });
 
-  const needsApproval =
-    (allowance ?? 0n) < parseUnits(amount ?? "0", decimals) &&
-    tokenAddress?.toLowerCase() !== ETHER.toLowerCase() &&
-    tokenAddress !== undefined;
+  const needsApproval = useMemo(
+    () =>
+      (allowance ?? 0n) < parseUnits(amount ?? "0", decimals) &&
+      tokenAddress?.toLowerCase() !== ETHER.toLowerCase() &&
+      tokenAddress !== undefined,
+    [allowance, amount, decimals, tokenAddress]
+  );
   const queryClient = useQueryClient();
   const resetApproval = useCallback(() => {
     queryClient.invalidateQueries({ queryKey });

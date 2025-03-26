@@ -2,106 +2,74 @@ import PoolHeader from "@/components/shared/poolHeader";
 import { TableRow } from "@/components/ui/table";
 import { TPoolType } from "@/lib/types";
 import React, { useCallback, useMemo } from "react";
-import { useVoteProvider } from "./voteProvider";
-import { inputPatternMatch } from "@/lib/utils";
+import { useVoteProvider } from "../__contexts__/voteProvider";
+import { formatNumber } from "@/lib/utils";
+import { convertWETHToPlainETHIfApplicable, useGetTokenInfo } from "@/utils";
+import { TPoolExtended } from "@/contexts/pairsProvider";
+import { formatEther } from "viem";
+import { useGetPairBribe } from "@/lib/hooks/useGetPairBribe";
+
 interface Props {
-  poolId: string;
+  pairInfo: TPoolExtended;
 }
-export default function VoteRow({ poolId }: Props) {
-  const {
-    setAmountForPool,
-    selectedVeNFT,
-    totalPercent,
-    selectedVeNFTPools,
-    removePool,
-  } = useVoteProvider();
-  const row = selectedVeNFTPools?.[poolId];
-  const value = useMemo(() => {
-    return row ? row.toString() : "";
-  }, [row]);
-  const percentLeft = useMemo(() => {
-    const valuePercent = isFinite(parseFloat(value)) ? parseFloat(value) : 0;
-    return 100 - (totalPercent - valuePercent);
-  }, [totalPercent, value]);
-  const handleMaxClick = () => {
-    if (!selectedVeNFT) return;
-    setAmountForPool({
-      veNftId: selectedVeNFT?.id.toString(),
-      poolId,
-      amount: percentLeft,
-    });
-  };
-  const setValue = useCallback(
-    ({ amount }: { amount: number }) => {
-      if (!selectedVeNFT) return;
-      setAmountForPool({
-        veNftId: selectedVeNFT?.id.toString(),
-        poolId,
-        amount,
-      });
-    },
-    [poolId, selectedVeNFT, setAmountForPool]
+export default function VoteRow({ pairInfo }: Props) {
+  const { allocate, allocations, selectedVeNFT } = useVoteProvider();
+
+  const token0 = useGetTokenInfo(
+    convertWETHToPlainETHIfApplicable(pairInfo.token0)
   );
+  const token1 = useGetTokenInfo(
+    convertWETHToPlainETHIfApplicable(pairInfo.token1)
+  );
+
+  const handleMaxClick = useCallback(() => {
+    if (!selectedVeNFT) return;
+    allocate(pairInfo.pair_address, 100); // Implemented to allocate percentage left if the allocation is very close to being exhausted
+  }, [allocate, selectedVeNFT]);
+
+  const pairBribe = useGetPairBribe({ pair: pairInfo.pair_address });
+  const totalVotes = useMemo(
+    () =>
+      pairBribe
+        .map((bribe) => bribe.totalVotes)
+        .reduce((prev, curr) => prev + curr, 0n),
+    [pairBribe]
+  );
+
   return (
     <TableRow cols="10" className="z-10">
       <td className="col-span-3">
         <PoolHeader
-          poolType={TPoolType.CONCENTRATED}
-          token0={{
-            symbol: "ETH",
-            address: "0x123",
-            decimals: 18,
-            logoURI: "https://example.com",
-            name: "Ethereum",
-            chainId: 1,
-          }}
-          token1={{
-            symbol: "ETH",
-            address: "0x123",
-            decimals: 18,
-            logoURI: "https://example.com",
-            name: "Ethereum",
-            chainId: 1,
-          }}
+          poolType={pairInfo.stable ? TPoolType.STABLE : TPoolType.VOLATILE}
+          token0={token0}
+          token1={token1}
         />
       </td>
-      <td className="text-right">{poolId}</td>
-      <td>11.22%</td>
-      <td>~43,279.55</td>
-      <td>131331</td>
-      <td>131331</td>
-      <td>131331</td>
+      <td>~${formatNumber(formatEther(pairInfo.tvl))}</td>
+      <td>{formatEther(pairInfo.emissions)}</td>
+      <td>
+        ~${formatNumber(formatEther(pairInfo.fees + pairInfo.incentives))}
+      </td>
+      <td>~${formatNumber(formatEther(pairInfo.incentives))}</td>
+      <td>{formatNumber(formatEther(totalVotes))}</td>
       <td>
         <div className="flex justify-end">
           <div className="bg-neutral-950 transition-colors group-hover:bg-neutral-900 justify-between rounded-md p-2 flex gap-x-4">
             <div className="flex gap-x-1">
               <input
                 placeholder="0"
-                value={value}
+                type="number"
+                min={0}
+                max={100}
+                value={allocations[pairInfo.pair_address] || 0}
                 onChange={(e) => {
-                  if (inputPatternMatch(e.target.value)) {
-                    let newValue = "";
-                    if (parseFloat(e.target.value) < 0) {
-                      return;
-                    }
-                    if (parseFloat(e.target.value) > percentLeft) {
-                      newValue = `${percentLeft}`;
-                    } else {
-                      newValue = e.target.value;
-                    }
-                    if (isFinite(parseFloat(newValue))) {
-                      console.log(newValue);
-                      setValue({ amount: parseFloat(newValue) });
-                    } else {
-                      if (!selectedVeNFT) return;
-                      removePool({
-                        veNftId: selectedVeNFT?.id.toString(),
-                        poolId,
-                      });
-                    }
-                  }
+                  const value = !isNaN(e.target.valueAsNumber)
+                    ? e.target.valueAsNumber
+                    : allocations[pairInfo.pair_address] || 0;
+
+                  allocate(pairInfo.pair_address, value);
                 }}
-                className="w-[30px] focus:ring-transparent transition-all  bg-transparent"
+                className="w-[40px] focus:ring-transparent transition-all  bg-transparent"
               />
               <span className="text-neutral-400">%</span>
             </div>

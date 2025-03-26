@@ -174,7 +174,7 @@ export default function PoolsTable() {
             setValue={(value) => {
               updateState({ searchQuery: value });
             }}
-          ></SearchInput>
+          />
         </div>
       </div>
       <div className="pt-4 min-h-[500px]  overflow-x-auto scroll-container">
@@ -234,7 +234,9 @@ export default function PoolsTable() {
           </thead>
           <tbody className="gap-y-2 pt-2 flex flex-col">
             {loadingBounced &&
-              Array.from({ length: 10 }, (_, i) => <PoolRowSkeleton key={i} />)}
+              Array.from({ length: pageLength }, (_, i) => (
+                <PoolRowSkeleton key={i} />
+              ))}
             {!loadingBounced &&
               modifiedPools.map((pool) => (
                 <PoolRow {...pool} key={pool.pair_address} />

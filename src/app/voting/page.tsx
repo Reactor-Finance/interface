@@ -2,14 +2,32 @@
 import SearchInput from "@/components/shared/searchInput";
 import Headers from "@/components/ui/headers";
 import PageMarginContainer from "@/components/ui/pageMarginContainer";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import React from "react";
+// import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import React, { useMemo } from "react";
 import VoteTable from "./__components__/voteTable";
-import { VoteProvider } from "./__components__/voteProvider";
+import { VoteProvider } from "./__contexts__/voteProvider";
 import VotePower from "./__components__/votePower";
 import VoteDropdown from "./__components__/voteDropdown";
+import { useChainId, useReadContract } from "wagmi";
+import { EXCHANGE_HELPER } from "@/data/constants";
+import * as ExchangeHelper from "@/lib/abis/ExchangeHelper";
+import { formatNumber } from "@/lib/utils";
+import { formatEther } from "viem";
 
 export default function Page() {
+  const chainId = useChainId();
+  const exchangeHelper = useMemo(() => EXCHANGE_HELPER[chainId], [chainId]);
+  // Stats
+  const { data: fees = [BigInt(0)] } = useReadContract({
+    ...ExchangeHelper,
+    address: exchangeHelper,
+    functionName: "getFeesInUSDForAllPairs",
+  });
+  const { data: incentives = [BigInt(0)] } = useReadContract({
+    ...ExchangeHelper,
+    address: exchangeHelper,
+    functionName: "getBribesInUSDForAllPairs",
+  });
   return (
     <PageMarginContainer>
       <div className="rounded-lg flex flex-col sm:flex-row justify-between items-stretch  gap-y-6 sm:gap-y-0 sm:gap-x-16">
@@ -26,15 +44,21 @@ export default function Page() {
         <div className=" space-y-2 flex flex-col justify-between ">
           <div className="flex justify-between gap-x-6">
             <p className="text-neutral-400 text-sm">Total Fees</p>
-            <p className="text-neutral-100 text-sm">$165,000,000</p>
+            <p className="text-neutral-100 text-sm">
+              ${formatNumber(formatEther(fees[0]))}
+            </p>
           </div>
           <div className="flex justify-between gap-x-6">
             <p className="text-neutral-400 text-sm">Total Incentives:</p>
-            <p className="text-neutral-100 text-sm">$44,866,347</p>
+            <p className="text-neutral-100 text-sm">
+              ${formatNumber(formatEther(incentives[0]))}
+            </p>
           </div>
           <div className="flex justify-between gap-x-6">
             <p className="text-neutral-400 text-sm">Total Rewards:</p>
-            <p className="text-neutral-100 text-sm">$44,866,347</p>
+            <p className="text-neutral-100 text-sm">
+              ${formatNumber(formatEther(fees[0] + incentives[0]))}
+            </p>
           </div>
           <div className="flex justify-between gap-x-6">
             <p className="text-neutral-400 text-sm">Epoch #85 Ends in:</p>
@@ -46,17 +70,14 @@ export default function Page() {
       <h2 className="text-2xl">Pools</h2>
 
       <VoteProvider>
-        <div className="flex justify-between pt-4 items-center">
-          <Tabs defaultValue="all">
+        <div className="flex justify-end pt-4 items-center">
+          {/* <Tabs defaultValue="all">
             <TabsList>
               <TabsTrigger value={"all"}>All</TabsTrigger>
               <TabsTrigger value={"stable"}>Most Rewarded</TabsTrigger>
               <TabsTrigger value={"vol"}>My Votes</TabsTrigger>
-              {/* <TabsTrigger value={TabValues.CONCENTRATED}> */}
-              {/*   Concentrated */}
-              {/* </TabsTrigger> */}
             </TabsList>
-          </Tabs>
+          </Tabs> */}
           <div className="gap-x-4 flex ">
             <div className="w-[285px]">
               <SearchInput

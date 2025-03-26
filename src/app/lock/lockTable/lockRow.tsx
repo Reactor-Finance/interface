@@ -39,6 +39,10 @@ export default function LockRow({
         ? TokenStatus.ACTIVE
         : TokenStatus.INACTIVE;
   }, [token, currentDate]);
+  const apr = useMemo(
+    () => (token.rebase_amount * 100n) / token.amount,
+    [token]
+  );
 
   return (
     <tr className="grid text-center rounded-sm grid-cols-8 items-center bg-neutral-1000 py-2 px-6">
@@ -58,10 +62,10 @@ export default function LockRow({
         </span>
       </td>
       <td>
-        <span className="text-blue-light">10%</span>
+        <span className="text-blue-light">{String(apr)}%</span>
       </td>
       <td className="">
-        {formatNumber(formatUnits(token.rebase_amount, RCT_DECIMALS))}
+        {formatNumber(formatUnits(token.rebase_amount, RCT_DECIMALS))} RCT
       </td>
       <td className="">{unlockDate.toDateString()}</td>
       <td className="">

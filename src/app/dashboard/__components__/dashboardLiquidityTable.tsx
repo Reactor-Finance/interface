@@ -8,9 +8,13 @@ import usePadLoading from "@/lib/hooks/usePadLoading";
 import Spinner from "@/components/ui/spinner";
 import Link from "next/link";
 import { zeroAddress } from "viem";
-import { wmonToMon } from "@/lib/utils";
+import { convertWETHToPlainETHIfApplicable } from "@/utils";
+import { useChainId } from "wagmi";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function DashboardLiquidityTable() {
+  const chainId = useChainId();
+  const queryClient = useQueryClient();
   const { data: pairs, isLoading } = useGetPairs({});
   const activePairs = useMemo(
     () =>
@@ -23,13 +27,11 @@ export default function DashboardLiquidityTable() {
         )
         .map((pair) => ({
           ...pair,
-
-          token0: wmonToMon(pair.token0),
-          token1: wmonToMon(pair.token1),
+          token0: convertWETHToPlainETHIfApplicable(pair.token0, chainId),
+          token1: convertWETHToPlainETHIfApplicable(pair.token1, chainId),
         })),
     [pairs]
   );
-  console.log(activePairs, "ACTIVE PAIRS");
   const [selectedPair, setSelectedPair] = useState(activePairs[0]);
   const [stateType, setStateType] = useState<StateType>({
     dialogOpen: false,
@@ -42,6 +44,11 @@ export default function DashboardLiquidityTable() {
         <DashboardLiquidityDialog
           state={stateType}
           pairInfo={selectedPair}
+          onTransactionCompleted={() =>
+            void queryClient.invalidateQueries({
+              queryKey: selectedPair.queryKey,
+            })
+          }
           onOpenChange={(isOpen) =>
             setStateType((s) => ({ ...s, dialogOpen: isOpen }))
           }

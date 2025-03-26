@@ -3,6 +3,7 @@ import { useChainId, useReadContract } from "wagmi";
 import { abi } from "@/lib/abis/Router";
 import { getAddress, zeroAddress } from "viem";
 import { useMemo } from "react";
+import { convertETHToWETHIfApplicable } from "@/utils";
 
 export default function useQuoteRemoveLiquidity({
   token0,
@@ -18,8 +19,20 @@ export default function useQuoteRemoveLiquidity({
   enabled: boolean;
 }) {
   const chainId = useChainId();
-  const t0 = useMemo(() => (token0 ? getAddress(token0) : undefined), [token0]);
-  const t1 = useMemo(() => (token1 ? getAddress(token1) : undefined), [token1]);
+  const t0 = useMemo(
+    () =>
+      token0
+        ? convertETHToWETHIfApplicable(getAddress(token0), chainId)
+        : undefined,
+    [token0, chainId]
+  );
+  const t1 = useMemo(
+    () =>
+      token1
+        ? convertETHToWETHIfApplicable(getAddress(token1), chainId)
+        : undefined,
+    [token1, chainId]
+  );
   const router = useMemo(() => ROUTER[chainId], [chainId]);
 
   return useReadContract({

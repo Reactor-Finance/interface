@@ -49,6 +49,13 @@ export const poolsRouter = createTRPCRouter({
         functionName: "getFeesInUSDForAllPairs",
       });
 
+      // Get incentives
+      const [, incentives, pairs3] = await viemClient.readContract({
+        ...ExchangeHelper,
+        address: EXCHANGE_HELPER[input.chainId],
+        functionName: "getBribesInUSDForAllPairs",
+      });
+
       // Get pairs
       const pairs = await viemClient.readContract({
         abi,
@@ -70,12 +77,17 @@ export const poolsRouter = createTRPCRouter({
         const feeIndex = pairs2.findIndex(
           (addr) => addr.toLowerCase() === pair.pair_address.toLowerCase()
         );
+        // Bribes
+        const incentiveIndex = pairs3.findIndex(
+          (addr) => addr.toLowerCase() === pair.pair_address.toLowerCase()
+        );
 
         return {
           ...pair,
           tvl: tvls[tvlIndex] || 0n,
           volume24hr: volumes[volumeIndex] || 0n,
           fees: fees[feeIndex] || 0n,
+          incentives: incentives[incentiveIndex] || 0n,
         };
       });
       return mappedPools.filter(
