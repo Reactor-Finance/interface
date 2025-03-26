@@ -31,7 +31,7 @@ interface Props {
 }
 
 export default function VoteDialog({ open, setOpen }: Props) {
-  const { allocations, selectedVeNFT } = useVoteProvider();
+  const { allocations, selectedVeNFT, disallocateAll } = useVoteProvider();
   const { refresh: refreshPools } = usePoolslistContext();
   const { lockTokens, reset: refreshVeNFTs } = useVeNFTsProvider();
   const selectedLockToken = useMemo(
@@ -96,11 +96,22 @@ export default function VoteDialog({ open, setOpen }: Props) {
         onSuccess: () => {
           refreshPools(); // Refresh pools on success
           refreshVeNFTs(); // Refresh veNFTs
+          disallocateAll(); // Clear allocations
+          if (setOpen) setOpen(false); // Close dialog
         },
       });
       return;
     }
-  }, [voteSimulation, writeContract, hash, reset, refreshPools, refreshVeNFTs]);
+  }, [
+    voteSimulation,
+    writeContract,
+    hash,
+    reset,
+    refreshPools,
+    refreshVeNFTs,
+    disallocateAll,
+    setOpen,
+  ]);
 
   useEffect(() => {
     if (voteSimulation.error) console.error(voteSimulation.error);
