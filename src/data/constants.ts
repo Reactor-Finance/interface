@@ -43,6 +43,9 @@ export const RCT: { [key: number]: `0x${string}` } = {
 export const EXCHANGE_HELPER: { [key: number]: `0x${string}` } = {
   [ChainId.MONAD_TESTNET]: "0x9cb90faa71fb6dfd8aaB747460080C52CA9B0B23",
 };
+export const VAS: { [key: number]: `0x${string}` } = {
+  [ChainId.MONAD_TESTNET]: "0xac408042cAeb70cd67ED94C86D36f237D2945b15",
+};
 export const ETHER = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 // Explorer links
 export const EXPLORERS: { [key: number]: string } = {
