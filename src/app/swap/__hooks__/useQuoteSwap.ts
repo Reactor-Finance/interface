@@ -1,9 +1,10 @@
 import { useChainId, useReadContract } from "wagmi";
 import * as TradeHelper from "@/lib/abis/TradeHelper";
-import { parseUnits, zeroAddress } from "viem";
+import { formatUnits, parseUnits, zeroAddress } from "viem";
 import { useMemo } from "react";
 import { TToken } from "@/lib/types";
 import { ETHER, TRADE_HELPER, WETH } from "@/data/constants";
+import { convertETHToWETHIfApplicable } from "@/utils";
 
 export function useQuoteSwap({
   amountIn,
@@ -12,8 +13,8 @@ export function useQuoteSwap({
   tokenOut,
   selected,
 }: {
-  amountIn: string;
-  amountOut: string;
+  amountIn: number;
+  amountOut: number;
   selected: 0 | 1;
   tokenIn: TToken | null;
   tokenOut: TToken | null;
@@ -35,70 +36,84 @@ export function useQuoteSwap({
         : tokenOut?.address,
     [tokenOut?.address, weth]
   );
-  const tokensExist = useMemo(
+  const tokensNonNull = useMemo(
     () => tokenIn !== null && tokenOut !== null,
     [tokenIn, tokenOut]
   );
   const {
-    data: [receivedAmountOut, stableOut] = [BigInt(0), false],
-    error,
-    isLoading,
+    data: [receivedAmountOut, amountOutStable] = [BigInt(0), false],
+    error: receivedAmountOutError,
+    isLoading: amountOutLoading,
   } = useReadContract({
     address,
     ...TradeHelper,
     functionName: "getAmountOut",
     args: [
       parseUnits(String(amountIn), tokenIn?.decimals ?? 18),
-      address0 ?? zeroAddress,
-      address1 ?? zeroAddress,
+      convertETHToWETHIfApplicable(address0 ?? zeroAddress, chainId),
+      convertETHToWETHIfApplicable(address1 ?? zeroAddress, chainId),
     ],
     query: {
-      enabled: !!amountIn && tokensExist && selected === 0 && amountIn !== "",
+      enabled: !!amountIn && tokensNonNull && selected === 0,
+      refetchInterval: 10_000, // We need refetch interval here to cover for other swaps. By that, I mean situations where this pair is being swapped elsewhere. This is to update the quote in real-time as query invalidation by key is not feasible
     },
   });
   const {
     isLoading: amountInLoading,
-    data: [receivedAmountIn, stableIn] = [BigInt(0), false],
+    data: [receivedAmountIn, amountInStable] = [BigInt(0), false],
+    error: receivedAmountInError,
   } = useReadContract({
     address,
     ...TradeHelper,
     functionName: "getAmountIn",
     args: [
-      parseUnits(amountOut, tokenOut?.decimals ?? 18),
-      address0 ?? zeroAddress,
-      address1 ?? zeroAddress,
+      parseUnits(String(amountOut), tokenOut?.decimals ?? 18),
+      convertETHToWETHIfApplicable(address0 ?? zeroAddress, chainId),
+      convertETHToWETHIfApplicable(address1 ?? zeroAddress, chainId),
     ],
     query: {
-      enabled: !!amountOut && tokensExist && selected === 1 && amountOut !== "",
+      enabled: !!amountOut && tokensNonNull && selected === 1,
+      refetchInterval: 10_000, // We need refetch interval here to cover for other swaps. By that, I mean situations where this pair is being swapped elsewhere. This is to update the quote in real-time as query invalidation by key is not feasible
     },
   });
 
-  // const isIntrinsicWETHProcess = useMemo(
-  //   () =>
-  //     (tokenIn?.address.toLowerCase() === weth.toLowerCase() &&
-  //       tokenOut?.address.toLowerCase() === ETHER.toLowerCase()) ||
-  //     (tokenIn?.address.toLowerCase() === ETHER.toLowerCase() &&
-  //       tokenOut?.address.toLowerCase() === weth.toLowerCase()),
-  //   [weth, tokenIn?.address, tokenOut?.address]
-  // );
+  const isIntrinsicWETHProcess = useMemo(
+    () =>
+      (tokenIn?.address.toLowerCase() === weth.toLowerCase() &&
+        tokenOut?.address.toLowerCase() === ETHER.toLowerCase()) ||
+      (tokenIn?.address.toLowerCase() === ETHER.toLowerCase() &&
+        tokenOut?.address.toLowerCase() === weth.toLowerCase()),
+    [weth, tokenIn?.address, tokenOut?.address]
+  );
 
-  console.log(parseUnits(amountOut, tokenOut?.decimals ?? 18));
-  console.log({ receivedAmountIn, receivedAmountOut });
-  const { quoteAmountIn, quoteAmountOut } = useMemo(
-    () => ({
-      quoteAmountIn: receivedAmountIn,
-      quoteAmountOut: receivedAmountOut,
-    }),
-    [receivedAmountOut, receivedAmountIn]
+  const receivedAmount = useMemo(
+    () => (selected === 0 ? receivedAmountOut : receivedAmountIn),
+    [selected, receivedAmountOut, receivedAmountIn]
+  );
+
+  const quoteAmount = useMemo(
+    () =>
+      isIntrinsicWETHProcess
+        ? amountIn
+        : selected === 0 && tokenOut
+          ? Number(formatUnits(receivedAmount, tokenOut.decimals))
+          : selected === 1 && tokenIn
+            ? Number(formatUnits(receivedAmount, tokenIn.decimals))
+            : 0,
+    [
+      receivedAmount,
+      amountIn,
+      tokenOut,
+      isIntrinsicWETHProcess,
+      selected,
+      tokenIn,
+    ]
   );
 
   return {
-    quoteAmountIn,
-    quoteAmountOut,
-    stableIn,
-    stableOut,
-    error,
-    isLoading,
-    amountInLoading,
+    quoteAmount,
+    error: selected === 0 ? receivedAmountOutError : receivedAmountInError,
+    isLoading: selected === 0 ? amountInLoading : amountOutLoading,
+    stable: amountInStable || amountOutStable,
   };
 }

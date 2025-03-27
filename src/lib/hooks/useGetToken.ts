@@ -1,8 +1,7 @@
 import { useMemo } from "react";
 import { Address, erc20Abi } from "viem";
-import { useReadContracts } from "wagmi";
+import { useBytecode, useChainId, useReadContracts } from "wagmi";
 import { TToken } from "../types";
-import { ChainId } from "@/data/constants";
 
 export default function useGetToken({
   address,
@@ -11,7 +10,9 @@ export default function useGetToken({
   address: Address | undefined;
   disabled?: boolean;
 }) {
-  const { data, isFetched } = useReadContracts({
+  const chainId = useChainId();
+  const { data: byteCodeData } = useBytecode({ address, chainId });
+  const { data: fetchedTokenData, isFetched } = useReadContracts({
     contracts: [
       {
         abi: erc20Abi,
@@ -30,13 +31,13 @@ export default function useGetToken({
       },
     ],
     query: {
-      enabled: address?.length === 42 && !disabled,
+      enabled: byteCodeData?.length !== 0 && !disabled,
     },
   });
   const foundToken = useMemo(() => {
     if (!address) return;
-    if (data) {
-      const [decimals, symbol, name] = data;
+    if (fetchedTokenData) {
+      const [decimals, symbol, name] = fetchedTokenData;
       if (!decimals.result || !symbol.result || !name.result) return;
       const token: TToken = {
         address,
@@ -44,11 +45,10 @@ export default function useGetToken({
         symbol: symbol.result,
         name: name.result,
         logoURI: null,
-        chainId: ChainId.MONAD_TESTNET,
+        chainId,
       };
       return token;
     }
-  }, [address, data]);
-  if (!address) return { foundToken: undefined, isFetched: true };
-  return { foundToken, isFetched };
+  }, [address, fetchedTokenData, chainId]);
+  return { token: foundToken, isFetched };
 }

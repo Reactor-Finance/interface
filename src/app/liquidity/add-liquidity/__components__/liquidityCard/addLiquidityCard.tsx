@@ -10,12 +10,12 @@ import {
 import { useAddLiquidity } from "../../../__hooks__/useAddLiquidity";
 import SubmitButton from "@/components/shared/submitBtn";
 import useGetButtonStatuses from "@/components/shared/__hooks__/useGetButtonStatuses";
-import { Address, formatUnits, isAddress, parseUnits, zeroAddress } from "viem";
+import { formatUnits, isAddress, parseUnits, zeroAddress } from "viem";
 import { z } from "zod";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCheckPair } from "@/lib/hooks/useCheckPair";
 import useApproveWrite from "@/lib/hooks/useApproveWrite";
-import { ChainId, ETHER, ROUTER, WETH } from "@/data/constants";
+import { ROUTER } from "@/data/constants";
 import { useQuoteLiquidity } from "@/app/liquidity/__hooks__/useQuoteLiquidity";
 import { useGetTokenInfo } from "@/utils";
 import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
@@ -25,7 +25,6 @@ import { useGetPairInfo } from "@/lib/hooks/useGetPairInfo";
 import DisplayFormattedNumber from "@/components/shared/displayFormattedNumber";
 import { formatNumber } from "@/lib/utils";
 import InitPoolInfo from "./initPoolInfo";
-import useWrapWrite from "@/lib/hooks/useWrapWrite";
 import useInitializePoolValidation from "./hooks/useInitializePoolValidation";
 import { useDebounce } from "@/lib/hooks/useDebounce";
 import useGetToken from "@/lib/hooks/useGetToken";
@@ -51,53 +50,48 @@ export default function AddLiquidityCard() {
 
     const afterParse = searchParamsSchema.safeParse(param);
     if (!afterParse.success) {
-      console.log("failed parse");
       return { t0: undefined, t1: undefined, version: "stable" };
     }
     const { token1, token0, version: v } = afterParse.data;
     return { t1: token1, t0: token0, version: v };
   }, [params]);
 
-  // Tokens
-  let token0 = useGetTokenInfo(t0 ?? "0x");
-  let token1 = useGetTokenInfo(t1 ?? "0x");
+  // Direct tokens
+  const token0 = useGetTokenInfo(t0 ?? zeroAddress);
+  const token1 = useGetTokenInfo(t1 ?? zeroAddress);
   const routerNav = useRouter();
-  // If token is not in our token list
-  // Fetch info from token contract
-  // =====
-  const { isFetched: fetched0, foundToken: foundToken0 } = useGetToken({
+  // If token is not in our token list, then fetch from contract
+  const { isFetched: fetched0, token: fetchedToken0 } = useGetToken({
     address: t0,
     disabled: !!token0,
   });
-  const { isFetched: fetched1, foundToken: foundToken1 } = useGetToken({
+  const { isFetched: fetched1, token: fetchedToken1 } = useGetToken({
     address: t1,
     disabled: !!token1,
   });
-  if (!token0 && foundToken0) {
-    token0 = foundToken0;
-  }
-  if (!token1 && foundToken1) {
-    token1 = foundToken1;
-  }
-  useEffect(() => {
-    if (!foundToken0 && fetched0 && !token0) {
-      routerNav.push("/");
-    }
-    if (!foundToken1 && fetched1 && !token1) {
-      routerNav.push("/");
-    }
-  }, [fetched0, fetched1, foundToken0, foundToken1, routerNav, token0, token1]);
-  console.log({ foundToken0, foundToken1, token0, token1 });
-  // =====
+
+  const asset0 = useMemo(
+    () =>
+      !!token0
+        ? token0
+        : fetched0 && !!fetchedToken0
+          ? fetchedToken0
+          : undefined,
+    [fetched0, fetchedToken0, token0]
+  );
+  const asset1 = useMemo(
+    () =>
+      !!token1
+        ? token1
+        : fetched1 && !!fetchedToken1
+          ? fetchedToken1
+          : undefined,
+    [fetched1, fetchedToken1, token1]
+  );
   const [amount0, setAmount0] = useState("");
   const [amount1, setAmount1] = useState("");
   const { debouncedValue: amount0Bounced } = useDebounce(amount0, 300);
   const { debouncedValue: amount1Bounced } = useDebounce(amount1, 300);
-  useEffect(() => {
-    // reset inputs if change pool version
-    setAmount0("");
-    setAmount1("");
-  }, [version]);
 
   // Router
   const router = useMemo(() => ROUTER[chainId], [chainId]);
@@ -113,30 +107,36 @@ export default function AddLiquidityCard() {
   const quoteLiquidity = useQuoteLiquidity({
     token0: (selectedInput === "0" ? t0 : t1) ?? zeroAddress,
     token1: (selectedInput === "0" ? t1 : t0) ?? zeroAddress,
-    token0Decimals: token0?.decimals ?? 18,
-    token1Decimals: token1?.decimals ?? 18,
+    token0Decimals:
+      selectedInput === "0"
+        ? (asset0?.decimals ?? 18)
+        : (asset1?.decimals ?? 18),
+    token1Decimals:
+      selectedInput === "0"
+        ? (asset0?.decimals ?? 18)
+        : (asset1?.decimals ?? 18),
     stable: version === "stable",
     quoting: selectedInput === "0" ? "in" : "out",
     amountIn: parseUnits(
       selectedInput === "0" ? amount0 : amount1,
-      selectedInput === "0" ? (token0?.decimals ?? 0) : (token1?.decimals ?? 0)
+      asset0?.decimals ?? 18
     ),
   });
-  // find which token is wmon
-  const wmonToken = useMemo(() => {
-    if (token0?.address === WETH[ChainId.MONAD_TESTNET]) {
-      return "token0";
-    }
-    if (token1?.address === WETH[ChainId.MONAD_TESTNET]) {
-      return "token1";
-    }
-    return "none";
-  }, [token0?.address, token1?.address]);
-  const { needsWrap, resetWrap, depositSimulation } = useWrapWrite({
-    amountIn: wmonToken === "token0" ? amount0 : amount1,
-    isWmon: wmonToken !== "none",
-    disabled: wmonToken === "token0" ? amount0 === "" : amount1 === "",
-  });
+  // We don't use wrapping any more
+  // const wmonToken = useMemo(() => {
+  //   if (token0?.address === WETH[ChainId.MONAD_TESTNET]) {
+  //     return "token0";
+  //   }
+  //   if (token1?.address === WETH[ChainId.MONAD_TESTNET]) {
+  //     return "token1";
+  //   }
+  //   return "none";
+  // }, [token0?.address, token1?.address]);
+  // const { needsWrap, resetWrap, depositSimulation } = useWrapWrite({
+  //   amountIn: wmonToken === "token0" ? amount0 : amount1,
+  //   isWmon: wmonToken !== "none",
+  //   disabled: wmonToken === "token0" ? amount0 === "" : amount1 === "",
+  // });
   // Check approval required
   const {
     approveWriteRequest: token0ApprovalWriteRequest,
@@ -145,10 +145,10 @@ export default function AddLiquidityCard() {
     allowanceKey: token0AllowanceKey,
   } = useApproveWrite({
     spender: router,
-    tokenAddress: token0?.address ?? zeroAddress,
-    decimals: token0?.decimals,
+    tokenAddress: asset0?.address ?? zeroAddress,
+    decimals: asset0?.decimals,
     amount: amount0Bounced,
-    disabled: amount0 === "",
+    disabled: isNaN(Number(amount0)) || Number(amount0) <= 0,
   });
 
   const {
@@ -158,20 +158,20 @@ export default function AddLiquidityCard() {
     allowanceKey: token1AllowanceKey,
   } = useApproveWrite({
     spender: router,
-    tokenAddress: token1?.address ?? zeroAddress,
-    decimals: token1?.decimals,
+    tokenAddress: asset1?.address ?? zeroAddress,
+    decimals: asset1?.decimals,
     amount: amount1Bounced,
-    disabled: amount1 === "",
+    disabled: isNaN(Number(amount1)) || Number(amount1) <= 0,
   });
 
   // Amounts parsed
   const amountADesired = useMemo(
-    () => parseUnits(amount0Bounced, token0?.decimals ?? 18),
-    [amount0Bounced, token0?.decimals]
+    () => parseUnits(amount0Bounced, asset0?.decimals ?? 18),
+    [amount0Bounced, asset0?.decimals]
   );
   const amountBDesired = useMemo(
-    () => parseUnits(amount1Bounced, token1?.decimals ?? 18),
-    [amount1Bounced, token1?.decimals]
+    () => parseUnits(amount1Bounced, asset1?.decimals ?? 18),
+    [amount1Bounced, asset1?.decimals]
   );
   const {
     addLiquidityETHSimulation,
@@ -181,10 +181,12 @@ export default function AddLiquidityCard() {
     disabled:
       token1NeedsApproval ||
       token1NeedsApproval ||
-      amount0 === "" ||
-      amount1 === "",
-    token0: token0?.address ?? zeroAddress,
-    token1: token1?.address ?? zeroAddress,
+      isNaN(Number(amount0)) ||
+      Number(amount0) <= 0 ||
+      isNaN(Number(amount1)) ||
+      Number(amount1) <= 0,
+    token0: asset0?.address ?? zeroAddress,
+    token1: asset1?.address ?? zeroAddress,
     amountADesired,
     amountBDesired,
     stable: version === "stable",
@@ -193,50 +195,43 @@ export default function AddLiquidityCard() {
   const { writeContract, reset, isPending, data: hash } = useWriteContract(); // We'll also call reset when transaction toast is closed
   const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash });
   const { setToast } = useTransactionToastProvider();
-  const { balance: balance0Raw, balanceQueryKey: bal0Key } = useGetBalance({
-    tokenAddress: token0?.address ?? zeroAddress,
+  const { balance: balance0, queryKey: balance0QueryKey } = useGetBalance({
+    tokenAddress: asset0?.address ?? zeroAddress,
   });
-  const {
-    balance: balance1Raw,
-    etherBalance,
-    balanceQueryKey: bal1Key,
-  } = useGetBalance({
-    tokenAddress: token1?.address ?? zeroAddress,
+  const { balance: balance1, queryKey: balance1QueryKey } = useGetBalance({
+    tokenAddress: asset1?.address ?? zeroAddress,
   });
 
-  const balance0 =
-    token0?.address.toLowerCase() === ETHER.toLowerCase()
-      ? etherBalance.value
-      : balance0Raw;
-  const balance1 =
-    token1?.address.toLowerCase() === ETHER.toLowerCase()
-      ? etherBalance.value
-      : balance1Raw;
-
-  const { balance, balanceQueryKey: lpQueryKey } = useGetBalance({
-    tokenAddress: (pair as Address) ?? zeroAddress,
+  const { balance: lpBalance, queryKey: lpQueryKey } = useGetBalance({
+    tokenAddress: pairExists ? pair : zeroAddress,
   });
   const queryClient = useQueryClient();
-  const { pairInfo, queryKey: pairKey } = useGetPairInfo({ pair });
-  const resetAfterSwap = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: bal0Key });
-    queryClient.invalidateQueries({ queryKey: bal1Key });
-    queryClient.invalidateQueries({ queryKey: pairKey });
+  const { pairInfo, queryKey: pairQueryKey } = useGetPairInfo({ pair });
+  const resetAfterLPProvision = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: balance0QueryKey });
+    queryClient.invalidateQueries({ queryKey: balance1QueryKey });
+    queryClient.invalidateQueries({ queryKey: pairQueryKey });
     queryClient.invalidateQueries({ queryKey: lpQueryKey });
-  }, [bal0Key, bal1Key, lpQueryKey, pairKey, queryClient]);
+  }, [
+    balance0QueryKey,
+    balance1QueryKey,
+    lpQueryKey,
+    pairQueryKey,
+    queryClient,
+  ]);
 
   useEffect(() => {
     if (isSuccess) {
       reset();
-      if (needsWrap) {
-        resetWrap();
-        setToast({
-          actionTitle: "Wrapped",
-          actionDescription: "",
-          hash,
-        });
-        return;
-      }
+      // if (needsWrap) {
+      //   resetWrap();
+      //   setToast({
+      //     actionTitle: "Wrapped",
+      //     actionDescription: "",
+      //     hash,
+      //   });
+      //   return;
+      // }
       if (token0NeedsApproval) {
         queryClient.invalidateQueries({ queryKey: token0AllowanceKey });
         setToast({
@@ -261,7 +256,7 @@ export default function AddLiquidityCard() {
           actionDescription: "",
           hash,
         });
-        resetAfterSwap();
+        resetAfterLPProvision();
         setAmount0("");
         setAmount1("");
       }
@@ -269,22 +264,17 @@ export default function AddLiquidityCard() {
   }, [
     hash,
     isSuccess,
-    needsWrap,
     queryClient,
     reset,
-    resetAfterSwap,
-    resetWrap,
+    resetAfterLPProvision,
     setToast,
     token0AllowanceKey,
     token0NeedsApproval,
     token1AllowanceKey,
     token1NeedsApproval,
   ]);
+
   const onSubmit = useCallback(() => {
-    if (needsWrap && depositSimulation.data?.request) {
-      writeContract(depositSimulation.data?.request);
-      return;
-    }
     if (token0NeedsApproval && token0ApprovalWriteRequest) {
       writeContract(token0ApprovalWriteRequest);
       return;
@@ -303,8 +293,6 @@ export default function AddLiquidityCard() {
       }
     }
   }, [
-    needsWrap,
-    depositSimulation.data?.request,
     token0NeedsApproval,
     token0ApprovalWriteRequest,
     token1NeedsApproval,
@@ -324,17 +312,16 @@ export default function AddLiquidityCard() {
     }
   }, [token0, token1, token0NeedsApproval, token1NeedsApproval]);
 
-  let stateValid = useMemo(
+  const stateValid = useMemo(
     () =>
-      (!!token0 &&
-        !!token1 &&
-        (!token0NeedsApproval && !token1NeedsApproval
-          ? (Boolean(addLiquidityETHSimulation.data?.request) ||
-              Boolean(addLiquiditySimulation.data?.request)) &&
-            amountADesired > 0n &&
-            amountBDesired > 0n
-          : true)) ||
-      needsWrap,
+      !!token0 &&
+      !!token1 &&
+      (!token0NeedsApproval && !token1NeedsApproval
+        ? (Boolean(addLiquidityETHSimulation.data?.request) ||
+            Boolean(addLiquiditySimulation.data?.request)) &&
+          amountADesired > 0n &&
+          amountBDesired > 0n
+        : true),
     [
       token0,
       token1,
@@ -344,20 +331,18 @@ export default function AddLiquidityCard() {
       addLiquiditySimulation.data?.request,
       amountADesired,
       amountBDesired,
-      needsWrap,
     ]
   );
-  const { isValid, errorMessage } = useInitializePoolValidation({
+
+  const { isValid: poolInitValid, errorMessage } = useInitializePoolValidation({
     amount0,
-    needsWrap,
+    needsWrap: false,
     amount1,
     token0,
     token1,
     balance0,
     balance1,
   });
-
-  stateValid = stateValid && isValid;
 
   const { state: buttonState } = useGetButtonStatuses({
     isLoading,
@@ -374,10 +359,13 @@ export default function AddLiquidityCard() {
         return;
       }
       if (quoteLiquidity && pairExists) {
-        const num = formatUnits(quoteLiquidity, token1?.decimals ?? 18);
+        let num = parseFloat(
+          formatUnits(quoteLiquidity, asset1?.decimals ?? 18)
+        );
+        num = Math.floor(num * 100) / 100;
         setAmount1(num.toString());
       }
-      if (amount0 === "" && pairExists) {
+      if (isNaN(Number(amount0)) || (Number(amount0) <= 0 && pairExists)) {
         setAmount1("");
       }
     } else {
@@ -385,11 +373,13 @@ export default function AddLiquidityCard() {
         setAmount0(amount0);
       }
       if (quoteLiquidity && pairExists) {
-        console.log(quoteLiquidity);
-        const num = formatUnits(quoteLiquidity, token0?.decimals ?? 18);
-        setAmount0(num);
+        let num = parseFloat(
+          formatUnits(quoteLiquidity, asset1?.decimals ?? 18)
+        );
+        num = Math.floor(num * 100) / 100;
+        setAmount0(num.toString());
       }
-      if (amount1 === "" && pairExists) {
+      if (isNaN(Number(amount1)) || (Number(amount1) <= 0 && pairExists)) {
         setAmount0("");
       }
     }
@@ -399,10 +389,14 @@ export default function AddLiquidityCard() {
     pairExists,
     quoteLiquidity,
     selectedInput,
-    token0?.decimals,
-    token1?.decimals,
+    asset0?.decimals,
+    asset1?.decimals,
   ]);
-  console.log({ addLiquiditySimulation });
+
+  useEffect(() => {
+    if (!asset0 || !asset1) routerNav.push("/");
+  }, [asset0, asset1, routerNav]);
+
   return (
     <>
       <h2 className="text-xl">
@@ -485,7 +479,7 @@ export default function AddLiquidityCard() {
               <span>Amount</span>
               <span>
                 <DisplayFormattedNumber
-                  num={formatNumber(formatUnits(balance ?? 0n, 18))}
+                  num={formatNumber(formatUnits(lpBalance, 18))}
                 />{" "}
                 lp
               </span>
@@ -495,12 +489,12 @@ export default function AddLiquidityCard() {
       )}
       <SubmitButton
         state={buttonState}
-        isValid={stateValid}
+        isValid={stateValid || poolInitValid}
         validationError={errorMessage}
         approveTokenSymbol={tokenNeedingApproval?.symbol}
         onClick={onSubmit}
       >
-        {needsWrap ? "Wrap" : "Add Liquidity"}
+        Add Liquidity
       </SubmitButton>
     </>
   );

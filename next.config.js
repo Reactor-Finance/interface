@@ -17,7 +17,7 @@ const nextConfig = {
     return [
       {
         source: "/api/rpc",
-        destination: process.env.NEXT_PUBLIC_RPC_URL,
+        destination: process.env.RPC_URL,
       },
       {
         source: "/api/points/leaderboard",

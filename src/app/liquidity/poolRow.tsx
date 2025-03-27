@@ -8,16 +8,16 @@ import { useRouter } from "next/navigation";
 import { useTokenlistContext } from "@/contexts/tokenlistContext";
 import { formatNumber } from "@/lib/utils";
 import { formatEther } from "viem";
-import { TPoolExtended } from "@/contexts/poolsTvl";
+import { TPoolExtended } from "@/contexts/pairsProvider";
 
 export default function PoolRow({
   stable,
   token0,
   token1,
   emissions,
-  tvlInUsd,
-  feeInUsd,
-  volumeInUsd7D,
+  tvl,
+  fees,
+  volume24hr,
   reserve0,
   reserve1,
   ...poolData
@@ -65,12 +65,12 @@ export default function PoolRow({
           />
         )}
       </th>
-      <th className="">${formatNumber(formatEther(tvlInUsd))}</th>
+      <th className="">${formatNumber(formatEther(tvl))}</th>
       <th className="text-blue-light hidden lg:block">
         {formatNumber(formatEther(emissions))}%
       </th>
-      <th className="hidden lg:block">${feeInUsd}</th>
-      <th>${formatNumber(formatEther(volumeInUsd7D))}</th>
+      <th className="hidden lg:block">${fees}</th>
+      <th>${formatNumber(formatEther(volume24hr))}</th>
       <th className="text-left pl-4  lg:col-span-3 ">
         <div className="flex justify-between">
           <span></span>

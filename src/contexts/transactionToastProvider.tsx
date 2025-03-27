@@ -1,11 +1,14 @@
 "use client";
 import React, { createContext, useCallback, useContext, useState } from "react";
 import { Address } from "viem";
+
+// Always ensure there's ample space between your imports and the rest of the code. It makes it cleaner and readable
 type Toast = {
   hash: Address | undefined;
   actionTitle: string | undefined;
   actionDescription: string | undefined;
 };
+
 interface State {
   toastInfo:
     | {
@@ -19,6 +22,7 @@ interface State {
 const initialState: State = {
   toastInfo: undefined,
 };
+
 interface ContextType {
   state: State;
   setToast: (toast: Toast | undefined) => void;

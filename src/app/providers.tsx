@@ -14,7 +14,7 @@ import { createConfig, http, WagmiProvider } from "wagmi";
 import { TRPCReactProvider } from "@/trpc/react";
 import { TokenlistContextProvider } from "@/contexts/tokenlistContext";
 import { TransactionToastProvider } from "@/contexts/transactionToastProvider";
-import { PoolslistContextProvider } from "@/contexts/poolsTvl";
+import { PoolslistContextProvider } from "@/contexts/pairsProvider";
 import {
   metaMaskWallet,
   phantomWallet,

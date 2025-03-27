@@ -1,7 +1,7 @@
 import { TableRow } from "@/components/ui/table";
 import React from "react";
 
-export default function PoolRowSkeleton() {
+export default function VoteRowSkeleton() {
   return (
     <TableRow cols="11">
       <th className="col-span-4  rounded-md animate-pulse text-left flex">

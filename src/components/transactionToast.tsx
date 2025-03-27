@@ -1,12 +1,18 @@
 "use client";
 import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
+import { EXPLORERS } from "@/data/constants";
 import useOutBounce from "@/lib/hooks/useOutBounce";
 import { Check, ExternalLink, X } from "lucide-react";
 import Link from "next/link";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
+import { useChainId } from "wagmi";
 
 export default function TransactionToast() {
+  const chainId = useChainId();
+  const explorer = useMemo(() => EXPLORERS[chainId], [chainId]);
   const { state, setToast } = useTransactionToastProvider();
+  const toastInfo = useOutBounce({ value: state.toastInfo, duration: 400 });
+
   useEffect(() => {
     if (state.toastInfo) {
       const clear = setTimeout(() => {
@@ -15,7 +21,7 @@ export default function TransactionToast() {
       return () => clearTimeout(clear);
     }
   }, [setToast, state.toastInfo]);
-  const toastInfo = useOutBounce({ value: state.toastInfo, duration: 400 });
+
   return (
     <div
       data-state={state.toastInfo ? "open" : "closed"}
@@ -42,7 +48,7 @@ export default function TransactionToast() {
           <span className="font-medium">{toastInfo?.actionTitle}</span>
         </div>
         <Link
-          href={`https://testnet.monadexplorer.com/tx/${state.toastInfo?.hash}`}
+          href={`${explorer}/tx/${state.toastInfo?.hash}`}
           className="flex gap-x-1 text-[11px] text-success-400 z-10"
           target="_blank"
         >

@@ -22,6 +22,7 @@ import { formatNumber } from "@/lib/utils";
 import { useAtomicDate } from "@/lib/hooks/useAtomicDate";
 import { useQueryClient } from "@tanstack/react-query";
 import { useVeNFTsProvider } from "@/contexts/veNFTsProvider";
+import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
 
 // Local constants
 const YEARS_2 = 62208000;
@@ -38,6 +39,7 @@ export default function CreateLockDialog() {
   const { queryKey: locksQueryKey } = useVeNFTsProvider();
   const rctBalance = useGetBalance({ tokenAddress: rct });
   const { writeContract, reset, data: hash, isPending } = useWriteContract();
+  const { setToast } = useTransactionToastProvider();
   const { isLoading, isSuccess } = useWaitForTransactionReceipt({
     hash,
   });
@@ -64,7 +66,7 @@ export default function CreateLockDialog() {
       resetApproval();
     }
     if (isSuccess && !needsApproval) {
-      queryClient.invalidateQueries({ queryKey: rctBalance.balanceQueryKey });
+      queryClient.invalidateQueries({ queryKey: rctBalance.queryKey });
       queryClient.invalidateQueries({ queryKey: locksQueryKey });
       reset();
     }
@@ -73,7 +75,7 @@ export default function CreateLockDialog() {
     locksQueryKey,
     needsApproval,
     queryClient,
-    rctBalance.balanceQueryKey,
+    rctBalance.queryKey,
     reset,
     resetApproval,
   ]);
@@ -85,11 +87,25 @@ export default function CreateLockDialog() {
   const onSubmit = useCallback(() => {
     if (needsApproval && approveWriteRequest) {
       reset(); // Reset state first
-      writeContract(approveWriteRequest);
+      writeContract(approveWriteRequest, {
+        onSuccess: (_data) =>
+          setToast({
+            hash: _data,
+            actionTitle: "Approved to spend RCT",
+            actionDescription: "Escrow was permitted to spend your RCT",
+          }),
+      });
       return;
     }
     if (createLockSimulation) {
-      writeContract(createLockSimulation.request);
+      writeContract(createLockSimulation.request, {
+        onSuccess: (_data) =>
+          setToast({
+            hash: _data,
+            actionTitle: "Created lock",
+            actionDescription: "Lock was successfully created",
+          }),
+      });
     }
   }, [
     needsApproval,
@@ -97,6 +113,7 @@ export default function CreateLockDialog() {
     createLockSimulation,
     reset,
     writeContract,
+    setToast,
   ]);
 
   const { state } = useGetButtonStatuses({

@@ -1,4 +1,4 @@
-export const ExchangeHelper = [
+export const abi = [
   {
     inputs: [],
     stateMutability: "nonpayable",
@@ -69,12 +69,64 @@ export const ExchangeHelper = [
   },
   {
     inputs: [],
+    name: "getBribesInUSDForAllPairs",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "totalValue",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256[]",
+        name: "bribes",
+        type: "uint256[]",
+      },
+      {
+        internalType: "contract Pair[]",
+        name: "pairs",
+        type: "address[]",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "contract Pair",
+        name: "pair",
+        type: "address",
+      },
+    ],
+    name: "getBribesInUSDForPair",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "totalValue",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "getFeesInUSDForAllPairs",
     outputs: [
       {
         internalType: "uint256",
         name: "totalValue",
         type: "uint256",
+      },
+      {
+        internalType: "uint256[]",
+        name: "fees",
+        type: "uint256[]",
+      },
+      {
+        internalType: "contract Pair[]",
+        name: "pairs",
+        type: "address[]",
       },
     ],
     stateMutability: "view",
@@ -100,52 +152,6 @@ export const ExchangeHelper = [
     type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "from",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "to",
-        type: "uint256",
-      },
-    ],
-    name: "getPoolData",
-    outputs: [
-      {
-        components: [
-          {
-            internalType: "address",
-            name: "pair",
-            type: "address",
-          },
-          {
-            internalType: "uint256",
-            name: "fee7",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "tvl",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "volume24",
-            type: "uint256",
-          },
-        ],
-        internalType: "struct ExchangeHelper.PoolData[]",
-        name: "pairFees",
-        type: "tuple[]",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
     inputs: [],
     name: "getTVLInUSDForAllPairs",
     outputs: [
@@ -153,6 +159,16 @@ export const ExchangeHelper = [
         internalType: "uint256",
         name: "totalTVL",
         type: "uint256",
+      },
+      {
+        internalType: "uint256[]",
+        name: "tvls",
+        type: "uint256[]",
+      },
+      {
+        internalType: "contract Pair[]",
+        name: "pairs",
+        type: "address[]",
       },
     ],
     stateMutability: "view",
@@ -206,6 +222,16 @@ export const ExchangeHelper = [
         internalType: "uint256",
         name: "tvlPerTime",
         type: "uint256",
+      },
+      {
+        internalType: "uint256[]",
+        name: "volumes",
+        type: "uint256[]",
+      },
+      {
+        internalType: "contract Pair[]",
+        name: "pairs",
+        type: "address[]",
       },
     ],
     stateMutability: "view",

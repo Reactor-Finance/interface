@@ -10,6 +10,8 @@ import React, {
   useState,
 } from "react";
 import { useAccount } from "wagmi";
+
+// Always give space between imports and the rest of the code
 export type TVeNFTsToken = {
   decimals: number;
   voted: boolean;
@@ -29,6 +31,7 @@ export type TVeNFTsToken = {
   tokenSymbol: string;
   tokenDecimals: bigint;
 };
+
 interface VeNFTsProviderType {
   lockTokens: readonly TVeNFTsToken[];
   selectedVeNFTsToken: TVeNFTsToken | undefined;
@@ -38,49 +41,49 @@ interface VeNFTsProviderType {
   queryKey: readonly unknown[];
 }
 
-const LiquidityContext = createContext<VeNFTsProviderType | undefined>(
-  undefined
-);
+const VeNFTContext = createContext<VeNFTsProviderType | undefined>(undefined);
+
 interface Props {
   children: React.ReactNode;
 }
 
 export const VeNFTsProvider = ({ children }: Props) => {
   const { address } = useAccount();
-  const { data: locks, queryKey } = useCheckUserVeNFTs();
+  const { data: locks = [], queryKey } = useCheckUserVeNFTs();
   const [selectedTokenId, setSelectedTokenId] = useState<string>("");
   const selectedVeNFTsToken = useMemo(() => {
-    return locks?.find((token) => token.id.toString() === selectedTokenId);
+    return locks.find((token) => String(token.id) === selectedTokenId);
   }, [locks, selectedTokenId]);
-  useEffect(() => {
-    if (address) {
-      setSelectedTokenId("");
-    }
-  }, [address]);
   const queryClient = useQueryClient();
   const reset = useCallback(() => {
     queryClient.invalidateQueries({ queryKey });
   }, [queryClient, queryKey]);
 
+  useEffect(() => {
+    if (address) {
+      setSelectedTokenId("");
+    }
+  }, [address]);
+
   return (
-    <LiquidityContext.Provider
+    <VeNFTContext.Provider
       value={{
         reset,
         selectedVeNFTsToken,
         setSelectedTokenId,
         selectedTokenId,
         queryKey,
-        lockTokens: locks ?? [],
+        lockTokens: locks,
       }}
     >
       {children}
-    </LiquidityContext.Provider>
+    </VeNFTContext.Provider>
   );
 };
 
 // Custom hook to use the context
 export const useVeNFTsProvider = () => {
-  const context = useContext(LiquidityContext);
+  const context = useContext(VeNFTContext);
   if (!context) {
     throw new Error("useVeNFTsProvider must be used within a VeNFTsProvider");
   }

@@ -41,6 +41,13 @@ export const RCT: { [key: number]: `0x${string}` } = {
   [ChainId.MONAD_TESTNET]: "0x02B8FcBE1D7ff6D6652C3A332B6a7B71392B6251",
 };
 export const EXCHANGE_HELPER: { [key: number]: `0x${string}` } = {
-  [ChainId.MONAD_TESTNET]: "0x0159f1cfE00e287f84d9d4D974Da2FEF1D6099Ac",
+  [ChainId.MONAD_TESTNET]: "0x9cb90faa71fb6dfd8aaB747460080C52CA9B0B23",
+};
+export const VAS: { [key: number]: `0x${string}` } = {
+  [ChainId.MONAD_TESTNET]: "0xe0C2aC5716da69382a3ba3C20E43b91Ada068Fb6",
 };
 export const ETHER = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+// Explorer links
+export const EXPLORERS: { [key: number]: string } = {
+  [ChainId.MONAD_TESTNET]: "https://testnet.monadexplorer.com",
+};

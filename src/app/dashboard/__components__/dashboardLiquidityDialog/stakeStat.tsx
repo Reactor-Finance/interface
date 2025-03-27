@@ -1,31 +1,43 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { StatRow } from "./statRow";
 import { TToken } from "@/lib/types";
 import { formatUnits } from "viem";
+
 interface Props {
   action: "stake" | "unstake";
-  percent: string;
+  percent: number | string;
   token0: TToken | undefined;
   token1: TToken | undefined;
-  userTokens0: bigint;
-  userTokens1: bigint;
+  balance0: bigint;
+  balance1: bigint;
 }
+
 export default function StakeStats({
   percent,
   token0,
   token1,
-  userTokens0,
-  userTokens1,
+  balance0,
+  balance1,
   action,
 }: Props) {
-  const a = (userTokens0 * BigInt(percent)) / 100n;
-  const b = (userTokens1 * BigInt(percent)) / 100n;
-  const verb = action === "stake" ? "To stake" : "To unstake";
+  const a = useMemo(
+    () => (balance0 * BigInt(percent)) / 100n,
+    [balance0, percent]
+  );
+  const b = useMemo(
+    () => (balance1 * BigInt(percent)) / 100n,
+    [balance1, percent]
+  );
+  const verb = useMemo(
+    () => (action === "stake" ? "To stake" : "To unstake"),
+    [action]
+  );
+
   return (
     <div className="space-y-2">
       <StatRow
         title={action === "stake" ? "Stake" : "Unstake"}
-        value={percent + "%"}
+        value={String(percent) + "%"}
       />
       <StatRow
         title={verb + " " + token0?.symbol}

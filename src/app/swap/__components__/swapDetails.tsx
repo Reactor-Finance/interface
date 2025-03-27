@@ -6,12 +6,13 @@ import { formatUnits } from "viem";
 import { TToken } from "@/lib/types";
 import { useAtom } from "jotai/react";
 import { settingDialogOpenAtom, slippageAtom } from "@/store";
-import { ChainId, EXCHANGE_HELPER, SLIPPAGE_ZEROS } from "@/data/constants";
+import { EXCHANGE_HELPER, SLIPPAGE_ZEROS } from "@/data/constants";
 import { useGetMarketQuote } from "@/lib/hooks/useGetMarketQuote";
-import { useReadContract } from "wagmi";
-import { ExchangeHelper } from "@/lib/abis/ExchangeHelper";
+import { useChainId, useReadContract } from "wagmi";
+import * as ExchangeHelper from "@/lib/abis/ExchangeHelper";
 import { formatNumber } from "@/lib/utils";
 import DisplayFormattedNumber from "@/components/shared/displayFormattedNumber";
+
 interface Props {
   amountIn: bigint;
   amountOut: bigint;
@@ -24,11 +25,11 @@ export default function SwapDetails({
   token0,
   token1,
 }: Props) {
+  const chainId = useChainId();
   const [open, setOpen] = useState(false);
   const [slippage] = useAtom(slippageAtom);
 
-  const dialog = useAtom(settingDialogOpenAtom);
-  const setDialogOpen = dialog[1];
+  const [, setDialogOpen] = useAtom(settingDialogOpenAtom);
 
   const { per, min } = useMemo(() => {
     if (amountOut === 0n) {
@@ -49,9 +50,10 @@ export default function SwapDetails({
   // address tokenB,
   // uint256 amountIn,
   // bool multiHops
+  const exchangeHelper = useMemo(() => EXCHANGE_HELPER[chainId], [chainId]);
   const { data: priceImpact = BigInt(0) } = useReadContract({
-    abi: ExchangeHelper,
-    address: EXCHANGE_HELPER[ChainId.MONAD_TESTNET],
+    ...ExchangeHelper,
+    address: exchangeHelper,
     functionName: "calculatePriceImpact",
     args: [token0.address, token1.address, amountIn, false],
   });
