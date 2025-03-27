@@ -26,7 +26,7 @@ export default function ClaimAllLocks() {
     tokenIds,
     enableQuery: !needsApproval,
   });
-  const { writeContract, reset, isPending, data: hash } = useWriteContract();
+  const { writeContract, reset, isPending } = useWriteContract();
   const { setToast } = useTransactionToastProvider();
   const queryClient = useQueryClient();
 
@@ -34,7 +34,7 @@ export default function ClaimAllLocks() {
     if (needsApproval && approveManySimulation) {
       reset();
       writeContract(approveManySimulation.request, {
-        onSuccess: () => {
+        onSuccess: (hash) => {
           queryClient.invalidateQueries({ queryKey: approveManyQueryKey });
           setToast({
             hash,
@@ -48,7 +48,7 @@ export default function ClaimAllLocks() {
     if (simulation) {
       reset();
       writeContract(simulation.request, {
-        onSuccess: () => {
+        onSuccess: (hash) => {
           setToast({
             hash,
             actionTitle: "Transaction successful",
@@ -58,14 +58,7 @@ export default function ClaimAllLocks() {
       });
       return;
     }
-  }, [
-    needsApproval,
-    approveManySimulation,
-    simulation,
-    queryClient,
-    hash,
-    setToast,
-  ]);
+  }, [needsApproval, approveManySimulation, simulation, queryClient, setToast]);
 
   const isValid = useMemo(
     () =>
@@ -73,6 +66,7 @@ export default function ClaimAllLocks() {
     [simulation, approveManySimulation, needsApproval]
   );
   const { isConnected } = useAccount();
+
   return (
     isConnected && (
       <Button

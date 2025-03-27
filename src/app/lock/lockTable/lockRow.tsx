@@ -1,13 +1,19 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { TLockToken } from "../types";
 import logo from "@/assets/reactor-symbol.svg";
 import { formatUnits } from "viem";
 import { formatNumber } from "@/lib/utils";
-import { RCT_DECIMALS } from "@/data/constants";
+import { RCT_DECIMALS, VAS } from "@/data/constants";
 import { useAtomicDate } from "@/lib/hooks/useAtomicDate";
+import { useChainId, useWriteContract } from "wagmi";
+import { useVeApprovalForSingle } from "@/lib/hooks/useVeApprovalsSimulate";
+import { useVasClaimForSingleToken } from "@/lib/hooks/useVasClaims";
+import { useTransactionToastProvider } from "@/contexts/transactionToastProvider";
+import { useQueryClient } from "@tanstack/react-query";
+import Spinner from "@/components/ui/spinner";
 
 enum TokenStatus {
   ACTIVE = "Active",
@@ -26,6 +32,8 @@ export default function LockRow({
   token,
   onLockActionMenuClicked,
 }: Props) {
+  const chainId = useChainId();
+  const vas = useMemo(() => VAS[chainId], [chainId]);
   const unlockDate = useMemo(
     () => new Date(Number(token.lockEnd) * 1000),
     [token]
@@ -42,6 +50,54 @@ export default function LockRow({
   const apr = useMemo(
     () => (token.rebase_amount * 100n) / token.amount,
     [token]
+  );
+
+  const {
+    needsApproval,
+    simulation: approvalSimulation,
+    queryKey: approvalQueryKey,
+  } = useVeApprovalForSingle({ spender: vas, tokenId: token.id });
+  const { data: simulation } = useVasClaimForSingleToken({
+    tokenId: token.id,
+    enableQuery: !needsApproval,
+  });
+  const { writeContract, reset, isPending } = useWriteContract();
+  const { setToast } = useTransactionToastProvider();
+  const queryClient = useQueryClient();
+
+  const onSubmit = useCallback(() => {
+    if (needsApproval && approvalSimulation) {
+      reset();
+      writeContract(approvalSimulation.request, {
+        onSuccess: (hash) => {
+          queryClient.invalidateQueries({ queryKey: approvalQueryKey });
+          setToast({
+            hash,
+            actionTitle: "Approved",
+            actionDescription: "You gave approval to spend your NFTs",
+          });
+        },
+      });
+      return;
+    }
+    if (simulation) {
+      reset();
+      writeContract(simulation.request, {
+        onSuccess: (hash) => {
+          setToast({
+            hash,
+            actionTitle: "Transaction successful",
+            actionDescription: "You have successfully claimed reward",
+          });
+        },
+      });
+      return;
+    }
+  }, [needsApproval, approvalSimulation, simulation, queryClient, setToast]);
+
+  const isValid = useMemo(
+    () => Boolean(simulation) || (needsApproval && Boolean(approvalSimulation)),
+    [simulation, approvalSimulation, needsApproval]
   );
 
   return (
@@ -84,8 +140,17 @@ export default function LockRow({
       </td>
       <td>
         <div className="flex gap-x-4 justify-end">
-          <Button variant={"primary"} size="sm">
-            Claim
+          <Button
+            onClick={onSubmit}
+            disabled={!isValid || isPending}
+            variant={"primary"}
+            size="sm"
+          >
+            {isPending ? (
+              <Spinner />
+            ) : (
+              <>{needsApproval ? "Approve" : "Claim"}</>
+            )}
           </Button>
           <Button
             onClick={() => {

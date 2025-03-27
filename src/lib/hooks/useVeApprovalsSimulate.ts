@@ -48,7 +48,7 @@ export function useVeApprovalForSingle({
 
   return {
     simulation:
-      isApprovedOrOwner && simulation?.request ? simulation : undefined,
+      !isApprovedOrOwner && simulation?.request ? simulation : undefined,
     isLoading: isLoading || isFetching || isPending,
     needsApproval: !isApprovedOrOwner,
     queryKey: isApprovedOrOwnerQueryKey,
@@ -67,6 +67,7 @@ export function useVeApprovalForMany({ spender }: { spender: Address }) {
       args: [address, spender],
       query: {
         enabled: spender !== zeroAddress && address !== zeroAddress,
+        refetchInterval: 60000, // Refetch per minute
       },
     });
   const {
@@ -86,7 +87,7 @@ export function useVeApprovalForMany({ spender }: { spender: Address }) {
 
   return {
     simulation:
-      isApprovedForAll && simulation?.request ? simulation : undefined,
+      !isApprovedForAll && simulation?.request ? simulation : undefined,
     isLoading: isLoading || isFetching || isPending,
     needsApproval: !isApprovedForAll,
     queryKey: isApprovedForAllQueryKey,
