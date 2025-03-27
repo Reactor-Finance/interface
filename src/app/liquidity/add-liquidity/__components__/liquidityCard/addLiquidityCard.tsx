@@ -116,6 +116,7 @@ export default function AddLiquidityCard() {
         ? (asset0?.decimals ?? 18)
         : (asset1?.decimals ?? 18),
     stable: version === "stable",
+    quoting: selectedInput === "0" ? "in" : "out",
     amountIn: parseUnits(
       selectedInput === "0" ? amount0 : amount1,
       asset0?.decimals ?? 18
