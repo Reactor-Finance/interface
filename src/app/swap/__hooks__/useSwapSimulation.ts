@@ -5,9 +5,9 @@ import { parseEther, parseUnits, zeroAddress } from "viem";
 import { ETHER, ROUTER, WETH } from "@/data/constants";
 import { TToken } from "@/lib/types";
 import { useAtomicDate } from "@/lib/hooks/useAtomicDate";
-import { useAtom } from "jotai/react";
 import { multiHopsAtom, slippageAtom, transactionDeadlineAtom } from "@/store";
 import { convertETHToWETHIfApplicable } from "@/utils";
+import { useAtom } from "jotai";
 
 type SwapRoute = {
   from: `0x${string}`;

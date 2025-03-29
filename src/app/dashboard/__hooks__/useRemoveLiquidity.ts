@@ -2,7 +2,7 @@ import { ROUTER, WETH } from "@/data/constants";
 import * as Router from "@/lib/abis/Router";
 import { useAtomicDate } from "@/lib/hooks/useAtomicDate";
 import { transactionDeadlineAtom } from "@/store";
-import { useAtom } from "jotai/react";
+import { useAtom } from "jotai";
 import { useMemo } from "react";
 import { Address, zeroAddress } from "viem";
 import { useAccount, useChainId, useSimulateContract } from "wagmi";

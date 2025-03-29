@@ -10,7 +10,7 @@ import {
   transactionDeadlineAtom,
 } from "@/store";
 import { inputPatternNumberMatch } from "@/utils";
-import { useAtom } from "jotai/react";
+import { useAtom } from "jotai";
 import { Settings } from "lucide-react";
 import React, { useCallback, useEffect, useState } from "react";
 type State = {
