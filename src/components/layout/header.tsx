@@ -8,6 +8,7 @@ import { CustomConnectButton } from "./customConnectButton";
 import { useAccount } from "wagmi";
 import usePointsAccount from "@/app/points/__hooks__/usePointsAccount";
 import SideNav from "./sideNav";
+
 export default function Header() {
   const { isConnected } = useAccount();
   const router = useRouter();
@@ -31,12 +32,13 @@ export default function Header() {
 
       <div className="col-span-2 hidden lg:block">
         {isConnected && (
-          <ul className="grid justify-center  grid-cols-4 place-items-center text-[14px]">
+          <ul className="flex justify-evenly items-center gap-3 text-[14px]">
             <NavLink href="/swap">Swap</NavLink>
-            <NavLink href="/liquidity">Liquidity</NavLink>
             <NavLink href="/dashboard">Dashboard</NavLink>
+            <NavLink href="/liquidity">Liquidity</NavLink>
+            <NavLink href="/voting">Vote</NavLink>
+            <NavLink href="/lock">Lock</NavLink>
             <NavLink href="/points">Points</NavLink>
-            {/* <NavLink href="/lock">Lock</NavLink> */}
           </ul>
         )}
       </div>

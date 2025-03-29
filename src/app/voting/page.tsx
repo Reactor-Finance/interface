@@ -9,14 +9,19 @@ import { VoteProvider } from "./__contexts__/voteProvider";
 import VotePower from "./__components__/votePower";
 import VoteDropdown from "./__components__/voteDropdown";
 import { useChainId, useReadContract } from "wagmi";
-import { EXCHANGE_HELPER } from "@/data/constants";
+import { EXCHANGE_HELPER, VOTER } from "@/data/constants";
 import * as ExchangeHelper from "@/lib/abis/ExchangeHelper";
+import * as Voter from "@/lib/abis/Voter";
 import { formatNumber } from "@/lib/utils";
 import { formatEther } from "viem";
+// import { useAtomicDate } from "@/lib/hooks/useAtomicDate";
+import ReactCountdown from "react-countdown";
 
 export default function Page() {
   const chainId = useChainId();
   const exchangeHelper = useMemo(() => EXCHANGE_HELPER[chainId], [chainId]);
+  const voter = useMemo(() => VOTER[chainId], [chainId]);
+  // const now = useAtomicDate();
   // Stats
   const { data: fees = [BigInt(0)] } = useReadContract({
     ...ExchangeHelper,
@@ -28,6 +33,16 @@ export default function Page() {
     address: exchangeHelper,
     functionName: "getBribesInUSDForAllPairs",
   });
+  const { data: currentEpoch = BigInt(0) } = useReadContract({
+    ...Voter,
+    address: voter,
+    functionName: "_epochTimestamp",
+  });
+
+  const endsIn = useMemo(() => {
+    const week = BigInt(60 * 60 * 24 * 7);
+    return (currentEpoch + week) * 1000n;
+  }, [currentEpoch]);
   return (
     <PageMarginContainer>
       <div className="rounded-lg flex flex-col sm:flex-row justify-between items-stretch  gap-y-6 sm:gap-y-0 sm:gap-x-16">
@@ -60,10 +75,23 @@ export default function Page() {
               ${formatNumber(formatEther(fees[0] + incentives[0]))}
             </p>
           </div>
-          <div className="flex justify-between gap-x-6">
-            <p className="text-neutral-400 text-sm">Epoch #85 Ends in:</p>
-            <p className="text-neutral-100 text-sm">06:17:52:36</p>
-          </div>
+          <ReactCountdown
+            date={Number(endsIn)}
+            renderer={({ days, hours, minutes, seconds, completed }) => (
+              <div className="flex justify-between gap-x-6">
+                <p className="text-neutral-400 text-sm">
+                  Current epoch ends in:
+                </p>
+                {!completed ? (
+                  <p className="text-neutral-100 text-sm">
+                    {days}:{hours}:{minutes}:{seconds}
+                  </p>
+                ) : (
+                  <p className="text-neutral-100 text-sm">Completed</p>
+                )}
+              </div>
+            )}
+          />
         </div>
       </div>
       <div className="pt-12"></div>

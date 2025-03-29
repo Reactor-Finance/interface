@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { cva, VariantProps } from "class-variance-authority";
+import { VariantProps, cva } from "class-variance-authority";
 import React, { forwardRef } from "react";
 
 export function Table({ children }: { children: React.ReactNode }) {

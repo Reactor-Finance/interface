@@ -2,7 +2,7 @@
 
 import { ASSETS_REPO_SLUG } from "@/data/serverConstants";
 import { octokit } from "@/lib/octokit";
-import { TokenlistSchema, TToken } from "@/lib/types";
+import { TToken, TokenlistSchema } from "@/lib/types";
 import { z } from "zod";
 
 export async function getTokenlist(chainId: number) {

@@ -16,6 +16,7 @@ export default [
     extends: ["next"],
     rules: {
       "@typescript-eslint/no-explicit-any": "warn",
+      "sort-imports": "warn",
     },
   }),
 ];

@@ -1,7 +1,7 @@
 import React from "react";
 import ImageWithFallback from "./imageWithFallback";
 import { TToken } from "@/lib/types";
-import { cva, VariantProps } from "class-variance-authority";
+import { VariantProps, cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const variants = cva("rounded-full", {

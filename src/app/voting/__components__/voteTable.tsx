@@ -13,7 +13,10 @@ export default function VoteTable() {
   const prunedData = useMemo(
     () =>
       pools.filter(
-        (p) => p.pair_address !== zeroAddress && p.total_supply > 0n
+        (p) =>
+          p.pair_address !== zeroAddress &&
+          p.gauge !== zeroAddress &&
+          p.total_supply > 0n
       ),
     [pools]
   );

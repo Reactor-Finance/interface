@@ -3,7 +3,7 @@ import {
   executeFindPool,
   findPoolSchema,
 } from "@/server/queries/pools/getFindPools";
-import { executeGetPools, FilterSchema } from "@/server/queries/pools/getPools";
+import { FilterSchema, executeGetPools } from "@/server/queries/pools/getPools";
 import { zeroAddress } from "viem";
 import { ChainId, EXCHANGE_HELPER, PAIR_HELPER } from "@/data/constants";
 import { abi } from "@/lib/abis/PairHelper";

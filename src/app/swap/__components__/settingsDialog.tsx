@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import Input from "@/components/ui/input";
-import { Tabs, TabsTrigger, TabsList } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { inputPatternMatch } from "@/lib/utils";
 import {
   settingDialogOpenAtom,

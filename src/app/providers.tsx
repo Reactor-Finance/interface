@@ -10,16 +10,16 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { monadTestnet } from "wagmi/chains";
 import { hashFn } from "@wagmi/core/query";
 import { FC, PropsWithChildren } from "react";
-import { createConfig, http, WagmiProvider } from "wagmi";
+import { WagmiProvider, createConfig, http } from "wagmi";
 import { TRPCReactProvider } from "@/trpc/react";
 import { TokenlistContextProvider } from "@/contexts/tokenlistContext";
 import { TransactionToastProvider } from "@/contexts/transactionToastProvider";
 import { PoolslistContextProvider } from "@/contexts/pairsProvider";
 import {
+  injectedWallet,
   metaMaskWallet,
   phantomWallet,
   walletConnectWallet,
-  injectedWallet,
 } from "@rainbow-me/rainbowkit/wallets";
 import { VeNFTsProvider } from "@/contexts/veNFTsProvider";
 const connectors = connectorsForWallets(
