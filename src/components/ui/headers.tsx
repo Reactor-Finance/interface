@@ -4,8 +4,8 @@ import Tooltip from "./tooltip";
 function GradiantHeaderOne({
   children,
 }: {
-  colorOne: string;
-  colorTwo: string;
+  colorOne?: string;
+  colorTwo?: string;
   children: ReactNode;
 }) {
   return (
