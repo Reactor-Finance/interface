@@ -16,7 +16,7 @@ import { usePoolslistContext } from "@/contexts/pairsProvider";
 
 type QueryFilters = {
   searchQuery: string;
-  isStable: boolean | undefined;
+  stability: undefined | "stable" | "volatile";
   orderBy: "none" | "tvl" | "fees" | "volume";
   orderDirection: "up" | "down";
 };
@@ -40,13 +40,9 @@ export default function PoolsTable() {
       ),
     [pools]
   );
-  const lastPage = useMemo(
-    () => Math.ceil(prunedData.length / pageLength),
-    [prunedData]
-  );
   const [filters, setFilters] = useState<QueryFilters>({
     searchQuery: "",
-    isStable: undefined,
+    stability: undefined,
     orderBy: "none",
     orderDirection: "up",
   });
@@ -58,12 +54,9 @@ export default function PoolsTable() {
     [filters]
   );
   const { debouncedValue: filtersDebounced } = useDebounce(filters, 300);
-  const poolsLength = useMemo(
-    () => pools?.filter((p) => p.pair_address !== zeroAddress).length ?? 0,
-    [pools]
-  );
-  const modifiedPools = useMemo(() => {
-    const { searchQuery, isStable, orderBy, orderDirection } = filtersDebounced;
+  const { modifiedPools, poolsLength } = useMemo(() => {
+    const { searchQuery, stability, orderBy, orderDirection } =
+      filtersDebounced;
     // First filter by search query
     let filteredPools = searchQuery.trim().length
       ? prunedData.filter(
@@ -79,8 +72,10 @@ export default function PoolsTable() {
         )
       : prunedData;
     // Filter now by stability
-    if (isStable)
-      filteredPools = filteredPools.filter((pool) => pool.stable === isStable);
+    if (stability === "stable")
+      filteredPools = filteredPools.filter((pool) => pool.stable);
+    if (stability === "volatile")
+      filteredPools = filteredPools.filter((pool) => !pool.stable);
     // Sort by TVL
     switch (orderBy) {
       case "none":
@@ -110,9 +105,14 @@ export default function PoolsTable() {
 
     const start = (page - 1) * pageLength;
     const end = page * pageLength;
-    return filteredPools.slice(start, end);
+    const modifiedPools = filteredPools.slice(start, end);
+    return { modifiedPools, poolsLength: filteredPools.length };
   }, [filtersDebounced, page, prunedData]);
 
+  const lastPage = useMemo(
+    () => Math.ceil(poolsLength / pageLength),
+    [poolsLength]
+  );
   useEffect(() => {
     if (isLoading) {
       setLoadingBounced(true);
@@ -129,21 +129,22 @@ export default function PoolsTable() {
 
   const handleTabChange = useCallback(
     (value: TabValues) => {
+      setPage(1);
       switch (value) {
         case TabValues.ALL: {
-          updateState({ isStable: undefined });
+          updateState({ stability: undefined });
           break;
         }
         case TabValues.STABLE: {
-          updateState({ isStable: true });
+          updateState({ stability: "stable" });
           break;
         }
         case TabValues.VOLATILE: {
-          updateState({ isStable: false });
+          updateState({ stability: "volatile" });
           break;
         }
         case TabValues.CONCENTRATED: {
-          updateState({ isStable: undefined });
+          updateState({ stability: undefined });
           break;
         }
       }
