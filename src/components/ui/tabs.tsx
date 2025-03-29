@@ -4,8 +4,7 @@ import * as React from "react";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
 
 import { cn } from "@/lib/utils";
-import { VariantProps } from "@heroui/react";
-import { cva } from "class-variance-authority";
+import { cva, VariantProps } from "class-variance-authority";
 
 const Tabs = TabsPrimitive.Root;
 // Define the `cva` function for styling variants
