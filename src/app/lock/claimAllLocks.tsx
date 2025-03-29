@@ -58,7 +58,16 @@ export default function ClaimAllLocks() {
       });
       return;
     }
-  }, [needsApproval, approveManySimulation, simulation, queryClient, setToast]);
+  }, [
+    needsApproval,
+    approveManySimulation,
+    simulation,
+    reset,
+    writeContract,
+    queryClient,
+    approveManyQueryKey,
+    setToast,
+  ]);
 
   const isValid = useMemo(
     () =>

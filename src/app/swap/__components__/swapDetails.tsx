@@ -4,7 +4,7 @@ import infoIcon from "@/assets/info.svg";
 import Tooltip from "@/components/ui/tooltip";
 import { formatUnits } from "viem";
 import { TToken } from "@/lib/types";
-import { useAtom } from "jotai/react";
+import { useAtom } from "jotai";
 import { settingDialogOpenAtom, slippageAtom } from "@/store";
 import { EXCHANGE_HELPER, SLIPPAGE_ZEROS } from "@/data/constants";
 import { useGetMarketQuote } from "@/lib/hooks/useGetMarketQuote";
